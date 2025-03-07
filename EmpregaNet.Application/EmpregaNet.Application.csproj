@@ -2,10 +2,14 @@
 
   <ItemGroup>
     <ProjectReference Include="..\EmpregaNet.Domain\EmpregaNet.Domain.csproj" />
+    <ProjectReference Include="..\EmpregaNet.Infra\EmpregaNet.Infra.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="MediatR" Version="12.4.1" />
+    <PackageReference Include="FluentValidation" Version="11.11.0" />
+    <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="11.11.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="9.0.2" />
   </ItemGroup>
 
   <PropertyGroup>
