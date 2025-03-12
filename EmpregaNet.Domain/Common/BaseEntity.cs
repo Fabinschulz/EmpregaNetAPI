@@ -1,9 +1,10 @@
-using System;
+using System.ComponentModel.DataAnnotations;
 
-namespace EmpregaNet.Domain.Common
+namespace EmpregaNet.Domain
 {
     public abstract class BaseEntity : IEquatable<BaseEntity>
     {
+        [Key]
         public long Id { get; private set; }
         public Guid Code { get; private set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;

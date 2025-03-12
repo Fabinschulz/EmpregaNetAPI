@@ -8,9 +8,8 @@ namespace EmpregaNet.Infra.Configurations
 {
     public static class SwaggerConfig
     {
-        public static void AddSwaggerDoc(this WebApplicationBuilder builder)
+        public static WebApplicationBuilder AddSwaggerDoc(this WebApplicationBuilder builder)
         {
-
             builder.Services.AddSwaggerGen(config =>
             {
                 config.SwaggerDoc("v1", new()
@@ -20,29 +19,30 @@ namespace EmpregaNet.Infra.Configurations
                     Description = "Uma API para cadastro de vagas de emprego",
                     License = new OpenApiLicense() { Name = "MIT", Url = new Uri("https://opensource.org/Licenses/MIT") },
                     Contact = new OpenApiContact() { Name = "Fabio Lima", Email = "fabio.lima19997@gmail.com" },
-
                 });
+
+                config.TagActionsBy(api => new[] { api.GroupName ?? "Default" });
+                config.DocInclusionPredicate((name, api) => true);
+                config.EnableAnnotations();
+                config.DocumentFilter<TagDescriptionsDocumentFilter>();
+
                 var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
                 var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
                 config.IncludeXmlComments(xmlPath);
-                config.DocumentFilter<TagDescriptionsDocumentFilter>();
             });
+
+            return builder;
         }
 
         public class TagDescriptionsDocumentFilter : IDocumentFilter
         {
-            /// <summary>
-            /// Applies the filter to the OpenApiDocument.
-            /// </summary>
             public void Apply(OpenApiDocument swaggerDoc, DocumentFilterContext context)
             {
                 swaggerDoc.Tags = new List<OpenApiTag>
-                {
-                    new OpenApiTag { Name = "EmpregaNet", Description = "EmpregaNet API" }
-                };
+            {
+                new OpenApiTag { Name = "Default", Description = "Endpoints relacionados a autenticação" },
+            };
             }
         }
-
-
     }
 }

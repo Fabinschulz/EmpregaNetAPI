@@ -1,4 +1,4 @@
-using EmpregaNet.Domain.Interfaces;
+using EmpregaNet.Infra.Interface;
 using FluentValidation.Results;
 
 namespace EmpregaNet.Application.Messages

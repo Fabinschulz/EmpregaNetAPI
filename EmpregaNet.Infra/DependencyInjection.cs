@@ -1,6 +1,5 @@
 using EmpregaNet.Domain.Entities;
 using EmpregaNet.Infra.Configurations;
-using EmpregaNet.Infra.Persistence.Database;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
@@ -9,7 +8,7 @@ namespace EmpregaNet.Infra
 {
     public static class DependencyInjection
     {
-        public static void AddDependencyInjection(this WebApplicationBuilder builder)
+        public static void AddWebApplication(this WebApplicationBuilder builder)
         {
             builder.AddSwaggerDoc();
             builder.AddDatabase();
@@ -22,6 +21,7 @@ namespace EmpregaNet.Infra
             services.AddEndpointsApiExplorer();
             services.ConfigureCorsPolicy();
             services.AddIdentityConfiguration();
+            services.RegisterServices();
         }
     }
 }

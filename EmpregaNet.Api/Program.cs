@@ -1,25 +1,28 @@
-using EmpregaNet.Domain.Entities;
+using EmpregaNet.Api.Middleware;
 using EmpregaNet.Infra;
+using EmpregaNet.Infra.Configurations;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.AddDependencyInjection();
+builder.AddWebApplication();
+
 var builderServices = builder.Services;
 builderServices.ConfigureServices();
+builderServices.AddControllers();
+builder.AddSentryMonitoring();
 
 var app = builder.Build();
 
 // builderServices.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Program).Assembly));
 
-app.MapOpenApi();
-app.UseSwagger();
-app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "EmpregaNet Api v1"));
-app.MapSwagger();
 
-app.UseHttpsRedirection();
-app.UseAuthentication();
-app.UseAuthorization();
-app.MapIdentityApi<User>();
+#region Configure Pipeline
 
-app.MapGet("/", () => "Hello World!");
-
+app.UseApiConfiguration(app.Environment);
+app.UseMiddleware<ExceptionHandlingMiddleware>();
+app.MapControllers();
 app.Run();
+
+#endregion
+
+
+
