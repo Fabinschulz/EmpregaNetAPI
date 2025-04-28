@@ -9,13 +9,13 @@ namespace EmpregaNet.Api.Controllers.Candidates
     {
         private readonly IMediator _mediator;
         private readonly IDistributedCacheService _cacheRepository;
-        private readonly IHub _sentryHub;
 
-        public CandidatesController(IMediator mediator, IDistributedCacheService cacheRepository, IHub sentryHub)
+
+        public CandidatesController(IMediator mediator, IDistributedCacheService cacheRepository)
         {
             _mediator = mediator;
             _cacheRepository = cacheRepository;
-            _sentryHub = sentryHub;
+
         }
 
         // [HttpGet("{id}")]

@@ -4,6 +4,7 @@ using System.Text.Json;
 
 namespace EmpregaNet.Api.Middleware
 {
+    // deprecated
     public class ExceptionHandlingMiddleware
     {
         private readonly RequestDelegate _next;
@@ -32,7 +33,7 @@ namespace EmpregaNet.Api.Middleware
             var errors = new string[] { };
 
             // // Captura a exceção no Sentry
-            SentrySdk.CaptureException(exception);
+            //SentrySdk.CaptureException(exception);
 
             // Tratar exceções específicas
             switch (exception)

@@ -12,7 +12,6 @@ namespace EmpregaNet.Domain.Entities
     /// </remarks>
     public class User : IdentityUser, IAggregateRoot
     {
-        public string FullName { get; set; } = string.Empty;
         public Address? Address { get; set; }
         public DateTime? BirthDate { get; set; }
         public ICollection<JobApplication> Applications { get; set; } = new List<JobApplication>();
@@ -23,11 +22,5 @@ namespace EmpregaNet.Domain.Entities
         public DateTime? UpdatedAt { get; set; } = null;
         public DateTime? DeletedAt { get; set; } = null;
         public bool IsDeleted { get; set; } = false;
-    }
-
-    public class UserLogin
-    {
-        public string Email { get; set; } = string.Empty;
-        public string Password { get; set; } = string.Empty;
     }
 }

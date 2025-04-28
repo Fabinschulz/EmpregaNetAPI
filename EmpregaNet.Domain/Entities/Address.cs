@@ -1,11 +1,12 @@
 using EmpregaNet.Domain.Enums;
+using EmpregaNet.Domain.Interface;
 
 namespace EmpregaNet.Domain.Entities
 {
     /// <summary>
     /// Entidade que representa um endereço
     /// </summary>
-    public class Address
+    public class Address : IAggregateRoot
     {
         public required string AddressName { get; set; }
 

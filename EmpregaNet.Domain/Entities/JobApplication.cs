@@ -1,12 +1,13 @@
 
 using EmpregaNet.Domain.Enums;
+using EmpregaNet.Domain.Interface;
 
 namespace EmpregaNet.Domain.Entities
 {
     /// <summary>
     /// Entidade que representa uma candidatura de um usuário a uma vaga.
     /// </summary>
-    public class JobApplication : BaseEntity
+    public class JobApplication : BaseEntity, IAggregateRoot
     {
         public DateTime ApplicationDate { get; set; } = DateTime.Now;
         public ApplicationStatus Status { get; set; }

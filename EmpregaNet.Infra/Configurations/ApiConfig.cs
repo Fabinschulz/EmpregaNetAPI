@@ -8,18 +8,6 @@ namespace EmpregaNet.Infra.Configurations
 {
     public static class ApiConfig
     {
-        public static void AddSentryMonitoring(this WebApplicationBuilder builder)
-        {
-            var sentryDsn = builder.Configuration["Sentry:Dsn"];
-
-            builder.WebHost.UseSentry(o =>
-            {
-                o.Dsn = sentryDsn;
-                o.Debug = builder.Environment.IsDevelopment();
-                o.TracesSampleRate = 1.0;
-                o.AttachStacktrace = true;
-            });
-        }
 
         public static void UseApiConfiguration(this WebApplication app, IWebHostEnvironment env)
         {

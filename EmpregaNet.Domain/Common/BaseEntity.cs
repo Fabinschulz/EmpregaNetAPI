@@ -6,7 +6,6 @@ namespace EmpregaNet.Domain
     {
         [Key]
         public long Id { get; private set; }
-        public Guid Code { get; private set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? UpdatedAt { get; set; } = null;
         public DateTime? DeletedAt { get; set; } = null;
@@ -14,7 +13,7 @@ namespace EmpregaNet.Domain
 
         public BaseEntity()
         {
-            Code = Guid.NewGuid();
+           
         }
 
         public bool Equals(BaseEntity? other)

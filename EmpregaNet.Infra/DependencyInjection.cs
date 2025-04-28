@@ -1,7 +1,6 @@
-using EmpregaNet.Domain.Entities;
 using EmpregaNet.Infra.Configurations;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace EmpregaNet.Infra
@@ -14,7 +13,7 @@ namespace EmpregaNet.Infra
             builder.AddDatabase();
         }
 
-        public static void ConfigureServices(this IServiceCollection services)
+        public static void ConfigureServices(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddOpenApi();
             services.AddControllers();
@@ -22,6 +21,7 @@ namespace EmpregaNet.Infra
             services.ConfigureCorsPolicy();
             services.AddIdentityConfiguration();
             services.RegisterServices();
+            services.Configure<ElasticsearchSettings>(configuration.GetSection("ElasticsearchSettings"));
         }
     }
 }
