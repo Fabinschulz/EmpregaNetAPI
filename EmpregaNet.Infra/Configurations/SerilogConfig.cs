@@ -57,16 +57,9 @@ namespace EmpregaNet.Infra.Configurations
                 FailureCallback = (logEvent, exception) => Log.Error(exception, $"Falha ao enviar log para Elasticsearch: {logEvent.MessageTemplate}"),
                 EmitEventFailure = EmitEventFailureHandling.WriteToSelfLog | EmitEventFailureHandling.RaiseCallback,
                 ModifyConnectionSettings = conn =>
-                {
-                    var modified = conn;
-
-                    if (!string.IsNullOrEmpty(settings.Username) && !string.IsNullOrEmpty(settings.Password))
-                    {
-                        modified = modified.BasicAuthentication(settings.Username, settings.Password);
-                    }
-
-                    return modified;
-                }
+                !string.IsNullOrEmpty(settings.Username)
+                    ? conn.BasicAuthentication(settings.Username, settings.Password)
+                        : conn
             };
         }
     }
