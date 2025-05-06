@@ -33,7 +33,7 @@ namespace EmpregaNet.Api.Middleware
             var errors = new string[] { };
 
             // // Captura a exceção no Sentry
-            //SentrySdk.CaptureException(exception);
+            SentrySdk.CaptureException(exception);
 
             // Tratar exceções específicas
             switch (exception)

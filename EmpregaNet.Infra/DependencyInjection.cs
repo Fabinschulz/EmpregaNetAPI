@@ -21,7 +21,7 @@ namespace EmpregaNet.Infra
             services.ConfigureCorsPolicy();
             services.AddIdentityConfiguration();
             services.RegisterServices();
-            services.Configure<ElasticsearchSettings>(configuration.GetSection("ElasticsearchSettings"));
+            // services.Configure<ElasticsearchSettings>(configuration.GetSection("ElasticsearchSettings"));
         }
     }
 }

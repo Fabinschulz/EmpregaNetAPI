@@ -33,7 +33,7 @@ packages/
 
 # Ignorar arquivos do Docker
 Dockerfile
-docker-compose.yml
+# docker-compose.yml
 .dockerignore
 
 # Ignorar arquivos de IDE

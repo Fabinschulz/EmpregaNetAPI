@@ -2,7 +2,6 @@ using System.Net;
 using EmpregaNet.Application.Common.Exceptions;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
-using Serilog;
 
 namespace EmpregaNet.Api.Middleware
 {
@@ -23,7 +22,9 @@ namespace EmpregaNet.Api.Middleware
 
             var (statusCode, title, errors) = MapException(exception);
 
-            Log.Error(exception, "Erro ao processar a requisição: {Message}", exception.Message);
+            // Log.Error(exception, "Erro ao processar a requisição: {Message}", exception.Message); - ELK
+            // Captura a exceção no Sentry
+            SentrySdk.CaptureException(exception);
 
             var problemDetails = new ProblemDetails
             {

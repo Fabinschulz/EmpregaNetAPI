@@ -1,0 +1,116 @@
+services:
+  redis:
+    container_name: redis
+    image: redis:latest
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - empregaNet_network
+
+  webapp:
+    build: .
+    container_name: empregaNet_api
+    ports:
+      - "8080:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__PostgreSQLConnection=Host=localhost;Port=5432;Database=EmpregaNetDB;Username=postgres;Password=postgres;Pooling=true;Persist Security Info=true;
+      - Redis=redis:6379,abortConnect=false,connectRetry=2,connectTimeout=5000
+    restart: always
+    depends_on:
+      redis:
+        condition: service_healthy
+      elasticsearch:
+        condition: service_healthy
+    networks:
+      - empregaNet_network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 2
+      start_period: 30s
+
+networks:
+  empregaNet_network:
+    driver: bridge
+
+volumes:
+  redis_data:
+
+
+# Docker Compose configuration for Elasticsearch, Kibana, and APM Server
+  # elasticsearch:
+  #   image: docker.elastic.co/elasticsearch/elasticsearch:8.18.0
+  #   container_name: elasticsearch
+  #   restart: always
+  #   environment:
+  #     - node.name=elasticsearch
+  #     - discovery.type=single-node
+  #     - xpack.security.enabled=false
+  #     - bootstrap.memory_lock=true
+  #     - cluster.name=empregaNet-cluster
+  #     - xpack.license.self_generated.type=basic
+  #     - xpack.monitoring.enabled=true
+  #     - xpack.security.enabled=false
+  #     - TZ=America/Sao_Paulo
+  #   healthcheck:
+  #     test:
+  #       ["CMD-SHELL", "curl -f http://localhost:9200/_cluster/health || exit 1"]
+  #     interval: 30s
+  #     timeout: 10s
+  #     retries: 5
+  #     start_period: 30s
+  #   ports:
+  #     - "9200:9200"
+  #   volumes:
+  #     - elastic_data:/usr/share/elasticsearch/data
+  #   networks:
+  #     - empregaNet_network
+
+  # kibana:
+  #   image: docker.elastic.co/kibana/kibana:8.18.0
+  #   container_name: kibana
+  #   depends_on:
+  #     - elasticsearch
+  #   restart: always
+  #   ports:
+  #     - "5601:5601"
+  #   networks:
+  #     - empregaNet_network
+  #   environment:
+  #     - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+  #     - TZ=America/Sao_Paulo
+  #   healthcheck:
+  #     test: ["CMD-SHELL", "curl -f http://localhost:5601/api/status || exit 1"]
+  #     interval: 30s
+  #     timeout: 10s
+  #     retries: 5
+  #     start_period: 60s
+
+  # apm:
+  #   image: docker.elastic.co/apm/apm-server:8.18.0
+  #   container_name: apm-server
+  #   depends_on:
+  #     elasticsearch:
+  #       condition: service_healthy
+  #   ports:
+  #     - "8200:8200"
+  #   environment:
+  #     - output.elasticsearch.hosts=["http://elasticsearch:9200"]
+  #     - TZ=America/Sao_Paulo
+  #     - setup.template.enabled=true
+  #     - apm-server.host=0.0.0.0:8200
+  #     - apm-server.rum.enabled=true
+  #     - output.elasticsearch.ssl.enabled=false
+  #   healthcheck:
+  #     test: ["CMD", "curl", "-f", "http://localhost:8200/"]
+  #     interval: 30s
+  #     timeout: 10s
+  #     retries: 2
+  #     start_period: 60s
+  #   networks:
+  #     - empregaNet_network
