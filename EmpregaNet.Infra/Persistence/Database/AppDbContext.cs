@@ -1,6 +1,7 @@
 ﻿using EmpregaNet.Domain;
 using EmpregaNet.Domain.Entities;
 using EmpregaNet.Infra.Interface;
+using EmpregaNet.Infra.Persistence.Repositories;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -17,12 +18,7 @@ namespace EmpregaNet.Infra.Persistence.Database
         {
 
             base.OnModelCreating(modelBuilder);
-            
-            modelBuilder.Entity<IdentityUserRole<long>>(entity =>
-            {
-                entity.HasKey(ur => new { ur.UserId, ur.RoleId });
-            });
-
+            modelBuilder.AddIdentityUserExtensions();
             //ApplyConfigurationsFromAssembly: aplica TODAS as configurações no assembly. (FluentAPI)
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
         }
