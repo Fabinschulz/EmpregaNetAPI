@@ -5,10 +5,10 @@ namespace EmpregaNet.Domain.Enums
     /// <summary>
     /// Enumeração que representa o gênero.
     /// </summary>
-    public enum Gender
+    public enum GenderEnum
     {
-        [Description("Não informado")] NotInformed = 0,
-        [Description("Masculino")] Male = 1,
-        [Description("Feminino")] Female = 2
+        [Description("Não informado")] NotInformed,
+        [Description("Masculino")] Male,
+        [Description("Feminino")] Female
     }
 }

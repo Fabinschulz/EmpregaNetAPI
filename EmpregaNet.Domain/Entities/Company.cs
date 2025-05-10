@@ -9,8 +9,8 @@ namespace EmpregaNet.Domain.Entities
     /// </summary>
     public class Company : BaseEntity, IAggregateRoot
     {
-        [EnumDataType(typeof(TypeOfActivity))]
-        public TypeOfActivity? TypeOfActivity { get; set; }
+        [EnumDataType(typeof(TypeOfActivityEnum))]
+        public TypeOfActivityEnum? TypeOfActivity { get; set; }
         public required string CompanyName { get; set; }
         public required Address Address { get; set; }
         public required string RegistrationNumber { get; set; } // CNPJ

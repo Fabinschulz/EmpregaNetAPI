@@ -8,10 +8,10 @@ namespace EmpregaNet.Api.Controllers.Candidates
     public class CandidatesController : Controller
     {
         private readonly IMediator _mediator;
-        private readonly IDistributedCacheService _cacheRepository;
+        private readonly IMemoryService _cacheRepository;
         private readonly IHub _sentryHub;
 
-        public CandidatesController(IMediator mediator, IDistributedCacheService cacheRepository, IHub sentryHub)
+        public CandidatesController(IMediator mediator, IMemoryService cacheRepository, IHub sentryHub)
 
         {
             _mediator = mediator;

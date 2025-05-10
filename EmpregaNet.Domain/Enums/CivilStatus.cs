@@ -5,13 +5,13 @@ namespace EmpregaNet.Domain.Enums
     /// <summary>
     /// Enumeração que representa o estado civil de um usuário.
     /// </summary>
-    public enum CivilStatus
+    public enum CivilStatusEnum
     {
-        [Description("")] NaoSelecionado = 0,
-        [Description("Casado")] Married = 1,
-        [Description("Viúvo")] Widowed = 2,
-        [Description("Separado")] Separated = 3,
-        [Description("Divorciado")] Divorced = 4,
-        [Description("Solteiro")] Single = 5
+        [Description("")] NaoSelecionado,
+        [Description("Casado")] Married,
+        [Description("Viúvo")] Widowed,
+        [Description("Separado")] Separated,
+        [Description("Divorciado")] Divorced,
+        [Description("Solteiro")] Single
     }
 }

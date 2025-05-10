@@ -5,12 +5,12 @@ namespace EmpregaNet.Domain.Enums
     /// <summary>
     /// Enumeração que representa o tipo de usuário (Candidato ou Recrutador).
     /// </summary>
-    public enum UserType
+    public enum UserTypeEnum
     {
         /// <summary>
         /// Tipo de usuário não selecionado.
         /// </summary>
-        [Description("")] NaoSelecionado = 0,
+        [Description("")] NaoSelecionado,
 
         /// <summary>
         /// Tipo de usuário Candidato.
@@ -18,7 +18,7 @@ namespace EmpregaNet.Domain.Enums
         /// <remarks>
         /// Representa um usuário que está em busca de uma oportunidade de emprego.
         /// </remarks>
-        [Description("Candidato")] Candidate = 1,
+        [Description("Candidato")] Candidate,
 
         /// <summary>
         /// Tipo de usuário Recrutador.
@@ -26,7 +26,7 @@ namespace EmpregaNet.Domain.Enums
         /// <remarks>
         /// Representa um usuário que está recrutando candidatos para uma vaga de emprego.
         /// </remarks>
-        [Description("Recrutador")] Recruiter = 2,
+        [Description("Recrutador")] Recruiter,
 
         /// <summary>
         /// Tipo de usuário Administrador.
@@ -34,7 +34,7 @@ namespace EmpregaNet.Domain.Enums
         /// <remarks>
         /// Representa um usuário que tem acesso total ao sistema e pode gerenciar todos os usuários e dados.
         /// </remarks>
-        [Description("Administrador")] Admin = 3,
+        [Description("Administrador")] Admin,
 
         /// <summary>
         /// Tipo de usuário Gestor.
@@ -42,7 +42,7 @@ namespace EmpregaNet.Domain.Enums
         /// <remarks>
         /// Representa um usuário que tem acesso a funcionalidades de gerenciamento, mas não tem acesso total ao sistema.
         /// </remarks>
-        [Description("Gestor")] Manager = 4,
+        [Description("Gestor")] Manager,
 
         /// <summary>
         /// Tipo de usuário Entrevistador.
@@ -50,7 +50,7 @@ namespace EmpregaNet.Domain.Enums
         /// <remarks>
         /// Representa um usuário que tem acesso a funcionalidades de entrevista, mas não tem acesso total ao sistema.
         /// </remarks>
-        [Description("Entrevistador")] Interviewer = 5,
+        [Description("Entrevistador")] Interviewer,
 
         /// <summary>
         /// Tipo de usuário Analista.
@@ -58,7 +58,7 @@ namespace EmpregaNet.Domain.Enums
         /// <remarks>
         /// Representa um usuário que tem acesso a funcionalidades de análise, mas não tem acesso total ao sistema.
         /// </remarks>
-        [Description("Analista")] Analyst = 6
+        [Description("Analista")] Analyst
         
     }
 }

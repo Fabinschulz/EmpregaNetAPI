@@ -5,15 +5,16 @@ namespace EmpregaNet.Domain.Enums
     /// <summary>
     /// Enumeração que representa o status de uma candidatura a uma vaga.
     /// </summary>
-    public enum ApplicationStatus
+    public enum ApplicationStatusEnum
     {
-        [Description("Aprovado")] Approved = 0,
-        [Description("Aguardando aprovação")] Pending = 1,
-        [Description("Rejeitado")] Rejected = 2,
-        [Description("Expirado")] Timeout = 3,
-        [Description("Vaga cancelada pela empresa")] Canceled = 4,
-        [Description("Erro")] Error = 7,
-        [Description("Em Análise")] Processing = 8,
-        [Description("Encerrado")] Finished = 9,
+        [Description("")] NaoSelecionado,
+        [Description("Aprovado")] Approved,
+        [Description("Aguardando aprovação")] Pending,
+        [Description("Rejeitado")] Rejected,
+        [Description("Expirado")] Timeout,
+        [Description("Vaga cancelada pela empresa")] Canceled,
+        [Description("Erro")] Error,
+        [Description("Em Análise")] Processing,
+        [Description("Encerrado")] Finished,
     }
 }

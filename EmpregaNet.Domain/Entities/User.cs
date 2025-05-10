@@ -15,9 +15,9 @@ namespace EmpregaNet.Domain.Entities
         public Address? Address { get; set; }
         public DateTime? BirthDate { get; set; }
         public ICollection<JobApplication> Applications { get; set; } = new List<JobApplication>();
-        public CivilStatus CivilStatus { get; set; }
-        public Gender? Gender { get; set; }
-        public UserType UserType { get; set; } = UserType.Candidate; // converter para Roles depois
+        public CivilStatusEnum CivilStatus { get; set; }
+        public GenderEnum? Gender { get; set; }
+        public UserTypeEnum UserType { get; set; } = UserTypeEnum.Candidate; // converter para Roles depois
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? UpdatedAt { get; set; } = null;
         public DateTime? DeletedAt { get; set; } = null;

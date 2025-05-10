@@ -5,11 +5,11 @@ namespace EmpregaNet.Domain.Enums
     /// <summary>
     /// Enumeração que representa o tipo de atividade da empresa.
     /// </summary>
-    public enum TypeOfActivity
+    public enum TypeOfActivityEnum
     {
-        [Description("")] NaoSelecionado = 0,
-        [Description("Indústria")] Industry = 1,
-        [Description("Serviços")] services = 2,
-        [Description("Comércio")] business = 3
+        [Description("")] NaoSelecionado,
+        [Description("Indústria")] Industry,
+        [Description("Serviços")] services,
+        [Description("Comércio")] business
     }
 }

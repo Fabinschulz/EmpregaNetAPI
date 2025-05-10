@@ -1,5 +1,7 @@
+using EmpregaNet.Infra.Cache.ElastiCacheRedis;
 using EmpregaNet.Infra.Configurations;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace EmpregaNet.Infra
@@ -12,9 +14,11 @@ namespace EmpregaNet.Infra
             builder.AddDatabase();
         }
 
-        public static void ConfigureServices(this IServiceCollection services)
+        public static void ConfigureServices(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddOpenApi();
+            services.AddMemoryCache();
+            services.UseRedisCache(configuration);
             services.AddControllers();
             services.AddEndpointsApiExplorer();
             services.ConfigureCorsPolicy();

@@ -11,7 +11,7 @@ namespace EmpregaNet.Domain.Entities
         public required string Title { get; set; }
         public required string Description { get; set; }
         public decimal Salary { get; set; }
-        public JobType JobType { get; set; }
+        public JobTypeEnum JobType { get; set; }
         public DateTime PublicationDate { get; set; }
         public long CompanyId { get; set; }
         public Company? Company { get; set; }

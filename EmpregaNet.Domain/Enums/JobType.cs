@@ -5,15 +5,16 @@ namespace EmpregaNet.Domain.Enums
     /// <summary>
     /// Enumeração que representa o tipo de vaga.
     /// </summary>
-    public enum JobType
+    public enum JobTypeEnum
     {
-        [Description("Tempo Integral")] FullTime = 0,
-        [Description("Meio Período")] PartTime = 1,
-        [Description("Estágio")] Internship = 2,
-        [Description("Freelancer")] Freelancer = 3,
-        [Description("Temporário")] Temporary = 4,
-        [Description("Trainee")] Trainee = 5,
-        [Description("Voluntário")] Volunteer = 6,
-        [Description("Remoto")] Remote = 7
+        [Description("")] NaoSelecionado,
+        [Description("Tempo Integral")] FullTime,
+        [Description("Meio Período")] PartTime,
+        [Description("Estágio")] Internship,
+        [Description("Freelancer")] Freelancer,
+        [Description("Temporário")] Temporary,
+        [Description("Trainee")] Trainee,
+        [Description("Voluntário")] Volunteer,
+        [Description("Remoto")] Remote
     }
 }
