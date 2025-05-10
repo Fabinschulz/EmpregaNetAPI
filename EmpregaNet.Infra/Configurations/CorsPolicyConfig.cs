@@ -11,10 +11,10 @@ namespace EmpregaNet.Infra.Configurations
         {
             services.AddCors(opt =>
             {
-                opt.AddDefaultPolicy(builder => builder
-                    .AllowAnyOrigin()
-                    .AllowAnyMethod()
-                    .AllowAnyHeader());
+                opt.AddPolicy("AllowAll", builder => builder
+                   .AllowAnyOrigin()
+                   .AllowAnyMethod()
+                   .AllowAnyHeader());
             });
 
             return services;

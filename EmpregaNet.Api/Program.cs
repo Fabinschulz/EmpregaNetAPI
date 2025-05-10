@@ -6,8 +6,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.AddWebApplication();
 
 var builderServices = builder.Services;
-builderServices.ConfigureServices(builder.Configuration);
+builderServices.ConfigureServices();
 builderServices.AddControllers();
+builderServices.AddExceptionHandler<GlobalExceptionHandler>();
 
 var app = builder.Build();
 builderServices.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Program).Assembly));
@@ -18,9 +19,9 @@ builderServices.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Progra
 app.UseApiConfiguration(app.Environment);
 // app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.MapControllers();
-builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
-builder.Services.AddProblemDetails();
 app.UseExceptionHandler();
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.Run();
 

@@ -7,8 +7,9 @@ namespace EmpregaNet.Domain.Enums
     /// </summary>
     public enum TypeOfActivity
     {
-        [Description("Indústria")] Industry = 0,
-        [Description("Serviços")] services = 1,
-        [Description("Comércio")] business = 2
+        [Description("")] NaoSelecionado = 0,
+        [Description("Indústria")] Industry = 1,
+        [Description("Serviços")] services = 2,
+        [Description("Comércio")] business = 3
     }
 }

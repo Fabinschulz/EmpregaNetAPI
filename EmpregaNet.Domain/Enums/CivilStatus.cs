@@ -7,10 +7,11 @@ namespace EmpregaNet.Domain.Enums
     /// </summary>
     public enum CivilStatus
     {
-        [Description("Casado")] Married = 0,
-        [Description("Viúvo")] Widowed = 1,
-        [Description("Separado")] Separated = 2,
-        [Description("Divorciado")] Divorced = 3,
-        [Description("Solteiro")] Single = 4
+        [Description("")] NaoSelecionado = 0,
+        [Description("Casado")] Married = 1,
+        [Description("Viúvo")] Widowed = 2,
+        [Description("Separado")] Separated = 3,
+        [Description("Divorciado")] Divorced = 4,
+        [Description("Solteiro")] Single = 5
     }
 }
