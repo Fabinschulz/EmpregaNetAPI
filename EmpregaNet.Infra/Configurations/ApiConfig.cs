@@ -13,7 +13,7 @@ namespace EmpregaNet.Infra.Configurations
         {
             if (env.IsDevelopment())
             {
-                app.UseDeveloperExceptionPage();
+                app.ApplyMigrations();
             }
 
             // Under certain scenarios, e.g minikube / linux environment / behind load balancer

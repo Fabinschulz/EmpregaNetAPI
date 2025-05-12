@@ -29,13 +29,15 @@ namespace EmpregaNet.Infra.Configurations
                     })
                     .AddEntityFrameworkStores<AppDbContext>()
                     .AddRoleManager<RoleManager<IdentityRole<long>>>()
-                    .AddSignInManager<SignInManager<User>>() 
+                    .AddSignInManager<SignInManager<User>>()
                     .AddUserManager<UserManager<User>>()
+                    .AddApiEndpoints()
                     .AddDefaultTokenProviders(); // Adiciona suporte a tokens (confirmação de email, reset de senha, etc.)
 
             // Configuração de cache e proteção de dados
-            services.AddMemoryCache()
-                    .AddDataProtection();
+            services.AddMemoryCache().AddDataProtection();
+            services.AddAuthentication().AddBearerToken(IdentityConstants.BearerScheme);
+            services.AddAuthorization();
 
             return services;
         }

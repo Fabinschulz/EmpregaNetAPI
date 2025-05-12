@@ -17,14 +17,16 @@ namespace EmpregaNet.Infra
         public static void ConfigureServices(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddOpenApi();
+            services.AddHttpContextAccessor();
             services.AddMemoryCache();
             services.UseRedisCache(configuration);
             services.AddControllers();
             services.AddEndpointsApiExplorer();
             services.ConfigureCorsPolicy();
-            services.AddIdentityConfiguration();
             services.DIRegistrationServices();
             services.AddProblemDetails();
+            services.AddControllers();
+            services.AddIdentityConfiguration();
         }
     }
 }

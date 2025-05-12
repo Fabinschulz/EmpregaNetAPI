@@ -1,4 +1,4 @@
-using EmpregaNet.Infra.Cache.DistributedCache;
+using EmpregaNet.Infra.Cache.MemoryService;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
