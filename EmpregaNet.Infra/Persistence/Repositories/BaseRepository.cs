@@ -47,11 +47,6 @@ namespace EmpregaNet.Infra.Persistence.Repositories
             return true;
         }
 
-        public async Task<List<T>> GetAllAsync()
-        {
-            return await _context.Set<T>().ToListAsync();
-        }
-
         public async Task<ListDataPagination<T>> GetAllAsync(int Page, int Size, string? orderBy)
         {
             var query = _context.Set<T>().AsQueryable();

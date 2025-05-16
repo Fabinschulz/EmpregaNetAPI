@@ -22,14 +22,14 @@ namespace EmpregaNet.Infra.Configurations
             if (app.Configuration["USE_HTTPS_REDIRECTION"] == "true")
                 app.UseHttpsRedirection();
 
-            app.MapOpenApi();
-            app.UseSwagger();
-            app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "EmpregaNet Api v1"));
-            app.MapSwagger();
+            app.UseOpenApi();
+            app.UseSwaggerUi();
 
             // Middleware de autenticação e autorização
             app.UseAuthentication();
             app.UseAuthorization();
+            app.MapControllers();
+            app.MapIdentityApi<User>();
 
             // Mapear endpoints do Identity
             app.MapIdentityApi<User>();

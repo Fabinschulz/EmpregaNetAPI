@@ -1,8 +1,7 @@
-using System.Reflection;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.OpenApi.Models;
-using Swashbuckle.AspNetCore.SwaggerGen;
+using NSwag.Generation.Processors.Security;
 
 namespace EmpregaNet.Infra.Configurations
 {
@@ -10,39 +9,28 @@ namespace EmpregaNet.Infra.Configurations
     {
         public static WebApplicationBuilder AddSwaggerDoc(this WebApplicationBuilder builder)
         {
-            builder.Services.AddSwaggerGen(config =>
+            builder.Services.AddOpenApiDocument(op =>
             {
-                config.SwaggerDoc("v1", new()
-                {
-                    Title = "EmpregaNet API",
-                    Version = "v1",
-                    Description = "Uma API para cadastro de vagas de emprego",
-                    License = new OpenApiLicense() { Name = "MIT", Url = new Uri("https://opensource.org/Licenses/MIT") },
-                    Contact = new OpenApiContact() { Name = "Fabio Lima", Email = "fabio.lima19997@gmail.com" },
-                });
-
-                config.TagActionsBy(api => new[] { api.GroupName ?? "Default" });
-                config.DocInclusionPredicate((name, api) => true);
-                config.EnableAnnotations();
-                config.DocumentFilter<TagDescriptionsDocumentFilter>();
-
-                var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-                var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
-                config.IncludeXmlComments(xmlPath);
+                op.DocumentName = "v1";
+                op.Title = "EmpregaNet API";
+                op.Version = "v1";
+                op.Description = "Uma API para cadastro de vagas de emprego";
+                op.DocumentProcessors.Add(new SecurityDefinitionAppender(
+                    JwtBearerDefaults.AuthenticationScheme,
+                    new NSwag.OpenApiSecurityScheme
+                    {
+                        Name = "Authorization",
+                        Description = "Insira o token JWT no formato: Bearer {seu token}",
+                        Type = NSwag.OpenApiSecuritySchemeType.Http,
+                        In = NSwag.OpenApiSecurityApiKeyLocation.Header,
+                        Scheme = JwtBearerDefaults.AuthenticationScheme,
+                        BearerFormat = "JWT"
+                    }
+                ));
+                op.OperationProcessors.Add(new AspNetCoreOperationSecurityScopeProcessor(JwtBearerDefaults.AuthenticationScheme));
             });
 
             return builder;
-        }
-
-        public class TagDescriptionsDocumentFilter : IDocumentFilter
-        {
-            public void Apply(OpenApiDocument swaggerDoc, DocumentFilterContext context)
-            {
-                swaggerDoc.Tags = new List<OpenApiTag>
-            {
-                new OpenApiTag { Name = "Default", Description = "Endpoints relacionados a autenticação" },
-            };
-            }
         }
     }
 }

@@ -34,7 +34,7 @@ namespace EmpregaNet.Infra.Cache.MemoryService
             }
         }
 
-        public Task<T>? Get<T>(string key)
+        public Task<T>? GetValueAsync<T>(string key)
         {
             var cacheKey = $"{_options.KeyPrefix}:{key}";
             var someSeconds = TimeSpan.FromSeconds(_randon.Next(1, 60));
@@ -82,7 +82,7 @@ namespace EmpregaNet.Infra.Cache.MemoryService
             return default;
         }
 
-        public Task<T>? Get<T>(string key, Func<T, bool> isValid)
+        public Task<T>? GetValueAsync<T>(string key, Func<T, bool> isValid)
         {
             var cacheKey = $"{_options.KeyPrefix}:{key}";
 

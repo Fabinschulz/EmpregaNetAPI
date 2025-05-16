@@ -1,4 +1,5 @@
-﻿using EmpregaNet.Domain.Entities;
+﻿using EmpregaNet.Application.Services;
+using EmpregaNet.Domain.Entities;
 using EmpregaNet.Infra.Cache.MemoryService;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -14,6 +15,7 @@ public static class DIRegistrationServicesConfig
         services.AddTransient<IEmailSender<User>, IdentityNoOpEmailSender>();
         services.AddTransient<IEmailSender<User>, EmailSender>();
         services.AddSingleton<IMemoryService, MemoryService>();
+        services.AddScoped(typeof(BaseService<>), typeof(BaseService<>));
         // services.Configure<ElasticsearchSettings>(configuration.GetSection("ElasticsearchSettings"));
     }
 
