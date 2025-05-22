@@ -12,13 +12,16 @@ namespace EmpregaNet.Api.Controllers.Base
     {
         protected readonly IMediator _mediator;
         protected readonly IMemoryService _cacheService;
+        private readonly IHub _sentryHub;
         private readonly string _entityName;
 
-        protected BaseController(IMediator mediator, IMemoryService cacheService)
+        protected BaseController(IMediator mediator, IMemoryService cacheService, IHub sentryHub)
         {
+            _sentryHub = sentryHub;
             _mediator = mediator;
             _cacheService = cacheService;
             _entityName = typeof(TResponse).Name;
+
         }
 
         [HttpGet]

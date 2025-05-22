@@ -19,4 +19,15 @@ namespace EmpregaNet.Domain.Entities
         public ICollection<Job> Jobs { get; set; } = new List<Job>();
 
     }
+
+    public class CompanyCommand
+    {
+        public string? CompanyName { get; set; }
+        public string? RegistrationNumber { get; set; }
+        public string? Email { get; set; }
+        public string? Phone { get; set; }
+        public Address? Address { get; set; }
+        public TypeOfActivityEnum? TypeOfActivity { get; set; }
+        public ICollection<Job>? Jobs { get; set; }
+    }
 }
