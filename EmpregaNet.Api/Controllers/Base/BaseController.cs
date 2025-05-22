@@ -1,103 +1,98 @@
+using EmpregaNet.Application.Common.Command;
 using EmpregaNet.Domain;
 using EmpregaNet.Domain.Common;
-using EmpregaNet.Domain.Interface;
-using EmpregaNet.Domain.Interfaces;
 using EmpregaNet.Infra.Cache.MemoryService;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
+
 
 namespace EmpregaNet.Api.Controllers.Base
 {
-    [ApiController]
-    [Route("api/[controller]")]
-    public abstract class BaseController<TEntity> : ControllerBase where TEntity : BaseEntity, IAggregateRoot
+    public abstract class BaseController<TRequest, TResponse> : ControllerBase where TResponse : BaseEntity
     {
-        protected readonly IMemoryService _memoryService;
-        protected readonly IBaseRepository<TEntity> _repository;
+        protected readonly IMediator _mediator;
+        protected readonly IMemoryService _cacheService;
         private readonly string _entityName;
 
-        protected BaseController(IBaseRepository<TEntity> repository, IMemoryService memoryService)
+        protected BaseController(IMediator mediator, IMemoryService cacheService)
         {
-            _repository = repository;
-            _entityName = typeof(TEntity).Name;
-            _memoryService = memoryService;
+            _mediator = mediator;
+            _cacheService = cacheService;
+            _entityName = typeof(TResponse).Name;
         }
 
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public virtual async Task<IActionResult> GetAll([FromQuery] int page = 1, [FromQuery] int size = 100, [FromQuery] string? orderBy = null)
         {
-            var cacheKey = $"{_entityName}_GetAll_{page}_{size}_{orderBy}";
-            var cachedData = await _memoryService.GetValueAsync<ListDataPagination<TEntity>>(cacheKey)!;
-            var expiration = TimeSpan.FromMinutes(60);
+
+            var cacheKey = $"{_entityName}_GetAll_{page}_{size}";
+            var cachedData = await _cacheService.GetValueAsync<ListDataPagination<TResponse>>(cacheKey)!;
 
             if (cachedData != null) return Ok(cachedData);
 
-            var data = await _repository.GetAllAsync(page, size, orderBy);
-            await _memoryService.SetValueAsync(cacheKey, data, expiration);
+            var result = await _mediator.Send(new GetAllQuery<TResponse>(page, size, orderBy));
+            await _cacheService.SetValueAsync(cacheKey, result, TimeSpan.FromMinutes(5));
 
-            return Ok(data);
+
+            return Ok(result);
         }
 
-        [HttpGet("{id}")]
+
+        [HttpGet("{id:long}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public virtual async Task<IActionResult> GetById([FromRoute] long id)
         {
             var cacheKey = $"{_entityName}_GetById_{id}";
-            var cachedData = await _memoryService.GetValueAsync<TEntity>(cacheKey)!;
-            var expiration = TimeSpan.FromMinutes(60);
+            var cachedData = await _cacheService.GetValueAsync<TResponse>(cacheKey)!;
 
             if (cachedData != null) return Ok(cachedData);
 
-            var data = await _repository.GetByIdAsync(id);
-            await _memoryService.SetValueAsync(cacheKey, data, expiration);
+            var result = await _mediator.Send(new GetByIdQuery<TResponse>(id));
+            await _cacheService.SetValueAsync(cacheKey, result, TimeSpan.FromMinutes(5));
 
-            return Ok(data);
+
+            return Ok(result);
         }
 
-        [HttpPost]
-        [ProducesResponseType(StatusCodes.Status201Created)]
-        public virtual async Task<IActionResult> Create([FromBody] TEntity entity)
-        {
-            var result = await _repository.CreateAsync(entity);
-            await InvalidateCacheForEntity();
-
-            return CreatedAtAction(nameof(GetById), new { id = GetEntityId(result) }, result);
-        }
-
-        [HttpPut("{id}")]
+        [HttpPut("{id:long}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public virtual async Task<IActionResult> Update([FromRoute] long id, [FromBody] TEntity entity)
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public virtual async Task<IActionResult> Update([FromRoute] long id, [FromBody] TRequest entity)
         {
-            var result = await _repository.UpdateAsync(entity);
+            var result = await _mediator.Send(new UpdateCommand<TRequest, TResponse>(id, entity));
             await InvalidateCacheForEntity(id);
 
             return Ok(result);
         }
 
-        [HttpDelete("{id}")]
+        [HttpDelete("{id:long}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public virtual async Task<IActionResult> Delete([FromRoute] long id)
         {
-            var entity = await _repository.GetByIdAsync(id);
-            if (entity == null) return NotFound("Não foi possível encontrar o registro.");
-
-            await _repository.DeleteAsync(entity);
+            await _mediator.Send(new DeleteCommand<TResponse>(id));
             await InvalidateCacheForEntity(id);
 
             return NoContent();
         }
 
-        protected virtual Task InvalidateCacheForEntity(long id = default)
+        protected virtual Task<Unit> InvalidateCacheForEntity(long id = default)
         {
-            var cacheKey = $"{_entityName}_GetById_{id}";
-            _memoryService.Remove(cacheKey);
-
             var allCacheKey = $"{_entityName}_GetAll_";
-            _memoryService.Remove(allCacheKey);
+            _cacheService.Remove(allCacheKey);
 
-            return Task.CompletedTask;
+            if (id != default)
+            {
+                var cacheKey = $"{_entityName}_GetById_{id}";
+                _cacheService.Remove(cacheKey);
+            }
+
+            return Task.FromResult(Unit.Value);
         }
 
-        protected abstract long GetEntityId(TEntity entity);
+        protected abstract long GetEntityId(TResponse entity);
     }
 }

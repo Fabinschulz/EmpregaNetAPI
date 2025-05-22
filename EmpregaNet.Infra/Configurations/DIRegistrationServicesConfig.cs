@@ -15,8 +15,6 @@ public static class DIRegistrationServicesConfig
         services.AddTransient<IEmailSender<User>, IdentityNoOpEmailSender>();
         services.AddTransient<IEmailSender<User>, EmailSender>();
         services.AddSingleton<IMemoryService, MemoryService>();
-        services.AddScoped(typeof(BaseService<>), typeof(BaseService<>));
-        // services.Configure<ElasticsearchSettings>(configuration.GetSection("ElasticsearchSettings"));
     }
 
 }

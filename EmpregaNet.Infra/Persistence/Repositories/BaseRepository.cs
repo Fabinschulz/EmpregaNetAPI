@@ -1,4 +1,3 @@
-
 using EmpregaNet.Domain;
 using EmpregaNet.Domain.Common;
 using EmpregaNet.Domain.Interfaces;
@@ -38,8 +37,13 @@ namespace EmpregaNet.Infra.Persistence.Repositories
             return await _context.Set<T>().FirstOrDefaultAsync(x => x.Id == id);
         }
 
-        public async Task<bool> DeleteAsync(T entity)
+
+        public async Task<bool> DeleteAsync(long id)
         {
+            var entity = await GetByIdAsync(id);
+            if (entity == null)
+                throw new KeyNotFoundException($"{typeof(T).Name} com ID {id} não encontrado");
+
             //_context.Set<T>().Remove(entity);
             _context.Set<T>().Update(entity);
             await _context.SaveChangesAsync();
