@@ -31,10 +31,10 @@ logs/
 packages/
 *.nupkg
 
-# Ignorar arquivos do Docker
-Dockerfile
-# docker-compose.yml
-.dockerignore
+# # Ignorar arquivos do Docker
+# Dockerfile
+# # docker-compose.yml
+# .dockerignore
 
 # Ignorar arquivos de IDE
 *.user

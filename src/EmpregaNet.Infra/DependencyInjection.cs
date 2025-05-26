@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using EmpregaNet.Infra.Cache.ElastiCacheRedis;
 using EmpregaNet.Infra.Configurations;
 using Microsoft.AspNetCore.Builder;
@@ -14,7 +15,7 @@ namespace EmpregaNet.Infra
             builder.AddDatabase();
             builder.AddIdentityConfiguration();
             builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
-             // services.Configure<ElasticsearchSettings>(configuration.GetSection("ElasticsearchSettings"));
+            // services.Configure<ElasticsearchSettings>(configuration.GetSection("ElasticsearchSettings"));
         }
 
         public static void ConfigureServices(this IServiceCollection services, IConfiguration configuration)
@@ -22,12 +23,14 @@ namespace EmpregaNet.Infra
             services.AddHttpContextAccessor();
             services.AddMemoryCache();
             services.UseRedisCache(configuration);
-            services.AddControllers();
             services.AddEndpointsApiExplorer();
             services.ConfigureCorsPolicy();
             services.DIRegistrationServices();
             services.AddProblemDetails();
-            services.AddControllers();
+            services.AddControllers().AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+            }); ;
         }
     }
 }
