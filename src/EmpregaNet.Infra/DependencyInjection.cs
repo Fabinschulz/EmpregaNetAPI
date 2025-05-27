@@ -27,6 +27,7 @@ namespace EmpregaNet.Infra
             services.ConfigureCorsPolicy();
             services.DIRegistrationServices();
             services.AddProblemDetails();
+            services.AddSwaggerGen();
             services.AddControllers().AddJsonOptions(options =>
             {
                 options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());

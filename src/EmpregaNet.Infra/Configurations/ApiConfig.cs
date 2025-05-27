@@ -17,11 +17,9 @@ namespace EmpregaNet.Infra.Configurations
             // Under certain scenarios, e.g minikube / linux environment / behind load balancer
             // https redirection could lead dev's to over complicated configuration for testing purpouses
             // In production is a good practice to keep it true
-            if (app.Configuration["USE_HTTPS_REDIRECTION"] == "true")
-                app.UseHttpsRedirection();
-
-            // app.UseOpenApi();
-            // app.UseSwaggerUi();
+            app.UseHttpsRedirection();
+            app.UseSwagger();
+            app.UseSwaggerUI();
 
             // Middleware de autenticação e autorização
             app.UseAuthentication();

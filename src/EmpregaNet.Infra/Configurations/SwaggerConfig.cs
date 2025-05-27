@@ -7,6 +7,7 @@ namespace EmpregaNet.Infra.Configurations
     {
         public static WebApplicationBuilder AddSwaggerDoc(this WebApplicationBuilder builder)
         {
+            
            
             return builder;
         }

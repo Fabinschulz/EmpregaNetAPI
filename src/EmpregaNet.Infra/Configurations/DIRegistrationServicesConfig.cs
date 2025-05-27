@@ -12,6 +12,9 @@ public static class DIRegistrationServicesConfig
     public static void DIRegistrationServices(this IServiceCollection services)
     {
         services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+        services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
+        
+        // services.AddScoped<IMediatorHandler, MediatorHandler>(); // toDo: registrar
         // services.AddTransient<IEmailSender<User>, IdentityNoOpEmailSender>();
         // services.AddTransient<IEmailSender<User>, EmailSender>();
         services.AddSingleton<IMemoryService, MemoryService>();
