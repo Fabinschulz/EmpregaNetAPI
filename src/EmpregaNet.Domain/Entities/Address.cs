@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using EmpregaNet.Domain.Enums;
 using EmpregaNet.Domain.Interface;
 
@@ -8,6 +9,8 @@ namespace EmpregaNet.Domain.Entities
     /// </summary>
     public class Address : IAggregateRoot
     {
+        [Key]
+        public long Id { get; set; }
         public required string AddressName { get; set; }
 
         public required string ZipCode { get; set; }

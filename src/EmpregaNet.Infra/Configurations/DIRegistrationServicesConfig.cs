@@ -1,6 +1,8 @@
 ﻿using EmpregaNet.Domain.Entities;
+using EmpregaNet.Domain.Interfaces;
 using EmpregaNet.Domain.Services;
 using EmpregaNet.Infra.Cache.MemoryService;
+using EmpregaNet.Infra.Persistence.Repositories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
@@ -12,9 +14,10 @@ public static class DIRegistrationServicesConfig
     public static void DIRegistrationServices(this IServiceCollection services)
     {
         services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-        services.AddTransient<IEmailSender<User>, IdentityNoOpEmailSender>();
-        services.AddTransient<IEmailSender<User>, EmailSender>();
+        // services.AddTransient<IEmailSender<User>, IdentityNoOpEmailSender>();
+        // services.AddTransient<IEmailSender<User>, EmailSender>();
         services.AddSingleton<IMemoryService, MemoryService>();
+        services.AddScoped<ICompanyRepository, CompanyRepository>();
         services.AddScoped<CompanyService>();
     }
 

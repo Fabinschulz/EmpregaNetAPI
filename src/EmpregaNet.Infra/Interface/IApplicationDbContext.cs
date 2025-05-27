@@ -5,9 +5,10 @@ namespace EmpregaNet.Infra.Interface
 {
     public interface IApplicationDbContext
     {
-        DbSet<Company> Company { get; }
-        DbSet<Job> Job { get; }
-        DbSet<JobApplication> JobApplication { get; }
+        DbSet<Company> Companies { get; }
+        DbSet<Job> Jobs { get; }
+        DbSet<JobApplication> JobApplications { get; }
+        DbSet<Address> Addresses { get; }
 
 
         Task<int> SaveChangesAsync(CancellationToken cancellationToken);

@@ -10,9 +10,10 @@ namespace EmpregaNet.Infra.Persistence.Database
 {
     public class AppDbContext(DbContextOptions<AppDbContext> options) : IdentityDbContext<User, IdentityRole<long>, long>(options), IApplicationDbContext
     {
-        public DbSet<Company> Company => Set<Company>();
-        public DbSet<Job> Job => Set<Job>();
-        public DbSet<JobApplication> JobApplication => Set<JobApplication>();
+        public DbSet<Company> Companies => Set<Company>();
+        public DbSet<Job> Jobs => Set<Job>();
+        public DbSet<JobApplication> JobApplications => Set<JobApplication>();
+        public DbSet<Address> Addresses => Set<Address>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

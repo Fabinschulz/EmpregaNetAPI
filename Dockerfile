@@ -8,14 +8,9 @@ ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 
 COPY EmpregaNet.sln ./
-COPY src/EmpregaNet.Api/EmpregaNet.Api.csproj ./src/EmpregaNet.Api/
-COPY src/EmpregaNet.Application/EmpregaNet.Application.csproj ./src/EmpregaNet.Application/
-COPY src/EmpregaNet.Domain/EmpregaNet.Domain.csproj ./src/EmpregaNet.Domain/
-COPY src/EmpregaNet.Infra/EmpregaNet.Infra.csproj ./src/EmpregaNet.Infra/
+COPY src ./src/
 
 RUN dotnet restore EmpregaNet.sln
-
-COPY src ./src
 
 WORKDIR /src/src/EmpregaNet.Api
 RUN dotnet build EmpregaNet.Api.csproj -c $BUILD_CONFIGURATION -o /app/build

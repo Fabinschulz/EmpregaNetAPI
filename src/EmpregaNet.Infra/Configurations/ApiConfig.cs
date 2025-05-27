@@ -29,10 +29,7 @@ namespace EmpregaNet.Infra.Configurations
             app.UseAuthentication();
             app.UseAuthorization();
             app.MapControllers();
-            app.MapIdentityApi<User>();
-
-            // Mapear endpoints do Identity
-            app.MapIdentityApi<User>();
+            // app.MapIdentityApi<User>();
 
         }
     }

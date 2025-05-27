@@ -20,9 +20,9 @@ namespace EmpregaNet.Infra
 
         public static void ConfigureServices(this IServiceCollection services, IConfiguration configuration)
         {
+            services.UseRedisCache(configuration);
             services.AddHttpContextAccessor();
             services.AddMemoryCache();
-            services.UseRedisCache(configuration);
             services.AddEndpointsApiExplorer();
             services.ConfigureCorsPolicy();
             services.DIRegistrationServices();
