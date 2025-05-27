@@ -1,14 +1,15 @@
 using EmpregaNet.Application.Common.Command;
-using EmpregaNet.Domain;
 using EmpregaNet.Domain.Common;
+using EmpregaNet.Domain.Interfaces;
 using EmpregaNet.Infra.Cache.MemoryService;
-using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
 
 namespace EmpregaNet.Api.Controllers.Base
 {
-    public abstract class BaseController<TRequest, TResponse> : ControllerBase where TResponse : BaseEntity
+    public abstract class BaseController<TRequest, TResponse> : ControllerBase
+        where TResponse : class
+        where TRequest : class
     {
         protected readonly IMediator _mediator;
         protected readonly IMemoryService _cacheService;
@@ -60,6 +61,16 @@ namespace EmpregaNet.Api.Controllers.Base
             return Ok(result);
         }
 
+        [HttpPost]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public virtual async Task<IActionResult> Create([FromBody] TRequest entity)
+        {
+            var result = await _mediator.Send(new CreateCommand<TRequest, TResponse>(entity));
+            await InvalidateCacheForEntity();
+            return CreatedAtAction(nameof(GetById), new { id = GetEntityId(result) }, result);
+        }
+
         [HttpPut("{id:long}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -82,7 +93,7 @@ namespace EmpregaNet.Api.Controllers.Base
             return NoContent();
         }
 
-        protected virtual Task<Unit> InvalidateCacheForEntity(long id = default)
+        protected virtual Task InvalidateCacheForEntity(long id = default)
         {
             var allCacheKey = $"{_entityName}_GetAll_";
             _cacheService.Remove(allCacheKey);
@@ -93,7 +104,7 @@ namespace EmpregaNet.Api.Controllers.Base
                 _cacheService.Remove(cacheKey);
             }
 
-            return Task.FromResult(Unit.Value);
+            return Task.CompletedTask;
         }
 
         protected abstract long GetEntityId(TResponse entity);

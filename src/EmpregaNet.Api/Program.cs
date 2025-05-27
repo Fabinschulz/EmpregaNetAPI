@@ -1,14 +1,22 @@
 using System.Security.Claims;
 using EmpregaNet.Api.Middleware;
+using EmpregaNet.Application.Messages;
+using EmpregaNet.Domain.Services;
 using EmpregaNet.Infra;
 using EmpregaNet.Infra.Configurations;
 using EmpregaNet.Infra.Persistence.Database;
+using FluentValidation;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.AddWebApplication();
 
 var builderServices = builder.Services;
-builderServices.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Program).Assembly));
+// builderServices.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Program).Assembly));
+// builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(MediatorHandler).Assembly));
+
+builder.Services.AddMediator(typeof(Program).Assembly);
+builder.Services.AddValidatorsFromAssemblyContaining<Command>();
+
 builderServices.ConfigureServices(builder.Configuration);
 builderServices.AddExceptionHandler<GlobalExceptionHandler>();
 

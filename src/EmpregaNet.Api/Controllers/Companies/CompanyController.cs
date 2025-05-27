@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
-using MediatR;
 using EmpregaNet.Domain.Entities;
 using EmpregaNet.Api.Controllers.Base;
 using EmpregaNet.Infra.Cache.MemoryService;
 using EmpregaNet.Application.Common.Command;
+using EmpregaNet.Domain.Interfaces;
 
 namespace EmpregaNet.Api.Controllers.Companies
 {
@@ -20,7 +20,7 @@ namespace EmpregaNet.Api.Controllers.Companies
         [HttpPost]
         [ProducesResponseType(typeof(Company), StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> Create([FromBody] CompanyCommand comm)
+        public override async Task<IActionResult> Create([FromBody] CompanyCommand comm)
         {
 
             if (!ModelState.IsValid)
