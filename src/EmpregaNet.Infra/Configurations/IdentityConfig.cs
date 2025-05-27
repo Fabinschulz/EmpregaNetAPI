@@ -41,9 +41,9 @@ namespace EmpregaNet.Infra.Configurations
                         options.Password.RequiredLength = 8;
 
                         // Configurações de Lockout
-                        // options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
-                        // options.Lockout.MaxFailedAccessAttempts = 5;
-                        // options.Lockout.AllowedForNewUsers = true;
+                        options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
+                        options.Lockout.MaxFailedAccessAttempts = 5;
+                        options.Lockout.AllowedForNewUsers = true;
 
                         // Configurações de usuário
                         options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
@@ -58,8 +58,6 @@ namespace EmpregaNet.Infra.Configurations
 
             // Configuração de cache e proteção de dados
             builder.Services.AddMemoryCache().AddDataProtection();
-            // services.AddAuthentication().AddBearerToken(IdentityConstants.BearerScheme);
-            // services.AddAuthorization();
 
             return builder;
         }

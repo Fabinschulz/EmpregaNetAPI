@@ -1,6 +1,5 @@
 using System.Security.Claims;
 using EmpregaNet.Api.Middleware;
-using EmpregaNet.Domain.Entities;
 using EmpregaNet.Infra;
 using EmpregaNet.Infra.Configurations;
 using EmpregaNet.Infra.Persistence.Database;

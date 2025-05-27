@@ -1,7 +1,5 @@
-using EmpregaNet.Domain.Entities;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Hosting;
 
 namespace EmpregaNet.Infra.Configurations
@@ -22,8 +20,8 @@ namespace EmpregaNet.Infra.Configurations
             if (app.Configuration["USE_HTTPS_REDIRECTION"] == "true")
                 app.UseHttpsRedirection();
 
-            app.UseOpenApi();
-            app.UseSwaggerUi();
+            // app.UseOpenApi();
+            // app.UseSwaggerUi();
 
             // Middleware de autenticação e autorização
             app.UseAuthentication();

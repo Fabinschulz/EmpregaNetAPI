@@ -1,10 +1,8 @@
-﻿using EmpregaNet.Domain.Entities;
-using EmpregaNet.Domain.Interfaces;
+﻿using EmpregaNet.Domain.Interfaces;
 using EmpregaNet.Domain.Services;
 using EmpregaNet.Infra.Cache.MemoryService;
 using EmpregaNet.Infra.Persistence.Repositories;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace EmpregaNet.Infra.Configurations;
