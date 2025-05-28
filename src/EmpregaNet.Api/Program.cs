@@ -6,7 +6,6 @@ using EmpregaNet.Domain.Services;
 using EmpregaNet.Infra;
 using EmpregaNet.Infra.Configurations;
 using EmpregaNet.Infra.Persistence.Database;
-using FluentValidation;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.AddWebApplication();

@@ -1,4 +1,5 @@
 using EmpregaNet.Application.Common.Command;
+using EmpregaNet.Domain;
 using EmpregaNet.Domain.Common;
 using EmpregaNet.Domain.Interfaces;
 using EmpregaNet.Infra.Cache.MemoryService;
@@ -8,8 +9,8 @@ using Microsoft.AspNetCore.Mvc;
 namespace EmpregaNet.Api.Controllers.Base
 {
     public abstract class BaseController<TRequest, TResponse> : ControllerBase
-        where TResponse : class
         where TRequest : class
+        where TResponse : BaseEntity
     {
         protected readonly IMediator _mediator;
         protected readonly IMemoryService _cacheService;
