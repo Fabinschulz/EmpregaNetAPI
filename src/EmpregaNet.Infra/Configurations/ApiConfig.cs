@@ -1,9 +1,13 @@
+using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 namespace EmpregaNet.Infra.Configurations
 {
+
     public static class ApiConfig
     {
 
@@ -14,19 +18,43 @@ namespace EmpregaNet.Infra.Configurations
                 app.ApplyMigrations();
             }
 
-            // Under certain scenarios, e.g minikube / linux environment / behind load balancer
-            // https redirection could lead dev's to over complicated configuration for testing purpouses
-            // In production is a good practice to keep it true
-            app.UseHttpsRedirection();
-            app.UseSwagger();
-            app.UseSwaggerUI();
+            app.UseHttpsRedirection()
+               .UseCors(c =>
+               {
+                   c.AllowAnyHeader();
+                   c.AllowAnyMethod();
+                   c.AllowAnyOrigin();
+               })
+               .UseAuthentication()
+               .UseAuthorization();
 
             // Middleware de autenticação e autorização
             app.UseAuthentication();
             app.UseAuthorization();
             app.MapControllers();
-            // app.MapIdentityApi<User>();
+            app.UseSwaggerSetup();
+            // app.MapIdentityApi<Usuario>();
 
+        }
+
+        public static WebApplicationBuilder AddApiConfiguration(this WebApplicationBuilder builder)
+        {
+            if (builder == null) throw new ArgumentNullException(nameof(builder));
+
+            builder.Configuration
+                        .SetBasePath(builder.Environment.ContentRootPath)
+                        .AddJsonFile("appsettings.json", true, true)
+                        .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", true, true)
+                        .AddEnvironmentVariables();
+
+            builder.Services.AddControllers().AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+            }); ;
+
+            builder.AddSwaggerConfiguration();
+
+            return builder;
         }
     }
 }

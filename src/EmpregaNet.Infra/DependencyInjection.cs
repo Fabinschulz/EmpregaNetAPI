@@ -11,7 +11,7 @@ namespace EmpregaNet.Infra
     {
         public static void AddWebApplication(this WebApplicationBuilder builder)
         {
-            builder.AddSwaggerDoc();
+            builder.AddApiConfiguration();
             builder.AddDatabase();
             builder.AddIdentityConfiguration();
             builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
@@ -28,10 +28,6 @@ namespace EmpregaNet.Infra
             services.DIRegistrationServices();
             services.AddProblemDetails();
             services.AddSwaggerGen();
-            services.AddControllers().AddJsonOptions(options =>
-            {
-                options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-            }); ;
         }
     }
 }
