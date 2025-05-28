@@ -9,9 +9,9 @@ namespace EmpregaNet.Infra.Persistence.Repositories
     public class BaseRepository<T> : IBaseRepository<T> where T : BaseEntity
     {
 
-        protected readonly AppDbContext _context;
+        protected readonly PostgreSqlContext _context;
 
-        public BaseRepository(AppDbContext context)
+        public BaseRepository(PostgreSqlContext context)
         {
             _context = context;
         }

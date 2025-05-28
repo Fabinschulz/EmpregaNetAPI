@@ -10,7 +10,7 @@ public static class ApplyMigrationsConfig
     public static void ApplyMigrations(this IApplicationBuilder app)
     {
         using IServiceScope scope = app.ApplicationServices.CreateScope();
-        using AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        using PostgreSqlContext dbContext = scope.ServiceProvider.GetRequiredService<PostgreSqlContext>();
         dbContext.Database.Migrate();
     }
 

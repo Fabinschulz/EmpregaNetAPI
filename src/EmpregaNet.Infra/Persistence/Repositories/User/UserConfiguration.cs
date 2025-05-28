@@ -24,6 +24,10 @@ namespace EmpregaNet.Infra.Persistence.Repositories
             builder.HasIndex(x => x.UserName)
                    .IsUnique()
                    .HasDatabaseName("IX_Users_UserName");
+
+            builder.HasIndex(x => x.PhoneNumber)
+                   .IsUnique()
+                   .HasDatabaseName("IX_Users_PhoneNumber");
         }
     }
 

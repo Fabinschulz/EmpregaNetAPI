@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using EmpregaNet.Api.Middleware;
-using EmpregaNet.Application.Messages;
+using EmpregaNet.Application.Common.Behaviors;
+using EmpregaNet.Domain.Interfaces;
 using EmpregaNet.Domain.Services;
 using EmpregaNet.Infra;
 using EmpregaNet.Infra.Configurations;
@@ -11,12 +12,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.AddWebApplication();
 
 var builderServices = builder.Services;
-// builderServices.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Program).Assembly));
-// builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(MediatorHandler).Assembly));
 
 builder.Services.AddMediator(typeof(Program).Assembly);
-builder.Services.AddValidatorsFromAssemblyContaining<Command>();
-
+builder.Services.AddScoped(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
 builderServices.ConfigureServices(builder.Configuration);
 builderServices.AddExceptionHandler<GlobalExceptionHandler>();
 
@@ -30,7 +28,7 @@ var app = builder.Build();
 
 app.UseApiConfiguration(app.Environment);
 
-app.MapGet("/whoAmI", async (ClaimsPrincipal claims, AppDbContext context) =>
+app.MapGet("/whoAmI", async (ClaimsPrincipal claims, PostgreSqlContext context) =>
 {
     var userId = claims.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
     var user = await context.Users.FindAsync(userId);

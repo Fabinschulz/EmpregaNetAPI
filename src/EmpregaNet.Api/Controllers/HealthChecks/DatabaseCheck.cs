@@ -5,10 +5,10 @@ using Microsoft.EntityFrameworkCore;
 public class DatabaseCheck : IHealthCheck
 {
     
-    private readonly AppDbContext _context;
+    private readonly PostgreSqlContext _context;
     private readonly ILogger<DatabaseCheck> _logger;
 
-    public DatabaseCheck(AppDbContext context, ILogger<DatabaseCheck> logger)        
+    public DatabaseCheck(PostgreSqlContext context, ILogger<DatabaseCheck> logger)        
     {
         _context = context;
         _logger = logger;

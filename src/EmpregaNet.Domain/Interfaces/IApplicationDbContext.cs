@@ -9,7 +9,7 @@ namespace EmpregaNet.Infra.Interface
         DbSet<Job> Jobs { get; }
         DbSet<JobApplication> JobApplications { get; }
         DbSet<Address> Addresses { get; }
-
+        // DbSet<User> Users { get; }
 
         Task<int> SaveChangesAsync(CancellationToken cancellationToken);
     }

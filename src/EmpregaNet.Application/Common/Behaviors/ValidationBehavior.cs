@@ -1,14 +1,12 @@
 ﻿using EmpregaNet.Application.Common.Exceptions;
 using FluentValidation;
 using FluentValidation.Results;
-using MediatR;
+using EmpregaNet.Domain.Interfaces;
 
 namespace EmpregaNet.Application.Common.Behaviors
 {
-    /// <summary>
-    /// Behavior for validating requests.
-    /// </summary>
-    public sealed class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse> where TRequest : IRequest<TResponse>
+    public sealed class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
+        where TRequest : IRequest<TResponse>
     {
         private readonly IEnumerable<IValidator<TRequest>> _validators;
 
@@ -36,6 +34,5 @@ namespace EmpregaNet.Application.Common.Behaviors
 
             return await next();
         }
-
     }
 }

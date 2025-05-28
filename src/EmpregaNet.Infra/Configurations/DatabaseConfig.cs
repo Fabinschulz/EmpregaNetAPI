@@ -15,7 +15,8 @@ public static class DatabaseConfig
 
         try
         {
-            builder.Services.AddDbContext<AppDbContext>(options => options.UseNpgsql(connectionString));
+            builder.Services.AddDbContext<PostgreSqlContext>(options => options.UseNpgsql(connectionString));
+            Console.WriteLine("Database connection established successfully.");
         }
         catch (Exception e)
         {

@@ -14,14 +14,38 @@ namespace EmpregaNet.Application.Common.Base
 
         public async Task<TResponse> Send<TResponse>(IRequest<TResponse> request, CancellationToken cancellationToken = default)
         {
-            var handlerType = typeof(IRequestHandler<,>).MakeGenericType(request.GetType(), typeof(TResponse));
-            var handler = _provider.GetService(handlerType);
+            var requestType = request.GetType();
+            var responseType = typeof(TResponse);
+            var handlerType = typeof(IRequestHandler<,>).MakeGenericType(requestType, responseType);
+            var handler = _provider.GetRequiredService(handlerType);
+
             if (handler == null)
                 throw new InvalidOperationException($"Handler not found for {request.GetType().Name}");
 
-            return await (Task<TResponse>)handlerType
-                .GetMethod("Handle")!
-                .Invoke(handler, new object[] { request, cancellationToken })!;
+            var handleMethod = handlerType.GetMethod("Handle");
+            if (handleMethod == null)
+            {
+                throw new InvalidOperationException($"Method 'Handle' not found on handler for {requestType.Name}");
+            }
+
+            var pipelineBehaviors = _provider.GetServices(typeof(IPipelineBehavior<,>)
+                                                  .MakeGenericType(requestType, responseType))
+                                                  .Cast<IPipelineBehavior<IRequest<TResponse>, TResponse>>()
+                                                  .ToList();
+
+            RequestHandlerDelegate<TResponse> next = async () =>
+            {
+                return await (Task<TResponse>)handleMethod.Invoke(handler, new object[] { request, cancellationToken })!;
+            };
+
+
+            foreach (var behavior in pipelineBehaviors.AsEnumerable().Reverse())
+            {
+                var currentBehavior = behavior;
+                next = async () => await currentBehavior.Handle(request, next, cancellationToken);
+            }
+
+            return await next();
         }
 
         public async Task Publish<TNotification>(TNotification notification, CancellationToken cancellationToken = default)

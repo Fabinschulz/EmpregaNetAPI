@@ -8,19 +8,20 @@ using Microsoft.Extensions.Logging;
 
 namespace EmpregaNet.Application.Common.Base;
 
-public class CreateHandler<TEntity> : IRequestHandler<CreateCommand<TEntity, TEntity>, TEntity>
-       where TEntity : BaseEntity
+public class CreateHandler<TRequest, TResponse> : IRequestHandler<CreateCommand<TRequest, TResponse>, TResponse>
+    where TRequest : class
+    where TResponse : BaseEntity
 {
-    protected readonly IBaseRepository<TEntity> _repository;
-    protected readonly IValidator<CreateCommand<TEntity, TEntity>> _validator;
-    protected readonly ILogger<CreateHandler<TEntity>> _logger;
+    protected readonly IBaseRepository<TResponse> _repository;
+    protected readonly IValidator<CreateCommand<TRequest, TResponse>> _validator;
+    protected readonly ILogger<CreateHandler<TRequest, TResponse>> _logger;
     protected readonly IMediator _mediator;
 
     public CreateHandler(
         IMediator mediator,
-        IBaseRepository<TEntity> repository,
-        IValidator<CreateCommand<TEntity, TEntity>> validator,
-        ILogger<CreateHandler<TEntity>> logger)
+        IBaseRepository<TResponse> repository,
+        IValidator<CreateCommand<TRequest, TResponse>> validator,
+        ILogger<CreateHandler<TRequest, TResponse>> logger)
     {
         _mediator = mediator;
         _repository = repository;
@@ -28,21 +29,24 @@ public class CreateHandler<TEntity> : IRequestHandler<CreateCommand<TEntity, TEn
         _logger = logger;
     }
 
-    public virtual async Task<TEntity> Handle(CreateCommand<TEntity, TEntity> request, CancellationToken cancellationToken)
+    public virtual async Task<TResponse> Handle(CreateCommand<TRequest, TResponse> request, CancellationToken cancellationToken)
     {
-        _logger.LogInformation("Criando a entidade {EntityName}:", typeof(TEntity).Name);
+        _logger.LogInformation("Criando a entidade {EntityName}:", typeof(TRequest).Name);
 
         await ValidateRequest(request, cancellationToken);
-        var createdEntity = await _repository.CreateAsync(request.entity);
-
-        _logger.LogInformation("{EntityName} criada com sucesso. ID: {Id}", typeof(TEntity).Name, createdEntity.Id);
 
 
-        await _mediator.Publish(new EntityEvent<TEntity>(createdEntity), cancellationToken);
+        var entityToCreate = request.entity as TResponse;
+        var createdEntity = await _repository.CreateAsync(entityToCreate!);
+        _logger.LogInformation("{EntityName} criada com sucesso. ID: {Id}", typeof(TResponse).Name, createdEntity.Id);
+
+        await _mediator.Publish(new EntityEvent<TResponse>(createdEntity), cancellationToken);
+
+        // return Mapper.Map<TResponse>(createdEntity);
         return createdEntity;
     }
 
-    protected virtual async Task ValidateRequest(CreateCommand<TEntity, TEntity> request, CancellationToken cancellationToken)
+    protected virtual async Task ValidateRequest(CreateCommand<TRequest, TResponse> request, CancellationToken cancellationToken)
     {
         var validationResult = await _validator.ValidateAsync(request, cancellationToken);
         if (!validationResult.IsValid)
@@ -50,7 +54,6 @@ public class CreateHandler<TEntity> : IRequestHandler<CreateCommand<TEntity, TEn
             throw new ValidationException(validationResult.Errors);
         }
     }
-
 }
 
 public class UpdateCommandHandler<TRequest, TResponse>
@@ -139,27 +142,24 @@ public sealed class GetByIdHandler<TEntity> : IRequestHandler<GetByIdQuery<TEnti
     }
 }
 
-public sealed class DeleteHandler<TEntity, TResponse> : IRequestHandler<DeleteCommand<TResponse>, TResponse>
+public sealed class DeleteHandler<TEntity> : IRequestHandler<DeleteCommand, bool>
     where TEntity : BaseEntity
-    where TResponse : class
 {
     private readonly IBaseRepository<TEntity> _repository;
-    private readonly ILogger<DeleteHandler<TEntity, TResponse>> _logger;
+    private readonly ILogger<DeleteHandler<TEntity>> _logger;
     private readonly IMediator _mediator;
 
     public DeleteHandler(
         IMediator mediator,
         IBaseRepository<TEntity> repository,
-        ILogger<DeleteHandler<TEntity, TResponse>> logger)
+        ILogger<DeleteHandler<TEntity>> logger)
     {
         _mediator = mediator;
         _repository = repository;
         _logger = logger;
     }
 
-#pragma warning disable CS8613 
-    public async Task<TResponse?> Handle(DeleteCommand<TResponse> request, CancellationToken cancellationToken)
-#pragma warning restore CS8613
+    public async Task<bool> Handle(DeleteCommand request, CancellationToken cancellationToken)
     {
         _logger.LogInformation("Removendo a entidade {EntityName} com o ID: {Id}",
             typeof(TEntity).Name, request.Id);
@@ -174,20 +174,6 @@ public sealed class DeleteHandler<TEntity, TResponse> : IRequestHandler<DeleteCo
         _logger.LogInformation("{EntityName} removido com sucesso. ID: {Id}", typeof(TEntity).Name, request.Id);
         await _mediator.Publish(new EntityEvent<TEntity>(entityToDelete), cancellationToken);
 
-        if (typeof(TResponse) == typeof(object) || typeof(TResponse) == typeof(void)) // 'void' aqui é apenas um marcador, na prática será 'object'
-        {
-            return null;
-        }
-        else if (typeof(TResponse) == typeof(bool))
-        {
-            return (TResponse)(object)true;
-        }
-        else if (typeof(TResponse) == typeof(TEntity))
-        {
-            return (TResponse)(object)entityToDelete;
-        }
-
-
-        return default(TResponse)!;
+        return true;
     }
 }

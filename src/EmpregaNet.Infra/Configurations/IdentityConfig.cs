@@ -49,7 +49,7 @@ namespace EmpregaNet.Infra.Configurations
                         options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
                         options.User.RequireUniqueEmail = true;
                     })
-                    .AddEntityFrameworkStores<AppDbContext>()
+                    .AddEntityFrameworkStores<PostgreSqlContext>()
                     .AddRoleManager<RoleManager<IdentityRole<long>>>()
                     .AddSignInManager<SignInManager<User>>()
                     .AddUserManager<UserManager<User>>()

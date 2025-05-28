@@ -6,7 +6,7 @@ namespace EmpregaNet.Infra.Persistence.Repositories;
 
 public class CompanyRepository : BaseRepository<Company>, ICompanyRepository
 {
-    public CompanyRepository(AppDbContext context) : base(context)
+    public CompanyRepository(PostgreSqlContext context) : base(context)
     {
     }
 

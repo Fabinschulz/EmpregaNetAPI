@@ -24,11 +24,11 @@ public sealed record UpdateCommand<TRequest, TResponse>(long Id, TRequest entity
     where TResponse : class;
 
 /// <summary>
-/// Command para Exclusão: TEntity é a entidade ou DTO de saída.
+/// Command para Exclusão: Retorna um booleano indicando sucesso.
 /// </summary>
 /// <typeparam name="TEntity"></typeparam>
 /// <param name="Id"></param>
-public sealed record DeleteCommand<TResponse>(long Id) : IRequest<TResponse>;
+public sealed record DeleteCommand(long Id) : IRequest<bool>;
 
 /// <summary>
 /// Query para Obter por ID: TResponse é a entidade ou DTO de saída.

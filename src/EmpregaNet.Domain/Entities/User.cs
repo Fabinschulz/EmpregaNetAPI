@@ -23,5 +23,10 @@ namespace EmpregaNet.Domain.Entities
         public DateTime? DeletedAt { get; set; } = null;
         public bool IsDeleted { get; set; } = false;
         public string? ProfilePicture { get; set; }
+
+        public User()
+        {
+            
+        }
     }
 }
