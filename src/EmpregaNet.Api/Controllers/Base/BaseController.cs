@@ -33,7 +33,7 @@ namespace EmpregaNet.Api.Controllers.Base
         {
 
             var cacheKey = $"{_entityName}_GetAll_{page}_{size}";
-            var cachedData = await _cacheService.GetValueAsync<ListDataPagination<TResponse>>(cacheKey)!;
+            var cachedData = await _cacheService.GetValueAsync<ListDataPagination<TResponse>>(cacheKey);
 
             if (cachedData != null) return Ok(cachedData);
 
@@ -51,7 +51,7 @@ namespace EmpregaNet.Api.Controllers.Base
         public virtual async Task<IActionResult> GetById([FromRoute] long id)
         {
             var cacheKey = $"{_entityName}_GetById_{id}";
-            var cachedData = await _cacheService.GetValueAsync<TResponse>(cacheKey)!;
+            var cachedData = await _cacheService.GetValueAsync<TResponse>(cacheKey);
 
             if (cachedData != null) return Ok(cachedData);
 

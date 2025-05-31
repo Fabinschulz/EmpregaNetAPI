@@ -46,7 +46,7 @@ namespace EmpregaNet.Infra.Configurations
                         options.Lockout.AllowedForNewUsers = true;
 
                         // Configurações de usuário
-                        options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
+                        options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+ ";
                         options.User.RequireUniqueEmail = true;
                     })
                     .AddEntityFrameworkStores<PostgreSqlContext>()

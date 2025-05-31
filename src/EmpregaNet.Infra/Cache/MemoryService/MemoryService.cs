@@ -9,7 +9,7 @@ namespace EmpregaNet.Infra.Cache.MemoryService
 {
     public class MemoryService : IMemoryService
     {
-        private IConnectionMultiplexer? _distributed;
+        private IConnectionMultiplexer _distributed;
         private IMemoryCache _local;
         private readonly ILogger<MemoryService> _logger;
         private MemoryServiceOptions _options;
@@ -18,48 +18,44 @@ namespace EmpregaNet.Infra.Cache.MemoryService
         public MemoryService(
             IMemoryCache local,
             ILogger<MemoryService> logger,
-            IServiceProvider serviceProvider,
+            IConnectionMultiplexer distributed,
             IOptionsMonitor<MemoryServiceOptions> options)
         {
             _local = local;
             _logger = logger;
             _options = options.CurrentValue ?? new MemoryServiceOptions
             {
-                KeyPrefix = "EMPREGANET_",
+                KeyPrefix = "OAUTH_CACHE_",
             };
-
-            if (serviceProvider != null)
-            {
-                _distributed = (IConnectionMultiplexer)serviceProvider.GetService(typeof(IConnectionMultiplexer))!;
-            }
+            _distributed = distributed;
         }
 
-        public Task<T>? GetValueAsync<T>(string key)
+        public async Task<T?> GetValueAsync<T>(string key)
         {
             var cacheKey = $"{_options.KeyPrefix}:{key}";
             var someSeconds = TimeSpan.FromSeconds(_randon.Next(1, 60));
 
             if (_local.TryGetValue(cacheKey, out T? value))
             {
-                return Task.FromResult(value)!;
+                return value;
             }
 
-            if (_distributed != null)
+            if (_distributed != null && _distributed.IsConnected)
             {
-                if (_distributed.IsConnected)
+                try
                 {
-                    var json = _distributed.GetDatabase().StringGet(cacheKey);
+                    var json = await _distributed.GetDatabase().StringGetAsync(cacheKey);
 
                     if (!string.IsNullOrEmpty(json))
                     {
                         var valueFromRedis = JsonSerializer.Deserialize<T>(json!);
-                        var expiration = _distributed.GetDatabase().KeyTimeToLive(cacheKey);
+                        var expiration = await _distributed.GetDatabase().KeyTimeToLiveAsync(cacheKey);
 
                         if (expiration.HasValue && expiration.Value < someSeconds)
                         {
                             _logger.LogDebug($"Chave de cache {cacheKey} expirada no Redis.");
                             Remove(cacheKey);
-                            return default;
+                            return default(T);
                         }
 
                         if (_local is not null && expiration is not null)
@@ -68,52 +64,49 @@ namespace EmpregaNet.Infra.Cache.MemoryService
                             _logger.LogDebug($"Chave de cache {cacheKey} encontrada no Redis e armazenada na memória local.");
                         }
 
-                        return Task.FromResult(valueFromRedis)!;
+                        return valueFromRedis;
                     }
-
                 }
-                else
+                catch (Exception ex)
                 {
-                    _logger.LogDebug($"Chave de cache {cacheKey} não encontrada no Redis.");
+                    _logger.LogError(ex, "Erro ao obter valor do Redis para a chave: {Key}", cacheKey);
+                    return default(T);
                 }
-
             }
 
-            return default;
+            return default(T);
         }
 
-        public Task<T>? GetValueAsync<T>(string key, Func<T, bool> isValid)
+        public async Task<T?> GetValueAsync<T>(string key, Func<T, bool> isValid)
         {
             var cacheKey = $"{_options.KeyPrefix}:{key}";
 
-            if (_local is not null)
+            if (_local.TryGetValue(cacheKey, out T? value))
             {
-                var value = _local.Get(cacheKey);
-                if (value is not null && isValid((T)value))
+                if (value is not null && isValid(value))
                 {
-                    return Task.FromResult((T)value);
+                    return value;
                 }
             }
 
-            if (_distributed != null)
+            if (_distributed != null && _distributed.IsConnected)
             {
-                if (_distributed.IsConnected)
+                try
                 {
-                    var json = _distributed.GetDatabase().StringGet(cacheKey);
+                    var json = await _distributed.GetDatabase().StringGetAsync(cacheKey);
 
                     if (!string.IsNullOrEmpty(json))
                     {
                         var valueFromRedis = JsonSerializer.Deserialize<T>(json!);
-                        var expiration = _distributed.GetDatabase().KeyTimeToLive(cacheKey);
+                        var expiration = await _distributed.GetDatabase().KeyTimeToLiveAsync(cacheKey);
 
                         if (valueFromRedis is not null)
                         {
-
                             if (!isValid(valueFromRedis))
                             {
                                 _logger.LogDebug($"Chave de cache {cacheKey} inválida.");
                                 Remove(cacheKey);
-                                return default;
+                                return default(T);
                             }
 
                             if (_local is not null && expiration is not null)
@@ -122,15 +115,18 @@ namespace EmpregaNet.Infra.Cache.MemoryService
                                 _logger.LogDebug($"Chave de cache {cacheKey} encontrada no Redis e armazenada na memória local.");
                             }
 
-
-                            return Task.FromResult(valueFromRedis);
+                            return valueFromRedis;
                         }
-
                     }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Erro ao obter valor do Redis (com validação) para a chave: {Key}", cacheKey);
+                    return default(T);
                 }
             }
 
-            return default;
+            return default(T);
         }
 
         public async Task SetValueAsync<T>(string key, T obj, TimeSpan expiration)
@@ -148,7 +144,7 @@ namespace EmpregaNet.Infra.Cache.MemoryService
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, "Erro ao salvar no Redis");
+                    _logger.LogError(ex, "Erro ao salvar no Redis para a chave: {Key}", cacheKey);
                 }
             }
         }
