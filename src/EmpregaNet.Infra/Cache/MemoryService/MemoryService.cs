@@ -25,7 +25,7 @@ namespace EmpregaNet.Infra.Cache.MemoryService
             _logger = logger;
             _options = options.CurrentValue ?? new MemoryServiceOptions
             {
-                KeyPrefix = "OAUTH_CACHE_",
+                KeyPrefix = "EMPREGANET_CACHE",
             };
             _distributed = distributed;
         }
