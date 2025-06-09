@@ -1,7 +1,9 @@
+using System.Text;
 using EmpregaNet.Domain.Entities;
 using EmpregaNet.Infra.Persistence.Database;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -9,14 +11,6 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace EmpregaNet.Infra.Configurations
 {
-    public class JwtSettings
-    {
-        public string SecretKey { get; set; } = string.Empty;
-        public int ExpirationHours { get; set; }
-        public string Issuer { get; set; } = string.Empty;
-        public string Audience { get; set; } = string.Empty;
-    }
-
     public static class IdentityConfig
     {
 
@@ -72,25 +66,28 @@ namespace EmpregaNet.Infra.Configurations
                 throw new InvalidOperationException("JwtSettings não configurado no appsettings.json ou variáveis de ambiente.");
             }
 
+            var key = Encoding.ASCII.GetBytes(jwtSettings.SecretKey);
+
             builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                            .AddJwtBearer(options =>
+                            .AddJwtBearer((options =>
                                     {
+                                        options.RequireHttpsMetadata = true;
                                         options.SaveToken = true;
                                         options.TokenValidationParameters = new TokenValidationParameters
                                         {
                                             ValidateIssuerSigningKey = true,
-                                            IssuerSigningKey = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(jwtSettings.SecretKey)),
+                                            IssuerSigningKey = new SymmetricSecurityKey(key),
                                             ValidateIssuer = true,
                                             ValidateAudience = true,
                                             ValidateLifetime = true,
                                             ValidAudience = jwtSettings.Audience,
                                             ValidIssuer = jwtSettings.Issuer
                                         };
-                                    });
+                                    }));
 
             builder.Services.AddAuthorization();
             builder.Services.AddHttpContextAccessor();
-
+            builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             return builder;
         }
     }

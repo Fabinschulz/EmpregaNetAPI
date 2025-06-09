@@ -16,24 +16,5 @@ namespace EmpregaNet.Api.Controllers.Companies
         {
         }
 
-        // [HttpPost]
-        // [ProducesResponseType(typeof(Company), StatusCodes.Status201Created)]
-        // [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        // public override async Task<IActionResult> Create([FromBody] CompanyCommand comm)
-        // {
-
-        //     if (!ModelState.IsValid)
-        //     {
-        //         return BadRequest(ModelState);
-        //     }
-        //     var command = new CreateCommand<CompanyCommand, Company>(comm);
-        //     var result = await _mediator.Send(command);
-
-        //     await InvalidateCacheForEntity();
-        //     return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
-        // }
-
-
-        protected override long GetEntityId(Company entity) => entity.Id;
     }
 }

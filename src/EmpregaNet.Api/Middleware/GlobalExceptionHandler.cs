@@ -1,5 +1,6 @@
 using System.Net;
 using EmpregaNet.Application.Common.Exceptions;
+using FluentValidation;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 
@@ -82,6 +83,12 @@ namespace EmpregaNet.Api.Middleware
                     statusCode = (int)HttpStatusCode.NotFound;
                     title = "Banco de dados não encontrado";
                     errors = new[] { databaseNotFoundException.Message };
+                    break;
+
+                case ValidationException validationException:
+                    statusCode = (int)HttpStatusCode.BadRequest;
+                    title = "Validação falhou";
+                    errors = validationException.Errors.Select(e => e.ErrorMessage).ToArray();
                     break;
 
                 default:

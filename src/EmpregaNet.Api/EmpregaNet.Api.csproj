@@ -9,6 +9,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="9.0.4" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\EmpregaNet.Application\EmpregaNet.Application.csproj" />
     <ProjectReference Include="..\EmpregaNet.Infra\EmpregaNet.Infra.csproj" />
   </ItemGroup>

@@ -8,14 +8,14 @@ namespace EmpregaNet.Infra.Cache.ElastiCacheRedis
     {
         public static IServiceCollection UseRedisCache(this IServiceCollection services, IConfiguration configuration)
         {
-            var redisEndpoint = configuration["Redis"];
+            var connectionString = configuration["Redis"];
 
-            if (string.IsNullOrEmpty(redisEndpoint))
+            if (string.IsNullOrEmpty(connectionString))
             {
                 throw new ArgumentException("A configuração do Redis não foi encontrada. Verifique a chave 'Redis' no arquivo de configuração.");
             }
 
-            Action<ConfigurationOptions> configDefault = (ConfigurationOptions opts) =>
+            Action<ConfigurationOptions> defaultOptions = (ConfigurationOptions opts) =>
             {
                 opts.AbortOnConnectFail = false;
                 opts.ReconnectRetryPolicy = new ExponentialRetry(2000, 5000);
@@ -26,13 +26,7 @@ namespace EmpregaNet.Infra.Cache.ElastiCacheRedis
                 opts.KeepAlive = 30;
             };
 
-            services.AddStackExchangeRedisCache(options =>
-             {
-                 options.Configuration = redisEndpoint;
-                 options.InstanceName = "EMPREGANET_";
-             });
-
-            ConnectionMultiplexer redis = ConnectionMultiplexer.Connect(redisEndpoint, configDefault);
+            ConnectionMultiplexer redis = ConnectionMultiplexer.Connect(connectionString, defaultOptions);
             services.AddSingleton<IConnectionMultiplexer>(redis);
 
             Console.WriteLine("Redis IsConnected: " + redis.IsConnected);

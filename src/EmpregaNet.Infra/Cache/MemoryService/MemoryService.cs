@@ -3,7 +3,7 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using StackExchange.Redis;
-using System.Text.Json;
+using Newtonsoft.Json;
 
 namespace EmpregaNet.Infra.Cache.MemoryService
 {
@@ -33,7 +33,7 @@ namespace EmpregaNet.Infra.Cache.MemoryService
         public async Task<T?> GetValueAsync<T>(string key)
         {
             var cacheKey = $"{_options.KeyPrefix}:{key}";
-            var someSeconds = TimeSpan.FromSeconds(_randon.Next(1, 60));
+            var someSeconds = TimeSpan.FromSeconds(_randon.Next(1, 60)); // Tempo aleatório para antecipar o refresh do cache local
 
             if (_local.TryGetValue(cacheKey, out T? value))
             {
@@ -48,7 +48,7 @@ namespace EmpregaNet.Infra.Cache.MemoryService
 
                     if (!string.IsNullOrEmpty(json))
                     {
-                        var valueFromRedis = JsonSerializer.Deserialize<T>(json!);
+                        var valueFromRedis = JsonConvert.DeserializeObject<T>(json!);
                         var expiration = await _distributed.GetDatabase().KeyTimeToLiveAsync(cacheKey);
 
                         if (expiration.HasValue && expiration.Value < someSeconds)
@@ -97,7 +97,7 @@ namespace EmpregaNet.Infra.Cache.MemoryService
 
                     if (!string.IsNullOrEmpty(json))
                     {
-                        var valueFromRedis = JsonSerializer.Deserialize<T>(json!);
+                        var valueFromRedis = JsonConvert.DeserializeObject<T>(json!);
                         var expiration = await _distributed.GetDatabase().KeyTimeToLiveAsync(cacheKey);
 
                         if (valueFromRedis is not null)
@@ -139,7 +139,7 @@ namespace EmpregaNet.Infra.Cache.MemoryService
             {
                 try
                 {
-                    var json = JsonSerializer.Serialize(obj);
+                    var json = JsonConvert.SerializeObject(obj);
                     await _distributed.GetDatabase().StringSetAsync(cacheKey, json, expiration);
                 }
                 catch (Exception ex)

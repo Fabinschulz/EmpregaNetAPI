@@ -11,7 +11,6 @@ namespace EmpregaNet.Infra
     {
         public static void AddWebApplication(this WebApplicationBuilder builder)
         {
-            builder.AddApiConfiguration();
             builder.AddDatabase();
             builder.AddIdentityConfiguration();
             builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
@@ -24,7 +23,6 @@ namespace EmpregaNet.Infra
             services.AddHttpContextAccessor();
             services.AddMemoryCache();
             services.AddEndpointsApiExplorer();
-            services.ConfigureCorsPolicy();
             services.DIRegistrationServices();
             services.AddProblemDetails();
             services.AddSwaggerGen();

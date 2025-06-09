@@ -1,6 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-
-namespace EmpregaNet.Infra.Configurations
+﻿
+namespace EmpregaNet.Api.Configurations
 {
     public static class CorsPolicyConfig
     {

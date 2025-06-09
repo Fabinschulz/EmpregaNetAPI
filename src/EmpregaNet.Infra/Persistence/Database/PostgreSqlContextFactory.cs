@@ -17,7 +17,7 @@ namespace EmpregaNet.Infra.Persistence.Database
 
             Console.WriteLine($"Tentando carregar appsettings.json de: {basePath}");
 
-            var configuration = new ConfigurationBuilder()
+            var configuration = new ConfigurationBuilder().AddEnvironmentVariables()
                 .SetBasePath(basePath)
                 .AddJsonFile("appsettings.json", true, true)
                 .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production"}.json", true, true)

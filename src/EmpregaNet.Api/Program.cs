@@ -1,20 +1,22 @@
 using System.Security.Claims;
+using EmpregaNet.Api.Configurations;
 using EmpregaNet.Api.Middleware;
 using EmpregaNet.Application.Common.Behaviors;
 using EmpregaNet.Domain.Interfaces;
 using EmpregaNet.Domain.Services;
 using EmpregaNet.Infra;
-using EmpregaNet.Infra.Configurations;
 using EmpregaNet.Infra.Persistence.Database;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.AddWebApplication();
+builder.AddApiConfiguration();
 
 var builderServices = builder.Services;
 
-builder.Services.AddMediator(typeof(Program).Assembly);
-builder.Services.AddScoped(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+builderServices.AddMediator(typeof(Program).Assembly);
+builderServices.AddScoped(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
 builderServices.ConfigureServices(builder.Configuration);
+builderServices.ConfigureCorsPolicy();
 builderServices.AddExceptionHandler<GlobalExceptionHandler>();
 
 builderServices.AddHealthChecks()
@@ -34,7 +36,6 @@ app.MapGet("/whoAmI", async (ClaimsPrincipal claims, PostgreSqlContext context) 
     return user;
 }).RequireAuthorization();
 
-// app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.UseExceptionHandler();
 
 app.Run();

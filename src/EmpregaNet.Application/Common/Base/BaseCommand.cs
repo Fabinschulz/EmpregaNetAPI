@@ -4,31 +4,29 @@ using EmpregaNet.Domain.Interfaces;
 namespace EmpregaNet.Application.Common.Command;
 
 /// <summary>
-/// Command para Criação: TRequest é o DTO de entrada, TResponse é a entidade ou DTO de saída.
+/// Command para Criação: TRequest é o DTO de entrada.
 /// </summary>
 /// <typeparam name="TRequest"></typeparam>
-/// <typeparam name="TResponse"></typeparam>
 /// <param name="entity"></param>
-public sealed record CreateCommand<TRequest, TResponse>(TRequest entity) : IRequest<TResponse>
-    where TRequest : class
-    where TResponse : class;
+public sealed record CreateCommand<TRequest>(TRequest entity) : IRequest<long> where TRequest : class;
 
 /// <summary>
 /// Command para Atualização: TRequest é o DTO de entrada, TResponse é a entidade ou DTO de saída.
 /// </summary>
 /// <typeparam name="TRequest"></typeparam>
 /// <typeparam name="TResponse"></typeparam>
+/// <param name="entity"></param>
 /// <param name="Id"></param>
 public sealed record UpdateCommand<TRequest, TResponse>(long Id, TRequest entity) : IRequest<TResponse>
     where TRequest : class
     where TResponse : class;
 
 /// <summary>
-/// Command para Exclusão: Retorna um booleano indicando sucesso.
+/// Command para Exclusão: TEntity é a entidade ou DTO de saída.
 /// </summary>
 /// <typeparam name="TEntity"></typeparam>
 /// <param name="Id"></param>
-public sealed record DeleteCommand(long Id) : IRequest<bool>;
+public sealed record DeleteCommand<TEntity>(long Id) : IRequest<bool> where TEntity : class;
 
 /// <summary>
 /// Query para Obter por ID: TResponse é a entidade ou DTO de saída.

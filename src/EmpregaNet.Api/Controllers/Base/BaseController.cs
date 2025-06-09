@@ -1,5 +1,4 @@
 using EmpregaNet.Application.Common.Command;
-using EmpregaNet.Domain;
 using EmpregaNet.Domain.Common;
 using EmpregaNet.Domain.Interfaces;
 using EmpregaNet.Infra.Cache.MemoryService;
@@ -10,7 +9,7 @@ namespace EmpregaNet.Api.Controllers.Base
 {
     public abstract class BaseController<TRequest, TResponse> : ControllerBase
         where TRequest : class
-        where TResponse : BaseEntity
+        where TResponse : class
     {
         protected readonly IMediator _mediator;
         protected readonly IMemoryService _cacheService;
@@ -63,13 +62,17 @@ namespace EmpregaNet.Api.Controllers.Base
         }
 
         [HttpPost]
-        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public virtual async Task<IActionResult> Create([FromBody] TRequest entity)
         {
-            var result = await _mediator.Send(new CreateCommand<TRequest, TResponse>(entity));
+            var id = await _mediator.Send(new CreateCommand<TRequest>(entity));
             await InvalidateCacheForEntity();
-            return CreatedAtAction(nameof(GetById), new { id = GetEntityId(result) }, result);
+            var okResult = typeof(TRequest).Name.Contains("Command")
+                ? $"{typeof(TRequest).Name.Replace("Command", "")} registrado(a) com sucesso. ID: {id}"
+                : $"{typeof(TRequest).Name.Replace("ViewModel", "")} registrado(a) com sucesso. ID: {id}";
+
+            return Ok(okResult);
         }
 
         [HttpPut("{id:long}")]
@@ -84,14 +87,13 @@ namespace EmpregaNet.Api.Controllers.Base
         }
 
         [HttpDelete("{id:long}")]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public virtual async Task<IActionResult> Delete([FromRoute] long id)
         {
-            await _mediator.Send(new DeleteCommand(id));
+            await _mediator.Send(new DeleteCommand<TResponse>(id));
             await InvalidateCacheForEntity(id);
-
-            return NoContent();
+            return Ok($"{typeof(TResponse).Name.Replace("Command", "")} excluído(a) com sucesso. ID: {id}");
         }
 
         protected virtual Task InvalidateCacheForEntity(long id = default)
@@ -107,7 +109,5 @@ namespace EmpregaNet.Api.Controllers.Base
 
             return Task.CompletedTask;
         }
-
-        protected abstract long GetEntityId(TResponse entity);
     }
 }

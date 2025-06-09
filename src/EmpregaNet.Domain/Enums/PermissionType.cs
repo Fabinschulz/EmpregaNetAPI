@@ -1,6 +1,6 @@
 using System.ComponentModel;
 
-namespace ESM0028.src.Domain.Enum
+namespace EmpregaNet.Domain.Enums
 {
     public enum PermissionTypeEnum
     {

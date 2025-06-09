@@ -1,20 +1,29 @@
 using System.Reflection;
+using System.Xml.Linq;
+using EmpregaNet.Infra.Utils;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 
-namespace EmpregaNet.Infra.Configurations
+namespace EmpregaNet.Api.Configurations
 {
     public static class SwaggerConfig
     {
+        /// <summary>
+        /// Adiciona e configura o Swagger/OpenAPI no pipeline de serviços da aplicação.
+        /// Inclui documentação, segurança JWT, filtros de schema e comentários XML de múltiplos projetos.
+        /// </summary>
+        /// <param name="builder">Coleção de serviços da aplicação (<see cref="WebApplicationBuilder"/>).</param>
+        /// <returns>Coleção de serviços configurada.</returns>
         public static WebApplicationBuilder AddSwaggerConfiguration(this WebApplicationBuilder builder)
         {
             if (builder == null) throw new ArgumentNullException(nameof(builder));
 
             builder.Services.AddEndpointsApiExplorer();
 
+            // Define informações básicas da documentação Swagger
             builder.Services.AddSwaggerGen(s =>
             {
                 s.SwaggerDoc("v1", new OpenApiInfo
@@ -26,14 +35,10 @@ namespace EmpregaNet.Infra.Configurations
                     License = new OpenApiLicense { Name = "MIT" }
                 });
 
-                var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-                var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
-                s.IncludeXmlComments(xmlPath);
-                s.DocumentFilter<TagDescriptionsDocumentFilter>();
-
+                // Configura autenticação JWT Bearer no Swagger
                 s.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                 {
-                    Description = "Input the JWT like: Bearer {your token}",
+                    Description = "Insira o token JWT desta maneira: Bearer {seu token}",
                     Name = "Authorization",
                     Scheme = "Bearer",
                     BearerFormat = "JWT",
@@ -41,6 +46,7 @@ namespace EmpregaNet.Infra.Configurations
                     Type = SecuritySchemeType.ApiKey
                 });
 
+                // Exige o uso do esquema de segurança Bearer em todas as operações
                 s.AddSecurityRequirement(new OpenApiSecurityRequirement
                 {
                     {
@@ -85,6 +91,29 @@ namespace EmpregaNet.Infra.Configurations
                     return true;
                 });
 
+                // Suporte a polimorfismo em schemas usando oneOf
+                s.UseOneOfForPolymorphism();
+
+                var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+                s.IncludeXmlComments(xmlPath);
+                s.DocumentFilter<TagDescriptionsDocumentFilter>();
+                s.SchemaFilter<DescribeEnumMembers>(XDocument.Load(xmlPath));
+                s.SchemaFilter<IgnoreEnumSchemaFilter>(XDocument.Load(xmlPath));
+
+                var appName = "EmpregaNet";
+                // Inclui comentários e filtros do projeto Application
+                xmlPath = Path.Combine(AppContext.BaseDirectory, $"{appName}.Application.xml");
+                s.IncludeXmlComments(xmlPath);
+                s.SchemaFilter<DescribeEnumMembers>(XDocument.Load(xmlPath));
+                s.SchemaFilter<IgnoreEnumSchemaFilter>(XDocument.Load(xmlPath));
+
+                // Inclui comentários e filtros do projeto Domain
+                xmlPath = Path.Combine(AppContext.BaseDirectory, $"{appName}.Domain.xml");
+                s.IncludeXmlComments(xmlPath);
+                s.SchemaFilter<DescribeEnumMembers>(XDocument.Load(xmlPath));
+                s.SchemaFilter<IgnoreEnumSchemaFilter>(XDocument.Load(xmlPath));
+
             });
 
             return builder;
@@ -103,13 +132,13 @@ namespace EmpregaNet.Infra.Configurations
 
         public static IApplicationBuilder UseSwaggerSetup(this IApplicationBuilder app)
         {
-            if (app == null) throw new ArgumentNullException(nameof(app));
 
             app.UseSwagger();
             app.UseSwaggerUI(c =>
             {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
                 c.DocExpansion(Swashbuckle.AspNetCore.SwaggerUI.DocExpansion.None);
+                c.DefaultModelsExpandDepth(-1);
             });
 
             return app;
