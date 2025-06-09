@@ -51,8 +51,13 @@ namespace EmpregaNet.Api.Configurations
             }); ;
 
             builder.AddSwaggerConfiguration();
+            builder.Services.ConfigureCorsPolicy();
             builder.Services.AddScoped<HttpUserContext>();
             builder.Services.AddScoped<IHttpCurrentUser, HttpCurrentUser>();
+
+            builder.Services.AddHealthChecks()
+                           .AddCheck<DatabaseCheck>("Database")
+                           .AddCheck<MemoryServiceCheck>("Cache");
 
             return builder;
         }

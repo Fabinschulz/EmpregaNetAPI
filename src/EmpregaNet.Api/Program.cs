@@ -1,8 +1,7 @@
 using System.Security.Claims;
 using EmpregaNet.Api.Configurations;
 using EmpregaNet.Api.Middleware;
-using EmpregaNet.Application.Common.Behaviors;
-using EmpregaNet.Domain.Interfaces;
+using EmpregaNet.Application.Service;
 using EmpregaNet.Domain.Services;
 using EmpregaNet.Infra;
 using EmpregaNet.Infra.Persistence.Database;
@@ -12,16 +11,10 @@ builder.AddWebApplication();
 builder.AddApiConfiguration();
 
 var builderServices = builder.Services;
-
-builderServices.AddMediator(typeof(Program).Assembly);
-builderServices.AddScoped(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
 builderServices.ConfigureServices(builder.Configuration);
-builderServices.ConfigureCorsPolicy();
+builderServices.AddMediator(typeof(Program).Assembly);
 builderServices.AddExceptionHandler<GlobalExceptionHandler>();
-
-builderServices.AddHealthChecks()
-               .AddCheck<DatabaseCheck>("Database")
-               .AddCheck<MemoryServiceCheck>("Cache");
+builderServices.AddApplication(); // Registra serviços e handlers da camada de Application (ex: MediatR, automappers, etc.)
 
 var app = builder.Build();
 

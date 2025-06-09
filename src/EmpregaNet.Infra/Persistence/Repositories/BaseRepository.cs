@@ -2,6 +2,7 @@ using EmpregaNet.Domain;
 using EmpregaNet.Domain.Common;
 using EmpregaNet.Domain.Interfaces;
 using EmpregaNet.Infra.Persistence.Database;
+using EmpregaNet.Mapper.Extensions;
 using Microsoft.EntityFrameworkCore;
 
 namespace EmpregaNet.Infra.Persistence.Repositories
@@ -60,11 +61,8 @@ namespace EmpregaNet.Infra.Persistence.Repositories
                 query = ApplyOrderBy(query, orderBy);
             }
 
-            var totalItems = await query.CountAsync();
-            var totalPages = (int)Math.Ceiling((double)totalItems / Size);
-            var data = await query.Skip(Page * Size).Take(Size).ToListAsync();
-
-            return new ListDataPagination<T>(data, Page, totalPages, totalItems);
+            var result = await query.PaginatedListAsync(Page, Size);
+            return result;
         }
 
         private static IQueryable<T> ApplyOrderBy(IQueryable<T> query, string orderBy)

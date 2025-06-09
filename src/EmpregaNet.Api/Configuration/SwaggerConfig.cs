@@ -1,8 +1,6 @@
 using System.Reflection;
 using System.Xml.Linq;
 using EmpregaNet.Infra.Utils;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
@@ -30,7 +28,7 @@ namespace EmpregaNet.Api.Configurations
                 {
                     Version = "v1",
                     Title = "Authentication and Authorization API",
-                    Description = "OAuth API Swagger surface",
+                    Description = "EmpregaNet API Swagger surface",
                     Contact = new OpenApiContact { Name = "Freetech", Email = "freetech@outlook.com.br", Url = new Uri("https://freetech.vercel.app/") },
                     License = new OpenApiLicense { Name = "MIT" }
                 });

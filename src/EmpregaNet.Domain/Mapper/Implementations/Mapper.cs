@@ -6,15 +6,15 @@ namespace Mapper.Implementations;
 /// <summary>
 /// Implementação padrão do mapeador de objetos utilizando a <see cref="IConfigurationProvider"/>.
 /// </summary>
-public class Mapper : IMapper
+public class MapperObj : IMapper
 {
     private readonly IConfigurationProvider _configuration;
 
     /// <summary>
-    /// Inicializa uma nova instância do <see cref="Mapper"/>.
+    /// Inicializa uma nova instância do <see cref="MapperObj"/>.
     /// </summary>
     /// <param name="configuration">Configuração de mapeamento utilizada.</param>
-    public Mapper(IConfigurationProvider configuration)
+    public MapperObj(IConfigurationProvider configuration)
     {
         _configuration = configuration;
     }
