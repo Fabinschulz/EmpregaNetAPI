@@ -1,7 +1,6 @@
-﻿using Mapper.Interfaces;
-using Microsoft.EntityFrameworkCore;
+﻿using EmpregaNet.Domain.Components.Mapper.Interfaces;
 
-namespace EmpregaNet.Mapper.Extensions;
+namespace EmpregaNet.Domain.Components.Mapper;
 
 /// <summary>
 /// Extensões para facilitar a projeção de consultas <see cref="IQueryable{T}"/> utilizando o <see cref="IConfigurationProvider"/>.

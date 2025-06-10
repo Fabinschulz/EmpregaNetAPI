@@ -1,4 +1,4 @@
-namespace EmpregaNet.Domain.Interfaces
+namespace EmpregaNet.Domain.Components.Mediator.Interfaces
 {
     public delegate Task<TResponse> RequestHandlerDelegate<TResponse>();
 

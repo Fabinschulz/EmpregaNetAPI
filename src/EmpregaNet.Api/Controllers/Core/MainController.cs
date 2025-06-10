@@ -1,13 +1,12 @@
 using EmpregaNet.Application.Common.Command;
 using EmpregaNet.Domain.Common;
-using EmpregaNet.Domain.Interfaces;
+using EmpregaNet.Domain.Components.Mediator.Interfaces;
 using EmpregaNet.Infra.Cache.MemoryService;
 using Microsoft.AspNetCore.Mvc;
 
-
-namespace EmpregaNet.Api.Controllers.Base
+namespace EmpregaNet.Api.Controllers.Core
 {
-    public abstract class BaseController<TRequest, TResponse> : ControllerBase
+    public abstract class MainController<TRequest, TResponse> : ControllerBase
         where TRequest : class
         where TResponse : class
     {
@@ -16,7 +15,7 @@ namespace EmpregaNet.Api.Controllers.Base
         private readonly IHub _sentryHub;
         private readonly string _entityName;
 
-        protected BaseController(IMediator mediator, IMemoryService cacheService, IHub sentryHub)
+        protected MainController(IMediator mediator, IMemoryService cacheService, IHub sentryHub)
         {
             _sentryHub = sentryHub;
             _mediator = mediator;
@@ -39,7 +38,6 @@ namespace EmpregaNet.Api.Controllers.Base
             var result = await _mediator.Send(new GetAllQuery<TResponse>(page, size, orderBy));
             await _cacheService.SetValueAsync(cacheKey, result, TimeSpan.FromMinutes(5));
 
-
             return Ok(result);
         }
 
@@ -56,7 +54,6 @@ namespace EmpregaNet.Api.Controllers.Base
 
             var result = await _mediator.Send(new GetByIdQuery<TResponse>(id));
             await _cacheService.SetValueAsync(cacheKey, result, TimeSpan.FromMinutes(5));
-
 
             return Ok(result);
         }

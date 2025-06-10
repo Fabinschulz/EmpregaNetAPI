@@ -1,6 +1,6 @@
 ﻿using EmpregaNet.Domain.Mapper.Interface;
 
-namespace Mapper.Interfaces;
+namespace EmpregaNet.Domain.Components.Mapper.Interfaces;
 
 /// <summary>
 /// Define um contrato para implementação de mapeamentos personalizados.

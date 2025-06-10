@@ -2,7 +2,7 @@ using System.Security.Claims;
 using EmpregaNet.Api.Configurations;
 using EmpregaNet.Api.Middleware;
 using EmpregaNet.Application.Service;
-using EmpregaNet.Domain.Services;
+using EmpregaNet.Domain.Components.Mediator.Extensions;
 using EmpregaNet.Infra;
 using EmpregaNet.Infra.Persistence.Database;
 

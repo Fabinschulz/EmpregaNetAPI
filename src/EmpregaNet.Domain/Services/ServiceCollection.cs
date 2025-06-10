@@ -1,6 +1,6 @@
 using System.Reflection;
-using EmpregaNet.Application.Common.Base;
-using EmpregaNet.Domain.Interfaces;
+using EmpregaNet.Domain.Components.Mediator;
+using EmpregaNet.Domain.Components.Mediator.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace EmpregaNet.Domain.Services;

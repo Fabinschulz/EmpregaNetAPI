@@ -1,5 +1,5 @@
 using EmpregaNet.Domain.Common;
-using EmpregaNet.Domain.Interfaces;
+using EmpregaNet.Domain.Components.Mediator.Interfaces;
 
 namespace EmpregaNet.Application.Common.Command;
 

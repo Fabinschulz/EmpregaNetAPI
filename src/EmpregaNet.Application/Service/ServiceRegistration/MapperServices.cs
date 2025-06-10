@@ -1,11 +1,11 @@
 using System.Reflection;
 using EmpregaNet.Application.Common.Behaviors;
-using EmpregaNet.Domain.Interfaces;
 using EmpregaNet.Domain.Mapper.Interface;
 using EmpregaNet.Infra.Utils;
-using Mapper.Implementations;
-using Mapper.Interfaces;
+using EmpregaNet.Domain.Components.Mapper;
+using EmpregaNet.Domain.Components.Mapper.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
+using EmpregaNet.Domain.Components.Mediator.Interfaces;
 
 namespace EmpregaNet.Application.Service;
 

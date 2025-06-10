@@ -1,6 +1,6 @@
 ﻿using EmpregaNet.Domain.Mapper.Interface;
 
-namespace Mapper.Implementations;
+namespace EmpregaNet.Domain.Components.Mapper;
 
 /// <summary>
 /// Representa as opções de configuração para um membro (propriedade) durante o mapeamento.
