@@ -11,31 +11,20 @@ namespace EmpregaNet.Domain.Entities
     {
         [Key]
         public long Id { get; set; }
-        public required string AddressName { get; set; }
+        public required string Street { get; set; }
 
         public required string ZipCode { get; set; }
 
         public required string City { get; set; }
 
-        public string State
-        {
-            get
-            {
-                if (UF == UF.NaoSelecionado)
-                {
-                    return "";
-                }
-                return UF.ToString();
-            }
-        }
+        [EnumDataType(typeof(UF))]
+        public required UF State { get; set; }
 
-        public UF UF { get; set; }
-
-        public required string District { get; set; }
+        public required string District { get; set; } // Bairro
 
         public required string Number { get; set; }
 
-        public required string Complement { get; set; }
+        public string? Complement { get; set; }
 
     }
 }

@@ -13,7 +13,7 @@ public static class MapperInjection
 {
     public static IServiceCollection AddApplication(this IServiceCollection services)
     {
-        
+
         var assemblies = Assembly.GetExecutingAssembly();
         var config = new MapperConfiguration();
 
@@ -32,7 +32,13 @@ public static class MapperInjection
         // Registra o Mapper como singleton, utilizando a configuração criada
         services.AddSingleton<IMapper>(new MapperObj(config));
 
+        // Adiciona o comportamento de validação antes da execução de qualquer Handler.
+        // Ele intercepta a requisição, executa as validações necessárias e, se falhar, evita que o Handler seja executado.
         services.AddScoped(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+
+        // Adiciona o comportamento de medição de performance em cada requisição.
+        // Se o tempo de execução ultrapassar um limite (por exemplo, 500ms), será logado um aviso.
+        services.AddScoped(typeof(IPipelineBehavior<,>), typeof(PerformanceBehaviour<,>));
 
         return services;
     }

@@ -26,7 +26,7 @@ public sealed record UpdateCommand<TRequest, TResponse>(long Id, TRequest entity
 /// </summary>
 /// <typeparam name="TEntity"></typeparam>
 /// <param name="Id"></param>
-public sealed record DeleteCommand<TEntity>(long Id) : IRequest<bool> where TEntity : class;
+public sealed record DeleteCommand<TEntity>(long Id) : IRequest<bool>;
 
 /// <summary>
 /// Query para Obter por ID: TResponse é a entidade ou DTO de saída.

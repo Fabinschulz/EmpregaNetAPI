@@ -1,9 +1,28 @@
 using System.Reflection;
-using EmpregaNet.Domain.Components.Mediator;
 using EmpregaNet.Domain.Components.Mediator.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace EmpregaNet.Domain.Services;
+
+/// <summary>
+/// Classe de extensão para registro automático do Mediator na coleção de serviços.
+/// 
+/// ✅ O método AddMediator registra as interfaces principais do Mediator:
+///     - IMediator → implementação Mediator
+///     - IRequestHandler<,> e INotificationHandler<> → resolve automaticamente todas as classes que implementam essas interfaces.
+///
+/// ✅ Permite a passagem opcional de filtros para assemblies:
+///     - Sem parâmetros → registra de todos os assemblies carregados.
+///     - Com array de Assembly → registra apenas os fornecidos.
+///     - Com array de string → registra apenas os assemblies cujo nome inicia com algum dos prefixos fornecidos.
+///
+/// 📌 Exemplo de uso na Startup ou Program:
+/// services.AddMediator(); // Registra handlers de todos os assemblies carregados
+/// services.AddMediator(typeof(MyApp.SomeClass).Assembly);
+/// services.AddMediator("MyApp", "MyApp.Domain"); // Registra assemblies que começam com "MyApp" ou "MyApp.Domain"
+///
+/// 🚨 Erro lançado se o parâmetro for inválido (não Assembly nem string).
+/// </summary>
+namespace EmpregaNet.Domain.Components.Mediator.Extensions;
 
 public static class ServiceCollectionExtensions
 {
@@ -22,6 +41,9 @@ public static class ServiceCollectionExtensions
         return services;
     }
 
+    /// <summary>
+    /// Resolve os assemblies com base nos argumentos fornecidos.
+    /// </summary>
     private static Assembly[] ResolveAssemblies(object[] args)
     {
         // Returna todos os assemblies
@@ -53,7 +75,9 @@ public static class ServiceCollectionExtensions
         throw new ArgumentException("Invalid parameters for AddSimpleMediator(). Use: no arguments, Assembly[], or prefix strings.");
     }
 
-
+    /// <summary>
+    /// Registra no DI todas as classes que implementam o handler genérico especificado.
+    /// </summary>
     private static void RegisterHandlers(IServiceCollection services, Assembly[] assemblies, Type handlerInterface)
     {
         var types = assemblies.SelectMany(a => a.GetTypes())
@@ -74,7 +98,12 @@ public static class ServiceCollectionExtensions
         }
     }
 
-
+    /// <summary>
+    /// Registra no DI todos os behaviors que implementam o IPipelineBehavior genérico.
+    /// </summary>
+    /// <remarks>
+    /// Os behaviors são resolvidos dinamicamente com base no tipo de request e response.
+    /// </remarks>
     private static void RegisterPipelineBehaviors(IServiceCollection services, Assembly[] assemblies)
     {
         var types = assemblies.SelectMany(a => a.GetTypes())

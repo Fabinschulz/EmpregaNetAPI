@@ -8,7 +8,7 @@ namespace EmpregaNet.Domain.Enums
     public enum UF
     {
 
-        [Description("")] NaoSelecionado,
+        [Description("Não informado")] NaoSelecionado,
         [Description("Acre")] AC,
         [Description("Alagoas")] AL,
         [Description("Amapá")] AP,

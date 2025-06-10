@@ -1,6 +1,17 @@
 using EmpregaNet.Domain.Components.Mediator.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 
+/// <summary>
+/// Implementação central do CQRSService responsável por:
+/// ✅ Executar comandos e consultas via Send.
+/// ✅ Publicar notificações via Publish.
+/// ✅ Resolver dinamicamente Handlers e Behaviors via IServiceProvider.
+///
+/// ⚙️ Características principais:
+/// - Suporte a Pipeline Behaviors, permitindo composição de middlewares.
+/// - Reflexão para invocar handlers de forma desacoplada.
+/// - Utiliza IServiceProvider para resolver dependências.
+/// </summary>
 namespace EmpregaNet.Domain.Components.Mediator;
 
 public class Mediator : IMediator
@@ -12,6 +23,15 @@ public class Mediator : IMediator
         _provider = provider;
     }
 
+    /// <summary>
+    /// Envia um comando ou consulta, resolvendo o handler apropriado.
+    /// Executa também a cadeia de pipeline behaviors.
+    /// </summary>
+    /// <typeparam name="TResponse">Tipo esperado de resposta.</typeparam>
+    /// <param name="request">Instância do comando ou consulta.</param>
+    /// <param name="cancellationToken">Token de cancelamento.</param>
+    /// <returns>Resposta processada pelo handler.</returns>
+    /// <exception cref="InvalidOperationException">Se o handler não for encontrado.</exception>
     public async Task<TResponse> Send<TResponse>(IRequest<TResponse> request, CancellationToken cancellationToken = default)
     {
         var requestType = request.GetType();
@@ -54,6 +74,7 @@ public class Mediator : IMediator
         var handlerType = typeof(INotificationHandler<>).MakeGenericType(notification.GetType());
         var handlers = _provider.GetServices(handlerType);
 
+        // Executa todos os handlers sequencialmente
         foreach (var handler in handlers)
         {
             await (Task)handlerType
