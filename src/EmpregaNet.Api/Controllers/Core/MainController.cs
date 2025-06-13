@@ -88,7 +88,7 @@ namespace EmpregaNet.Api.Controllers.Core
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public virtual async Task<IActionResult> Delete([FromRoute] long id)
         {
-            await _mediator.Send(new DeleteCommand<TResponse>(id));
+            await _mediator.Send(new DeleteCommand(id));
             await InvalidateCacheForEntity(id);
             return Ok($"{typeof(TResponse).Name.Replace("Command", "")} excluído(a) com sucesso. ID: {id}");
         }

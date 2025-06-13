@@ -1,6 +1,5 @@
 using System.Net;
 using Common.Exceptions;
-using EmpregaNet.Application.Common.Exceptions;
 using EmpregaNet.Domain;
 using EmpregaNet.Domain.Enums;
 using Microsoft.AspNetCore.Diagnostics;
