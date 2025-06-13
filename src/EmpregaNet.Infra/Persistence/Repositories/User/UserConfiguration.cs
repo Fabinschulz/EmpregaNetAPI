@@ -2,6 +2,7 @@ using EmpregaNet.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using OAuth.Domain.Entities;
 
 namespace EmpregaNet.Infra.Persistence.Repositories
 {
@@ -35,7 +36,7 @@ namespace EmpregaNet.Infra.Persistence.Repositories
     {
         public static void AddIdentityUserExtensions(this ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<IdentityRole<long>>(b =>
+            modelBuilder.Entity<Role>(b =>
             {
                 b.ToTable("Roles");
                 b.HasKey(x => x.Id);
