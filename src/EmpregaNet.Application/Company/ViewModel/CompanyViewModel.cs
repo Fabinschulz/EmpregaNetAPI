@@ -1,8 +1,7 @@
-using EmpregaNet.Application.ViewModel;
-using EmpregaNet.Domain.Components.Mapper.Interfaces;
+using EmpregaNet.Application.Jobs.ViewModel;
+using Mapper.Interfaces;
 using EmpregaNet.Domain.Entities;
 using EmpregaNet.Domain.Enums;
-using EmpregaNet.Domain.Mapper.Interface;
 
 namespace EmpregaNet.Application.Companies.ViewModel;
 

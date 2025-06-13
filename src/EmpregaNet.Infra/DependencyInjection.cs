@@ -9,12 +9,13 @@ namespace EmpregaNet.Infra
 {
     public static class DependencyInjection
     {
-        public static void AddWebApplication(this WebApplicationBuilder builder)
+        public static void RegisterInfraDependency(this WebApplicationBuilder builder)
         {
             builder.AddDatabase();
             builder.AddIdentityConfiguration();
             builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
             // services.Configure<ElasticsearchSettings>(configuration.GetSection("ElasticsearchSettings"));
+            builder.Services.ConfigureServices(builder.Configuration);
         }
 
         public static void ConfigureServices(this IServiceCollection services, IConfiguration configuration)
@@ -23,7 +24,7 @@ namespace EmpregaNet.Infra
             services.AddHttpContextAccessor();
             services.AddMemoryCache();
             services.AddEndpointsApiExplorer();
-            services.DIRegistrationServices();
+            services.RegisterRepositories();
             services.AddProblemDetails();
             services.AddSwaggerGen();
         }

@@ -1,4 +1,4 @@
-using EmpregaNet.Domain.Components.Mediator.Interfaces;
+using Mediator.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 
 /// <summary>

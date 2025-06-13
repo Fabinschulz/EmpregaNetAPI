@@ -1,6 +1,6 @@
 ﻿using EmpregaNet.Domain.Components.Mapper;
 
-namespace EmpregaNet.Domain.Mapper.Interface;
+namespace Mapper.Interfaces;
 
 /// <summary>
 /// Define um contrato para configuração fluente de mapeamentos entre <typeparamref name="TSource"/> e <typeparamref name="TDestination"/>.

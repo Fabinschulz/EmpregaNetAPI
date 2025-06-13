@@ -1,5 +1,5 @@
 using System.Reflection;
-using EmpregaNet.Domain.Components.Mediator.Interfaces;
+using Mediator.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 
 
@@ -32,7 +32,7 @@ public static class ServiceCollectionExtensions
     {
         var assemblies = ResolveAssemblies(args);
 
-        services.AddSingleton<IMediator, Mediator>();
+        services.AddSingleton<IMediator, Mediator>(); //AddScoped
 
         RegisterHandlers(services, assemblies, typeof(INotificationHandler<>));
         RegisterHandlers(services, assemblies, typeof(IRequestHandler<,>));
@@ -72,7 +72,7 @@ public static class ServiceCollectionExtensions
                 .ToArray();
         }
 
-        throw new ArgumentException("Invalid parameters for AddSimpleMediator(). Use: no arguments, Assembly[], or prefix strings.");
+        throw new ArgumentException("Invalid arguments. Expected Assembly or string array.");
     }
 
     /// <summary>

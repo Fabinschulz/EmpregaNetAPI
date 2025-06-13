@@ -1,11 +1,13 @@
 using EmpregaNet.Application.Common.Command;
 using EmpregaNet.Application.Companies.Command;
 using EmpregaNet.Application.Messages;
-using EmpregaNet.Domain.Components.Mediator.Interfaces;
+using Mediator.Interfaces;
 using EmpregaNet.Domain.Entities;
 using EmpregaNet.Domain.Interfaces;
 using FluentValidation;
 using Microsoft.Extensions.Logging;
+using Common.Exceptions;
+using EmpregaNet.Domain.Enums;
 
 namespace EmpregaNet.Application.Handler.Companies.Command;
 
@@ -19,7 +21,7 @@ public sealed class CreateCompanyCommandHandler : IRequestHandler<CreateCommand<
     public CreateCompanyCommandHandler(ICompanyRepository companyRepository,
                                        IValidator<CreateCompanyCommand> validator,
                                        ILogger<CreateCompanyCommandHandler> logger,
-                                        IMediator mediator)
+                                       IMediator mediator)
     {
         _companyRepository = companyRepository;
         _validator = validator;
@@ -35,8 +37,18 @@ public sealed class CreateCompanyCommandHandler : IRequestHandler<CreateCommand<
             var validationResult = await _validator.ValidateAsync(request.entity, cancellationToken);
             if (!validationResult.IsValid)
             {
-                _logger.LogWarning("Falha na validação da criação da Empresa: {Errors}", string.Join(", ", validationResult.Errors.Select(e => e.ErrorMessage)));
-                throw new ValidationException(validationResult.Errors);
+                _logger.LogWarning("Falha na validação da criação da empresa: {Errors}", string.Join(", ", validationResult.Errors.Select(e => e.ErrorMessage)));
+                throw new ValidationAppException(validationResult.Errors);
+            }
+
+            var existingCompany = await _companyRepository.GetByRegistrationNumberAsync(request.entity.RegistrationNumber);
+            if (existingCompany != null)
+            {
+                _logger.LogWarning("Tentativa de criar empresa com registro já existente: {RegistrationNumber}", request.entity.RegistrationNumber);
+                throw new ValidationAppException(
+                    nameof(request.entity.RegistrationNumber),
+                    $"Já existe uma empresa registrada com o número de registro '{request.entity.RegistrationNumber}'.",
+                    DomainErrorEnum.RESOURCE_ALREADY_EXISTS);
             }
 
             var company = new Company
@@ -56,25 +68,20 @@ public sealed class CreateCompanyCommandHandler : IRequestHandler<CreateCommand<
             return createdCompanyId.Id;
 
         }
-        catch (ValidationException ex)
-        {
-            _logger.LogWarning(ex, "Erro de validação ao criar funcionalidade. Request: {@Request}", request);
-            throw;
-        }
         catch (InvalidOperationException ex)
         {
-            _logger.LogWarning(ex, "Erro de lógica de negócio ao criar funcionalidade: {Message}. Request: {@Request}", ex.Message, request);
+            _logger.LogWarning(ex, "Erro de lógica de negócio ao criar empresa: {Message}. Request: {@Request}", ex.Message, request);
             throw;
         }
         catch (KeyNotFoundException ex)
         {
-            _logger.LogWarning(ex, "Entidade não encontrada ao criar funcionalidade: {Message}. Request: {@Request}", ex.Message, request);
+            _logger.LogWarning(ex, "Entidade não encontrada ao criar empresa: {Message}. Request: {@Request}", ex.Message, request);
             throw;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Erro inesperado ao criar funcionalidade. Request: {@Request}", request);
-            throw new Exception("Ocorreu um erro inesperado ao criar a funcionalidade. Por favor, tente novamente mais tarde.");
+            _logger.LogError(ex, "Erro inesperado ao criar empresa. Request: {@Request}", request);
+            throw new Exception("Ocorreu um erro inesperado ao criar a empresa. Por favor, tente novamente mais tarde.");
         }
 
     }

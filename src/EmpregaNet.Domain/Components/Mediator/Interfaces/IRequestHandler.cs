@@ -1,4 +1,4 @@
-namespace EmpregaNet.Domain.Components.Mediator.Interfaces;
+namespace Mediator.Interfaces;
 
 
 /// <summary>
@@ -27,8 +27,7 @@ namespace EmpregaNet.Domain.Components.Mediator.Interfaces;
 /// </summary>
 /// <typeparam name="TRequest">Tipo da requisição que implementa <see cref="IRequest{TResponse}"/>.</typeparam>
 /// <typeparam name="TResponse">Tipo da resposta que será retornada após o processamento.</typeparam>
-public interface IRequestHandler<TRequest, TResponse>
-       where TRequest : IRequest<TResponse>
+public interface IRequestHandler<in TRequest, TResponse> where TRequest : IRequest<TResponse>
 {
     /// <summary>
     ///  Método responsável por manipular uma requisição e retornar uma resposta.

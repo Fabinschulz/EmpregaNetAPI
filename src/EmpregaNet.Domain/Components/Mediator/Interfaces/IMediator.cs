@@ -1,4 +1,4 @@
-namespace EmpregaNet.Domain.Components.Mediator.Interfaces;
+namespace Mediator.Interfaces;
 
 public interface IMediator
 {

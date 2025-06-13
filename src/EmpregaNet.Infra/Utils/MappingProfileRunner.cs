@@ -1,6 +1,5 @@
 ﻿using System.Reflection;
-using EmpregaNet.Domain.Mapper.Interface;
-using EmpregaNet.Domain.Components.Mapper.Interfaces;
+using Mapper.Interfaces;
 
 namespace EmpregaNet.Infra.Utils;
 

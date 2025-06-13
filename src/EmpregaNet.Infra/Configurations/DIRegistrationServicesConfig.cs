@@ -7,7 +7,7 @@ namespace EmpregaNet.Infra.Configurations;
 
 public static class DIRegistrationServicesConfig
 {
-    public static void DIRegistrationServices(this IServiceCollection services)
+    public static void RegisterRepositories(this IServiceCollection services)
     {
         services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
         // services.AddTransient<IEmailSender<User>, IdentityNoOpEmailSender>();

@@ -1,12 +1,13 @@
 using EmpregaNet.Application.Common.Command;
 using EmpregaNet.Application.Companies.ViewModel;
-using EmpregaNet.Application.Messages;
-using EmpregaNet.Application.ViewModel;
-using EmpregaNet.Domain.Components.Mediator.Interfaces;
+using EmpregaNet.Application.Jobs.ViewModel;
+using Mediator.Interfaces;
 using EmpregaNet.Domain.Entities;
 using EmpregaNet.Domain.Interfaces;
 using FluentValidation;
 using Microsoft.Extensions.Logging;
+using Common.Exceptions;
+using EmpregaNet.Domain.Enums;
 
 namespace EmpregaNet.Application.Companies.Command;
 
@@ -14,17 +15,14 @@ public sealed class UpdateCompanyHandler : IRequestHandler<UpdateCommand<UpdateC
 {
     private readonly ICompanyRepository _companyRepository;
     private readonly IValidator<UpdateCompanyCommand> _validator;
-    private readonly IMediator _mediator;
     private readonly ILogger<UpdateCompanyHandler> _logger;
 
     public UpdateCompanyHandler(ICompanyRepository companyRepository,
                                 IValidator<UpdateCompanyCommand> validator,
-                                IMediator mediator,
                                 ILogger<UpdateCompanyHandler> logger)
     {
         _companyRepository = companyRepository;
         _validator = validator;
-        _mediator = mediator;
         _logger = logger;
     }
 
@@ -45,13 +43,19 @@ public sealed class UpdateCompanyHandler : IRequestHandler<UpdateCommand<UpdateC
             if (company == null)
             {
                 _logger.LogError("Empresa não encontrada com ID: {CompanyId}", request.Id);
-                throw new KeyNotFoundException($"Empresa com ID '{request.Id}' não encontrada.");
+                throw new ValidationAppException(
+                    nameof(request.Id),
+                    $"Empresa com ID '{request.Id}' não encontrada.",
+                    DomainErrorEnum.RESOURCE_ID_NOT_FOUND);
             }
 
             if (company.IsDeleted)
             {
                 _logger.LogError("Tentativa de atualização de empresa excluída. ID: {CompanyId}", request.Id);
-                throw new InvalidOperationException($"Não é possível atualizar uma empresa excluída. ID: {request.Id}");
+                throw new ValidationAppException(
+                    nameof(request.Id),
+                    $"Não é possível atualizar uma empresa excluída. ID '{request.Id}' já está marcado como excluído.",
+                    DomainErrorEnum.INVALID_ACTION_FOR_STATUS);
             }
 
             if (request.entity.TypeOfActivity.HasValue) company.TypeOfActivity = request.entity.TypeOfActivity;
@@ -62,8 +66,6 @@ public sealed class UpdateCompanyHandler : IRequestHandler<UpdateCommand<UpdateC
 
             await _companyRepository.UpdateAsync(company);
             _logger.LogInformation("Empresa atualizada com sucesso. ID: {CompanyId}", company.Id);
-
-            await _mediator.Publish(new EntityEvent<Company>(company), cancellationToken);
 
             return new CompanyViewModel
             {
@@ -85,11 +87,6 @@ public sealed class UpdateCompanyHandler : IRequestHandler<UpdateCommand<UpdateC
                     IsDeleted = j.IsDeleted
                 }).ToList(),
             };
-        }
-        catch (ValidationException ex)
-        {
-            _logger.LogWarning(ex, "Erro de validação ao atualizar funcionalidade (ID: {Id}). Request: {@Request}", request.Id, request);
-            throw;
         }
         catch (KeyNotFoundException ex)
         {

@@ -1,15 +1,15 @@
 using Microsoft.AspNetCore.Mvc;
-using EmpregaNet.Domain.Entities;
 using EmpregaNet.Api.Controllers.Core;
 using EmpregaNet.Infra.Cache.MemoryService;
-using EmpregaNet.Domain.Components.Mediator.Interfaces;
+using Mediator.Interfaces;
 using EmpregaNet.Application.Companies.Command;
+using EmpregaNet.Application.Companies.ViewModel;
 
 namespace EmpregaNet.Api.Controllers.Companies
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class CompanyController : MainController<CreateCompanyCommand, Company>
+    public class CompanyController : MainController<CreateCompanyCommand, CompanyViewModel>
     {
 
         public CompanyController(IMediator mediator, IMemoryService cacheService, IHub sentryHub)

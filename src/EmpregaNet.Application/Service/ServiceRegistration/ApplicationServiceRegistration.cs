@@ -1,17 +1,16 @@
 using System.Reflection;
 using EmpregaNet.Application.Common.Behaviors;
-using EmpregaNet.Domain.Mapper.Interface;
+using Mapper.Interfaces;
 using EmpregaNet.Infra.Utils;
 using EmpregaNet.Domain.Components.Mapper;
-using EmpregaNet.Domain.Components.Mapper.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
-using EmpregaNet.Domain.Components.Mediator.Interfaces;
+using Mediator.Interfaces;
 
 namespace EmpregaNet.Application.Service;
 
-public static class MapperInjection
+public static class ApplicationServiceRegistration
 {
-    public static IServiceCollection AddApplication(this IServiceCollection services)
+    public static IServiceCollection RegisterApplicationDependency(this IServiceCollection services)
     {
 
         var assemblies = Assembly.GetExecutingAssembly();

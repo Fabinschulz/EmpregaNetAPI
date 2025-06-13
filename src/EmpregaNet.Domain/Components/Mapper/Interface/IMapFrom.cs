@@ -1,4 +1,4 @@
-﻿namespace EmpregaNet.Domain.Mapper.Interface;
+﻿namespace Mapper.Interfaces;
 
 /// <summary>
 /// Define um contrato para configuração automática de mapeamento de um tipo de origem para o tipo que implementa esta interface.

@@ -8,7 +8,7 @@
 ///     }
 /// }
 
-namespace EmpregaNet.Domain.Components.Mediator.Interfaces;
+namespace Mediator.Interfaces;
 
 /// <summary>
 /// Interface genérica para manipuladores de notificações no padrão CQRS.

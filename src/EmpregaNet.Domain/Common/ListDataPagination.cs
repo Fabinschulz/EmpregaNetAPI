@@ -19,8 +19,13 @@ public class ListDataPagination<T>
     }
 
     /// <summary>
-    /// Cria uma instância paginada de forma assíncrona.
+    ///  Cria uma instância paginada de forma assíncrona.
+    /// Usage: await ListDataPagination<TDestination>.CreateAsync(queryable, pageNumber, pageSize);
     /// </summary>
+    /// <param name="source">Fonte de dados.</param>
+    /// <param name="pageNumber">Número da página.</param>
+    /// <param name="pageSize">Tamanho da página.</param>
+    /// <returns> Uma instância de <see cref="ListDataPagination{T}"/> com os dados paginados.</returns>
     public static async Task<ListDataPagination<T>> CreateAsync(IQueryable<T> source, int pageNumber, int pageSize)
     {
         var totalItems = await source.CountAsync();

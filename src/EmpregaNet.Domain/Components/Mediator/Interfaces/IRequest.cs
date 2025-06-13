@@ -1,4 +1,4 @@
-namespace EmpregaNet.Domain.Components.Mediator.Interfaces;
+namespace Mediator.Interfaces;
 
 /// <summary>
 /// Interface que representa uma requisição no padrão CQRS (Command Query Responsibility Segregation).
@@ -22,4 +22,4 @@ namespace EmpregaNet.Domain.Components.Mediator.Interfaces;
 /// }
 /// </summary>
 /// <typeparam name="TResponse">Tipo da resposta esperada ao processar a requisição.</typeparam>
-public interface IRequest<TResponse> { }
+public interface IRequest<out TResponse> { }

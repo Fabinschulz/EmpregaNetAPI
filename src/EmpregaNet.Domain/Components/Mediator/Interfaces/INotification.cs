@@ -1,4 +1,4 @@
-namespace EmpregaNet.Domain.Components.Mediator.Interfaces;
+namespace Mediator.Interfaces;
 
 /// <summary>
 /// Interface de marcação utilizada para definir objetos de notificação no padrão CQRS.

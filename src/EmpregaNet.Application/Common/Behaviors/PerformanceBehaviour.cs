@@ -1,5 +1,5 @@
 ﻿using EmpregaNet.Application.Service;
-using EmpregaNet.Domain.Components.Mediator.Interfaces;
+using Mediator.Interfaces;
 using Microsoft.Extensions.Logging;
 using System.Diagnostics;
 
@@ -25,7 +25,7 @@ namespace EmpregaNet.Application.Common.Behaviors;
 public class PerformanceBehaviour<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse> where TRequest : IRequest<TResponse>
 {
     private readonly Stopwatch _timer;
-    private readonly ILogger<TRequest> _logger;
+    private readonly ILogger<PerformanceBehaviour<TRequest, TResponse>> _logger;
     private readonly IHttpCurrentUser _currentUser;
 
     /// <summary>
@@ -33,9 +33,7 @@ public class PerformanceBehaviour<TRequest, TResponse> : IPipelineBehavior<TRequ
     /// </summary>
     /// <param name="logger">Logger para registrar eventos.</param>
     /// <param name="currentUser">Serviço para obter informações do usuário atual.</param>
-    public PerformanceBehaviour(
-        ILogger<TRequest> logger,
-        IHttpCurrentUser currentUser
+    public PerformanceBehaviour(ILogger<PerformanceBehaviour<TRequest, TResponse>> logger, IHttpCurrentUser currentUser
     )
     {
         _logger = logger;

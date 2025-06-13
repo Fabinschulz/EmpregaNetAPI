@@ -1,7 +1,7 @@
 using EmpregaNet.Application.Common.Command;
 using EmpregaNet.Application.Companies.ViewModel;
-using EmpregaNet.Application.ViewModel;
-using EmpregaNet.Domain.Components.Mediator.Interfaces;
+using EmpregaNet.Application.Jobs.ViewModel;
+using Mediator.Interfaces;
 using EmpregaNet.Domain.Interfaces;
 using Microsoft.Extensions.Logging;
 

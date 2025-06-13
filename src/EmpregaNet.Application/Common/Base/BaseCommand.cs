@@ -1,5 +1,5 @@
 using EmpregaNet.Domain.Common;
-using EmpregaNet.Domain.Components.Mediator.Interfaces;
+using Mediator.Interfaces;
 
 namespace EmpregaNet.Application.Common.Command;
 
@@ -24,9 +24,8 @@ public sealed record UpdateCommand<TRequest, TResponse>(long Id, TRequest entity
 /// <summary>
 /// Command para Exclusão: TEntity é a entidade ou DTO de saída.
 /// </summary>
-/// <typeparam name="TEntity"></typeparam>
 /// <param name="Id"></param>
-public sealed record DeleteCommand<TEntity>(long Id) : IRequest<bool>;
+public sealed record DeleteCommand(long Id) : IRequest<bool>;
 
 /// <summary>
 /// Query para Obter por ID: TResponse é a entidade ou DTO de saída.

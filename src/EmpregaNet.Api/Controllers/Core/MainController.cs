@@ -1,6 +1,6 @@
 using EmpregaNet.Application.Common.Command;
 using EmpregaNet.Domain.Common;
-using EmpregaNet.Domain.Components.Mediator.Interfaces;
+using Mediator.Interfaces;
 using EmpregaNet.Infra.Cache.MemoryService;
 using Microsoft.AspNetCore.Mvc;
 

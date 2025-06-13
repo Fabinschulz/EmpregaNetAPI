@@ -1,8 +1,9 @@
 using System.Net;
+using Common.Exceptions;
 using EmpregaNet.Application.Common.Exceptions;
-using FluentValidation;
+using EmpregaNet.Domain;
+using EmpregaNet.Domain.Enums;
 using Microsoft.AspNetCore.Diagnostics;
-using Microsoft.AspNetCore.Mvc;
 
 namespace EmpregaNet.Api.Middleware
 {
@@ -20,83 +21,119 @@ namespace EmpregaNet.Api.Middleware
             Exception exception,
             CancellationToken cancellationToken)
         {
+            var correlationId = httpContext.Items["Correlation-ID"]?.ToString() ?? Guid.NewGuid().ToString();
+            var (domainError, httpStatusCode) = MapExceptionToDomainError(exception, correlationId);
 
-            var (statusCode, title, errors) = MapException(exception);
+            _logger.LogError(exception, "Erro ao processar a requisição: {Message}. CorrelationId: {CorrelationId}", exception.Message, correlationId);
+            // Captura a exceção no Sentry, ELK, etc.
+            // SentrySdk.CaptureException(exception); 
+            // Log.Error(exception, "Erro ao processar a requisição: {Message}", exception.Message); 
 
-            // Log.Error(exception, "Erro ao processar a requisição: {Message}", exception.Message); - ELK
-            // Captura a exceção no Sentry
-            SentrySdk.CaptureException(exception);
-
-            var problemDetails = new ProblemDetails
-            {
-                Status = statusCode,
-                Title = title,
-                Detail = exception.Message,
-                Extensions = { ["errors"] = errors }
-            };
-
-            httpContext.Response.StatusCode = problemDetails.Status.Value;
-            await httpContext.Response.WriteAsJsonAsync(problemDetails, cancellationToken);
+            httpContext.Response.StatusCode = httpStatusCode;
+            httpContext.Response.ContentType = "application/json";
+            await httpContext.Response.WriteAsJsonAsync(domainError, cancellationToken);
 
             return true;
         }
 
-        private static (int statusCode, string title, string[] errors) MapException(Exception exception)
+
+        /// <summary>
+        /// Mapeia diferentes tipos de exceção para uma estrutura DomainError e um StatusCode HTTP.
+        /// </summary>
+        /// <param name="exception">A exceção a ser mapeada.</param>
+        /// <param name="correlationId">O ID de correlação da requisição.</param>
+        /// <returns>Uma tupla contendo o DomainError mapeado e o StatusCode HTTP apropriado.</returns>
+        private (DomainError domainError, int httpStatusCode) MapExceptionToDomainError(Exception exception, string correlationId)
         {
+            var code = DomainErrorEnum.UNEXPECTED_EXCEPTION;
+            var message = "Erro inesperado. Tente novamente mais tarde.";
+            object details = new { };
+            string[] errors = Array.Empty<string>();
             var statusCode = (int)HttpStatusCode.InternalServerError;
-            var title = "Erro no Servidor";
-            var errors = Array.Empty<string>();
+
+            if (exception.InnerException != null)
+            {
+                exception = exception.InnerException;
+            }
 
             switch (exception)
             {
                 case BadRequestException badRequestException:
                     statusCode = (int)HttpStatusCode.BadRequest;
-                    title = "Requisição inválida";
+                    code = DomainErrorEnum.INVALID_PARAMS;
+                    message = "Requisição inválida.";
                     errors = badRequestException.Errors;
                     break;
 
                 case NotFoundException notFoundException:
                     statusCode = (int)HttpStatusCode.NotFound;
-                    title = "Recurso não encontrado";
+                    code = DomainErrorEnum.RESOURCE_ID_NOT_FOUND;
+                    message = "Recurso não encontrado.";
                     errors = new[] { notFoundException.Message };
                     break;
 
                 case InvalidOperationException invalidOperationException:
                     statusCode = (int)HttpStatusCode.Conflict;
-                    title = "Problema de concorrência";
+                    code = DomainErrorEnum.INVALID_ACTION_FOR_RECORD;
+                    message = "Operação inválida.";
                     errors = new[] { invalidOperationException.Message };
                     break;
 
                 case KeyNotFoundException keyNotFoundException:
                     statusCode = (int)HttpStatusCode.NotFound;
-                    title = "Chave não encontrada";
+                    code = DomainErrorEnum.RESOURCE_ID_NOT_FOUND;
+                    message = "Chave não encontrada.";
                     errors = new[] { keyNotFoundException.Message };
                     break;
 
                 case UnauthorizedAccessException unauthorizedAccessException:
                     statusCode = (int)HttpStatusCode.Unauthorized;
-                    title = "Acesso não autorizado";
+                    code = DomainErrorEnum.MISSING_RESOURCE_PERMISSION;
+                    message = "Acesso não autorizado.";
                     errors = new[] { unauthorizedAccessException.Message };
                     break;
 
                 case DatabaseNotFoundException databaseNotFoundException:
-                    statusCode = (int)HttpStatusCode.NotFound;
-                    title = "Banco de dados não encontrado";
+                    statusCode = (int)HttpStatusCode.ServiceUnavailable;
+                    code = DomainErrorEnum.UNEXPECTED_EXCEPTION;
+                    message = "Banco de dados não encontrado.";
                     errors = new[] { databaseNotFoundException.Message };
                     break;
 
-                case ValidationException validationException:
+                case ValidationAppException validationException:
                     statusCode = (int)HttpStatusCode.BadRequest;
-                    title = "Validação falhou";
-                    errors = validationException.Errors.Select(e => e.ErrorMessage).ToArray();
+                    code = DomainErrorEnum.INVALID_PARAMS;
+                    message = "Validação falhou.";
+                    errors = validationException.Errors.SelectMany(e => e.Value).ToArray();
+                    break;
+
+                case ForbiddenAccessException forbiddenAccessException:
+                    statusCode = (int)HttpStatusCode.Forbidden;
+                    code = DomainErrorEnum.MISSING_RESOURCE_PERMISSION;
+                    message = "Acesso negado. Você não possui o nível de permissão necessário para acessar este recurso.";
+                    errors = new[] { forbiddenAccessException.Message };
                     break;
 
                 default:
-                    errors = new[] { exception?.StackTrace ?? "Erro interno no servidor." };
+                    statusCode = (int)HttpStatusCode.InternalServerError;
+                    code = DomainErrorEnum.UNEXPECTED_EXCEPTION;
+                    message = "Erro interno no servidor.";
+                    errors = new[] { exception.Message };
                     break;
             }
 
-            return (statusCode, title, errors);
+            details = new { Errors = errors.Any() ? errors : null, StackTrace = exception.StackTrace };
+
+            var domainError = new DomainError
+            {
+                StatusCode = statusCode,
+                Code = code,
+                Message = message,
+                Details = details,
+                CorrelationId = correlationId
+            };
+
+            return (domainError, statusCode);
         }
     }
 }

@@ -1,7 +1,7 @@
-﻿using EmpregaNet.Application.Common.Exceptions;
+﻿using Common.Exceptions;
 using FluentValidation;
 using FluentValidation.Results;
-using EmpregaNet.Domain.Components.Mediator.Interfaces;
+using Mediator.Interfaces;
 
 namespace EmpregaNet.Application.Common.Behaviors
 {

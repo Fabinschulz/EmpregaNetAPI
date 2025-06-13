@@ -1,9 +1,10 @@
+using Mapper.Interfaces;
 using EmpregaNet.Domain.Entities;
 using EmpregaNet.Domain.Enums;
 
-namespace EmpregaNet.Application.ViewModel
+namespace EmpregaNet.Application.Jobs.ViewModel
 {
-    public sealed class JobViewModel
+    public sealed class JobViewModel : IMapFrom<Job>, ICustomMap
     {
         public long Id { get; set; }
         public required string Title { get; set; }
@@ -18,6 +19,11 @@ namespace EmpregaNet.Application.ViewModel
         public DateTime? UpdatedAt { get; set; } = null;
         public DateTime? DeletedAt { get; set; } = null;
         public bool IsDeleted { get; set; } = false;
+
+        public void CustomMap(IMapperConfigurationExpression configuration)
+        {
+            configuration.CreateMapWithOptions<Job, JobViewModel>().Apply();
+        }
 
     }
 }

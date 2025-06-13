@@ -7,14 +7,13 @@ using EmpregaNet.Infra;
 using EmpregaNet.Infra.Persistence.Database;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.AddWebApplication();
+builder.RegisterInfraDependency();
 builder.AddApiConfiguration();
 
 var builderServices = builder.Services;
-builderServices.ConfigureServices(builder.Configuration);
 builderServices.AddMediator(typeof(Program).Assembly);
 builderServices.AddExceptionHandler<GlobalExceptionHandler>();
-builderServices.AddApplication(); // Registra serviços e handlers da camada de Application (ex: MediatR, automappers, etc.)
+builderServices.RegisterApplicationDependency(); // Registra serviços e handlers da camada de Application (ex: MediatR, automappers, etc.)
 
 var app = builder.Build();
 

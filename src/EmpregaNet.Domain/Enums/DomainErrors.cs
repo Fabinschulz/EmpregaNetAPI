@@ -5,6 +5,15 @@ namespace EmpregaNet.Domain.Enums
     public enum DomainErrorEnum
     {
         /// <summary>
+        /// Registro já existe
+        /// </summary>
+        [Description("Registro já existe.")] RESOURCE_ALREADY_EXISTS,
+
+        /// <summary>
+        /// Dados inválidos.
+        /// </summary>
+        [Description("Dados inválidos.")] INVALID_PARAMS,
+        /// <summary>
         /// Registro não encontrado
         /// </summary>
         [Description("Registro não encontrado")] RESOURCE_ID_NOT_FOUND,

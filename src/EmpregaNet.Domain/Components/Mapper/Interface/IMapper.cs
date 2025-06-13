@@ -1,4 +1,4 @@
-namespace EmpregaNet.Domain.Mapper.Interface;
+namespace Mapper.Interfaces;
 
 public interface IMapper
 {

@@ -1,4 +1,4 @@
-﻿using EmpregaNet.Domain.Mapper.Interface;
+﻿using Mapper.Interfaces;
 
 namespace EmpregaNet.Domain.Components.Mapper;
 
