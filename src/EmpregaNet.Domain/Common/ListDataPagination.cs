@@ -20,7 +20,7 @@ public class ListDataPagination<T>
 
     /// <summary>
     ///  Cria uma instância paginada de forma assíncrona.
-    /// Usage: await ListDataPagination<TDestination>.CreateAsync(queryable, pageNumber, pageSize);
+    /// Usage: await ListDataPagination<TDestination/>.CreateAsync(queryable, pageNumber, pageSize);
     /// </summary>
     /// <param name="source">Fonte de dados.</param>
     /// <param name="pageNumber">Número da página.</param>

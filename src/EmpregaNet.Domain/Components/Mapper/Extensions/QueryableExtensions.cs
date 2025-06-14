@@ -1,6 +1,6 @@
 ﻿using Mapper.Interfaces;
 
-namespace EmpregaNet.Domain.Components.Mapper;
+namespace Components.Mapper;
 
 /// <summary>
 /// Extensões para facilitar a projeção de consultas <see cref="IQueryable{T}"/> utilizando o <see cref="IMapperConfigurationProvider"/>.

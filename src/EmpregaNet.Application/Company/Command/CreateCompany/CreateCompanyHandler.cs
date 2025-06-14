@@ -1,6 +1,5 @@
 using EmpregaNet.Application.Common.Command;
 using EmpregaNet.Application.Companies.Command;
-using EmpregaNet.Application.Messages;
 using Mediator.Interfaces;
 using EmpregaNet.Domain.Entities;
 using EmpregaNet.Domain.Interfaces;
@@ -16,17 +15,14 @@ public sealed class CreateCompanyCommandHandler : IRequestHandler<CreateCommand<
     private readonly ICompanyRepository _companyRepository;
     private readonly IValidator<CreateCompanyCommand> _validator;
     private readonly ILogger<CreateCompanyCommandHandler> _logger;
-    private readonly IMediator _mediator;
 
     public CreateCompanyCommandHandler(ICompanyRepository companyRepository,
                                        IValidator<CreateCompanyCommand> validator,
-                                       ILogger<CreateCompanyCommandHandler> logger,
-                                       IMediator mediator)
+                                       ILogger<CreateCompanyCommandHandler> logger)
     {
         _companyRepository = companyRepository;
         _validator = validator;
         _logger = logger;
-        _mediator = mediator;
     }
     public async Task<long> Handle(CreateCommand<CreateCompanyCommand> request, CancellationToken cancellationToken)
     {
@@ -63,19 +59,13 @@ public sealed class CreateCompanyCommandHandler : IRequestHandler<CreateCommand<
 
             var createdCompanyId = await _companyRepository.CreateAsync(company);
             _logger.LogInformation("Empresa criada com sucesso. ID: {CompanyId}", createdCompanyId);
-            await _mediator.Publish(new EntityEvent<Company>(company), cancellationToken);
 
             return createdCompanyId.Id;
 
         }
-        catch (InvalidOperationException ex)
+        catch (ValidationAppException ex)
         {
-            _logger.LogWarning(ex, "Erro de lógica de negócio ao criar empresa: {Message}. Request: {@Request}", ex.Message, request);
-            throw;
-        }
-        catch (KeyNotFoundException ex)
-        {
-            _logger.LogWarning(ex, "Entidade não encontrada ao criar empresa: {Message}. Request: {@Request}", ex.Message, request);
+            _logger.LogWarning(ex, "Falha de validação ao criar empresa. Request: {@Request}", request);
             throw;
         }
         catch (Exception ex)

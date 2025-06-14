@@ -2,7 +2,7 @@ using EmpregaNet.Domain;
 using EmpregaNet.Domain.Common;
 using EmpregaNet.Domain.Interfaces;
 using EmpregaNet.Infra.Persistence.Database;
-using EmpregaNet.Domain.Components.Mapper;
+using Components.Mapper;
 using Microsoft.EntityFrameworkCore;
 
 namespace EmpregaNet.Infra.Persistence.Repositories

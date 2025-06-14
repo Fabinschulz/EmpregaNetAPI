@@ -2,7 +2,7 @@ using System.Reflection;
 using EmpregaNet.Application.Common.Behaviors;
 using Mapper.Interfaces;
 using EmpregaNet.Infra.Utils;
-using EmpregaNet.Domain.Components.Mapper;
+using Components.Mapper;
 using Microsoft.Extensions.DependencyInjection;
 using Mediator.Interfaces;
 using EmpregaNet.Infra.Configurations;
@@ -28,7 +28,7 @@ public static class ApplicationServiceRegistration
         config.AssertConfigurationIsValid();
         services.AddSingleton<IMapperConfigurationProvider>(config);
         services.AddSingleton<IMapper>(new MapperObj(config));
-         services.AddValidatorsFromAssembly(assemblies);
+        services.AddValidatorsFromAssembly(assemblies);
 
         // Adiciona o comportamento de validação antes da execução de qualquer Handler.
         // Ele intercepta a requisição, executa as validações necessárias e, se falhar, evita que o Handler seja executado.

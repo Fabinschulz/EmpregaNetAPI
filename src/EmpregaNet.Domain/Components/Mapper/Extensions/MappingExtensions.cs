@@ -1,6 +1,6 @@
 ﻿using EmpregaNet.Domain.Common;
 
-namespace EmpregaNet.Domain.Components.Mapper;
+namespace Components.Mapper;
 
 /// <summary>
 /// Extensões para facilitar a paginação e projeção de consultas <see cref="IQueryable{T}"/>.

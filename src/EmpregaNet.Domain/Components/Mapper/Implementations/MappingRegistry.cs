@@ -1,4 +1,4 @@
-﻿namespace EmpregaNet.Domain.Components.Mapper;
+﻿namespace Components.Mapper;
 
 /// <summary>
 /// Registro central de todas as funções de mapeamento configuradas.

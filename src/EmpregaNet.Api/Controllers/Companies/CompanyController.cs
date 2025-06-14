@@ -4,6 +4,7 @@ using EmpregaNet.Infra.Cache.MemoryService;
 using Mediator.Interfaces;
 using EmpregaNet.Application.Companies.Command;
 using EmpregaNet.Application.Companies.ViewModel;
+using Mapper.Interfaces;
 
 namespace EmpregaNet.Api.Controllers.Companies
 {
@@ -12,8 +13,8 @@ namespace EmpregaNet.Api.Controllers.Companies
     public class CompanyController : MainController<CreateCompanyCommand, CompanyViewModel>
     {
 
-        public CompanyController(IMediator mediator, IMemoryService cacheService)
-            : base(mediator, cacheService)
+        public CompanyController(IMemoryService cacheService, IMapperConfigurationProvider configuration)
+            : base(cacheService, configuration)
         {
         }
 

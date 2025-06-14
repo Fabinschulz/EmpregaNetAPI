@@ -123,7 +123,8 @@ namespace EmpregaNet.Api.Configurations
             {
                 swaggerDoc.Tags = new List<OpenApiTag>
                 {
-                    new OpenApiTag { Name = "USER", Description = "User API" }
+                    new OpenApiTag { Name = "USER", Description = "Cadastrar, atualizar e consultar usuário" },
+                    new OpenApiTag { Name = "COMPANY", Description = "Cadastrar, atualizar e consultar empresa" },
                 };
             }
         }

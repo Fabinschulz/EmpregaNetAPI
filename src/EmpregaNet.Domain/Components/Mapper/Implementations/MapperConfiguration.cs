@@ -1,6 +1,6 @@
 ﻿using Mapper.Interfaces;
 
-namespace EmpregaNet.Domain.Components.Mapper;
+namespace Components.Mapper;
 
 /// <summary>
 /// Configuração central de mapeamento, responsável por registrar e validar mapeamentos.

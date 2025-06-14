@@ -70,7 +70,7 @@ public class HttpCurrentUser : IHttpCurrentUser
     /// <summary>
     /// Obtém todas as permissões do usuário autenticado consultando o serviço de autenticação.
     /// </summary>
-    /// <returns>Lista de permissões (<see cref="UserPermission"/>) ou <c>null</c> se não houver permissões.</returns>
+    /// <returns>Lista de permissões (<see cref="UserPermissionVieModel"/>) ou <c>null</c> se não houver permissões.</returns>
     public async Task<List<UserPermissionVieModel>?> GetAllPermissions() => await _jwtBuilder.GetAllPermissions(Key);
 
     /// <summary>

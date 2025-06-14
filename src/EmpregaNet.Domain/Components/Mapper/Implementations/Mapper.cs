@@ -1,6 +1,6 @@
 ﻿using Mapper.Interfaces;
 
-namespace EmpregaNet.Domain.Components.Mapper;
+namespace Components.Mapper;
 
 /// <summary>
 /// Implementação padrão do mapeador de objetos utilizando a <see cref="IMapperConfigurationProvider"/>.

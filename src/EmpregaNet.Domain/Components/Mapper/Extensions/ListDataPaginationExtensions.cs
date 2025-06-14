@@ -1,7 +1,7 @@
 ﻿using EmpregaNet.Domain.Common;
 using Mapper.Interfaces;
 
-namespace EmpregaNet.Domain.Components.Mapper;
+namespace Components.Mapper;
 
 /// <summary>
 /// Extensões para projeção de objetos em uma instância de <see cref="ListDataPagination{T}"/>.

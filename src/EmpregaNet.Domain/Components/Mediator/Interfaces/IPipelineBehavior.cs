@@ -27,22 +27,10 @@ namespace Mediator.Interfaces
     /// - Autorização.
     /// 
     /// A ordem de execução é determinada pela ordem de registro na injeção de dependência.
-    /// 
-    /// Exemplo de implementação:
-    /// public class LoggingBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
-    /// {
-    ///     public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
-    ///     {
-    ///         Console.WriteLine($"Handling {typeof(TRequest).Name}");
-    ///         var response = await next();
-    ///         Console.WriteLine($"Handled {typeof(TResponse).Name}");
-    ///         return response;
-    ///     }
-    /// }
     /// </summary>
     /// <typeparam name="TRequest">Tipo da requisição.</typeparam>
     /// <typeparam name="TResponse">Tipo da resposta.</typeparam>
-    public interface IPipelineBehavior<in TRequest, TResponse> where TRequest : IRequest<TResponse>
+    public interface IPipelineBehavior<TRequest, TResponse>
     {
 
         /// <summary>

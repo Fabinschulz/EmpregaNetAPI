@@ -14,11 +14,6 @@ namespace EmpregaNet.Application.Common.Behaviors;
 /// da requisição.
 /// 
 /// Aplicação típica: Monitoramento de performance e detecção de operações lentas.
-/// 
-/// <example>
-/// Exemplo de injeção:
-/// services.AddScoped(typeof(IPipelineBehavior<,>), typeof(PerformanceBehaviour<,>));
-/// </example>
 /// </summary>
 /// <typeparam name="TRequest">Tipo da requisição.</typeparam>
 /// <typeparam name="TResponse">Tipo da resposta.</typeparam>

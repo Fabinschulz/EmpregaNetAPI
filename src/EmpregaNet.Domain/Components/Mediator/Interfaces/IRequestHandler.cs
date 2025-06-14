@@ -9,21 +9,6 @@ namespace Mediator.Interfaces;
 /// para separar claramente as operações de leitura (queries) e escrita (commands).
 /// 
 /// O manipulador processa a lógica associada à requisição e retorna o resultado esperado.
-/// 
-/// Exemplo de uso:
-/// 
-/// public class GetUserByIdQuery : IRequest<UserDto>
-/// {
-///     public Guid UserId { get; set; }
-/// }
-/// 
-/// public class GetUserByIdHandler : IRequestHandler<GetUserByIdQuery, UserDto>
-/// {
-///     public async Task<UserDto> Handle(GetUserByIdQuery request, CancellationToken cancellationToken)
-///     {
-///         // Lógica para buscar usuário e retornar DTO.
-///     }
-/// }
 /// </summary>
 /// <typeparam name="TRequest">Tipo da requisição que implementa <see cref="IRequest{TResponse}"/>.</typeparam>
 /// <typeparam name="TResponse">Tipo da resposta que será retornada após o processamento.</typeparam>

@@ -1,6 +1,8 @@
 using Mediator.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 
+namespace EmpregaNet.Domain.Components.Mediator;
+
 /// <summary>
 /// Implementação central do CQRSService responsável por:
 /// ✅ Executar comandos e consultas via Send.
@@ -12,8 +14,6 @@ using Microsoft.Extensions.DependencyInjection;
 /// - Reflexão para invocar handlers de forma desacoplada.
 /// - Utiliza IServiceProvider para resolver dependências.
 /// </summary>
-namespace EmpregaNet.Domain.Components.Mediator;
-
 public class Mediator : IMediator
 {
     private readonly IServiceProvider _provider;

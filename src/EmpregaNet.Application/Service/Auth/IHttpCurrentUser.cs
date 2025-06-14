@@ -33,7 +33,7 @@ public interface IHttpCurrentUser
 
     /// <summary>
     /// Token de acesso (JWT) do usuário autenticado.
-    // /// </summary>
+    /// </summary>
     string AccessToken { get; }
 
     /// <summary>

@@ -1,12 +1,13 @@
 ﻿using Common.Exceptions;
 using FluentValidation;
-using FluentValidation.Results;
 using Mediator.Interfaces;
 
 namespace EmpregaNet.Application.Common.Behaviors
 {
-    public sealed class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
-        where TRequest : IRequest<TResponse>
+    /// <summary>
+    /// Behavior for validating requests.
+    /// </summary>
+    public class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse> where TRequest : notnull
     {
         private readonly IEnumerable<IValidator<TRequest>> _validators;
 
@@ -14,25 +15,27 @@ namespace EmpregaNet.Application.Common.Behaviors
 
         public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
         {
-            var context = new ValidationContext<TRequest>(request);
-            var validationFailures = new List<ValidationFailure>();
-
-            foreach (var validator in _validators)
+            if (_validators.Any())
             {
-                var validationResult = await validator.ValidateAsync(context, cancellationToken);
-                if (!validationResult.IsValid)
+                var context = new ValidationContext<TRequest>(request);
+                var validationResults = await Task.WhenAll(
+                    _validators.Select(validator => validator.ValidateAsync(context, cancellationToken))
+                );
+
+                var failures = validationResults
+                    .Where(result => result.Errors.Any())
+                    .SelectMany(result => result.Errors)
+                    .ToList();
+
+                if (failures.Any())
                 {
-                    validationFailures.AddRange(validationResult.Errors);
+                    throw new ValidationAppException(failures);
                 }
             }
 
-            if (validationFailures.Any())
-            {
-                var errorMessages = validationFailures.Select(e => e.ErrorMessage).ToArray();
-                throw new BadRequestException(errorMessages);
-            }
 
             return await next();
         }
+
     }
 }

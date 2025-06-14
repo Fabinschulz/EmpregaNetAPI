@@ -1,12 +1,3 @@
-/// Exemplo de uso:
-/// public class CreateProductHandler : INotificationHandler<CreateProductEvent>
-/// {
-///     public Task Handle(CreateProductEvent notification, CancellationToken cancellationToken)
-///     {
-///         // Lógica de tratamento
-///         return Task.CompletedTask;
-///     }
-/// }
 
 namespace Mediator.Interfaces;
 

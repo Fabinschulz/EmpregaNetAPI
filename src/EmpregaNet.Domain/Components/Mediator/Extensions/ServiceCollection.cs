@@ -2,13 +2,14 @@ using System.Reflection;
 using Mediator.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 
+namespace EmpregaNet.Domain.Components.Mediator.Extensions;
 
 /// <summary>
 /// Classe de extensão para registro automático do Mediator na coleção de serviços.
 /// 
 /// ✅ O método AddMediator registra as interfaces principais do Mediator:
 ///     - IMediator → implementação Mediator
-///     - IRequestHandler<,> e INotificationHandler<> → resolve automaticamente todas as classes que implementam essas interfaces.
+///     - IRequestHandler e INotificationHandler → resolve automaticamente todas as classes que implementam essas interfaces.
 ///
 /// ✅ Permite a passagem opcional de filtros para assemblies:
 ///     - Sem parâmetros → registra de todos os assemblies carregados.
@@ -22,8 +23,6 @@ using Microsoft.Extensions.DependencyInjection;
 ///
 /// 🚨 Erro lançado se o parâmetro for inválido (não Assembly nem string).
 /// </summary>
-namespace EmpregaNet.Domain.Components.Mediator.Extensions;
-
 public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddMediator(

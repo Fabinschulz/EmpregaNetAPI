@@ -12,8 +12,7 @@ public sealed record CreateCompanyCommand(
    string Phone,
    Address Address,
    [EnumDataType(typeof(TypeOfActivityEnum))]
-   TypeOfActivityEnum TypeOfActivity,
-   ICollection<Job>? Jobs
+   TypeOfActivityEnum TypeOfActivity
 );
 
 public sealed class CreateCompanyDtoValidator : AbstractValidator<CreateCompanyCommand>
@@ -27,7 +26,7 @@ public sealed class CreateCompanyDtoValidator : AbstractValidator<CreateCompanyC
 
         RuleFor(x => x.RegistrationNumber)
             .NotEmpty().WithMessage("O CNPJ é obrigatório.")
-            .Matches(@"^\d{2}\.\d{3}\.\d{3}\/\d{4}\-\d{2}$").WithMessage("CNPJ inválido.");
+            .Matches(@"^\d{14}$").WithMessage("CNPJ inválido. Deve conter exatamente 14 dígitos.");
 
         RuleFor(x => x.Email)
             .NotEmpty().WithMessage("O e-mail é obrigatório.")
@@ -35,7 +34,7 @@ public sealed class CreateCompanyDtoValidator : AbstractValidator<CreateCompanyC
 
         RuleFor(x => x.Phone)
             .NotEmpty().WithMessage("O telefone é obrigatório.")
-            .Matches(@"^\(?\d{2}\)?[\s-]?\d{4,5}-?\d{4}$").WithMessage("Telefone inválido.");
+            .Matches(@"^\d{10,11}$").WithMessage("Telefone inválido. Deve conter entre 10 e 11 dígitos numéricos.");
 
         RuleFor(x => x.TypeOfActivity)
             .IsInEnum().WithMessage("Tipo de atividade inválido.");
