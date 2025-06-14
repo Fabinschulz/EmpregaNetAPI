@@ -3,7 +3,7 @@
 namespace EmpregaNet.Domain.Components.Mapper;
 
 /// <summary>
-/// Extensões para facilitar a projeção de consultas <see cref="IQueryable{T}"/> utilizando o <see cref="IConfigurationProvider"/>.
+/// Extensões para facilitar a projeção de consultas <see cref="IQueryable{T}"/> utilizando o <see cref="IMapperConfigurationProvider"/>.
 /// </summary>
 public static class QueryableExtensions
 {
@@ -18,7 +18,7 @@ public static class QueryableExtensions
     /// <returns>Lista de <typeparamref name="TDestination"/>.</returns>
     public static List<TDestination> ProjectToList<TSource, TDestination>(
         this IEnumerable<TSource> source,
-        IConfigurationProvider configuration)
+        IMapperConfigurationProvider configuration)
     {
         return source.AsQueryable()
                      .ProjectTo<TSource, TDestination>(configuration)
@@ -36,7 +36,7 @@ public static class QueryableExtensions
     /// <exception cref="InvalidOperationException">Se não houver mapeamento registrado.</exception>
     private static IQueryable<TDestination> ProjectTo<TSource, TDestination>(
         this IQueryable<TSource> source,
-        IConfigurationProvider config)
+        IMapperConfigurationProvider config)
     {
         var mapFunc = config.GetMapping(typeof(TSource), typeof(TDestination));
 

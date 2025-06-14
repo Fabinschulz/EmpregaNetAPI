@@ -36,7 +36,7 @@ public sealed class UpdateCompanyHandler : IRequestHandler<UpdateCommand<UpdateC
             if (!validationResult.IsValid)
             {
                 _logger.LogWarning("Falha na validação da atualização da Empresa: {Errors}", string.Join(", ", validationResult.Errors.Select(e => e.ErrorMessage)));
-                throw new ValidationException(validationResult.Errors);
+                throw new ValidationAppException(validationResult.Errors);
             }
 
             var company = await _companyRepository.GetByIdAsync(request.Id);

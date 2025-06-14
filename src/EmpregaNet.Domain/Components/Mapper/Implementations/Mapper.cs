@@ -3,17 +3,17 @@
 namespace EmpregaNet.Domain.Components.Mapper;
 
 /// <summary>
-/// Implementação padrão do mapeador de objetos utilizando a <see cref="IConfigurationProvider"/>.
+/// Implementação padrão do mapeador de objetos utilizando a <see cref="IMapperConfigurationProvider"/>.
 /// </summary>
 public class MapperObj : IMapper
 {
-    private readonly IConfigurationProvider _configuration;
+    private readonly IMapperConfigurationProvider _configuration;
 
     /// <summary>
     /// Inicializa uma nova instância do <see cref="MapperObj"/>.
     /// </summary>
     /// <param name="configuration">Configuração de mapeamento utilizada.</param>
-    public MapperObj(IConfigurationProvider configuration)
+    public MapperObj(IMapperConfigurationProvider configuration)
     {
         _configuration = configuration;
     }

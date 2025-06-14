@@ -5,7 +5,7 @@ namespace EmpregaNet.Domain.Components.Mapper;
 /// <summary>
 /// Configuração central de mapeamento, responsável por registrar e validar mapeamentos.
 /// </summary>
-public class MapperConfiguration : IConfigurationProvider, IMapperConfigurationExpression
+public class MapperConfiguration : IMapperConfigurationProvider, IMapperConfigurationExpression
 {
     private readonly MappingRegistry _registry = new();
 

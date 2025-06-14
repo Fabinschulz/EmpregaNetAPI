@@ -62,8 +62,8 @@ public class PerformanceBehaviour<TRequest, TResponse> : IPipelineBehavior<TRequ
         {
             var requestName = typeof(TRequest).Name;
             var user = _currentUser.GetContextUser();
-            var userId = user.Id;
-            var userName = user.UserName ?? string.Empty;
+            var userId = user?.UserToken.Id;
+            var userName = user?.UserToken.Username ?? string.Empty;
 
             _logger.LogWarning("Easymart Long Running Request: {Name} ({ElapsedMilliseconds} ms) {@UserId} {@UserName} {@Request}",
                 requestName, elapsedMilliseconds, userId, userName, request

@@ -32,11 +32,10 @@ public static class ServiceCollectionExtensions
     {
         var assemblies = ResolveAssemblies(args);
 
-        services.AddSingleton<IMediator, Mediator>(); //AddScoped
+        services.AddScoped<IMediator, Mediator>();
 
         RegisterHandlers(services, assemblies, typeof(INotificationHandler<>));
         RegisterHandlers(services, assemblies, typeof(IRequestHandler<,>));
-        RegisterPipelineBehaviors(services, assemblies);
 
         return services;
     }
@@ -90,32 +89,6 @@ public static class ServiceCollectionExtensions
                 .Where(i =>
                     i.IsGenericType &&
                     i.GetGenericTypeDefinition() == handlerInterface);
-
-            foreach (var iface in interfaces)
-            {
-                services.AddTransient(iface, type);
-            }
-        }
-    }
-
-    /// <summary>
-    /// Registra no DI todos os behaviors que implementam o IPipelineBehavior genérico.
-    /// </summary>
-    /// <remarks>
-    /// Os behaviors são resolvidos dinamicamente com base no tipo de request e response.
-    /// </remarks>
-    private static void RegisterPipelineBehaviors(IServiceCollection services, Assembly[] assemblies)
-    {
-        var types = assemblies.SelectMany(a => a.GetTypes())
-            .Where(t => t.IsClass && !t.IsAbstract)
-            .ToList();
-
-        foreach (var type in types)
-        {
-            var interfaces = type.GetInterfaces()
-                .Where(i =>
-                    i.IsGenericType &&
-                    i.GetGenericTypeDefinition() == typeof(IPipelineBehavior<,>));
 
             foreach (var iface in interfaces)
             {

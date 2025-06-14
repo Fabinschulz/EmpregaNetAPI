@@ -7,6 +7,7 @@ using EmpregaNet.Infra.Configurations;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using OAuth.Domain.Entities;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -15,19 +16,20 @@ namespace EmpregaNet.Application.Service;
 
 public interface IJwtBuilder
 {
-    Task<LoginVieModel> BuildUserTokenAsync(User user);
+    Task<UserLoggedViewModel> BuildUserTokenAsync(User user);
+    Task<List<UserPermissionVieModel>?> GetAllPermissions(string key);
 }
 
 public class JwtBuilder : IJwtBuilder
 {
     private readonly UserManager<User> _userManager;
-    private readonly RoleManager<IdentityRole<long>> _roleManager;
+    private readonly RoleManager<Role> _roleManager;
     private readonly JwtSettings _jwtSettings;
     private readonly IMemoryService _memoryService;
 
     public JwtBuilder(
         UserManager<User> userManager,
-        RoleManager<IdentityRole<long>> roleManager,
+        RoleManager<Role> roleManager,
         IOptions<JwtSettings> jwtSettingsOptions,
         IMemoryService memoryService)
     {
@@ -41,26 +43,26 @@ public class JwtBuilder : IJwtBuilder
     /// Constrói um token JWT para o usuário autenticado.
     /// </summary>
     /// <param name="user">Usuário autenticado para o qual o token será gerado.</param>
-    /// <returns>Um objeto <see cref="LoginVieModel"/> contendo o token e informações do usuário.</returns>
+    /// <returns>Um objeto <see cref="UserLoggedViewModel"/> contendo o token e informações do usuário.</returns>
     /// /// <exception cref="ArgumentNullException">Lançada se o usuário for nulo.</exception>  
     /// <remarks>
     /// Este método cria um token JWT contendo as claims do usuário, incluindo permissões e roles.
     /// </remarks>
 
-    public async Task<LoginVieModel> BuildUserTokenAsync(User user)
+    public async Task<UserLoggedViewModel> BuildUserTokenAsync(User user)
     {
 
         var claimsIdentity = await BuildClaimsIdentityAsync(user);
         var token = GenerateToken(claimsIdentity);
 
-        return new LoginVieModel
+        return new UserLoggedViewModel
         {
             AccessToken = token,
             ExpiresIn = TimeSpan.FromHours(_jwtSettings.ExpirationHours).TotalSeconds,
             UserToken = new UserToken
             {
                 Id = user.Id,
-                User = user.UserName ?? string.Empty,
+                Username = user.UserName ?? string.Empty,
                 Email = user.Email ?? string.Empty,
                 Claims = claimsIdentity.Claims
                     .Select(c => new UserClaim { Type = c.Type, Value = c.Value })
@@ -94,7 +96,7 @@ public class JwtBuilder : IJwtBuilder
     private IEnumerable<Claim> GetBasicJwtClaims(User user)
     {
         return new[]
-        {       
+        {
                 new Claim("userId", user.Id.ToString()),
                 new Claim("userName", user.UserName ?? string.Empty),
                 new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
@@ -111,6 +113,19 @@ public class JwtBuilder : IJwtBuilder
         {
             identity.AddClaim(new Claim(ClaimTypes.Role, roleName));
         }
+    }
+
+    /// <summary>
+    /// Recupera todas as permissões do usuário autenticado a partir do cache.
+    /// </summary>
+    /// <param name="key">Chave única do usuário.</param>
+    /// <returns>Lista de permissões (<see cref="UserPermissionVieModel"/>) ou <c>null</c> se não houver permissões.</returns>
+    public async Task<List<UserPermissionVieModel>?> GetAllPermissions(string key)
+    {
+        var tokenPermission = $"{key}:{CacheKeyType.Permissions}";
+        var permissions = await _memoryService.GetValueAsync<List<UserPermissionVieModel>>(tokenPermission);
+
+        return permissions;
     }
 
     /// <summary>
@@ -141,6 +156,11 @@ public class JwtBuilder : IJwtBuilder
         }
     }
 
+    /// <summary>
+    /// Gera o token JWT a partir dos claims de identidade do usuário.
+    /// </summary>
+    /// <param name="claimsIdentity">Claims de identidade do usuário.</param>
+    /// <returns>Token JWT codificado como string, com prefixo "Bearer".</returns>
     private string GenerateToken(ClaimsIdentity claimsIdentity)
     {
         var tokenHandler = new JwtSecurityTokenHandler();
@@ -161,6 +181,11 @@ public class JwtBuilder : IJwtBuilder
         return $"Bearer {tokenHandler.WriteToken(token)}";
     }
 
+    /// <summary>
+    /// Converte uma data para o formato Unix Epoch (segundos desde 01/01/1970).
+    /// </summary>
+    /// <param name="date">Data a ser convertida.</param>
+    /// <returns>Valor em segundos desde o Unix Epoch.</returns>
     private static long ToUnixEpochDate(DateTime date)
         => (long)Math.Round((date.ToUniversalTime() - new DateTimeOffset(1970, 1, 1, 0, 0, 0, TimeSpan.Zero))
             .TotalSeconds);

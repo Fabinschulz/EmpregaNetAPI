@@ -11,9 +11,9 @@ builder.RegisterInfraDependency();
 builder.AddApiConfiguration();
 
 var builderServices = builder.Services;
-builderServices.AddMediator(typeof(Program).Assembly);
+builderServices.AddMediator();
 builderServices.AddExceptionHandler<GlobalExceptionHandler>();
-builderServices.RegisterApplicationDependency(); // Registra serviços e handlers da camada de Application (ex: MediatR, automappers, etc.)
+builderServices.RegisterApplicationDependency();
 
 var app = builder.Build();
 

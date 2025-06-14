@@ -18,7 +18,7 @@ public static class ListDataPaginationExtensions
     /// <returns>Nova instância de <see cref="ListDataPagination{TDestination}"/> com os dados projetados.</returns>
     public static ListDataPagination<TDestination> ProjectToListDataPagination<TSource, TDestination>(
         this ListDataPagination<TSource> source,
-        IConfigurationProvider configuration)
+        IMapperConfigurationProvider configuration)
     {
         var projectedData = source.Data
             .AsQueryable()
@@ -47,7 +47,7 @@ public static class ListDataPaginationExtensions
     /// </returns>
     public static Task<ListDataPagination<TDestination>> ProjectToListDataPaginationAsync<TSource, TDestination>(
             this ListDataPagination<TSource> pagination,
-            IConfigurationProvider configuration)
+            IMapperConfigurationProvider configuration)
     {
         var projectedData = pagination.Data
             .AsQueryable()

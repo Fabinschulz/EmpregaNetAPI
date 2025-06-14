@@ -4,7 +4,7 @@
 /// Define um contrato para o provedor de configuração de mapeamentos.
 /// Responsável por fornecer informações sobre mapeamentos registrados.
 /// </summary>
-public interface IConfigurationProvider
+public interface IMapperConfigurationProvider
 {
     /// <summary>
     /// Obtém o delegate de mapeamento entre os tipos especificados.

@@ -1,4 +1,6 @@
-﻿using EmpregaNet.Domain.Entities;
+﻿using EmpregaNet.Application.ViewModel;
+using EmpregaNet.Domain.Entities;
+using EmpregaNet.Domain.Enums;
 using Microsoft.AspNetCore.Http;
 using System.Text;
 
@@ -19,7 +21,7 @@ public class HttpUserContext
     /// <summary>
     /// Instância cacheada do usuário autenticado, para evitar múltiplas leituras dos claims.
     /// </summary>
-    private User? _user;
+    private UserLoggedViewModel? _userLogged;
 
     /// <summary>
     /// Inicializa uma nova instância de <see cref="HttpUserContext"/>.
@@ -95,41 +97,46 @@ public class HttpUserContext
     /// Lançada se não for possível obter os dados do usuário a partir dos claims ou se o usuário não estiver autenticado.
     /// Em modo DEBUG, a exceção original é propagada.
     /// </exception>
-    public User GetContextuser()
+    public UserLoggedViewModel? GetContextuser()
     {
         try
         {
-            // Retorna o usuário cacheado, se já foi extraído anteriormente
-            if (_user != null)
+            if (_userLogged != null)
             {
-                return _user;
+                return _userLogged;
             }
 
             HttpContext context = _httpContextAccessor.HttpContext!;
 
             var claims = context?.User?.Identities?.FirstOrDefault()?.Claims;
 
-            User user = new User();
-
-            // Extrai os dados do usuário dos claims
-
             var userIdClaim = claims!.FirstOrDefault(s => s.Type == "userId")?.Value;
             if (!string.IsNullOrEmpty(userIdClaim) && long.TryParse(userIdClaim, out var userId))
             {
-                user.Id = userId;
+                _userLogged = new UserLoggedViewModel
+                {
+                    UserToken = new UserToken
+                    {
+                        Id = userId,
+                        Username = claims?.FirstOrDefault(s => s.Type == "userName")?.Value ?? string.Empty,
+                        Email = claims?.FirstOrDefault(s => s.Type == "email")?.Value ?? string.Empty,
+                        Claims = claims?.Select(c => new UserClaim { Type = c.Type, Value = c.Value }).ToList() ?? new List<UserClaim>()
+                    },
+                    AccessToken = context!.Request.Headers["AccessToken"].ToString(),
+                    ExpiresIn = TimeSpan.FromHours(1).TotalSeconds,
+                    Permissions = claims?
+                   .Where(c => c.Type == "permission")
+                   .Select(c => new UserPermissionVieModel
+                   {
+                       Resource = Enum.Parse<PermissionResourceEnum>(c.Value.Split(':')[0]),
+                       Type = Enum.Parse<PermissionTypeEnum>(c.Value.Split(':')[1])
+                   })
+                   .ToList() ?? new List<UserPermissionVieModel>()
+                };
             }
-            else
-            {
-                user.Id = 0;
-            }
 
 
-            user.UserName = claims?.FirstOrDefault(s => s?.Type == "userName")?.Value;
-            // user.AccessToken = context.Request.Headers["AccessToken"].ToString();
-
-            _user = user;
-
-            return _user;
+            return _userLogged;
         }
         catch (Exception ex)
         {

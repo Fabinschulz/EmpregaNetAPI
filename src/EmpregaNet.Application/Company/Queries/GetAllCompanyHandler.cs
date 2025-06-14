@@ -5,6 +5,7 @@ using Mediator.Interfaces;
 using EmpregaNet.Domain.Interfaces;
 using FluentValidation;
 using Microsoft.Extensions.Logging;
+using Common.Exceptions;
 
 namespace EmpregaNet.Application.Companies.Queries;
 
@@ -43,7 +44,7 @@ public sealed class GetAllCompanyHandler : IRequestHandler<GetAllQuery<CompanyVi
         {
             var validationResult = await _validator.ValidateAsync(request, cancellationToken);
             if (!validationResult.IsValid)
-                throw new ValidationException(validationResult.Errors);
+                throw new ValidationAppException(validationResult.Errors);
 
             var result = await _repository.GetAllAsync(request.Page, request.Size, request.OrderBy);
 

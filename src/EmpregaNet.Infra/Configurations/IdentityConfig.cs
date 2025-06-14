@@ -5,9 +5,11 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using OAuth.Domain.Entities;
 
 namespace EmpregaNet.Infra.Configurations
 {
@@ -25,7 +27,7 @@ namespace EmpregaNet.Infra.Configurations
 
         public static WebApplicationBuilder AddIdentityApiSupport(this WebApplicationBuilder builder)
         {
-            builder.Services.AddIdentity<User, IdentityRole<long>>(options =>
+            builder.Services.AddIdentity<User, Role>(options =>
                     {
                         // Configurações de senha
                         options.Password.RequireDigit = true;
@@ -44,7 +46,7 @@ namespace EmpregaNet.Infra.Configurations
                         options.User.RequireUniqueEmail = true;
                     })
                     .AddEntityFrameworkStores<PostgreSqlContext>()
-                    .AddRoleManager<RoleManager<IdentityRole<long>>>()
+                    .AddRoleManager<RoleManager<Role>>()
                     .AddSignInManager<SignInManager<User>>()
                     .AddUserManager<UserManager<User>>()
                     .AddApiEndpoints()
@@ -59,12 +61,12 @@ namespace EmpregaNet.Infra.Configurations
 
         private static WebApplicationBuilder AddJwtSupport(this WebApplicationBuilder builder)
         {
-            var jwtSettings = builder.Services.BuildServiceProvider().GetRequiredService<IOptions<JwtSettings>>().Value;
+            var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>();
+
 
             if (jwtSettings == null)
-            {
                 throw new InvalidOperationException("JwtSettings não configurado no appsettings.json ou variáveis de ambiente.");
-            }
+
 
             var key = Encoding.ASCII.GetBytes(jwtSettings.SecretKey);
 

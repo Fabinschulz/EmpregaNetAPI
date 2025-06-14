@@ -53,11 +53,6 @@ public sealed class GetCompanyByIdHandler : IRequestHandler<GetByIdQuery<Company
             _logger.LogInformation("Empresa encontrada: {Id}, Nome: {Nome}", request.Id, viewModel?.CompanyName);
             return viewModel!;
         }
-        catch (KeyNotFoundException ex)
-        {
-            _logger.LogWarning(ex, "Funcionalidade não encontrada ao buscar por ID: {Message}. Request: {@Request}", ex.Message, request);
-            throw;
-        }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Erro inesperado ao buscar funcionalidade por ID: {Id}. Request: {@Request}", request.Id, request);

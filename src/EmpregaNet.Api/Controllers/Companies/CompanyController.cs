@@ -12,8 +12,8 @@ namespace EmpregaNet.Api.Controllers.Companies
     public class CompanyController : MainController<CreateCompanyCommand, CompanyViewModel>
     {
 
-        public CompanyController(IMediator mediator, IMemoryService cacheService, IHub sentryHub)
-            : base(mediator, cacheService, sentryHub)
+        public CompanyController(IMediator mediator, IMemoryService cacheService)
+            : base(mediator, cacheService)
         {
         }
 

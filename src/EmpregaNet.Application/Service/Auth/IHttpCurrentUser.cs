@@ -1,4 +1,4 @@
-﻿using EmpregaNet.Domain.Entities;
+﻿using EmpregaNet.Application.ViewModel;
 using EmpregaNet.Domain.Enums;
 
 namespace EmpregaNet.Application.Service;
@@ -11,10 +11,10 @@ namespace EmpregaNet.Application.Service;
 public interface IHttpCurrentUser
 {
     /// <summary>
-    /// Obtém o objeto <see cref="User"/> representando o usuário autenticado no contexto atual.
+    /// Obtém o objeto <see cref="UserLoggedViewModel"/> representando o usuário autenticado no contexto atual.
     /// </summary>
-    /// <returns>Instância de <see cref="User"/> com os dados do usuário autenticado.</returns>
-    User GetContextUser();
+    /// <returns>Instância de <see cref="UserLoggedViewModel"/> com os dados do usuário autenticado.</returns>
+    UserLoggedViewModel? GetContextUser();
 
     /// <summary>
     /// Identificador único do usuário autenticado.
@@ -24,29 +24,29 @@ public interface IHttpCurrentUser
     /// <summary>
     /// Nome do usuário autenticado.
     /// </summary>
-    string UserName { get; }
+    string Username { get; }
 
     /// <summary>
     /// Chave única do usuário autenticado, geralmente utilizada para identificação e cache.
     /// </summary>
-    // string Key { get; }
+    string Key { get; }
 
     /// <summary>
     /// Token de acesso (JWT) do usuário autenticado.
     // /// </summary>
-    // string AccessToken { get; }
+    string AccessToken { get; }
 
     /// <summary>
     /// Obtém todas as permissões do usuário autenticado.
     /// </summary>
-    /// <returns>Lista de permissões (<see cref="UserPermission"/>) ou <c>null</c> se não houver permissões.</returns>
-    // List<UserPermissionVieModel>? GetAllPermissions();
+    /// <returns>Lista de permissões (<see cref="UserPermissionVieModel"/>) ou <c>null</c> se não houver permissões.</returns>
+    Task<List<UserPermissionVieModel>?> GetAllPermissions();
 
     /// <summary>
     /// Verifica se o usuário autenticado possui uma permissão específica para um recurso e tipo de ação.
     /// </summary>
-    /// <param name="resource">Recurso a ser verificado (<see cref="PermissionResource"/>).</param>
-    /// <param name="type">Tipo de permissão exigida (<see cref="PermissionType"/>).</param>
+    /// <param name="resource">Recurso a ser verificado (<see cref="PermissionResourceEnum"/>).</param>
+    /// <param name="type">Tipo de permissão exigida (<see cref="PermissionTypeEnum"/>).</param>
     /// <returns><c>true</c> se o usuário possui a permissão; caso contrário, <c>false</c>.</returns>
     Task<bool> HasPermission(PermissionResourceEnum resource, PermissionTypeEnum type);
 

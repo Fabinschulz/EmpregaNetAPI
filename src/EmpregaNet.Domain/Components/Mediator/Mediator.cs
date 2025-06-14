@@ -34,38 +34,42 @@ public class Mediator : IMediator
     /// <exception cref="InvalidOperationException">Se o handler não for encontrado.</exception>
     public async Task<TResponse> Send<TResponse>(IRequest<TResponse> request, CancellationToken cancellationToken = default)
     {
-        var requestType = request.GetType();
-        var responseType = typeof(TResponse);
-        var handlerType = typeof(IRequestHandler<,>).MakeGenericType(requestType, responseType);
-        var handler = _provider.GetRequiredService(handlerType);
+        var handlerType = typeof(IRequestHandler<,>).MakeGenericType(request.GetType(), typeof(TResponse));
+        var handler = _provider.GetService(handlerType);
 
         if (handler == null)
-            throw new InvalidOperationException($"Handler not found for {request.GetType().Name}");
-
-        var handleMethod = handlerType.GetMethod("Handle");
-        if (handleMethod == null)
         {
-            throw new InvalidOperationException($"Method 'Handle' not found on handler for {requestType.Name}");
+            throw new InvalidOperationException($"Handler not found for {request.GetType().Name}");
         }
 
-        var pipelineBehaviors = _provider.GetServices(typeof(IPipelineBehavior<,>)
-                                              .MakeGenericType(requestType, responseType))
-                                              .Cast<IPipelineBehavior<IRequest<TResponse>, TResponse>>()
-                                              .ToList();
-
-        RequestHandlerDelegate<TResponse> next = async () =>
+        RequestHandlerDelegate<TResponse> handlerDelegate = () =>
         {
-            return await (Task<TResponse>)handleMethod.Invoke(handler, new object[] { request, cancellationToken })!;
+            return (Task<TResponse>)handlerType
+                .GetMethod("Handle")!
+                .Invoke(handler, new object[] { request, cancellationToken })!;
         };
 
+        var behaviorsType = typeof(IEnumerable<>).MakeGenericType(typeof(IPipelineBehavior<,>).MakeGenericType(request.GetType(), typeof(TResponse)));
+        var behaviors = ((IEnumerable<object>?)_provider.GetService(behaviorsType))?.Reverse().ToList();
 
-        foreach (var behavior in pipelineBehaviors.AsEnumerable().Reverse())
+        if (behaviors == null || !behaviors.Any())
         {
-            var currentBehavior = behavior;
-            next = async () => await currentBehavior.Handle(request, next, cancellationToken);
+            return await handlerDelegate();
         }
 
-        return await next();
+        foreach (var behavior in behaviors)
+        {
+            var next = handlerDelegate;
+            var current = behavior;
+
+            handlerDelegate = () =>
+            {
+                var method = current.GetType().GetMethod("Handle")!;
+                return (Task<TResponse>)method.Invoke(current, new object[] { request, next, cancellationToken })!;
+            };
+        }
+
+        return await handlerDelegate();
     }
 
     public async Task Publish<TNotification>(TNotification notification, CancellationToken cancellationToken = default)
