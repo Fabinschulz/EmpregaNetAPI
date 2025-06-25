@@ -123,8 +123,38 @@ namespace EmpregaNet.Api.Configurations
             {
                 swaggerDoc.Tags = new List<OpenApiTag>
                 {
-                    new OpenApiTag { Name = "USER", Description = "Cadastrar, atualizar e consultar usuário" },
-                    new OpenApiTag { Name = "COMPANY", Description = "Cadastrar, atualizar e consultar empresa" },
+                    new OpenApiTag {
+                        Name = "Users",
+                        Description = "Endpoints para gestão de autenticação e autorização"
+                    },
+                    new OpenApiTag {
+                        Name = "Jobs",
+                        Description = "Endpoints para gerenciamento de oportunidades de emprego"
+                    },
+                    new OpenApiTag {
+                        Name = "Candidates",
+                        Description = "Endpoints para administração de cadastros de candidatos"
+                    },
+                    new OpenApiTag {
+                        Name = "Companies",
+                        Description = "Endpoints para administração de cadastros corporativos"
+                    },
+                    new OpenApiTag {
+                        Name = "JobApplications",
+                        Description = "Endpoints para processamento de inscrições em vagas"
+                    },
+                    new OpenApiTag {
+                        Name = "Search",
+                        Description = "Endpoints para consultas avançadas de vagas e empresas"
+                    },
+                    new OpenApiTag {
+                        Name = "Notifications",
+                        Description = "Endpoints para gestão de alertas e comunicações"
+                    },
+                    new OpenApiTag {
+                        Name = "Admin",
+                        Description = "Endpoints privilegiados para gestão do sistema"
+                    }
                 };
             }
         }
