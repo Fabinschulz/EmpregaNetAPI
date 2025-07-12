@@ -1,6 +1,6 @@
 using EmpregaNet.Api.Controllers.Core;
-using EmpregaNet.Application.Job.Commands;
-using EmpregaNet.Application.ViewModel;
+using EmpregaNet.Application.Jobs.Commands;
+using EmpregaNet.Application.Jobs.ViewModel;
 using EmpregaNet.Infra.Cache.MemoryService;
 using Microsoft.AspNetCore.Mvc;
 

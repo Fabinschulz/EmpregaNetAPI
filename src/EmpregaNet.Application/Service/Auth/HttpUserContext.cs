@@ -1,4 +1,4 @@
-﻿using EmpregaNet.Application.User;
+﻿using EmpregaNet.Application.Auth;
 using EmpregaNet.Domain.Entities;
 using EmpregaNet.Domain.Enums;
 using Microsoft.AspNetCore.Http;
