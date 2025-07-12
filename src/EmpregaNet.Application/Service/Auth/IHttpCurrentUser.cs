@@ -1,4 +1,4 @@
-﻿using EmpregaNet.Application.ViewModel;
+﻿using EmpregaNet.Application.User;
 using EmpregaNet.Domain.Enums;
 
 namespace EmpregaNet.Application.Service;

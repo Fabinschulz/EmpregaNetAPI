@@ -1,9 +1,9 @@
 using EmpregaNet.Application.Common.Command;
 using EmpregaNet.Application.Companies.ViewModel;
-using EmpregaNet.Application.Jobs.ViewModel;
 using Mediator.Interfaces;
 using EmpregaNet.Domain.Interfaces;
 using Microsoft.Extensions.Logging;
+using EmpregaNet.Application.Jobs.ViewModel;
 
 namespace EmpregaNet.Application.Companies.Queries;
 

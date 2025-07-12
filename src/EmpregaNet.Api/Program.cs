@@ -4,6 +4,7 @@ using EmpregaNet.Api.Middleware;
 using EmpregaNet.Application.Service;
 using EmpregaNet.Domain.Components.Mediator.Extensions;
 using EmpregaNet.Infra;
+using EmpregaNet.Infra.Configurations;
 using EmpregaNet.Infra.Persistence.Database;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -20,6 +21,7 @@ var app = builder.Build();
 #region Configure Pipeline
 
 app.UseApiConfiguration(app.Environment);
+app.UseSentryTracingMiddleware();
 
 app.MapGet("/whoAmI", async (ClaimsPrincipal claims, PostgreSqlContext context) =>
 {

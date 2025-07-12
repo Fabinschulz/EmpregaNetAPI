@@ -1,24 +1,24 @@
 using EmpregaNet.Application.Common.Command;
-using EmpregaNet.Application.Companies.ViewModel;
-using EmpregaNet.Application.Jobs.ViewModel;
 using Mediator.Interfaces;
-using EmpregaNet.Domain.Entities;
 using EmpregaNet.Domain.Interfaces;
 using FluentValidation;
 using Microsoft.Extensions.Logging;
 using Common.Exceptions;
 using EmpregaNet.Domain.Enums;
+using EmpregaNet.Application.Companies.ViewModel;
+using EmpregaNet.Domain.Entities;
+using EmpregaNet.Application.Jobs.ViewModel;
 
 namespace EmpregaNet.Application.Companies.Command;
 
-public sealed class UpdateCompanyHandler : IRequestHandler<UpdateCommand<UpdateCompanyCommand, CompanyViewModel>, CompanyViewModel>
+public sealed class UpdateCompanyHandler : IRequestHandler<UpdateCommand<CompanyCommand, CompanyViewModel>, CompanyViewModel>
 {
     private readonly ICompanyRepository _companyRepository;
-    private readonly IValidator<UpdateCompanyCommand> _validator;
+    private readonly IValidator<UpdateCommand<CompanyCommand, CompanyViewModel>> _validator;
     private readonly ILogger<UpdateCompanyHandler> _logger;
 
     public UpdateCompanyHandler(ICompanyRepository companyRepository,
-                                IValidator<UpdateCompanyCommand> validator,
+                                IValidator<UpdateCommand<CompanyCommand, CompanyViewModel>> validator,
                                 ILogger<UpdateCompanyHandler> logger)
     {
         _companyRepository = companyRepository;
@@ -26,18 +26,12 @@ public sealed class UpdateCompanyHandler : IRequestHandler<UpdateCommand<UpdateC
         _logger = logger;
     }
 
-    public async Task<CompanyViewModel> Handle(UpdateCommand<UpdateCompanyCommand, CompanyViewModel> request, CancellationToken cancellationToken)
+    public async Task<CompanyViewModel> Handle(UpdateCommand<CompanyCommand, CompanyViewModel> request, CancellationToken cancellationToken)
     {
         _logger.LogInformation("Iniciando o processo de atualização da empresa: {CompanyId}", request.Id);
 
         try
         {
-            var validationResult = await _validator.ValidateAsync(request.entity, cancellationToken);
-            if (!validationResult.IsValid)
-            {
-                _logger.LogWarning("Falha na validação da atualização da Empresa: {Errors}", string.Join(", ", validationResult.Errors.Select(e => e.ErrorMessage)));
-                throw new ValidationAppException(validationResult.Errors);
-            }
 
             var company = await _companyRepository.GetByIdAsync(request.Id);
             if (company == null)
@@ -58,9 +52,9 @@ public sealed class UpdateCompanyHandler : IRequestHandler<UpdateCommand<UpdateC
                     DomainErrorEnum.INVALID_ACTION_FOR_STATUS);
             }
 
-            if (request.entity.TypeOfActivity.HasValue) company.TypeOfActivity = request.entity.TypeOfActivity;
+            if (request.entity.TypeOfActivity != default) company.TypeOfActivity = request.entity.TypeOfActivity;
             if (!string.IsNullOrEmpty(request.entity.CompanyName)) company.CompanyName = request.entity.CompanyName;
-            if (request.entity.Address != null) company.Address = request.entity.Address;
+            if (request.entity.Address is not null) company.Address = request.entity.Address;
             if (!string.IsNullOrEmpty(request.entity.Email)) company.Email = request.entity.Email;
             if (!string.IsNullOrEmpty(request.entity.Phone)) company.Phone = request.entity.Phone;
 
@@ -76,7 +70,7 @@ public sealed class UpdateCompanyHandler : IRequestHandler<UpdateCommand<UpdateC
                 RegistrationNumber = company.RegistrationNumber,
                 Email = company.Email,
                 Phone = company.Phone,
-                Jobs = (company.Jobs ?? Enumerable.Empty<Job>()).Select(j => new JobViewModel
+                Jobs = (company.Jobs?.Cast<Job>() ?? Enumerable.Empty<Job>()).Select(j => new JobViewModel
                 {
                     Id = j.Id,
                     Title = j.Title,
@@ -88,7 +82,7 @@ public sealed class UpdateCompanyHandler : IRequestHandler<UpdateCommand<UpdateC
                 }).ToList(),
             };
         }
-        catch (KeyNotFoundException ex)
+        catch (ValidationAppException ex)
         {
             _logger.LogWarning(ex, "Funcionalidade ou Ações não encontradas para atualização: {Message}. Request: {@Request}", ex.Message, request);
             throw;

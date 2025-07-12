@@ -1,6 +1,6 @@
 ﻿using EmpregaNet.Domain.Enums;
 
-namespace EmpregaNet.Application.ViewModel;
+namespace EmpregaNet.Application.User;
 
 public class UserRegistry
 {

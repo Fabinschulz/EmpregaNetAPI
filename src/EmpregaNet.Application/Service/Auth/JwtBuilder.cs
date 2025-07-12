@@ -1,4 +1,4 @@
-using EmpregaNet.Application.ViewModel;
+using EmpregaNet.Application.User;
 using EmpregaNet.Domain.Entities;
 using EmpregaNet.Domain.Enums;
 using EmpregaNet.Infra.Cache;

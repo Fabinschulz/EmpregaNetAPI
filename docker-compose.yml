@@ -21,11 +21,25 @@ services:
     networks:
       - empregaNet_network
 
+  redisinsight:
+    container_name: redisinsight
+    image: redislabs/redisinsight:latest
+    restart: always
+    ports:
+      - "8001:8001"
+    volumes:
+      - redisinsight_data:/db
+    networks:
+      - oauth-network
+    depends_on:
+      redis:
+        condition: service_healthy
+
   webapp:
     build: .
     container_name: empregaNet_api
     ports:
-      - "8080:8080"
+      - "5540:5540"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__PostgreSQLConnection=Host=localhost;Port=5432;Database=EmpregaNetDB;Username=postgres;Password=postgres;Pooling=true;Persist Security Info=true;
@@ -52,6 +66,8 @@ networks:
 volumes:
   redis_data:
   postgres_data:
+  redisinsight_data:
+  
 # Docker Compose configuration for Elasticsearch, Kibana, and APM Server
 # elasticsearch:
 #   image: docker.elastic.co/elasticsearch/elasticsearch:8.18.0

@@ -2,13 +2,11 @@ using EmpregaNet.Application.Common.Command;
 using Mediator.Interfaces;
 using EmpregaNet.Domain.Interfaces;
 using Microsoft.Extensions.Logging;
-using Common.Exceptions;
-using EmpregaNet.Domain.Enums;
-using Elastic.Apm.Api;
+using EmpregaNet.Application.Companies.ViewModel;
 
 namespace EmpregaNet.Application.Companies.Command
 {
-    public sealed class DeleteCompanyHandler : IRequestHandler<DeleteCommand, bool>
+    public sealed class DeleteCompanyHandler : IRequestHandler<DeleteCommand<CompanyViewModel>, bool>
     {
         private readonly ICompanyRepository _repository;
         private readonly ILogger<DeleteCompanyHandler> _logger;
@@ -21,26 +19,14 @@ namespace EmpregaNet.Application.Companies.Command
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public async Task<bool> Handle(DeleteCommand request, CancellationToken cancellationToken)
+        public async Task<bool> Handle(DeleteCommand<CompanyViewModel> request, CancellationToken cancellationToken)
         {
             _logger.LogInformation("Iniciando remoção da funcionalidade com ID: {Id}", request.Id);
 
             try
             {
-                var company = await _repository.GetByIdAsync(request.Id);
-
-                if (company == null)
-                {
-                    _logger.LogWarning("Tentativa de remover empresa inexistente com ID: {Id}", request.Id);
-                    throw new ValidationAppException(
-                        nameof(request.Id),
-                        $"Empresa com ID '{request.Id}' não encontrada.",
-                        DomainErrorEnum.RESOURCE_ID_NOT_FOUND);
-                }
-
                 await _repository.DeleteAsync(request.Id);
                 _logger.LogInformation("Funcionalidade removida com sucesso. ID: {Id}", request.Id);
-
                 return true;
             }
             catch (KeyNotFoundException ex)

@@ -1,41 +1,35 @@
 using EmpregaNet.Application.Common.Command;
 using EmpregaNet.Application.Companies.Command;
 using Mediator.Interfaces;
-using EmpregaNet.Domain.Entities;
 using EmpregaNet.Domain.Interfaces;
 using FluentValidation;
 using Microsoft.Extensions.Logging;
 using Common.Exceptions;
 using EmpregaNet.Domain.Enums;
+using EmpregaNet.Domain.Entities;
 
 namespace EmpregaNet.Application.Handler.Companies.Command;
 
-public sealed class CreateCompanyCommandHandler : IRequestHandler<CreateCommand<CreateCompanyCommand>, long>
+public sealed class CreateCompanyCommandHandler : IRequestHandler<CreateCommand<CompanyCommand>, long>
 {
     private readonly ICompanyRepository _companyRepository;
-    private readonly IValidator<CreateCompanyCommand> _validator;
+    private readonly IValidator<CreateCommand<CompanyCommand>> _validator;
     private readonly ILogger<CreateCompanyCommandHandler> _logger;
 
     public CreateCompanyCommandHandler(ICompanyRepository companyRepository,
-                                       IValidator<CreateCompanyCommand> validator,
+                                       IValidator<CreateCommand<CompanyCommand>> validator,
                                        ILogger<CreateCompanyCommandHandler> logger)
     {
         _companyRepository = companyRepository;
         _validator = validator;
         _logger = logger;
     }
-    public async Task<long> Handle(CreateCommand<CreateCompanyCommand> request, CancellationToken cancellationToken)
+    public async Task<long> Handle(CreateCommand<CompanyCommand> request, CancellationToken cancellationToken)
     {
         _logger.LogInformation("Iniciando o processo de criação da empresa: {CompanyName}", request.entity.CompanyName);
 
         try
         {
-            var validationResult = await _validator.ValidateAsync(request.entity, cancellationToken);
-            if (!validationResult.IsValid)
-            {
-                _logger.LogWarning("Falha na validação da criação da empresa: {Errors}", string.Join(", ", validationResult.Errors.Select(e => e.ErrorMessage)));
-                throw new ValidationAppException(validationResult.Errors);
-            }
 
             var existingCompany = await _companyRepository.GetByRegistrationNumberAsync(request.entity.RegistrationNumber);
             if (existingCompany != null)

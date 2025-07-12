@@ -25,7 +25,7 @@ namespace EmpregaNet.Api.Middleware
 
             _logger.LogError(exception, "Erro ao processar a requisição: {Message}. CorrelationId: {CorrelationId}", exception.Message, correlationId);
             // Captura a exceção no Sentry, ELK, etc.
-            // SentrySdk.CaptureException(exception); 
+            SentrySdk.CaptureException(exception); 
             // Log.Error(exception, "Erro ao processar a requisição: {Message}", exception.Message); 
 
             httpContext.Response.StatusCode = httpStatusCode;

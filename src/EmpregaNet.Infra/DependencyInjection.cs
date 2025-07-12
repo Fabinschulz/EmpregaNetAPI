@@ -16,6 +16,7 @@ namespace EmpregaNet.Infra
             builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
             // services.Configure<ElasticsearchSettings>(configuration.GetSection("ElasticsearchSettings"));
             builder.Services.ConfigureServices(builder.Configuration);
+            builder.AddSentryConfiguration();
         }
 
         public static void ConfigureServices(this IServiceCollection services, IConfiguration configuration)
