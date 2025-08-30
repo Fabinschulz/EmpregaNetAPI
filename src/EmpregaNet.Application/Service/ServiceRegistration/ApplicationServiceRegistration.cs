@@ -1,8 +1,5 @@
 using System.Reflection;
 using EmpregaNet.Application.Common.Behaviors;
-using Mapper.Interfaces;
-using EmpregaNet.Infra.Utils;
-using Components.Mapper;
 using Microsoft.Extensions.DependencyInjection;
 using Mediator.Interfaces;
 using EmpregaNet.Infra.Configurations;
@@ -21,13 +18,6 @@ public static class ApplicationServiceRegistration
         services.AddScoped<IJwtBuilder, JwtBuilder>();
 
         var assemblies = Assembly.GetExecutingAssembly();
-
-        var config = new MapperConfiguration();
-        MappingProfileRunner.ApplyMappingsFromAssembly(assemblies, config);
-        MappingProfileRunner.ApplyCustomMappingsFromAssembly(assemblies, config);
-        config.AssertConfigurationIsValid();
-        services.AddSingleton<IMapperConfigurationProvider>(config);
-        services.AddSingleton<IMapper>(new MapperObj(config));
         services.AddValidatorsFromAssembly(assemblies);
 
         // Adiciona o comportamento de validação antes da execução de qualquer Handler.

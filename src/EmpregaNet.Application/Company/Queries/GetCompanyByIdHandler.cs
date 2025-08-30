@@ -23,40 +23,22 @@ public sealed class GetCompanyByIdHandler : IRequestHandler<GetByIdQuery<Company
         _logger.LogInformation("Buscando empresa por ID: {Id}", request.Id);
         try
         {
-            var result = await _repository.GetByIdAsync(request.Id);
-            var viewModel = new CompanyViewModel
-            {
-                Id = result!.Id,
-                CompanyName = result.CompanyName,
-                TypeOfActivity = result.TypeOfActivity,
-                Address = result.Address,
-                RegistrationNumber = result.RegistrationNumber,
-                Email = result.Email,
-                Phone = result.Phone,
-                Jobs = result.Jobs?.Select(job => new JobViewModel
-                {
-                    Id = job.Id,
-                    Title = job.Title,
-                    Description = job.Description,
-                    Salary = job.Salary,
-                    CreatedAt = job.CreatedAt,
-                    UpdatedAt = job.UpdatedAt,
-                    DeletedAt = job.DeletedAt,
-                    IsDeleted = job.IsDeleted
-                }).ToList() ?? new List<JobViewModel>(),
-                CreatedAt = result.CreatedAt,
-                UpdatedAt = result.UpdatedAt,
-                DeletedAt = result.DeletedAt,
-                IsDeleted = result.IsDeleted
-            };
+            var entity = await _repository.GetByIdAsync(request.Id);
 
-            _logger.LogInformation("Empresa encontrada: {Id}, Nome: {Nome}", request.Id, viewModel?.CompanyName);
-            return viewModel!;
+            if (entity is null)
+            {
+                _logger.LogWarning("Empresa não encontrada. ID: {Id}", request.Id);
+                throw new KeyNotFoundException($"Empresa com o ID {request.Id} não foi encontrada.");
+            }
+
+            var viewModel = entity.ToViewModel();
+            _logger.LogInformation("Empresa encontrada: {Id}, Nome: {Nome}", request.Id, viewModel.CompanyName);
+            return viewModel;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Erro inesperado ao buscar funcionalidade por ID: {Id}. Request: {@Request}", request.Id, request);
-            throw new Exception("Ocorreu um erro inesperado ao buscar a funcionalidade. Por favor, tente novamente mais tarde.");
+            _logger.LogError(ex, "Erro inesperado ao buscar empresa por ID: {Id}. Request: {@Request}", request.Id, request);
+            throw new Exception("Ocorreu um erro inesperado ao buscar a empresa. Por favor, tente novamente mais tarde.");
         }
     }
 }

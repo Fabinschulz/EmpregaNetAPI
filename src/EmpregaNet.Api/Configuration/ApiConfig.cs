@@ -39,6 +39,10 @@ namespace EmpregaNet.Api.Configurations
         {
             builder.EnvironmentConfig();
             builder.Services.AddControllers()
+            .ConfigureApiBehaviorOptions(options =>
+            {
+                options.SuppressModelStateInvalidFilter = true;
+            })
             .AddNewtonsoftJson(options =>
             {
                 // Ignora referências circulares durante a serialização JSON

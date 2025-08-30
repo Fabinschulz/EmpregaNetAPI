@@ -2,7 +2,6 @@ using EmpregaNet.Domain;
 using EmpregaNet.Domain.Common;
 using EmpregaNet.Domain.Interfaces;
 using EmpregaNet.Infra.Persistence.Database;
-using Components.Mapper;
 using Microsoft.EntityFrameworkCore;
 
 namespace EmpregaNet.Infra.Persistence.Repositories
@@ -74,6 +73,14 @@ namespace EmpregaNet.Infra.Persistence.Repositories
                     return query.OrderBy(x => x.CreatedAt);
                 case "createdAt_DESC":
                     return query.OrderByDescending(x => x.CreatedAt);
+                case "updatedAt_ASC":
+                    return query.OrderBy(x => x.UpdatedAt);
+                case "updatedAt_DESC":
+                    return query.OrderByDescending(x => x.UpdatedAt);
+                case "id_ASC":
+                    return query.OrderBy(x => x.Id);
+                case "id_DESC":
+                    return query.OrderByDescending(x => x.Id);
                 default:
                     return query.OrderByDescending(x => x.CreatedAt);
             }

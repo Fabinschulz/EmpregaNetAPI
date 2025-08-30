@@ -135,6 +135,18 @@ namespace EmpregaNet.Infra.Cache.MemoryService
 
             _local.Set(cacheKey, obj, DateTime.Now.Add(expiration));
 
+            // Mantém um registry de chaves para poder invalidar depois
+            if (_local.TryGetValue("CACHE_KEY_REGISTRY", out HashSet<string>? registry))
+            {
+                registry?.Add(cacheKey);
+            }
+            else
+            {
+                registry = new HashSet<string> { cacheKey };
+            }
+
+            _local.Set("CACHE_KEY_REGISTRY", registry);
+
             if (_distributed?.IsConnected == true)
             {
                 try
@@ -149,6 +161,10 @@ namespace EmpregaNet.Infra.Cache.MemoryService
             }
         }
 
+
+        /// <summary>
+        /// Remove uma única chave de cache da memória local e do Redis.
+        /// </summary>
         public void Remove(string key)
         {
             var cacheKey = $"{_options.KeyPrefix}:{key}";
@@ -168,5 +184,56 @@ namespace EmpregaNet.Infra.Cache.MemoryService
                 }
             }
         }
+
+        /// <summary>
+        /// Remove chaves de cache do Redis e da memória local com base em um padrão.
+        /// </summary>
+        /// <param name="pattern">O padrão de busca para as chaves (ex: "prefixo*").</param>
+        public async Task RemoveByPatternAsync(string pattern)
+        {
+            var cachePattern = $"{_options.KeyPrefix}:{pattern}";
+
+            if (_local is not null)
+            {
+                if (_local.TryGetValue("CACHE_KEY_REGISTRY", out HashSet<string>? registry))
+                {
+                    var keysToRemove = registry?.Where(k => k.StartsWith(cachePattern)).ToList() ?? new List<string>();
+
+                    foreach (var key in keysToRemove)
+                    {
+                        _local.Remove(key);
+                        registry?.Remove(key);
+                        _logger.LogDebug($"Chave de cache {key} removida da memória local por padrão.");
+                    }
+
+                    _local.Set("CACHE_KEY_REGISTRY", registry);
+                }
+            }
+
+            if (_distributed is null || !_distributed.IsConnected)
+            {
+                _logger.LogWarning($"Redis não está conectado. Portanto será removido apenas da memória local.");
+                return;
+            }
+
+            try
+            {
+                var server = _distributed.GetServer(_distributed.GetEndPoints().First());
+                var keys = server.Keys(pattern: cachePattern + "*").ToList();
+
+                foreach (var key in keys)
+                {
+                    await _distributed.GetDatabase().KeyDeleteAsync(key);
+                    _logger.LogDebug($"Chave de cache {key} removida do Redis por padrão.");
+                }
+
+                _logger.LogInformation($"Removidas {keys.Count} chaves de cache do Redis e da memória local.");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Erro ao remover chaves do Redis por padrão: {Pattern}", pattern);
+            }
+        }
+
     }
 }

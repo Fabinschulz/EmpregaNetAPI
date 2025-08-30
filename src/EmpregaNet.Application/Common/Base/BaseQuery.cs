@@ -8,7 +8,7 @@ namespace EmpregaNet.Application.Common.Command;
 /// </summary>
 /// <typeparam name="TResponse"></typeparam>
 /// <param name="Id"></param>
-public sealed record GetByIdQuery<TResponse>(long Id) : IRequest<TResponse> where TResponse : class;
+public sealed record GetByIdQuery<TResponse>(long Id) : IRequest<TResponse>;
 
 /// <summary>
 /// Query para Obter Todos: TResponse é a entidade ou DTO de saída na paginação.
@@ -17,4 +17,4 @@ public sealed record GetByIdQuery<TResponse>(long Id) : IRequest<TResponse> wher
 /// <param name="Page"></param>
 /// <param name="Size"></param>
 /// <param name="OrderBy"></param>
-public sealed record GetAllQuery<TResponse>(int Page, int Size, string? OrderBy) : IRequest<ListDataPagination<TResponse>> where TResponse : class;
+public sealed record GetAllQuery<TResponse>(int Page, int Size, string? OrderBy) : IRequest<ListDataPagination<TResponse>>;

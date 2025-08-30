@@ -6,7 +6,7 @@ using FluentValidation;
 using Microsoft.Extensions.Logging;
 using Common.Exceptions;
 using EmpregaNet.Domain.Enums;
-using EmpregaNet.Domain.Entities;
+using EmpregaNet.Application.Companies.Factories;
 
 namespace EmpregaNet.Application.Handler.Companies.Command;
 
@@ -32,7 +32,7 @@ public sealed class CreateCompanyCommandHandler : IRequestHandler<CreateCommand<
         {
 
             var existingCompany = await _companyRepository.GetByRegistrationNumberAsync(request.entity.RegistrationNumber);
-            if (existingCompany != null)
+            if (existingCompany is not null)
             {
                 _logger.LogWarning("Tentativa de criar empresa com registro já existente: {RegistrationNumber}", request.entity.RegistrationNumber);
                 throw new ValidationAppException(
@@ -41,15 +41,7 @@ public sealed class CreateCompanyCommandHandler : IRequestHandler<CreateCommand<
                     DomainErrorEnum.RESOURCE_ALREADY_EXISTS);
             }
 
-            var company = new Company
-            {
-                TypeOfActivity = request.entity.TypeOfActivity,
-                CompanyName = request.entity.CompanyName,
-                Address = request.entity.Address,
-                RegistrationNumber = request.entity.RegistrationNumber,
-                Email = request.entity.Email,
-                Phone = request.entity.Phone
-            };
+            var company = CompanyFactory.Create(request.entity);
 
             var createdCompanyId = await _companyRepository.CreateAsync(company);
             _logger.LogInformation("Empresa criada com sucesso. ID: {CompanyId}", createdCompanyId);

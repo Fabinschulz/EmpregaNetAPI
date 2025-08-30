@@ -1,7 +1,12 @@
+/.vs
+/EmpregaNet.Api/obj
+/EmpregaNet.Application/obj
+/EmpregaNet.Infra/obj
+/EmpregaNet.Domain/obj
+/EmpregaNet.Tests/obj
+
 # Ignorar arquivos de configuração sensíveis
-appsettings.Development.json
-appsettings.Production.json
-appsettings.Staging.json
+appsettings*.json
 
 # Ignorar segredos do usuário
 secrets.json

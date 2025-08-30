@@ -3,6 +3,8 @@ using Common.Exceptions;
 using EmpregaNet.Domain;
 using EmpregaNet.Domain.Enums;
 using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.EntityFrameworkCore;
+using Npgsql;
 
 namespace EmpregaNet.Api.Middleware
 {
@@ -24,9 +26,30 @@ namespace EmpregaNet.Api.Middleware
             var (domainError, httpStatusCode) = MapExceptionToDomainError(exception, correlationId);
 
             _logger.LogError(exception, "Erro ao processar a requisição: {Message}. CorrelationId: {CorrelationId}", exception.Message, correlationId);
-            // Captura a exceção no Sentry, ELK, etc.
-            SentrySdk.CaptureException(exception); 
-            // Log.Error(exception, "Erro ao processar a requisição: {Message}", exception.Message); 
+            SentrySdk.ConfigureScope(scope =>
+             {
+                 scope.SetExtra("DomainError_Code", domainError.Code.ToString());
+                 scope.SetExtra("DomainError_Message", domainError.Message);
+                 scope.SetExtra("DomainError_StatusCode", domainError.StatusCode);
+
+                 if (domainError.Details is IDictionary<string, object> detailsDictionary && detailsDictionary.TryGetValue("Errors", out var errorsValue))
+                 {
+                     if (errorsValue is string[] stringErrors)
+                     {
+                         scope.SetExtra("Validation_Errors", stringErrors);
+                     }
+                     else if (errorsValue is IEnumerable<string> enumerableErrors)
+                     {
+                         scope.SetExtra("Validation_Errors", enumerableErrors.ToArray());
+                     }
+                     else if (errorsValue is object[] objectErrors)
+                     {
+                         scope.SetExtra("Validation_Errors", objectErrors.Select(e => e?.ToString() ?? "N/A").ToArray());
+                     }
+                 }
+
+                 SentrySdk.CaptureException(exception);
+             });
 
             httpContext.Response.StatusCode = httpStatusCode;
             httpContext.Response.ContentType = "application/json";
@@ -101,8 +124,8 @@ namespace EmpregaNet.Api.Middleware
 
                 case ValidationAppException validationException:
                     statusCode = (int)HttpStatusCode.BadRequest;
-                    code = DomainErrorEnum.INVALID_PARAMS;
-                    message = "Validação falhou.";
+                    code = validationException.Code ?? DomainErrorEnum.INVALID_PARAMS;
+                    message = validationException.Message ?? "Erro de validação.";
                     errors = validationException.Errors.SelectMany(e => e.Value).ToArray();
                     break;
 
@@ -113,6 +136,13 @@ namespace EmpregaNet.Api.Middleware
                     errors = new[] { forbiddenAccessException.Message };
                     break;
 
+                case NotSupportedException notSupportedException:
+                    statusCode = (int)HttpStatusCode.NotImplemented;
+                    code = DomainErrorEnum.UNSUPPORTED_OPERATION;
+                    message = notSupportedException.Message ?? "Operação não suportada.";
+                    errors = new[] { notSupportedException.Message ?? "Mensagem não fornecida." };
+                    break;
+
                 default:
                     statusCode = (int)HttpStatusCode.InternalServerError;
                     code = DomainErrorEnum.UNEXPECTED_EXCEPTION;
@@ -121,7 +151,17 @@ namespace EmpregaNet.Api.Middleware
                     break;
             }
 
-            details = new { Errors = errors.Any() ? errors : null, StackTrace = exception.StackTrace };
+            details = new Dictionary<string, object>();
+            var isDevelopment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development";
+
+            if (errors.Any())
+            {
+                ((Dictionary<string, object>)details).Add("Errors", errors);
+            }
+            if (exception.StackTrace != null && isDevelopment)
+            {
+                ((Dictionary<string, object>)details).Add("StackTrace", exception.StackTrace);
+            }
 
             var domainError = new DomainError
             {

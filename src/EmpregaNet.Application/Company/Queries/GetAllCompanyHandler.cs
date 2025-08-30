@@ -47,20 +47,10 @@ public sealed class GetAllCompanyHandler : IRequestHandler<GetAllQuery<CompanyVi
                 throw new ValidationAppException(validationResult.Errors);
 
             var result = await _repository.GetAllAsync(request.Page, request.Size, request.OrderBy);
+            var companyViewModels = result.Data.Select(c => c.ToViewModel()).ToList();
 
-            var totalItems = result.Data.Count;
-            var companyViewModels = result.Data.Select(c => new CompanyViewModel
-            {
-                Id = c.Id,
-                CompanyName = c.CompanyName,
-                Email = c.Email,
-                Phone = c.Phone,
-                Address = c.Address,
-                TypeOfActivity = c.TypeOfActivity,
-                RegistrationNumber = c.RegistrationNumber
-            }).ToList();
-            _logger.LogInformation("Total de empresas encontradas: {Count}", totalItems);
-            return new ListDataPagination<CompanyViewModel>(companyViewModels, totalItems, request.Page, request.Size);
+            _logger.LogInformation("Total de empresas encontradas: {Count}", result.TotalItems);
+            return new ListDataPagination<CompanyViewModel>(companyViewModels, result.TotalItems, request.Page, request.Size);
         }
         catch (Exception ex)
         {

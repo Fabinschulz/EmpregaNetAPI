@@ -20,11 +20,17 @@ public sealed class UpdateCompanyCommandValidator : AbstractValidator<UpdateComm
 
         RuleFor(x => x.entity)
             .NotNull()
-            .WithMessage("Os dados da empresa para atualização não podem ser nulos.");
+            .WithMessage("Os dados da empresa não podem ser nulos.");
 
         RuleFor(x => x.entity.Jobs)
-             .NotNull().WithMessage("A lista de empregos é obrigatória na atualização.")
-             .Must(jobs => jobs != null && jobs.Any()).WithMessage("Deve haver pelo menos um emprego na atualização.");
+             .NotNull().WithMessage("A lista de empregos é obrigatória.")
+             .Must(jobs => jobs != null && jobs.Any()).WithMessage("Deve haver pelo menos um emprego.");
+
+        RuleFor(x => x.entity.TypeOfActivity)
+        .NotNull()
+            .WithMessage("O tipo de atividade é obrigatório.")
+            .IsInEnum()
+            .WithMessage("Tipo de atividade inválido.");
 
         RuleFor(x => x.entity)
             .SetValidator(new CompanyDataValidator());

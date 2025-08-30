@@ -3,6 +3,7 @@ using EmpregaNet.Domain.Entities;
 using EmpregaNet.Domain.Enums;
 using EmpregaNet.Application.Common.Base;
 using System.ComponentModel.DataAnnotations;
+using EmpregaNet.Application.Jobs.Commands;
 
 namespace EmpregaNet.Application.Companies.Command;
 
@@ -14,7 +15,7 @@ public sealed record CompanyCommand(
     [EnumDataType(typeof(TypeOfActivityEnum))]
     TypeOfActivityEnum TypeOfActivity,
     Address Address,
-    List<string>? Jobs
+    ICollection<JobCommand>? Jobs = null
 );
 
 /// <summary>

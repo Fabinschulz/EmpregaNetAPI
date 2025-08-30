@@ -4,6 +4,27 @@ namespace EmpregaNet.Domain.Enums
 {
     public enum DomainErrorEnum
     {
+
+        /// <summary>
+        /// Erro de conflito.
+        /// </summary>
+        [Description("Erro de conflito.")] CONFLICT,
+
+        /// <summary>
+        /// Nenhum erro
+        /// </summary>
+        [Description("Nenhum erro.")] NONE,
+
+        /// <summary>
+        /// Operação não suportada
+        /// </summary>
+        [Description("Operação não suportada.")] UNSUPPORTED_OPERATION,
+
+        /// <summary>
+        /// Falha ao criar recurso
+        /// </summary>
+        [Description("Falha ao criar recurso.")] RESOURCE_CREATION_FAILED,
+
         /// <summary>
         /// Registro já existe
         /// </summary>
