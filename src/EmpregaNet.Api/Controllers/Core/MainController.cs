@@ -1,9 +1,8 @@
-using EmpregaNet.Application.Common.Command;
 using EmpregaNet.Domain.Common;
-using Mediator.Interfaces;
 using EmpregaNet.Infra.Cache.MemoryService;
 using Microsoft.AspNetCore.Mvc;
-using EmpregaNet.Domain;
+using EmpregaNet.Domain.Components.Mediator.Interfaces;
+using EmpregaNet.Application.Common.Base;
 
 namespace EmpregaNet.Api.Controllers.Core
 {
@@ -11,11 +10,13 @@ namespace EmpregaNet.Api.Controllers.Core
     /// MainController é uma classe base para controladores que gerenciam entidades com operações CRUD.
     /// Fornece endpoints para criar, ler, atualizar e excluir recursos, além de implementar
     /// </summary>
-    /// <typeparam name="TCommand"></typeparam>
+    /// <typeparam name="TCreateCommand"></typeparam>
+    /// <typeparam name="TUpdateCommand"></typeparam>
     /// <typeparam name="TViewModel"></typeparam>
     [ApiController]
-    public abstract class MainController<TCommand, TViewModel> : ControllerBase
-        where TCommand : class
+    public abstract class MainController<TCreateCommand, TUpdateCommand, TViewModel> : ControllerBase
+        where TCreateCommand : class
+        where TUpdateCommand : class
         where TViewModel : class
     {
         private IMediator _IMediator = null!;
@@ -88,11 +89,11 @@ namespace EmpregaNet.Api.Controllers.Core
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(DomainError))]
         [ProducesResponseType(StatusCodes.Status409Conflict, Type = typeof(DomainError))]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public virtual async Task<IActionResult> Create([FromBody] TCommand entity)
+        public virtual async Task<IActionResult> Create([FromBody] TCreateCommand entity)
         {
-            var id = await _mediator.Send(new CreateCommand<TCommand>(entity));
+            var id = await _mediator.Send(new CreateCommand<TCreateCommand>(entity));
             await InvalidateCacheForEntity();
-            var successMessage = $"{typeof(TCommand).Name.Replace("Command", "")} registrado(a) com sucesso. ID: {id}";
+            var successMessage = $"{typeof(TCreateCommand).Name.Replace("Command", "")} registrado(a) com sucesso. ID: {id}";
 
             return Created($"api/{_entityName.ToLower()}/{id}", successMessage);
         }
@@ -108,9 +109,9 @@ namespace EmpregaNet.Api.Controllers.Core
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(DomainError))]
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(DomainError))]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public virtual async Task<IActionResult> Update([FromRoute] long id, [FromBody] TCommand entity)
+        public virtual async Task<IActionResult> Update([FromRoute] long id, [FromBody] TUpdateCommand entity)
         {
-            var result = await _mediator.Send(new UpdateCommand<TCommand, TViewModel>(id, entity));
+            var result = await _mediator.Send(new UpdateCommand<TUpdateCommand, TViewModel>(id, entity));
             await InvalidateCacheForEntity(id);
             return Ok(result);
         }
@@ -127,7 +128,7 @@ namespace EmpregaNet.Api.Controllers.Core
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(DomainError))]
         public virtual async Task<IActionResult> Delete([FromRoute] long id)
         {
-            await _mediator.Send(new DeleteCommand<TViewModel>(id));
+            await _mediator.Send(new DeleteCommand<TCreateCommand>(id));
             await InvalidateCacheForEntity(id);
             return NoContent();
         }

@@ -1,7 +1,7 @@
 ﻿using EmpregaNet.Domain.Enums;
 using FluentValidation.Results;
 
-namespace Common.Exceptions;
+namespace EmpregaNet.Application.Common.Exceptions;
 
 /// <summary>
 /// Exceção lançada quando uma ou mais validações de dados falham durante a execução de uma operação.

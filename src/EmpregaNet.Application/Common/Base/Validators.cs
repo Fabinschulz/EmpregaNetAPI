@@ -26,3 +26,28 @@ public sealed class AddressValidator : AbstractValidator<Address>
             .Matches(@"^\d{5}-?\d{3}$").WithMessage("CEP inválido.");
     }
 }
+
+public interface IPaginatedQuery
+{
+    int Page { get; }
+    int Size { get; }
+    string? OrderBy { get; }
+}
+
+public abstract class BasePaginatedQueryValidator<TQuery> : AbstractValidator<TQuery>
+    where TQuery : class, IPaginatedQuery
+{
+    protected BasePaginatedQueryValidator()
+    {
+        RuleFor(x => x.Page)
+            .NotEmpty().WithMessage("Page é obrigatório")
+            .GreaterThanOrEqualTo(1).WithMessage("A página precisa ser maior ou igual a 1");
+
+        RuleFor(x => x.Size)
+            .NotEmpty().WithMessage("Size é obrigatório")
+            .GreaterThanOrEqualTo(100).WithMessage("Size precisa ser maior ou igual a 100");
+
+        RuleFor(x => x.OrderBy)
+            .MaximumLength(50).WithMessage("Ordenação deve ter no máximo 50 caracteres.");
+    }
+}

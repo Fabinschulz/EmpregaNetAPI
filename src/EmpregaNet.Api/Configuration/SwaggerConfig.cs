@@ -1,11 +1,11 @@
 using System.Reflection;
 using System.Xml.Linq;
-using EmpregaNet.Infra.Utils;
+using EmpregaNet.Application.Utils;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 
-namespace EmpregaNet.Api.Configurations
+namespace EmpregaNet.Api.Configuration
 {
     public static class SwaggerConfig
     {

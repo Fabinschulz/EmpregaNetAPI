@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace EmpregaNet.Domain
+namespace EmpregaNet.Domain.Common
 {
     public abstract class BaseEntity : IEquatable<BaseEntity>
     {

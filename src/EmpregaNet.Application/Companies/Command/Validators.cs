@@ -1,29 +1,26 @@
 using FluentValidation;
 using EmpregaNet.Domain.Entities;
-using EmpregaNet.Domain.Enums;
 using EmpregaNet.Application.Common.Base;
-using System.ComponentModel.DataAnnotations;
-using EmpregaNet.Application.Jobs.Commands;
+using EmpregaNet.Domain.Enums;
 
 namespace EmpregaNet.Application.Companies.Command;
 
-public sealed record CompanyCommand(
-    string CompanyName,
-    string RegistrationNumber,
-    string Email,
-    string Phone,
-    [EnumDataType(typeof(TypeOfActivityEnum))]
-    TypeOfActivityEnum TypeOfActivity,
-    Address Address,
-    ICollection<JobCommand>? Jobs = null
-);
+public interface ICompanyCommand
+{
+    string CompanyName { get; }
+    string RegistrationNumber { get; }
+    string Email { get; }
+    string Phone { get; }
+    TypeOfActivityEnum TypeOfActivity { get; }
+    Address Address { get; }
+}
 
 /// <summary>
 /// Validador específico para o DTO CompanyCommand, contendo as regras de validação
 /// de formato e tamanho para os dados de uma empresa.
 /// Este validador é reutilizado por validadores de comando específicos (Create, Update).
 /// </summary>
-public sealed class CompanyDataValidator : AbstractValidator<CompanyCommand>
+public sealed class CompanyDataValidator<T> : AbstractValidator<T> where T : ICompanyCommand
 {
     public CompanyDataValidator()
     {

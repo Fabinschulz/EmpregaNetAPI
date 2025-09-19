@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace EmpregaNet.Infra.Persistence.Repositories;
 
-public class CompanyConfiguration : IEntityTypeConfiguration<Company>
+internal class CompanyConfiguration : IEntityTypeConfiguration<Company>
 {
     public void Configure(EntityTypeBuilder<Company> builder)
     {

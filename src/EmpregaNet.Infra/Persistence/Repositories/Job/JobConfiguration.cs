@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace EmpregaNet.Infra.Persistence.Repositories;
 
-public class JobConfiguration : IEntityTypeConfiguration<Job>
+internal class JobConfiguration : IEntityTypeConfiguration<Job>
 {
     public void Configure(EntityTypeBuilder<Job> builder)
     {

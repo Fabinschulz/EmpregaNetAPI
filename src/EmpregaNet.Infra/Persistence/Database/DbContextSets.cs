@@ -1,8 +1,7 @@
 ﻿using EmpregaNet.Domain.Entities;
-using EmpregaNet.Infra.Interface;
+using EmpregaNet.Domain.Interfaces;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using OAuth.Domain.Entities;
 
 namespace EmpregaNet.Infra.Persistence.Database
 {

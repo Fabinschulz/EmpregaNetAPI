@@ -1,6 +1,6 @@
 ﻿using EmpregaNet.Domain.Enums;
 
-namespace Common.Exceptions;
+namespace EmpregaNet.Application.Common.Exceptions;
 
 /// <summary>
 /// Exceção lançada quando um usuário tenta acessar um recurso ou executar uma ação para a qual não possui permissão.

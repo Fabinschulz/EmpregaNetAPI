@@ -5,7 +5,7 @@ namespace EmpregaNet.Application.Jobs.Factories;
 
 public abstract class JobFactory
 {
-    public static Job Create(JobCommand command, long companyId)
+    public static Job Create(CreateJobCommand command, long companyId)
     {
         return new Job(
             title: command.Title,
@@ -16,7 +16,7 @@ public abstract class JobFactory
         );
     }
 
-    public static Job Update(Job job, JobCommand command)
+    public static Job Update(Job job, CreateJobCommand command)
     {
         job.UpdateDetails(
             title: command.Title,

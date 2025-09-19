@@ -1,30 +1,43 @@
-using EmpregaNet.Application.Common.Command;
-using EmpregaNet.Application.Companies.Command;
-using Mediator.Interfaces;
 using EmpregaNet.Domain.Interfaces;
 using FluentValidation;
 using Microsoft.Extensions.Logging;
-using Common.Exceptions;
 using EmpregaNet.Domain.Enums;
+using System.ComponentModel.DataAnnotations;
+using EmpregaNet.Domain.Entities;
+using EmpregaNet.Application.Jobs.Commands;
+using EmpregaNet.Domain.Components.Mediator.Interfaces;
+using EmpregaNet.Application.Common.Exceptions;
+using EmpregaNet.Application.Common.Base;
 using EmpregaNet.Application.Companies.Factories;
 
-namespace EmpregaNet.Application.Handler.Companies.Command;
+namespace EmpregaNet.Application.Companies.Command;
 
-public sealed class CreateCompanyCommandHandler : IRequestHandler<CreateCommand<CompanyCommand>, long>
+public sealed record CreateCompanyCommand(
+    string CompanyName,
+    string RegistrationNumber,
+    string Email,
+    string Phone,
+    [EnumDataType(typeof(TypeOfActivityEnum))]
+    TypeOfActivityEnum TypeOfActivity,
+    Address Address,
+    ICollection<CreateJobCommand>? Jobs = null
+) : ICompanyCommand;
+
+public sealed class CreateCompanyCommandHandler : IRequestHandler<CreateCommand<CreateCompanyCommand>, long>
 {
     private readonly ICompanyRepository _companyRepository;
-    private readonly IValidator<CreateCommand<CompanyCommand>> _validator;
+    private readonly IValidator<CreateCommand<CreateCompanyCommand>> _validator;
     private readonly ILogger<CreateCompanyCommandHandler> _logger;
 
     public CreateCompanyCommandHandler(ICompanyRepository companyRepository,
-                                       IValidator<CreateCommand<CompanyCommand>> validator,
+                                       IValidator<CreateCommand<CreateCompanyCommand>> validator,
                                        ILogger<CreateCompanyCommandHandler> logger)
     {
         _companyRepository = companyRepository;
         _validator = validator;
         _logger = logger;
     }
-    public async Task<long> Handle(CreateCommand<CompanyCommand> request, CancellationToken cancellationToken)
+    public async Task<long> Handle(CreateCommand<CreateCompanyCommand> request, CancellationToken cancellationToken)
     {
         _logger.LogInformation("Iniciando o processo de criação da empresa: {CompanyName}", request.entity.CompanyName);
 

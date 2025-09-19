@@ -1,5 +1,5 @@
 using System.Reflection;
-using Mediator.Interfaces;
+using EmpregaNet.Domain.Components.Mediator.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace EmpregaNet.Domain.Components.Mediator.Extensions;

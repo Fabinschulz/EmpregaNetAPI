@@ -15,7 +15,20 @@ public static class DatabaseConfig
 
         try
         {
-            builder.Services.AddDbContext<PostgreSqlContext>(options => options.UseNpgsql(connectionString));
+            builder.Services.AddDbContext<PostgreSqlContext>(options =>
+            {
+                options.UseNpgsql(connectionString, npgsqlOptions =>
+                        {
+                            npgsqlOptions.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
+                            npgsqlOptions.EnableRetryOnFailure(
+                                maxRetryCount: 2,
+                                maxRetryDelay: TimeSpan.FromSeconds(10),
+                                errorCodesToAdd: null);
+                        })
+                       .EnableDetailedErrors()
+                       .EnableSensitiveDataLogging(true);
+
+            });
             Console.WriteLine("Database connection established successfully.");
         }
         catch (Exception e)
@@ -23,6 +36,5 @@ public static class DatabaseConfig
             Console.WriteLine("Error connecting to database: " + e.Message);
             throw new Exception("Error on postgresql: " + connectionString.Substring(0, 49));
         }
-
     }
 }

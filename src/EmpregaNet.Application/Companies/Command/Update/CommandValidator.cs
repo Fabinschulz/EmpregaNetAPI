@@ -1,16 +1,15 @@
-using EmpregaNet.Application.Common.Command;
-using EmpregaNet.Application.Companies.Command;
+using EmpregaNet.Application.Common.Base;
 using EmpregaNet.Application.Companies.ViewModel;
 using FluentValidation;
 
-namespace EmpregaNet.Application.Command.Update;
+namespace EmpregaNet.Application.Companies.Command;
 
 /// <summary>
 /// Validador para o comando de atualização de empresa (UpdateCommand).
 /// Valida o ID do comando e garante a obrigatoriedade dos campos para atualização.
 /// Utiliza o CompanyDataValidator para validação de formato.
 /// </summary>
-public sealed class UpdateCompanyCommandValidator : AbstractValidator<UpdateCommand<CompanyCommand, CompanyViewModel>>
+public sealed class UpdateCompanyCommandValidator : AbstractValidator<UpdateCommand<UpdateCompanyCommand, CompanyViewModel>>
 {
     public UpdateCompanyCommandValidator()
     {
@@ -33,6 +32,6 @@ public sealed class UpdateCompanyCommandValidator : AbstractValidator<UpdateComm
             .WithMessage("Tipo de atividade inválido.");
 
         RuleFor(x => x.entity)
-            .SetValidator(new CompanyDataValidator());
+            .SetValidator(new CompanyDataValidator<UpdateCompanyCommand>());
     }
 }

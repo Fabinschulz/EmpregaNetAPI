@@ -1,12 +1,13 @@
 using System.Reflection;
 using EmpregaNet.Application.Common.Behaviors;
 using Microsoft.Extensions.DependencyInjection;
-using Mediator.Interfaces;
 using EmpregaNet.Infra.Configurations;
 using Microsoft.Extensions.Configuration;
 using FluentValidation;
+using EmpregaNet.Domain.Components.Mediator.Interfaces;
+using EmpregaNet.Application.Service.Auth;
 
-namespace EmpregaNet.Application.Service;
+namespace EmpregaNet.Application.Service.ServiceRegistration;
 
 public static class ApplicationServiceRegistration
 {

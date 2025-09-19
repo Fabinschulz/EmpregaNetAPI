@@ -2,7 +2,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using StackExchange.Redis;
 
-namespace EmpregaNet.Infra.Cache.ElastiCacheRedis
+namespace EmpregaNet.Infra.Cache.RedisServiceCollection
 {
     public static class RedisServiceCollection
     {
@@ -15,7 +15,7 @@ namespace EmpregaNet.Infra.Cache.ElastiCacheRedis
                 throw new ArgumentException("A configuração do Redis não foi encontrada. Verifique a chave 'Redis' no arquivo de configuração.");
             }
 
-            Action<ConfigurationOptions> defaultOptions = (ConfigurationOptions opts) =>
+            Action<ConfigurationOptions> defaultOptions = (opts) =>
             {
                 opts.AbortOnConnectFail = false;
                 opts.ReconnectRetryPolicy = new ExponentialRetry(2000, 5000);

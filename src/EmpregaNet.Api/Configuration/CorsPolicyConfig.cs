@@ -1,5 +1,4 @@
-﻿
-namespace EmpregaNet.Api.Configurations
+﻿namespace EmpregaNet.Api.Configuration
 {
     public static class CorsPolicyConfig
     {

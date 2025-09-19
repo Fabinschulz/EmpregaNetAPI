@@ -1,4 +1,4 @@
-using EmpregaNet.Application.Auth;
+using EmpregaNet.Application.Auth.ViewModel;
 using EmpregaNet.Domain.Entities;
 using EmpregaNet.Domain.Enums;
 using EmpregaNet.Infra.Cache;
@@ -7,12 +7,11 @@ using EmpregaNet.Infra.Configurations;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using OAuth.Domain.Entities;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
-namespace EmpregaNet.Application.Service;
+namespace EmpregaNet.Application.Service.Auth;
 
 public interface IJwtBuilder
 {

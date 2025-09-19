@@ -1,6 +1,6 @@
 ﻿using EmpregaNet.Domain.Enums;
 
-namespace EmpregaNet.Domain;
+namespace EmpregaNet.Domain.Common;
 
 public class DomainError
 {

@@ -1,4 +1,4 @@
-namespace EmpregaNet.Infra.Interface
+namespace EmpregaNet.Domain.Interfaces
 {
     public interface IUnitOfWork
     {

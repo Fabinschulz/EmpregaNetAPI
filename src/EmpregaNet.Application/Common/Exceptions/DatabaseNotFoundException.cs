@@ -1,7 +1,6 @@
-
 using System.Runtime.Serialization;
 
-namespace Common.Exceptions;
+namespace EmpregaNet.Application.Common.Exceptions;
 
 [Serializable]
 public class DatabaseNotFoundException : Exception

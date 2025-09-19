@@ -4,7 +4,7 @@ using EmpregaNet.Domain.Enums;
 
 namespace EmpregaNet.Application.Jobs.Commands;
 
-public sealed record JobCommand
+public sealed record CreateJobCommand
 (
     long Id,
     string Title,

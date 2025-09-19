@@ -1,4 +1,4 @@
-﻿namespace Common.Exceptions
+﻿namespace EmpregaNet.Application.Common.Exceptions
 {
     /// <summary>
     /// Represents errors that occur during application execution due to a bad request.

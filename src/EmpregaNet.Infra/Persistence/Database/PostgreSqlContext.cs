@@ -1,4 +1,4 @@
-﻿using EmpregaNet.Domain;
+﻿using EmpregaNet.Domain.Common;
 using EmpregaNet.Infra.Persistence.Repositories;
 using Microsoft.EntityFrameworkCore;
 

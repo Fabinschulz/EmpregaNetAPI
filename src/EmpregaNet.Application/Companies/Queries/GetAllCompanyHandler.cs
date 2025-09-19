@@ -1,25 +1,17 @@
-using EmpregaNet.Application.Common.Command;
-using EmpregaNet.Application.Companies.ViewModel;
 using EmpregaNet.Domain.Common;
-using Mediator.Interfaces;
 using EmpregaNet.Domain.Interfaces;
 using FluentValidation;
 using Microsoft.Extensions.Logging;
-using Common.Exceptions;
+using EmpregaNet.Application.Common.Base;
+using EmpregaNet.Domain.Components.Mediator.Interfaces;
+using EmpregaNet.Application.Companies.ViewModel;
 
 namespace EmpregaNet.Application.Companies.Queries;
 
-public sealed class GetAllValidator : AbstractValidator<GetAllQuery<CompanyViewModel>>
+public sealed class GetAllValidator : BasePaginatedQueryValidator<GetAllQuery<CompanyViewModel>>
 {
-    public GetAllValidator()
+    public GetAllValidator() : base()
     {
-        RuleFor(x => x.Page)
-            .NotEmpty().WithMessage("Page é obrigatório")
-            .GreaterThanOrEqualTo(1).WithMessage("A página precisa ser maior ou igual a 1");
-
-        RuleFor(x => x.Size)
-            .NotEmpty().WithMessage("Size é obrigatório")
-            .GreaterThanOrEqualTo(100).WithMessage("Size precisa ser maior ou igual a 100");
     }
 }
 
@@ -42,10 +34,6 @@ public sealed class GetAllCompanyHandler : IRequestHandler<GetAllQuery<CompanyVi
 
         try
         {
-            var validationResult = await _validator.ValidateAsync(request, cancellationToken);
-            if (!validationResult.IsValid)
-                throw new ValidationAppException(validationResult.Errors);
-
             var result = await _repository.GetAllAsync(request.Page, request.Size, request.OrderBy);
             var companyViewModels = result.Data.Select(c => c.ToViewModel()).ToList();
 

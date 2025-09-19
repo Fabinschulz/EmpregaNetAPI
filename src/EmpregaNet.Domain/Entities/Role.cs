@@ -1,7 +1,7 @@
-using EmpregaNet.Domain.Interface;
+using EmpregaNet.Domain.Interfaces;
 using Microsoft.AspNetCore.Identity;
 
-namespace OAuth.Domain.Entities
+namespace EmpregaNet.Domain.Entities
 {
     public class Role : IdentityRole<long>, IAggregateRoot
     {

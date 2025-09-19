@@ -1,7 +1,7 @@
 using EmpregaNet.Domain.Entities;
 using EmpregaNet.Domain.Enums;
-using EmpregaNet.Application.Companies.ViewModel;
 using System.Diagnostics.CodeAnalysis;
+using EmpregaNet.Application.Companies.ViewModel;
 
 namespace EmpregaNet.Application.Jobs.ViewModel;
 

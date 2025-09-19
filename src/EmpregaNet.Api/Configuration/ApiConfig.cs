@@ -1,9 +1,9 @@
 using System.Text.Json.Serialization;
-using EmpregaNet.Application.Service;
+using EmpregaNet.Application.Service.Auth;
 using EmpregaNet.Infra.Configurations;
 using Newtonsoft.Json;
 
-namespace EmpregaNet.Api.Configurations
+namespace EmpregaNet.Api.Configuration
 {
 
     public static class ApiConfig

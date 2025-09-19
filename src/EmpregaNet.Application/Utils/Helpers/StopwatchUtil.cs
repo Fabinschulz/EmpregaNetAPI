@@ -1,6 +1,6 @@
 using System.Diagnostics;
 
-namespace EmpregaNet.Infra.Utils
+namespace EmpregaNet.Application.Utils
 {
     public class StopwatchUtil : IDisposable
     {

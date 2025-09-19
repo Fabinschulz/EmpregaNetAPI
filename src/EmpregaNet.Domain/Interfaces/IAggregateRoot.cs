@@ -1,4 +1,4 @@
-namespace EmpregaNet.Domain.Interface
+namespace EmpregaNet.Domain.Interfaces
 {
     public interface IAggregateRoot { }
 }

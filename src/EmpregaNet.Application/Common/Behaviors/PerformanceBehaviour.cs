@@ -1,5 +1,5 @@
-﻿using EmpregaNet.Application.Service;
-using Mediator.Interfaces;
+﻿using EmpregaNet.Application.Service.Auth;
+using EmpregaNet.Domain.Components.Mediator.Interfaces;
 using Microsoft.Extensions.Logging;
 using System.Diagnostics;
 

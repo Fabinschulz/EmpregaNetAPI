@@ -1,4 +1,4 @@
-﻿namespace Common.Exceptions
+﻿namespace EmpregaNet.Application.Common.Exceptions
 {
     /// <summary>
     /// Exception thrown when an entity is not found.

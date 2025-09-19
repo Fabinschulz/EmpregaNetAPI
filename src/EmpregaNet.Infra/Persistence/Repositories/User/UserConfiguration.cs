@@ -2,11 +2,10 @@ using EmpregaNet.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using OAuth.Domain.Entities;
 
 namespace EmpregaNet.Infra.Persistence.Repositories
 {
-    public class UserConfiguration : IEntityTypeConfiguration<User>
+    internal class UserConfiguration : IEntityTypeConfiguration<User>
     {
         public void Configure(EntityTypeBuilder<User> builder)
         {
@@ -32,7 +31,7 @@ namespace EmpregaNet.Infra.Persistence.Repositories
         }
     }
 
-    public static class IdentityUserExtensions
+    internal static class IdentityUserExtensions
     {
         public static void AddIdentityUserExtensions(this ModelBuilder modelBuilder)
         {

@@ -1,24 +1,38 @@
-using Mediator.Interfaces;
 using EmpregaNet.Domain.Interfaces;
 using FluentValidation;
 using Microsoft.Extensions.Logging;
-using Common.Exceptions;
 using EmpregaNet.Domain.Enums;
-using EmpregaNet.Application.Companies.ViewModel;
 using EmpregaNet.Application.Jobs.ViewModel;
+using System.ComponentModel.DataAnnotations;
+using EmpregaNet.Domain.Entities;
+using EmpregaNet.Application.Jobs.Commands;
+using EmpregaNet.Domain.Components.Mediator.Interfaces;
+using EmpregaNet.Application.Common.Exceptions;
+using EmpregaNet.Application.Companies.ViewModel;
+using EmpregaNet.Application.Common.Base;
 using EmpregaNet.Application.Companies.Factories;
-using EmpregaNet.Application.Common.Command;
 
 namespace EmpregaNet.Application.Companies.Command
 {
-    public sealed class UpdateCompanyHandler : IRequestHandler<UpdateCommand<CompanyCommand, CompanyViewModel>, CompanyViewModel>
+    public sealed record UpdateCompanyCommand(
+        string CompanyName,
+        string RegistrationNumber,
+        string Email,
+        string Phone,
+        [EnumDataType(typeof(TypeOfActivityEnum))]
+        TypeOfActivityEnum TypeOfActivity,
+        Address Address,
+        ICollection<CreateJobCommand>? Jobs = null
+    ) : ICompanyCommand;
+
+    public sealed class UpdateCompanyHandler : IRequestHandler<UpdateCommand<UpdateCompanyCommand, CompanyViewModel>, CompanyViewModel>
     {
         private readonly ICompanyRepository _companyRepository;
-        private readonly IValidator<UpdateCommand<CompanyCommand, CompanyViewModel>> _validator;
+        private readonly IValidator<UpdateCommand<UpdateCompanyCommand, CompanyViewModel>> _validator;
         private readonly ILogger<UpdateCompanyHandler> _logger;
 
         public UpdateCompanyHandler(ICompanyRepository companyRepository,
-                                    IValidator<UpdateCommand<CompanyCommand, CompanyViewModel>> validator,
+                                    IValidator<UpdateCommand<UpdateCompanyCommand, CompanyViewModel>> validator,
                                     ILogger<UpdateCompanyHandler> logger)
         {
             _companyRepository = companyRepository;
@@ -26,7 +40,7 @@ namespace EmpregaNet.Application.Companies.Command
             _logger = logger;
         }
 
-        public async Task<CompanyViewModel> Handle(UpdateCommand<CompanyCommand, CompanyViewModel> request, CancellationToken cancellationToken)
+        public async Task<CompanyViewModel> Handle(UpdateCommand<UpdateCompanyCommand, CompanyViewModel> request, CancellationToken cancellationToken)
         {
             _logger.LogInformation("Iniciando o processo de atualização da empresa: {CompanyId}", request.Id);
 

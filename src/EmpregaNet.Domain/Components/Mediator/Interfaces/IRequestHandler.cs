@@ -1,4 +1,4 @@
-namespace Mediator.Interfaces;
+namespace EmpregaNet.Domain.Components.Mediator.Interfaces;
 
 
 /// <summary>

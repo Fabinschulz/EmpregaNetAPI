@@ -1,6 +1,7 @@
 
+using EmpregaNet.Domain.Common;
 using EmpregaNet.Domain.Enums;
-using EmpregaNet.Domain.Interface;
+using EmpregaNet.Domain.Interfaces;
 
 namespace EmpregaNet.Domain.Entities
 {

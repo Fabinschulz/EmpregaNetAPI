@@ -1,8 +1,7 @@
 ﻿using EmpregaNet.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
-using OAuth.Domain.Entities;
 
-namespace EmpregaNet.Infra.Interface
+namespace EmpregaNet.Domain.Interfaces
 {
     public interface IApplicationDbContext
     {

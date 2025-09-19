@@ -1,10 +1,10 @@
-﻿using EmpregaNet.Application.Auth;
+﻿using EmpregaNet.Application.Auth.ViewModel;
 using EmpregaNet.Domain.Entities;
 using EmpregaNet.Domain.Enums;
 using Microsoft.AspNetCore.Http;
 using System.Text;
 
-namespace EmpregaNet.Application.Service;
+namespace EmpregaNet.Application.Service.Auth;
 
 /// <summary>
 /// Contexto do usuário em uma requisição HTTP.

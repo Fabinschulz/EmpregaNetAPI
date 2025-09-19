@@ -10,7 +10,7 @@ public abstract record CompanyFactory
     /// <summary>
     /// Cria uma nova entidade Company sem associar vagas.
     /// </summary>
-    public static Company Create(CompanyCommand command)
+    public static Company Create(CreateCompanyCommand command)
     {
         var company = new Company(
             companyName: command.CompanyName,
@@ -27,7 +27,7 @@ public abstract record CompanyFactory
     /// <summary>
     /// Atualiza uma entidade Company existente, incluindo a sincronização de vagas.
     /// </summary>
-    public static Company Update(Company company, CompanyCommand command)
+    public static Company Update(Company company, UpdateCompanyCommand command)
     {
         company.UpdateDetails(
             companyName: command.CompanyName,

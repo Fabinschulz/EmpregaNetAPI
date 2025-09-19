@@ -1,10 +1,10 @@
-using EmpregaNet.Application.Common.Command;
-using Mediator.Interfaces;
 using EmpregaNet.Domain.Interfaces;
 using Microsoft.Extensions.Logging;
+using EmpregaNet.Domain.Components.Mediator.Interfaces;
 using EmpregaNet.Application.Companies.ViewModel;
+using EmpregaNet.Application.Common.Base;
 
-namespace EmpregaNet.Application.Companies.Command
+namespace EmpregaNet.Application.Companies.Command.Delete
 {
     public sealed class DeleteCompanyHandler : IRequestHandler<DeleteCommand<CompanyViewModel>, bool>
     {

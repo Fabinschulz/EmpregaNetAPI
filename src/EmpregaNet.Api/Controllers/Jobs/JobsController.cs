@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace EmpregaNet.Api.Controllers.Jobs
 {
     [Route("api/[controller]")]
-    public class JobsController : MainController<JobCommand, JobViewModel>
+    public class JobsController : MainController<CreateJobCommand, CreateJobCommand, JobViewModel>
     {
 
         public JobsController(IMemoryService cacheService) : base(cacheService)

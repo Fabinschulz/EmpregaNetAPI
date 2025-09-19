@@ -1,4 +1,4 @@
-using EmpregaNet.Infra.Cache.ElastiCacheRedis;
+using EmpregaNet.Infra.Cache.RedisServiceCollection;
 using EmpregaNet.Infra.Configurations;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;

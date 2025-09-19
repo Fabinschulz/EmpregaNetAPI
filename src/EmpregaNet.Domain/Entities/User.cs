@@ -1,5 +1,5 @@
 using EmpregaNet.Domain.Enums;
-using EmpregaNet.Domain.Interface;
+using EmpregaNet.Domain.Interfaces;
 using Microsoft.AspNetCore.Identity;
 
 namespace EmpregaNet.Domain.Entities

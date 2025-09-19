@@ -1,6 +1,6 @@
-using Mediator.Interfaces;
+using EmpregaNet.Domain.Components.Mediator.Interfaces;
 
-namespace EmpregaNet.Application.Common.Command;
+namespace EmpregaNet.Application.Common.Base;
 
 /// <summary>
 /// Command para Criação: TRequest é o DTO de entrada.
