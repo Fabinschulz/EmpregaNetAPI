@@ -1,4 +1,4 @@
-using EmpregaNet.Domain.Components.Mediator.Interfaces;
+using EmpregaNet.Infra.Components.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace EmpregaNet.Domain.Components.Mediator;
@@ -14,7 +14,7 @@ namespace EmpregaNet.Domain.Components.Mediator;
 /// - Reflexão para invocar handlers de forma desacoplada.
 /// - Utiliza IServiceProvider para resolver dependências.
 /// </summary>
-public class Mediator : IMediator
+internal class Mediator : IMediator
 {
     private readonly IServiceProvider _provider;
 

@@ -1,5 +1,5 @@
 using EmpregaNet.Domain.Common;
-using EmpregaNet.Domain.Components.Mediator.Interfaces;
+using EmpregaNet.Infra.Components.Interfaces;
 
 namespace EmpregaNet.Application.Common.Base;
 

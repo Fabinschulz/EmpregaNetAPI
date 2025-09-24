@@ -1,4 +1,4 @@
-namespace EmpregaNet.Domain.Components.Mediator.Interfaces
+namespace EmpregaNet.Infra.Components.Interfaces
 {
     /// <summary>
     /// Delegate que representa a próxima etapa no pipeline de execução de um request.

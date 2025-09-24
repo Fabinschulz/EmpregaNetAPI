@@ -1,4 +1,4 @@
-namespace EmpregaNet.Domain.Components.Mediator.Interfaces;
+namespace EmpregaNet.Infra.Components.Interfaces;
 
 /// <summary>
 /// Interface que representa uma requisição no padrão CQRS (Command Query Responsibility Segregation).

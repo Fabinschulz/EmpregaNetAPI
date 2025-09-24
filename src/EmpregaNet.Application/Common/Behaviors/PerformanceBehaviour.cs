@@ -1,5 +1,5 @@
 ﻿using EmpregaNet.Application.Service.Auth;
-using EmpregaNet.Domain.Components.Mediator.Interfaces;
+using EmpregaNet.Infra.Components.Interfaces;
 using Microsoft.Extensions.Logging;
 using System.Diagnostics;
 
@@ -60,7 +60,7 @@ public class PerformanceBehaviour<TRequest, TResponse> : IPipelineBehavior<TRequ
             var userId = user?.UserToken.Id;
             var userName = user?.UserToken.Username ?? string.Empty;
 
-            _logger.LogWarning("Easymart Long Running Request: {Name} ({ElapsedMilliseconds} ms) {@UserId} {@UserName} {@Request}",
+            _logger.LogWarning("EmpregaNet Long Running Request: {Name} ({ElapsedMilliseconds} ms) {@UserId} {@UserName} {@Request}",
                 requestName, elapsedMilliseconds, userId, userName, request
             );
         }

@@ -5,37 +5,62 @@ using Microsoft.EntityFrameworkCore;
 
 namespace EmpregaNet.Infra.Persistence.Repositories
 {
+    /// <summary>
+    /// Repositório base para operações de persistência de dados.
+    ///
+    /// Este repositório encapsula a lógica de acesso a dados (CRUD) para uma entidade
+    /// genérica T. Ele atua como uma ponte entre a lógica de negócio e o banco de dados.
+    ///
+    /// Principais responsabilidades:
+    /// - Gerenciar consultas (como GetById e GetAll).
+    /// - Marcar entidades para criação, atualização ou exclusão.
+    ///
+    /// Não possui responsabilidade de transação:
+    /// As operações de escrita (Create, Update, Delete) não chamam SaveChangesAsync().
+    /// </summary>
+    /// <remarks>
+    /// Isso permite que múltiplos repositórios e operações sejam agrupados em uma única
+    /// transação atômica, gerenciada pela Unit of Work. Isso previne dados inconsistentes
+    /// e segue o padrão de design para transações.
+    /// </remarks>
+    /// <typeparam name="T">O tipo da entidade que o repositório gerencia.</typeparam>
     public class BaseRepository<T> : IBaseRepository<T> where T : BaseEntity
     {
-
         protected readonly PostgreSqlContext _context;
 
         public BaseRepository(PostgreSqlContext context)
         {
             _context = context;
         }
-
-        public async Task<T> CreateAsync(T entity)
-        {
-            await _context.Set<T>().AddAsync(entity);
-            await _context.SaveChangesAsync();
-            await Task.CompletedTask;
-            return entity;
-        }
-
-        public async Task<T> UpdateAsync(T entity)
-        {
-            _context.Set<T>().Update(entity);
-            await _context.SaveChangesAsync();
-            await Task.CompletedTask;
-            return entity;
-        }
-
         public async Task<T?> GetByIdAsync(long id)
         {
             return await _context.Set<T>().FirstOrDefaultAsync(x => x.Id == id);
         }
 
+        public async Task<ListDataPagination<T>> GetAllAsync(int Page, int Size, string? orderBy)
+        {
+            var query = _context.Set<T>().AsNoTracking();
+
+            if (!string.IsNullOrEmpty(orderBy))
+            {
+                query = ApplyOrderBy(query, orderBy);
+            }
+
+            var result = await query.PaginatedListAsync(Page, Size);
+            return result;
+        }
+
+        public async Task<T> CreateAsync(T entity)
+        {
+            await _context.Set<T>().AddAsync(entity);
+            return entity;
+        }
+
+        public virtual Task<T> UpdateAsync(T entity)
+        {
+            _context.Set<T>().Update(entity);
+            return Task.FromResult(entity);
+        }
 
         public async Task<bool> DeleteAsync(long id)
         {
@@ -46,22 +71,7 @@ namespace EmpregaNet.Infra.Persistence.Repositories
             //_context.Set<T>().Remove(entity);
             _context.Set<T>().Update(entity);
             entity.IsDeleted = true;
-            await _context.SaveChangesAsync();
-            await Task.CompletedTask;
             return true;
-        }
-
-        public async Task<ListDataPagination<T>> GetAllAsync(int Page, int Size, string? orderBy)
-        {
-            var query = _context.Set<T>().AsQueryable();
-
-            if (!string.IsNullOrEmpty(orderBy))
-            {
-                query = ApplyOrderBy(query, orderBy);
-            }
-
-            var result = await query.PaginatedListAsync(Page, Size);
-            return result;
         }
 
         private static IQueryable<T> ApplyOrderBy(IQueryable<T> query, string orderBy)
