@@ -5,7 +5,6 @@ using EmpregaNet.Domain.Enums;
 using System.ComponentModel.DataAnnotations;
 using EmpregaNet.Domain.Entities;
 using EmpregaNet.Application.Jobs.Commands;
-using EmpregaNet.Infra.Components.Interfaces;
 using EmpregaNet.Application.Common.Exceptions;
 using EmpregaNet.Application.Common.Base;
 using EmpregaNet.Application.Companies.Factories;

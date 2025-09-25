@@ -1,5 +1,3 @@
-namespace EmpregaNet.Infra.Components.Interfaces;
-
 /// <summary>
 /// Interface genérica para manipuladores de notificações no padrão CQRS.
 /// 

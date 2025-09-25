@@ -1,6 +1,3 @@
-namespace EmpregaNet.Infra.Components.Interfaces;
-
-
 /// <summary>
 /// Interface que define um manipulador (Handler) para uma requisição do tipo <typeparamref name="TRequest"/>
 /// que retorna uma resposta do tipo <typeparamref name="TResponse"/>.

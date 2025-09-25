@@ -1,5 +1,3 @@
-namespace EmpregaNet.Infra.Components.Interfaces;
-
 public interface IMediator
 {
     /// <summary>

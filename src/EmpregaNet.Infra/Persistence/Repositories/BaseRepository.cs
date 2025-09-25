@@ -15,12 +15,12 @@ namespace EmpregaNet.Infra.Persistence.Repositories
     /// - Gerenciar consultas (como GetById e GetAll).
     /// - Marcar entidades para criação, atualização ou exclusão.
     ///
-    /// Não possui responsabilidade de transação:
-    /// As operações de escrita (Create, Update, Delete) não chamam SaveChangesAsync().
     /// </summary>
     /// <remarks>
+    /// A persistência real das mudanças no banco de dados é delegada à Unit of Work,
+    /// que coordena a transação e garante que todas as operações sejam concluídas com sucesso.
     /// Isso permite que múltiplos repositórios e operações sejam agrupados em uma única
-    /// transação atômica, gerenciada pela Unit of Work. Isso previne dados inconsistentes
+    /// transação atômica. Isso previne dados inconsistentes
     /// e segue o padrão de design para transações.
     /// </remarks>
     /// <typeparam name="T">O tipo da entidade que o repositório gerencia.</typeparam>
@@ -53,13 +53,15 @@ namespace EmpregaNet.Infra.Persistence.Repositories
         public async Task<T> CreateAsync(T entity)
         {
             await _context.Set<T>().AddAsync(entity);
+            await _context.SaveChangesAsync();
             return entity;
         }
 
-        public virtual Task<T> UpdateAsync(T entity)
+        public virtual async Task<T> UpdateAsync(T entity)
         {
             _context.Set<T>().Update(entity);
-            return Task.FromResult(entity);
+            await _context.SaveChangesAsync();
+            return entity;
         }
 
         public async Task<bool> DeleteAsync(long id)

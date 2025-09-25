@@ -1,9 +1,5 @@
 using System.Reflection;
-using EmpregaNet.Domain.Components.Mediator;
-using EmpregaNet.Infra.Components.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
-
-namespace EmpregaNet.Infra.Components;
 
 /// <summary>
 /// Classe de extensão para registro automático do Mediator na coleção de serviços.

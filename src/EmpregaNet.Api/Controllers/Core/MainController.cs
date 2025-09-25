@@ -1,7 +1,6 @@
 using EmpregaNet.Domain.Common;
 using EmpregaNet.Infra.Cache.MemoryService;
 using Microsoft.AspNetCore.Mvc;
-using EmpregaNet.Infra.Components.Interfaces;
 using EmpregaNet.Application.Common.Base;
 
 namespace EmpregaNet.Api.Controllers.Core

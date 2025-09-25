@@ -1,7 +1,4 @@
-using EmpregaNet.Infra.Components.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
-
-namespace EmpregaNet.Domain.Components.Mediator;
 
 /// <summary>
 /// Implementação central do CQRSService responsável por:

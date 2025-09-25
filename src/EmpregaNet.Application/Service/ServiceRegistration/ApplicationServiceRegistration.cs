@@ -4,7 +4,6 @@ using Microsoft.Extensions.DependencyInjection;
 using EmpregaNet.Infra.Configurations;
 using Microsoft.Extensions.Configuration;
 using FluentValidation;
-using EmpregaNet.Infra.Components.Interfaces;
 using EmpregaNet.Application.Service.Auth;
 
 namespace EmpregaNet.Application.Service.ServiceRegistration;

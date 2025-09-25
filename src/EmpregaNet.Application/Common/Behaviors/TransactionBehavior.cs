@@ -1,4 +1,3 @@
-using EmpregaNet.Infra.Components.Interfaces;
 using EmpregaNet.Domain.Interfaces;
 using Microsoft.Extensions.Logging;
 

@@ -6,7 +6,6 @@ using EmpregaNet.Application.Jobs.ViewModel;
 using System.ComponentModel.DataAnnotations;
 using EmpregaNet.Domain.Entities;
 using EmpregaNet.Application.Jobs.Commands;
-using EmpregaNet.Infra.Components.Interfaces;
 using EmpregaNet.Application.Common.Exceptions;
 using EmpregaNet.Application.Companies.ViewModel;
 using EmpregaNet.Application.Common.Base;

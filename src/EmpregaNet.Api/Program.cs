@@ -2,7 +2,6 @@ using EmpregaNet.Api.Configuration;
 using EmpregaNet.Api.Middleware;
 using EmpregaNet.Application.Service.ServiceRegistration;
 using EmpregaNet.Infra;
-using EmpregaNet.Infra.Components;
 using EmpregaNet.Infra.Configurations;
 
 var builder = WebApplication.CreateBuilder(args);

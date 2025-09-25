@@ -1,5 +1,4 @@
 ﻿using EmpregaNet.Application.Common.Exceptions;
-using EmpregaNet.Infra.Components.Interfaces;
 using FluentValidation;
 
 namespace EmpregaNet.Application.Common.Behaviors

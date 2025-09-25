@@ -1,5 +1,4 @@
 using EmpregaNet.Application.Common.Behaviors;
-using EmpregaNet.Infra.Components.Interfaces;
 
 namespace EmpregaNet.Application.Common.Base;
 

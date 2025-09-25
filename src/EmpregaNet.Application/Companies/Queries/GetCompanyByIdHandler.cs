@@ -1,7 +1,6 @@
 using EmpregaNet.Domain.Interfaces;
 using Microsoft.Extensions.Logging;
 using EmpregaNet.Application.Jobs.ViewModel;
-using EmpregaNet.Infra.Components.Interfaces;
 using EmpregaNet.Application.Companies.ViewModel;
 using EmpregaNet.Application.Common.Base;
 
