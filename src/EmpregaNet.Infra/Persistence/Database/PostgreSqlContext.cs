@@ -6,6 +6,7 @@ namespace EmpregaNet.Infra.Persistence.Database
 {
     public class PostgreSqlContext(DbContextOptions<PostgreSqlContext> options) : DbContextSets<PostgreSqlContext>(options)
     {
+        public async Task MigrateAsync() => await base.Database.MigrateAsync();
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
 

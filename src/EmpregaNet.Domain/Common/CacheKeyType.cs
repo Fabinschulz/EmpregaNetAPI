@@ -1,4 +1,4 @@
-﻿namespace EmpregaNet.Infra.Cache;
+﻿namespace EmpregaNet.Domain.Common;
 public static class CacheKeyType
 {
     public const string DatabaseConfiguration = "DatabaseConfiguration";

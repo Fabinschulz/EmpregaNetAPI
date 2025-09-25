@@ -4,11 +4,11 @@
     <PackageReference Include="FluentValidation" Version="11.11.0" />
     <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="11.11.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.5" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\EmpregaNet.Domain\EmpregaNet.Domain.csproj" />
-    <ProjectReference Include="..\EmpregaNet.Infra\EmpregaNet.Infra.csproj" />
   </ItemGroup>
 
   <PropertyGroup>

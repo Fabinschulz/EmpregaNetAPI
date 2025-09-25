@@ -1,4 +1,4 @@
-﻿namespace EmpregaNet.Infra.Configurations;
+﻿namespace EmpregaNet.Application.Configurations;
 
 public class JwtSettings
 {

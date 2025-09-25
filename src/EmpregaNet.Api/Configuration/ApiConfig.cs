@@ -1,6 +1,5 @@
 using System.Text.Json.Serialization;
 using EmpregaNet.Application.Service.Auth;
-using EmpregaNet.Infra.Configurations;
 using Newtonsoft.Json;
 
 namespace EmpregaNet.Api.Configuration
@@ -11,11 +10,6 @@ namespace EmpregaNet.Api.Configuration
 
         public static void UseApiConfiguration(this WebApplication app, IWebHostEnvironment env)
         {
-            if (env.IsDevelopment())
-            {
-                app.ApplyMigrations();
-            }
-
             app.UseHttpsRedirection()
                .UseCors("AllowAll")
                .UseAuthentication()
@@ -37,7 +31,6 @@ namespace EmpregaNet.Api.Configuration
 
         public static WebApplicationBuilder AddApiConfiguration(this WebApplicationBuilder builder)
         {
-            builder.EnvironmentConfig();
             builder.Services.AddControllers()
             .ConfigureApiBehaviorOptions(options =>
             {

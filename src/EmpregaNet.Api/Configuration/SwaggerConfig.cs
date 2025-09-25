@@ -1,6 +1,5 @@
 using System.Reflection;
 using System.Xml.Linq;
-using EmpregaNet.Application.Utils;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 

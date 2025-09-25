@@ -11,10 +11,17 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="9.0.4" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.5" />
+    <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="8.1.2" />
+    <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="8.1.2" />
+    <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="8.1.2" />
+    <PackageReference Include="Sentry.AspNetCore" Version="5.8.1" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\EmpregaNet.Application\EmpregaNet.Application.csproj" />
+    <ProjectReference Include="..\EmpregaNet.Domain\EmpregaNet.Domain.csproj" />
+    <ProjectReference Include="..\EmpregaNet.Infra\EmpregaNet.Infra.csproj" />
   </ItemGroup>
 
 </Project>

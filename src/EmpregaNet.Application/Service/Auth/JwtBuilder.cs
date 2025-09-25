@@ -1,9 +1,9 @@
 using EmpregaNet.Application.Auth.ViewModel;
+using EmpregaNet.Application.Configurations;
+using EmpregaNet.Domain.Common;
 using EmpregaNet.Domain.Entities;
 using EmpregaNet.Domain.Enums;
-using EmpregaNet.Infra.Cache;
-using EmpregaNet.Infra.Cache.MemoryService;
-using EmpregaNet.Infra.Configurations;
+using EmpregaNet.Domain.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;

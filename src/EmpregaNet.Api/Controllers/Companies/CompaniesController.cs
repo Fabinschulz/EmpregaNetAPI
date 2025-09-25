@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using EmpregaNet.Api.Controllers.Core;
-using EmpregaNet.Infra.Cache.MemoryService;
 using EmpregaNet.Application.Companies.ViewModel;
 using EmpregaNet.Application.Companies.Command;
+using EmpregaNet.Domain.Interfaces;
 
 namespace EmpregaNet.Api.Controllers.Companies
 {

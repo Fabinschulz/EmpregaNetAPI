@@ -3,8 +3,6 @@ using EmpregaNet.Application.Common.Exceptions;
 using EmpregaNet.Domain.Common;
 using EmpregaNet.Domain.Enums;
 using Microsoft.AspNetCore.Diagnostics;
-using Microsoft.EntityFrameworkCore;
-using Npgsql;
 
 namespace EmpregaNet.Api.Middleware
 {

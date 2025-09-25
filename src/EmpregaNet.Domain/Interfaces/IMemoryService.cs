@@ -1,4 +1,4 @@
-namespace EmpregaNet.Infra.Cache.MemoryService;
+namespace EmpregaNet.Domain.Interfaces;
 
 public interface IMemoryService
 {

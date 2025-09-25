@@ -1,17 +1,28 @@
 using EmpregaNet.Infra.Persistence.Database;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace EmpregaNet.Infra.Configurations;
 
 public static class ApplyMigrationsConfig
 {
-    public static void ApplyMigrations(this IApplicationBuilder app)
+    public static void ApplyMigrations(this IServiceCollection services)
     {
-        using IServiceScope scope = app.ApplicationServices.CreateScope();
-        using PostgreSqlContext dbContext = scope.ServiceProvider.GetRequiredService<PostgreSqlContext>();
-        dbContext.Database.Migrate();
+        var postgreSql = GetPostgreSql(services);
+        try
+        {
+            postgreSql.MigrateAsync().GetAwaiter().GetResult();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Não foi possível concluir a migração do DB." + ex.ToString());
+            throw;
+        }
+    }
+
+    private static PostgreSqlContext GetPostgreSql(IServiceCollection services)
+    {
+        return (PostgreSqlContext)(services.BuildServiceProvider().GetService(typeof(PostgreSqlContext)) 
+            ?? throw new InvalidOperationException("PostgreSqlContext service is not registered."));
     }
 
 }

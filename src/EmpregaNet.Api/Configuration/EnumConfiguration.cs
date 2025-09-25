@@ -6,8 +6,6 @@ using System.Text;
 using System.Xml.Linq;
 using System.Xml.XPath;
 
-namespace EmpregaNet.Application.Utils;
-
 /// <summary>
 /// Filtro de schema para o Swagger que adiciona à descrição dos enums os valores possíveis e suas descrições extraídas dos comentários XML.
 /// Exibe uma lista HTML com os nomes e descrições dos membros do enum na documentação gerada.

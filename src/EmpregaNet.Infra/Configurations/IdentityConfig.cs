@@ -1,4 +1,5 @@
 using System.Text;
+using EmpregaNet.Application.Configurations;
 using EmpregaNet.Domain.Entities;
 using EmpregaNet.Infra.Persistence.Database;
 using Microsoft.AspNetCore.Authentication.JwtBearer;

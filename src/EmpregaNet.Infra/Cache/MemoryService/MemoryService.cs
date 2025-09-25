@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using StackExchange.Redis;
 using Newtonsoft.Json;
+using EmpregaNet.Domain.Interfaces;
 
 namespace EmpregaNet.Infra.Cache.MemoryService
 {

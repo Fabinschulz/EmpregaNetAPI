@@ -1,8 +1,6 @@
 using System.Reflection;
 using EmpregaNet.Application.Common.Behaviors;
 using Microsoft.Extensions.DependencyInjection;
-using EmpregaNet.Infra.Configurations;
-using Microsoft.Extensions.Configuration;
 using FluentValidation;
 using EmpregaNet.Application.Service.Auth;
 
@@ -12,9 +10,6 @@ public static class ApplicationServiceRegistration
 {
     public static IServiceCollection RegisterApplicationDependency(this IServiceCollection services)
     {
-        var serviceProvider = services.BuildServiceProvider();
-        var configuration = serviceProvider.GetRequiredService<IConfiguration>();
-        services.Configure<JwtSettings>(configuration.GetSection("JwtSettings"));
         services.AddScoped<IJwtBuilder, JwtBuilder>();
 
         var assemblies = Assembly.GetExecutingAssembly();

@@ -14,7 +14,7 @@
     <PackageReference Include="Serilog.Sinks.Elasticsearch" Version="10.0.0" />
     <PackageReference Include="NEST" Version="7.17.5" />
 
-     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.5" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="9.0.5" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="9.0.5" />
@@ -28,16 +28,13 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4" />
-    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.5" />
-    <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="8.1.2" />
-    <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="8.1.2" />
-    <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="8.1.2" />
     <PackageReference Include="Sentry.AspNetCore" Version="5.8.1" />
     <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="9.0.5" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\EmpregaNet.Domain\EmpregaNet.Domain.csproj" />
+    <ProjectReference Include="..\EmpregaNet.Application\EmpregaNet.Application.csproj" />
   </ItemGroup>
 
   <PropertyGroup>
