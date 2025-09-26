@@ -1,5 +1,6 @@
 using EmpregaNet.Api.Middleware;
 using EmpregaNet.Infra;
+using EmpregaNet.Infra.Configurations;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.EnvironmentConfig();
@@ -19,6 +20,7 @@ var app = builder.Build();
 
 app.SetupApiServices();
 app.UseExceptionHandler();
+app.UseSentryTracingMiddleware();
 app.Run();
 
 #endregion
