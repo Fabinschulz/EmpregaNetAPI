@@ -1,4 +1,4 @@
-﻿namespace EmpregaNet.Application.Utils.Helpers;
+﻿namespace EmpregaNet.Application.Utils;
 
 public static partial class Constants
 {

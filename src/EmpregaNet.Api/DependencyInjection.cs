@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 using EmpregaNet.Api.Configuration;
-using EmpregaNet.Application.Service.Auth;
+using EmpregaNet.Application.Auth;
 using Newtonsoft.Json;
 
 public static class DependencyInjection

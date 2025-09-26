@@ -1,5 +1,4 @@
-﻿using EmpregaNet.Application.Service.Auth;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using System.Diagnostics;
 
 namespace EmpregaNet.Application.Common.Behaviors;

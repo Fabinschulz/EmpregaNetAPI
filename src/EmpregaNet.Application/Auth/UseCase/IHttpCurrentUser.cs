@@ -1,8 +1,6 @@
 ﻿using EmpregaNet.Application.Auth.ViewModel;
 using EmpregaNet.Domain.Enums;
 
-namespace EmpregaNet.Application.Service.Auth;
-
 /// <summary>
 /// Interface que abstrai o acesso ao usuário autenticado no contexto da requisição HTTP.
 /// Permite obter informações básicas do usuário, token de acesso, permissões e realizar verificações de autorização.

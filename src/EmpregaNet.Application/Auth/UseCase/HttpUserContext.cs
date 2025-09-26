@@ -4,8 +4,6 @@ using EmpregaNet.Domain.Enums;
 using Microsoft.AspNetCore.Http;
 using System.Text;
 
-namespace EmpregaNet.Application.Service.Auth;
-
 /// <summary>
 /// Contexto do usuário em uma requisição HTTP.
 /// Responsável por extrair informações do usuário autenticado a partir dos claims do token JWT

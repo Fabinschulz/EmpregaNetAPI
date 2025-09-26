@@ -2,7 +2,7 @@ using System.Reflection;
 using EmpregaNet.Application.Common.Behaviors;
 using Microsoft.Extensions.DependencyInjection;
 using FluentValidation;
-using EmpregaNet.Application.Service.Auth;
+using EmpregaNet.Application.Interfaces;
 
 public static class DependencyInjection
 {

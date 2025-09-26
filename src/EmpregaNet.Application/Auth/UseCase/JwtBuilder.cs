@@ -1,5 +1,5 @@
 using EmpregaNet.Application.Auth.ViewModel;
-using EmpregaNet.Application.Configurations;
+using EmpregaNet.Application.Interfaces;
 using EmpregaNet.Domain.Common;
 using EmpregaNet.Domain.Entities;
 using EmpregaNet.Domain.Enums;
@@ -10,14 +10,6 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-
-namespace EmpregaNet.Application.Service.Auth;
-
-public interface IJwtBuilder
-{
-    Task<UserLoggedViewModel> BuildUserTokenAsync(User user);
-    Task<List<UserPermissionVieModel>?> GetAllPermissions(string key);
-}
 
 public class JwtBuilder : IJwtBuilder
 {

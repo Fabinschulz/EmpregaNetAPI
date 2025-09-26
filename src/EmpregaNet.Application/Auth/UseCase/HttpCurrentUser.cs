@@ -1,8 +1,9 @@
 ﻿using System.Text;
 using EmpregaNet.Application.Auth.ViewModel;
+using EmpregaNet.Application.Interfaces;
 using EmpregaNet.Domain.Enums;
 
-namespace EmpregaNet.Application.Service.Auth;
+namespace EmpregaNet.Application.Auth;
 
 /// <summary>
 /// Implementação de <see cref="IHttpCurrentUser"/> responsável por fornecer informações do usuário autenticado

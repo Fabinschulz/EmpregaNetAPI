@@ -46,7 +46,7 @@ namespace EmpregaNet.Infra.Persistence.Repositories
                 query = ApplyOrderBy(query, orderBy);
             }
 
-            var result = await query.PaginatedListAsync(Page, Size);
+            var result = await query.ToPaginatedListAsync(Page, Size);
             return result;
         }
 
