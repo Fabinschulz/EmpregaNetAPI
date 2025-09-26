@@ -51,9 +51,6 @@ namespace EmpregaNet.Infra.Configurations
                     .AddApiEndpoints()
                     .AddDefaultTokenProviders(); // Adiciona suporte a tokens (confirmação de email, reset de senha, etc.)
 
-            // Configuração de cache e proteção de dados
-            builder.Services.AddMemoryCache().AddDataProtection();
-
             return builder;
         }
 
@@ -61,7 +58,6 @@ namespace EmpregaNet.Infra.Configurations
         private static WebApplicationBuilder AddJwtSupport(this WebApplicationBuilder builder)
         {
             var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>();
-
 
             if (jwtSettings == null)
                 throw new InvalidOperationException("JwtSettings não configurado no appsettings.json ou variáveis de ambiente.");

@@ -4,14 +4,10 @@ using Microsoft.Extensions.DependencyInjection;
 using FluentValidation;
 using EmpregaNet.Application.Service.Auth;
 
-namespace EmpregaNet.Application.Service.ServiceRegistration;
-
-public static class ApplicationServiceRegistration
+public static class DependencyInjection
 {
-    public static IServiceCollection RegisterApplicationDependency(this IServiceCollection services)
+    public static IServiceCollection RegisterApplicationDependencies(this IServiceCollection services)
     {
-        services.AddScoped<IJwtBuilder, JwtBuilder>();
-
         var assemblies = Assembly.GetExecutingAssembly();
         services.AddValidatorsFromAssembly(assemblies);
 
@@ -20,6 +16,7 @@ public static class ApplicationServiceRegistration
         services.AddScoped(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
         services.AddScoped(typeof(IPipelineBehavior<,>), typeof(TransactionBehavior<,>));
         services.AddScoped(typeof(IPipelineBehavior<,>), typeof(PerformanceBehaviour<,>));
+        services.AddScoped<IJwtBuilder, JwtBuilder>();
 
         return services;
     }

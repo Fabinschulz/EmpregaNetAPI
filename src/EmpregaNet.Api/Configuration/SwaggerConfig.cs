@@ -12,16 +12,16 @@ namespace EmpregaNet.Api.Configuration
         /// Adiciona e configura o Swagger/OpenAPI no pipeline de serviços da aplicação.
         /// Inclui documentação, segurança JWT, filtros de schema e comentários XML de múltiplos projetos.
         /// </summary>
-        /// <param name="builder">Coleção de serviços da aplicação (<see cref="WebApplicationBuilder"/>).</param>
+        /// <param name="services">Coleção de serviços da aplicação (<see cref="IServiceCollection"/>).</param>
         /// <returns>Coleção de serviços configurada.</returns>
-        public static WebApplicationBuilder AddSwaggerConfiguration(this WebApplicationBuilder builder)
+        public static IServiceCollection SetupSwaggerDocumentation(this IServiceCollection services)
         {
-            if (builder == null) throw new ArgumentNullException(nameof(builder));
+            if (services == null) throw new ArgumentNullException(nameof(services));
 
-            builder.Services.AddEndpointsApiExplorer();
+            services.AddEndpointsApiExplorer();
 
             // Define informações básicas da documentação Swagger
-            builder.Services.AddSwaggerGen(s =>
+            services.AddSwaggerGen(s =>
             {
                 s.SwaggerDoc("v1", new OpenApiInfo
                 {
@@ -113,7 +113,7 @@ namespace EmpregaNet.Api.Configuration
 
             });
 
-            return builder;
+            return services;
         }
 
         public class TagDescriptionsDocumentFilter : IDocumentFilter

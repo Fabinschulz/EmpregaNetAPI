@@ -14,11 +14,21 @@ public static class DependencyInjection
 
     public static void RegisterCoreDependencies(this WebApplicationBuilder builder)
     {
-        builder.AddDatabase();
+        builder.SetUpDatabaseConnection();
         builder.AddIdentityConfiguration();
         builder.Services.SetupInfrastructureServices(builder.Configuration);
         builder.AddSentryConfiguration();
-        builder.Build().UseSentryTracingMiddleware();
+    }
+
+    private static void SetupInfrastructureServices(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.UseRedisCache(configuration);
+        services.AddHttpContextAccessor();
+        services.AddMemoryCache().AddDataProtection();
+        services.AddEndpointsApiExplorer();
+        services.RegisterRepositories();
+        services.AddProblemDetails();
+        services.ApplyMigrations();
     }
 
     private static void RegisterRepositories(this IServiceCollection services)
@@ -28,17 +38,6 @@ public static class DependencyInjection
         // services.AddTransient<IEmailSender<User>, EmailSender>();
         services.AddSingleton<IMemoryService, MemoryService>();
         services.AddScoped<ICompanyRepository, CompanyRepository>();
-    }
-
-    private static void SetupInfrastructureServices(this IServiceCollection services, IConfiguration configuration)
-    {
-        services.UseRedisCache(configuration);
-        services.AddHttpContextAccessor();
-        services.AddMemoryCache();
-        services.AddEndpointsApiExplorer();
-        services.RegisterRepositories();
-        services.AddProblemDetails();
-        services.ApplyMigrations();
     }
 
 }

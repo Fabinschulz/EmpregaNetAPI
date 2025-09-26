@@ -20,7 +20,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\EmpregaNet.Application\EmpregaNet.Application.csproj" />
-    <ProjectReference Include="..\EmpregaNet.Domain\EmpregaNet.Domain.csproj" />
     <ProjectReference Include="..\EmpregaNet.Infra\EmpregaNet.Infra.csproj" />
   </ItemGroup>
 

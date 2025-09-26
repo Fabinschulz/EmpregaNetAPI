@@ -1,9 +1,4 @@
-﻿using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.Configuration;
-
-namespace EmpregaNet.Infra.Configurations;
-
-/// <summary>
+﻿/// <summary>
 /// Classe de extensão responsável pela configuração do ambiente da aplicação Web API.
 /// Permite centralizar o carregamento de arquivos de configuração (appsettings) e variáveis de ambiente
 /// de acordo com o ambiente atual (Development, Staging, Production, etc).
