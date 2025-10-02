@@ -60,32 +60,11 @@ namespace EmpregaNet.Api.Configuration
                 });
 
                 // Excluding ASP.NET Identity endpoints
-                s.DocInclusionPredicate((docName, apiDesc) =>
+               s.DocInclusionPredicate((docName, apiDesc) =>
                 {
                     var relativePath = apiDesc.RelativePath;
 
-                    var identityEndpoints = new[]
-                    {
-                        "register",
-                        "manage",
-                        "refresh",
-                        "login",
-                        "confirmEmail",
-                        "resendConfirmationEmail",
-                        "forgotPassword",
-                        "resetPassword"
-                    };
-
-                    // Validating if the endpoint is avoided
-                    foreach (var endpoint in identityEndpoints)
-                    {
-                        if (relativePath!.Contains(endpoint, StringComparison.OrdinalIgnoreCase))
-                        {
-                            return false;
-                        }
-                    }
-
-                    return true;
+                    return !(relativePath?.StartsWith("Identity", StringComparison.OrdinalIgnoreCase) ?? false);
                 });
 
                 // Suporte a polimorfismo em schemas usando oneOf

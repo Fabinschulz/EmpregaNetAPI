@@ -1,9 +1,9 @@
 using EmpregaNet.Domain.Common;
-using EmpregaNet.Domain.Interfaces;
 using FluentValidation;
 using Microsoft.Extensions.Logging;
 using EmpregaNet.Application.Common.Base;
 using EmpregaNet.Application.Companies.ViewModel;
+using EmpregaNet.Application.Interfaces;
 
 namespace EmpregaNet.Application.Companies.Queries;
 

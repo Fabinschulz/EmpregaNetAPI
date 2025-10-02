@@ -1,5 +1,5 @@
+using EmpregaNet.Application.Interfaces;
 using EmpregaNet.Domain.Common;
-using EmpregaNet.Domain.Interfaces;
 using EmpregaNet.Infra.Persistence.Database;
 using Microsoft.EntityFrameworkCore;
 

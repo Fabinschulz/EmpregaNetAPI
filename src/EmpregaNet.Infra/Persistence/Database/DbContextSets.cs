@@ -1,11 +1,10 @@
 ﻿using EmpregaNet.Domain.Entities;
-using EmpregaNet.Domain.Interfaces;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace EmpregaNet.Infra.Persistence.Database
 {
-    public class DbContextSets<TContext> : IdentityDbContext<User, Role, long>, IApplicationDbContext where TContext : DbContext
+    public class DbContextSets<TContext> : IdentityDbContext<User, Role, long> where TContext : DbContext
     {
         public DbContextSets(DbContextOptions<TContext> options) : base(options) { }
 

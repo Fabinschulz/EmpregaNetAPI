@@ -1,8 +1,8 @@
-using EmpregaNet.Domain.Interfaces;
 using Microsoft.Extensions.Logging;
 using EmpregaNet.Application.Jobs.ViewModel;
 using EmpregaNet.Application.Companies.ViewModel;
 using EmpregaNet.Application.Common.Base;
+using EmpregaNet.Application.Interfaces;
 
 namespace EmpregaNet.Application.Companies.Queries;
 

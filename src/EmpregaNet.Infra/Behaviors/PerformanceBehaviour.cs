@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using System.Diagnostics;
 
-namespace EmpregaNet.Application.Common.Behaviors;
+namespace EmpregaNet.Infra.Behaviors;
 
 /// <summary>
 /// Comportamento de pipeline que monitora a performance das requisições CQRS.

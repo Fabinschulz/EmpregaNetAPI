@@ -1,12 +1,7 @@
 using EmpregaNet.Domain.Interfaces;
 using Microsoft.Extensions.Logging;
 
-namespace EmpregaNet.Application.Common.Behaviors;
-
-/// <summary>
-/// Marca uma requisição como transacional, indicando que deve ser executada dentro de uma transação de banco de dados.
-/// </summary>
-public interface ITransactional { }
+namespace EmpregaNet.Infra.Behaviors;
 
 /// <summary>
 /// Comportamento de pipeline que orquestra a execução de comandos dentro de uma transação atômica.

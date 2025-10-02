@@ -1,4 +1,3 @@
-using EmpregaNet.Domain.Interfaces;
 using FluentValidation;
 using Microsoft.Extensions.Logging;
 using EmpregaNet.Domain.Enums;
@@ -10,6 +9,7 @@ using EmpregaNet.Application.Common.Exceptions;
 using EmpregaNet.Application.Companies.ViewModel;
 using EmpregaNet.Application.Common.Base;
 using EmpregaNet.Application.Companies.Factories;
+using EmpregaNet.Application.Interfaces;
 
 namespace EmpregaNet.Application.Companies.Command
 {

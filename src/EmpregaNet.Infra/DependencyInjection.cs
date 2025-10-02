@@ -1,4 +1,6 @@
-﻿using EmpregaNet.Domain.Interfaces;
+﻿using EmpregaNet.Application.Interfaces;
+using EmpregaNet.Domain.Interfaces;
+using EmpregaNet.Infra.Behaviors;
 using EmpregaNet.Infra.Cache.MemoryService;
 using EmpregaNet.Infra.Cache.RedisServiceCollection;
 using EmpregaNet.Infra.Configurations;
@@ -26,18 +28,27 @@ public static class DependencyInjection
         services.AddHttpContextAccessor();
         services.AddMemoryCache().AddDataProtection();
         services.AddEndpointsApiExplorer();
-        services.RegisterRepositories();
+        services.SetupDependencyInjection();
         services.AddProblemDetails();
         services.ApplyMigrations();
     }
 
-    private static void RegisterRepositories(this IServiceCollection services)
+    private static void SetupDependencyInjection(this IServiceCollection services)
     {
-        services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
         // services.AddTransient<IEmailSender<User>, IdentityNoOpEmailSender>();
         // services.AddTransient<IEmailSender<User>, EmailSender>();
         services.AddSingleton<IMemoryService, MemoryService>();
+
+        // Adiciona o comportamento de validação antes da execução de qualquer Handler.
+        // Ele intercepta a requisição, executa as validações necessárias e, se falhar, evita que o Handler seja executado.
+        services.AddScoped(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+        services.AddScoped(typeof(IPipelineBehavior<,>), typeof(TransactionBehavior<,>));
+        services.AddScoped(typeof(IPipelineBehavior<,>), typeof(PerformanceBehaviour<,>));
+
+        #region Repositories
+        services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
         services.AddScoped<ICompanyRepository, CompanyRepository>();
+        #endregion
     }
 
 }

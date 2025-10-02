@@ -56,11 +56,11 @@ namespace EmpregaNet.Infra.Configurations
 
         private static WebApplicationBuilder AddJwtSupport(this WebApplicationBuilder builder)
         {
-            var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>();
+            var jwtSettingsSection = builder.Configuration.GetSection("JwtSettings");
+            var jwtSettings = jwtSettingsSection.Get<JwtSettings>();
 
-            if (jwtSettings == null)
-                throw new InvalidOperationException("JwtSettings não configurado no appsettings.json ou variáveis de ambiente.");
-
+            if (jwtSettings == null || string.IsNullOrEmpty(jwtSettings.SecretKey))
+                throw new InvalidOperationException("JwtSettings ou SecretKey não configurado(s) no appsettings.json ou variáveis de ambiente.");
 
             var key = Encoding.ASCII.GetBytes(jwtSettings.SecretKey);
 
@@ -84,6 +84,7 @@ namespace EmpregaNet.Infra.Configurations
             builder.Services.AddAuthorization();
             builder.Services.AddHttpContextAccessor();
             builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            builder.Services.Configure<JwtSettings>(jwtSettingsSection);
             return builder;
         }
     }
