@@ -8,6 +8,9 @@ namespace EmpregaNet.Application.Utils.Helpers
 {
     public static class RandomHelpers
     {
+
+        private const string BrasiliaTimeZoneId = "America/Sao_Paulo";
+        private const string FallbackTimeZoneId = "E. South America Standard Time";
         static readonly HttpClient client = new HttpClient();
 
         public class Location
@@ -111,6 +114,24 @@ namespace EmpregaNet.Application.Utils.Helpers
         }
 
         /// <summary>
+        /// Obtém o fuso horário de Brasília de forma segura.
+        /// </summary>
+        /// <returns>O objeto TimeZoneInfo para o fuso horário de Brasília.</returns>
+        private static TimeZoneInfo GetBrasiliaTimeZone()
+        {
+            try
+            {
+                // Tenta o ID padrão do IANA (Linux/macOS)
+                return TimeZoneInfo.FindSystemTimeZoneById(BrasiliaTimeZoneId);
+            }
+            catch (TimeZoneNotFoundException)
+            {
+                // Fallback para IDs comuns do Windows
+                return TimeZoneInfo.FindSystemTimeZoneById(FallbackTimeZoneId);
+            }
+        }
+
+        /// <summary>
         /// Obtém a data e hora atual no fuso horário de Brasília (America/Sao_Paulo).
         /// </summary>
         /// <returns>
@@ -118,23 +139,14 @@ namespace EmpregaNet.Application.Utils.Helpers
         /// </returns>
         public static DateTimeOffset GetBrasiliaDateTime()
         {
-            TimeZoneInfo timeZone;
-            try
-            {
-                timeZone = TimeZoneInfo.FindSystemTimeZoneById("America/Sao_Paulo");
-            }
-            catch
-            {
-                timeZone = TimeZoneInfo.FindSystemTimeZoneById("E. South America Standard Time");
-            }
-            return TimeZoneInfo.ConvertTime(DateTimeOffset.Now, timeZone);
+            return TimeZoneInfo.ConvertTime(DateTimeOffset.UtcNow, GetBrasiliaTimeZone());
         }
 
         /// <summary>
-        /// Converte um DateTimeOffset (que deve ser UTC) para o fuso horário de Brasília (America/Sao_Paulo)
-        /// e o retorna como uma string formatada (dd/MM/yyyy HH:mm:ss).
+        /// Converte um DateTimeOffset (UTC) para o fuso horário de Brasília e o retorna como string.
+        /// Este é o método que você deve usar nos ViewModels.
         /// </summary>
-        /// <param name="utcDate">O DateTimeOffset a ser convertido (preferencialmente em UTC).</param>
+        /// <param name="utcDate">O DateTimeOffset a ser convertido (lido do banco, deve ser UTC).</param>
         /// <param name="format">O formato de string desejado (padrão é "dd/MM/yyyy HH:mm:ss").</param>
         /// <returns>A string formatada com a data e hora local do Brasil.</returns>
         public static string FormatToBrasiliaTime(DateTimeOffset? utcDate, string format = "dd/MM/yyyy HH:mm:ss")
@@ -144,18 +156,8 @@ namespace EmpregaNet.Application.Utils.Helpers
                 return string.Empty;
             }
 
-            TimeZoneInfo timeZone;
-            try
-            {
-                // Tenta o ID mais robusto para a maioria dos sistemas
-                timeZone = TimeZoneInfo.FindSystemTimeZoneById("America/Sao_Paulo");
-            }
-            catch (TimeZoneNotFoundException)
-            {
-                timeZone = TimeZoneInfo.FindSystemTimeZoneById("E. South America Standard Time");
-            }
+            DateTimeOffset brasiliaTime = TimeZoneInfo.ConvertTime(utcDate.Value, GetBrasiliaTimeZone());
 
-            DateTimeOffset brasiliaTime = TimeZoneInfo.ConvertTime(utcDate.Value, timeZone);
             return brasiliaTime.ToString(format, CultureInfo.GetCultureInfo("pt-BR"));
         }
 

@@ -33,6 +33,7 @@ namespace EmpregaNet.Infra.Persistence.Database
                         break;
                     case EntityState.Deleted:
                         entry.Entity.DeletedAt = dateTimeUtcNow;
+                        entry.Entity.UpdatedAt = dateTimeUtcNow;
                         entry.Entity.IsDeleted = true;
                         entry.State = EntityState.Modified;
                         break;

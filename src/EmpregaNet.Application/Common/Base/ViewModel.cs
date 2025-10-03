@@ -10,35 +10,14 @@ public class BaseViewModel
     private DateTimeOffset? _updatedAt;
     private DateTimeOffset? _deletedAt;
 
-    public string CreatedAt
-    {
-        get => RandomHelpers.FormatToBrasiliaTime(_createdAt);
-    }
+    public string CreatedAt => RandomHelpers.FormatToBrasiliaTime(_createdAt);
+    public string? UpdatedAt => RandomHelpers.FormatToBrasiliaTime(_updatedAt);
+    public string? DeletedAt => RandomHelpers.FormatToBrasiliaTime(_deletedAt);
 
-    public DateTimeOffset CreatedAtUtc
-    {
-        set => _createdAt = value;
-    }
 
-    public string? UpdatedAt
-    {
-        get => RandomHelpers.FormatToBrasiliaTime(_updatedAt);
-    }
-
-    public DateTimeOffset? UpdatedAtUtc
-    {
-        set => _updatedAt = value;
-    }
-
-    public string? DeletedAt
-    {
-        get => RandomHelpers.FormatToBrasiliaTime(_deletedAt);
-    }
-
-    public DateTimeOffset? DeletedAtUtc
-    {
-        set => _deletedAt = value;
-    }
+    public DateTimeOffset CreatedAtUtc { set => _createdAt = value; }
+    public DateTimeOffset? UpdatedAtUtc { set => _updatedAt = value; }
+    public DateTimeOffset? DeletedAtUtc { set => _deletedAt = value; }
 
     // public UserViewModel? CriadoPor { get; set; }
     // public UserViewModel? AtualizadoPor { get; set; }
