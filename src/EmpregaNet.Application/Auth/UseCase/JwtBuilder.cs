@@ -93,7 +93,7 @@ public class JwtBuilder : IJwtBuilder
                 new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
                 new Claim(JwtRegisteredClaimNames.Email, user.Email!),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                new Claim(JwtRegisteredClaimNames.Iat, ToUnixEpochDate(DateTime.UtcNow).ToString(), ClaimValueTypes.Integer64),
+                new Claim(JwtRegisteredClaimNames.Iat, ToUnixEpochDate(DateTimeOffset.UtcNow).ToString(), ClaimValueTypes.Integer64),
             };
     }
 
@@ -162,7 +162,7 @@ public class JwtBuilder : IJwtBuilder
             Issuer = _jwtSettings.Issuer,
             Audience = _jwtSettings.Audience,
             Subject = claimsIdentity,
-            Expires = DateTime.UtcNow.AddHours(_jwtSettings.ExpirationHours),
+            Expires = DateTimeOffset.UtcNow.AddHours(_jwtSettings.ExpirationHours).UtcDateTime,
             SigningCredentials = new SigningCredentials(
                 new SymmetricSecurityKey(key),
                 SecurityAlgorithms.HmacSha256Signature)
@@ -177,7 +177,7 @@ public class JwtBuilder : IJwtBuilder
     /// </summary>
     /// <param name="date">Data a ser convertida.</param>
     /// <returns>Valor em segundos desde o Unix Epoch.</returns>
-    private static long ToUnixEpochDate(DateTime date)
+    private static long ToUnixEpochDate(DateTimeOffset date)
         => (long)Math.Round((date.ToUniversalTime() - new DateTimeOffset(1970, 1, 1, 0, 0, 0, TimeSpan.Zero))
             .TotalSeconds);
 }

@@ -16,17 +16,38 @@ namespace EmpregaNet.Application.Utils.Helpers
             public double Longitude { get; set; }
         }
 
+        /// <summary>
+        /// Obtém a exceção mais interna de uma exceção aninhada.
+        /// </summary>
+        /// <param name="e"></param>
+        /// <returns>
+        /// A exceção mais interna.
+        /// </returns>
         public static Exception GetInnerException(Exception e)
         {
             while (e.InnerException != null) e = e.InnerException;
             return e;
         }
 
+        /// <summary>
+        /// Converte graus em radianos.
+        /// </summary>
+        /// <param name="angle"></param>
+        /// <returns>
+        /// O valor em radianos.
+        /// </returns>
         public static double DegreeToRadian(double angle)
         {
             return Math.PI * angle / 180.0;
         }
 
+        /// <summary>
+        /// Valida se o número do CPF ou CNPJ é válido.
+        /// </summary>
+        /// <param name="documentNumber"></param>
+        /// <returns>
+        /// true se o número do CPF ou CNPJ for válido; caso contrário, false.
+        /// </returns>
         public static bool ValidateCPFCNPJ(string documentNumber)
         {
             var cpfcnpj = documentNumber;
@@ -49,10 +70,10 @@ namespace EmpregaNet.Application.Utils.Helpers
                         soma = 0;
                         for (j = 0; j <= 8 + i; j++) soma += d[j] * (10 + i - j);
 
-                        v[i] = soma * 10 % 11;
+                        v[i] = (soma * 10) % 11;
                         if (v[i] == 10) v[i] = 0;
                     }
-                    return v[0] == d[9] & v[1] == d[10];
+                    return (v[0] == d[9] & v[1] == d[10]);
                 case 14:
                     const string sequencia = "6543298765432";
                     for (i = 0; i <= 13; i++) d[i] = Convert.ToInt32(soNumero.Substring(i, 1));
@@ -62,15 +83,23 @@ namespace EmpregaNet.Application.Utils.Helpers
                         for (j = 0; j <= 11 + i; j++)
                             soma += d[j] * Convert.ToInt32(sequencia.Substring(j + 1 - i, 1));
 
-                        v[i] = soma * 10 % 11;
+                        v[i] = (soma * 10) % 11;
                         if (v[i] == 10) v[i] = 0;
                     }
-                    return v[0] == d[12] & v[1] == d[13];
+                    return (v[0] == d[12] & v[1] == d[13]);
                 default:
                     return false;
             }
         }
 
+        /// <summary>
+        /// Calcula a idade com base na data de nascimento fornecida.
+        /// Retorna a idade em anos completos.
+        /// </summary>
+        /// <param name="bornDate"></param>
+        /// <returns>
+        /// A idade em anos completos.
+        /// </returns>
         public static int GetAge(DateTime bornDate)
         {
             DateTime today = DateTime.Today;
@@ -81,6 +110,12 @@ namespace EmpregaNet.Application.Utils.Helpers
             return age;
         }
 
+        /// <summary>
+        /// Obtém a data e hora atual no fuso horário de Brasília (America/Sao_Paulo).
+        /// </summary>
+        /// <returns>
+        /// O valor DateTimeOffset atual no fuso horário de Brasília.
+        /// </returns>
         public static DateTimeOffset GetBrasiliaDateTime()
         {
             TimeZoneInfo timeZone;
@@ -95,6 +130,45 @@ namespace EmpregaNet.Application.Utils.Helpers
             return TimeZoneInfo.ConvertTime(DateTimeOffset.Now, timeZone);
         }
 
+        /// <summary>
+        /// Converte um DateTimeOffset (que deve ser UTC) para o fuso horário de Brasília (America/Sao_Paulo)
+        /// e o retorna como uma string formatada (dd/MM/yyyy HH:mm:ss).
+        /// </summary>
+        /// <param name="utcDate">O DateTimeOffset a ser convertido (preferencialmente em UTC).</param>
+        /// <param name="format">O formato de string desejado (padrão é "dd/MM/yyyy HH:mm:ss").</param>
+        /// <returns>A string formatada com a data e hora local do Brasil.</returns>
+        public static string FormatToBrasiliaTime(DateTimeOffset? utcDate, string format = "dd/MM/yyyy HH:mm:ss")
+        {
+            if (!utcDate.HasValue)
+            {
+                return string.Empty;
+            }
+
+            TimeZoneInfo timeZone;
+            try
+            {
+                // Tenta o ID mais robusto para a maioria dos sistemas
+                timeZone = TimeZoneInfo.FindSystemTimeZoneById("America/Sao_Paulo");
+            }
+            catch (TimeZoneNotFoundException)
+            {
+                timeZone = TimeZoneInfo.FindSystemTimeZoneById("E. South America Standard Time");
+            }
+
+            DateTimeOffset brasiliaTime = TimeZoneInfo.ConvertTime(utcDate.Value, timeZone);
+            return brasiliaTime.ToString(format, CultureInfo.GetCultureInfo("pt-BR"));
+        }
+
+        /// <summary>
+        /// Converte um DateTimeOffset para o fuso horário de Brasília (America/Sao_Paulo).
+        /// </summary>
+        /// <param name="date"></param>
+        /// <returns>
+        /// O valor DateTimeOffset convertido para o fuso horário de Brasília.
+        /// </returns>
+        /// <remarks> 
+        /// Se a conversão falhar, retorna o valor original.
+        /// </remarks>
         public static DateTimeOffset ConvertBrasiliaDateTime(DateTimeOffset date)
         {
             try
@@ -116,6 +190,14 @@ namespace EmpregaNet.Application.Utils.Helpers
             }
         }
 
+
+        /// <summary>
+        /// Converte um DateTimeOffset para um formato que pode ser comparado.
+        /// </summary>
+        /// <param name="date"></param>
+        /// <returns>
+        /// O valor DateTimeOffset convertido para UTC.
+        /// </returns>
         public static DateTimeOffset ConvertToCompareDate(DateTimeOffset date)
         {
             try
@@ -138,6 +220,13 @@ namespace EmpregaNet.Application.Utils.Helpers
             }
         }
 
+        /// <summary>
+        /// Converte uma string para DateTimeOffset, retornando null se a conversão falhar.
+        /// </summary>
+        /// <param name="date"></param>
+        /// <returns>
+        /// O valor DateTimeOffset convertido, ou null se a conversão falhar.
+        /// </returns>
         public static DateTimeOffset? StringToDateTimeOffset(string date)
         {
             DateTimeOffset converted;
@@ -148,6 +237,13 @@ namespace EmpregaNet.Application.Utils.Helpers
             return null;
         }
 
+        /// <summary>
+        /// Converte uma string para int, retornando null se a conversão falhar.
+        /// </summary>
+        /// <param name="integer"></param>
+        /// <returns>
+        /// O valor int convertido, ou null se a conversão falhar.
+        /// </returns>
         public static int? StringToInt(string integer)
         {
             int converted;
@@ -158,6 +254,13 @@ namespace EmpregaNet.Application.Utils.Helpers
             return null;
         }
 
+        /// <summary>
+        /// Converte uma string para long, retornando null se a conversão falhar.
+        /// </summary>
+        /// <param name="integer"></param>
+        /// <returns>
+        /// O valor long convertido, ou null se a conversão falhar.
+        /// </returns>
         public static long? StringToLong(string integer)
         {
             long converted;
@@ -168,6 +271,17 @@ namespace EmpregaNet.Application.Utils.Helpers
             return null;
         }
 
+        /// <summary>
+        /// Obtém a latitude e longitude de um endereço usando a API do Google Maps.
+        /// </summary>
+        /// <param name="street"></param>
+        /// <param name="number"></param>
+        /// <param name="cityName"></param>
+        /// <param name="stateAbrev"></param>
+        /// <param name="key"></param>
+        /// <returns>
+        /// Um objeto Location contendo a latitude e longitude, ou null se não for possível obter a localização.
+        /// </returns>
         public static Location? GetLatLng(string street, string number, string cityName, string stateAbrev, string key)
         {
 
@@ -205,6 +319,12 @@ namespace EmpregaNet.Application.Utils.Helpers
 
         }
 
+        /// <summary>
+        /// Gera um arquivo CSV local a partir de uma coleção de itens do tipo T.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="items"></param>
+        /// <param name="path"></param>
         public static void WriteCSVLocal<T>(IEnumerable<T> items, string path)
         {
             Type itemType = typeof(T);
@@ -222,6 +342,15 @@ namespace EmpregaNet.Application.Utils.Helpers
             }
         }
 
+        /// <summary>
+        /// Gera um arquivo CSV em memória a partir de uma coleção de itens do tipo T.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="items"></param>
+        /// <param name="separator"></param>
+        /// <returns>
+        /// Um MemoryStream contendo o arquivo CSV gerado.
+        /// </returns>
         public static MemoryStream WriteCSV<T>(IEnumerable<T> items, string separator)
         {
             Type itemType = typeof(T);
@@ -249,6 +378,11 @@ namespace EmpregaNet.Application.Utils.Helpers
 
         }
 
+        /// <summary>
+        /// Remove acentos de uma string.
+        /// </summary>
+        /// <param name="withAccents"></param>
+        /// <returns>A string sem acentos.</returns>
         public static string RemoveAccents(string withAccents)
         {
             if (!string.IsNullOrEmpty(withAccents))
@@ -259,14 +393,25 @@ namespace EmpregaNet.Application.Utils.Helpers
             return "";
         }
 
-
+        /// <summary>
+        /// Gera um número decimal aleatório dentro do intervalo especificado.
+        /// </summary>
+        /// <param name="min"></param>
+        /// <param name="max"></param>
+        /// <returns>
+        /// O número decimal aleatório gerado.
+        /// </returns>
         public static decimal RandomDecimal(decimal min, decimal max)
         {
             var rnd = new Random();
-            decimal d = (decimal)rnd.NextDouble() * (max - min) + min;
+            decimal d = (decimal)(rnd.NextDouble()) * (max - min) + min;
             return decimal.Round(d, 2);
         }
 
+        /// <summary>
+        /// Gera uma string aleatória de 8 caracteres, composta por consoantes e dígitos.
+        /// </summary>
+        /// <returns>A string aleatória gerada.</returns>
         public static string RandomStringWithoutVowels()
         {
             const string chars = "BCDFGHJKLMNPQRSTVWXYZbcdfghjklmnpqrstvwxyz0123456789";
@@ -281,7 +426,13 @@ namespace EmpregaNet.Application.Utils.Helpers
             return new string(stringChars);
         }
 
-
+        /// <summary>
+        /// Gera uma string aleatória de tamanho especificado, composta por letras maiúsculas, minúsculas e dígitos.
+        /// </summary>
+        /// <param name="size"></param>
+        /// <returns>
+        /// A string aleatória gerada.
+        /// </returns>
         public static string RandomString(int size)
         {
             const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -296,6 +447,16 @@ namespace EmpregaNet.Application.Utils.Helpers
             return new string(stringChars);
         }
 
+        /// <summary>
+        /// Calcula a distância em metros entre dois pontos geográficos usando a fórmula de Haversine.
+        /// </summary>
+        /// <param name="initialLatitude"></param>
+        /// <param name="initialLongitude"></param>
+        /// <param name="finalLatitude"></param>
+        /// <param name="finalLongitude"></param>
+        /// <returns>
+        /// A distância em metros entre os dois pontos.
+        /// </returns>
         public static double CalculateDistance(double initialLatitude, double initialLongitude,
             double finalLatitude, double finalLongitude)
         {

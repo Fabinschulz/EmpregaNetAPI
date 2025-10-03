@@ -10,7 +10,7 @@ namespace EmpregaNet.Domain.Entities
         public string Description { get; private set; }
         public decimal Salary { get; private set; }
         public JobTypeEnum JobType { get; private set; }
-        public DateTime PublicationDate { get; private set; }
+        public DateTimeOffset PublicationDate { get; private set; }
         public long? CompanyId { get; private set; }
         public Company? Company { get; private set; }
         public ICollection<JobApplication> Applications { get; private set; } = new List<JobApplication>();
@@ -22,7 +22,7 @@ namespace EmpregaNet.Domain.Entities
             Salary = salary;
             JobType = jobType;
             CompanyId = companyId;
-            PublicationDate = DateTime.UtcNow;
+            PublicationDate = DateTimeOffset.UtcNow;
         }
 
         public void UpdateDetails(string title, string description, decimal salary, JobTypeEnum jobType)

@@ -6,9 +6,9 @@ namespace EmpregaNet.Domain.Entities
     public class Role : IdentityRole<long>, IAggregateRoot
     {
 
-        public DateTime DataInclusao { get; set; } = DateTime.Now;
+        public DateTimeOffset DataInclusao { get; set; } = DateTimeOffset.Now;
 
-        public DateTime? DataAlteracao { get; set; }
+        public DateTimeOffset? DataAlteracao { get; set; }
 
         public Role() : base() { }
 

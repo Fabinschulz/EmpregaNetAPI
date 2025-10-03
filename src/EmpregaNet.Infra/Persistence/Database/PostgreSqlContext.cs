@@ -19,7 +19,7 @@ namespace EmpregaNet.Infra.Persistence.Database
         public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
 
-            var dateTimeUtcNow = DateTime.UtcNow;
+            var dateTimeUtcNow = DateTimeOffset.UtcNow;
 
             foreach (var entry in ChangeTracker.Entries<BaseEntity>())
             {

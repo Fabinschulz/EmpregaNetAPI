@@ -4,11 +4,11 @@ namespace EmpregaNet.Application.Messages
 {
     public class Event : Message, INotification
     {
-        public DateTime Timestamp { get; private set; }
+        public DateTimeOffset Timestamp { get; private set; }
 
         protected Event()
         {
-            Timestamp = DateTime.Now;
+            Timestamp = DateTimeOffset.Now;
         }
     }
 

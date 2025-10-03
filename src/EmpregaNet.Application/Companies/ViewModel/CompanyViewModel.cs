@@ -2,10 +2,11 @@ using EmpregaNet.Domain.Entities;
 using EmpregaNet.Domain.Enums;
 using EmpregaNet.Application.Jobs.ViewModel;
 using System.Diagnostics.CodeAnalysis;
+using EmpregaNet.Application.Common.Base;
 
 namespace EmpregaNet.Application.Companies.ViewModel;
 
-public sealed class CompanyViewModel
+public sealed class CompanyViewModel : BaseViewModel
 {
     public long Id { get; set; }
     public TypeOfActivityEnum? TypeOfActivity { get; set; }
@@ -15,10 +16,6 @@ public sealed class CompanyViewModel
     public required string Email { get; set; }
     public required string Phone { get; set; }
     public ICollection<JobViewModel> Jobs { get; set; } = new List<JobViewModel>();
-    public DateTime CreatedAt { get; set; }
-    public DateTime? UpdatedAt { get; set; } = null;
-    public DateTime? DeletedAt { get; set; } = null;
-    public bool IsDeleted { get; set; } = false;
 
 }
 
@@ -37,9 +34,9 @@ public static class CompanyMapper
             Email = entity.Email,
             Phone = entity.Phone,
             Jobs = entity.Jobs?.Select(job => job.ToViewModel()).ToList() ?? new List<JobViewModel>(),
-            CreatedAt = entity.CreatedAt,
-            UpdatedAt = entity.UpdatedAt,
-            DeletedAt = entity.DeletedAt,
+            CreatedAtUtc = entity.CreatedAt,
+            UpdatedAtUtc = entity.UpdatedAt,
+            DeletedAtUtc = entity.DeletedAt,
             IsDeleted = entity.IsDeleted
         };
     }

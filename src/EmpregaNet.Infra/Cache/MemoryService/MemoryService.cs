@@ -61,7 +61,7 @@ namespace EmpregaNet.Infra.Cache.MemoryService
 
                         if (_local is not null && expiration is not null)
                         {
-                            _local.Set(cacheKey, valueFromRedis, DateTime.Now.Add(expiration.Value - someSeconds));
+                            _local.Set(cacheKey, valueFromRedis, DateTimeOffset.Now.Add(expiration.Value - someSeconds));
                             _logger.LogDebug($"Chave de cache {cacheKey} encontrada no Redis e armazenada na memória local.");
                         }
 
@@ -112,7 +112,7 @@ namespace EmpregaNet.Infra.Cache.MemoryService
 
                             if (_local is not null && expiration is not null)
                             {
-                                _local.Set(cacheKey, valueFromRedis, DateTime.Now.Add(expiration.Value));
+                                _local.Set(cacheKey, valueFromRedis, DateTimeOffset.Now.Add(expiration.Value));
                                 _logger.LogDebug($"Chave de cache {cacheKey} encontrada no Redis e armazenada na memória local.");
                             }
 
@@ -134,7 +134,7 @@ namespace EmpregaNet.Infra.Cache.MemoryService
         {
             var cacheKey = $"{_options.KeyPrefix}:{key}";
 
-            _local.Set(cacheKey, obj, DateTime.Now.Add(expiration));
+            _local.Set(cacheKey, obj, DateTimeOffset.Now.Add(expiration));
 
             // Mantém um registry de chaves para poder invalidar depois
             if (_local.TryGetValue("CACHE_KEY_REGISTRY", out HashSet<string>? registry))

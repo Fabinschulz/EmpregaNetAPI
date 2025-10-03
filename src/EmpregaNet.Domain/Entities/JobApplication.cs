@@ -10,7 +10,7 @@ namespace EmpregaNet.Domain.Entities
     /// </summary>
     public class JobApplication : BaseEntity, IAggregateRoot
     {
-        public DateTime ApplicationDate { get; set; } = DateTime.Now;
+        public DateTimeOffset ApplicationDate { get; set; } = DateTimeOffset.Now;
         public ApplicationStatusEnum Status { get; set; }
         public long JobId { get; set; }
         public Job? Job { get; set; }

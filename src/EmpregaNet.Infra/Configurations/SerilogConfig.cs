@@ -53,7 +53,7 @@ namespace EmpregaNet.Infra.Configurations
             return new ElasticsearchSinkOptions(new Uri(settings.Uri))
             {
                 AutoRegisterTemplate = true,
-                IndexFormat = $"logs-{Assembly.GetExecutingAssembly().GetName().Name?.ToLower().Replace(".", "-")}-{environment.ToLower()}-{DateTime.UtcNow:yyyy-MM}",
+                IndexFormat = $"logs-{Assembly.GetExecutingAssembly().GetName().Name?.ToLower().Replace(".", "-")}-{environment.ToLower()}-{DateTimeOffset.UtcNow:yyyy-MM}",
                 FailureCallback = (logEvent, exception) => Log.Error(exception, $"Falha ao enviar log para Elasticsearch: {logEvent.MessageTemplate}"),
                 EmitEventFailure = EmitEventFailureHandling.WriteToSelfLog | EmitEventFailureHandling.RaiseCallback,
                 ModifyConnectionSettings = conn =>
