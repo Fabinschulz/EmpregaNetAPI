@@ -1,142 +1,140 @@
 services:
-  db:
-    image: postgres:15
+  postgres:
+    image: postgres:15-alpine
+    container_name: empreganet_postgres
+    restart: unless-stopped
     environment:
-      POSTGRES_DB: EmpregaNetDB
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
-      - "5432:5432"
+      - "${POSTGRES_PORT}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    networks:
+      - empreganet_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 20s
 
   redis:
-    container_name: redis
     image: redis:alpine
-    restart: always
+    container_name: empreganet_redis
+    restart: unless-stopped
     ports:
-      - "6379:6379"
+      - "${REDIS_PORT}:6379"
     volumes:
       - redis_data:/data
     networks:
-      - empregaNet_network
+      - empreganet_network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 20s
+      timeout: 5s
+      retries: 3
 
   redisinsight:
-    container_name: redisinsight
     image: redislabs/redisinsight:latest
-    restart: always
+    container_name: empreganet_redisinsight
+    restart: unless-stopped
     ports:
-      - "8001:8001"
+      - "${REDIS_INSIGHT_PORT}:5540"
+    depends_on:
+      redis:
+        condition: service_healthy
     volumes:
       - redisinsight_data:/db
     networks:
-      - oauth-network
-    depends_on:
-      redis:
-        condition: service_healthy
+      - empreganet_network
 
-  webapp:
-    build: .
-    container_name: empregaNet_api
+  bff:
+    container_name: empreganet_bff
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: final
+    working_dir: /app/bff
+    command: ["dotnet", "EmpregaNet.BFF.dll"]
     ports:
-      - "5540:5540"
+      - "${BFF_PORT}:8080"
     environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__PostgreSQLConnection=Host=localhost;Port=5432;Database=EmpregaNetDB;Username=postgres;Password=postgres;Pooling=true;Persist Security Info=true;
-      - Redis=redis:6379,abortConnect=false,connectRetry=2,connectTimeout=5000
-    restart: always
+      ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT}
+      ConnectionStrings__PostgreSQLConnection: "Host=${POSTGRES_HOST};Port=${POSTGRES_PORT};Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};Pooling=true;Persist Security Info=true;"
+      Redis__Connection: "${REDIS_HOST}:${REDIS_PORT}"
     depends_on:
-      redis:
+      postgres:
         condition: service_healthy
-      elasticsearch:
+      redis:
         condition: service_healthy
     networks:
-      - empregaNet_network
+      - empreganet_network
+    restart: unless-stopped
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:8080/health || exit 1"]
       interval: 30s
       timeout: 10s
-      retries: 2
+      retries: 3
+      start_period: 30s
+
+  api:
+    container_name: empreganet_api
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: final
+    working_dir: /app/api
+    command: ["dotnet", "EmpregaNet.Api.dll"]
+    ports:
+      - "${API_PORT}:8081"
+    environment:
+      ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT}
+      ConnectionStrings__PostgreSQLConnection: "Host=${POSTGRES_HOST};Port=${POSTGRES_PORT};Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};Pooling=true;Persist Security Info=true;"
+      Redis__Connection: "${REDIS_HOST}:${REDIS_PORT}"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - empreganet_network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8081/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
       start_period: 30s
 
 networks:
-  empregaNet_network:
+  empreganet_network:
     driver: bridge
 
 volumes:
-  redis_data:
   postgres_data:
+  redis_data:
   redisinsight_data:
-  
-# Docker Compose configuration for Elasticsearch, Kibana, and APM Server
-# elasticsearch:
-#   image: docker.elastic.co/elasticsearch/elasticsearch:8.18.0
-#   container_name: elasticsearch
-#   restart: always
-#   environment:
-#     - node.name=elasticsearch
-#     - discovery.type=single-node
-#     - xpack.security.enabled=false
-#     - bootstrap.memory_lock=true
-#     - cluster.name=empregaNet-cluster
-#     - xpack.license.self_generated.type=basic
-#     - xpack.monitoring.enabled=true
-#     - xpack.security.enabled=false
-#     - TZ=America/Sao_Paulo
-#   healthcheck:
-#     test:
-#       ["CMD-SHELL", "curl -f http://localhost:9200/_cluster/health || exit 1"]
-#     interval: 30s
-#     timeout: 10s
-#     retries: 5
-#     start_period: 30s
-#   ports:
-#     - "9200:9200"
-#   volumes:
-#     - elastic_data:/usr/share/elasticsearch/data
-#   networks:
-#     - empregaNet_network
 
-# kibana:
-#   image: docker.elastic.co/kibana/kibana:8.18.0
-#   container_name: kibana
-#   depends_on:
-#     - elasticsearch
-#   restart: always
-#   ports:
-#     - "5601:5601"
-#   networks:
-#     - empregaNet_network
-#   environment:
-#     - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
-#     - TZ=America/Sao_Paulo
-#   healthcheck:
-#     test: ["CMD-SHELL", "curl -f http://localhost:5601/api/status || exit 1"]
-#     interval: 30s
-#     timeout: 10s
-#     retries: 5
-#     start_period: 60s
 
-# apm:
-#   image: docker.elastic.co/apm/apm-server:8.18.0
-#   container_name: apm-server
-#   depends_on:
-#     elasticsearch:
-#       condition: service_healthy
-#   ports:
-#     - "8200:8200"
-#   environment:
-#     - output.elasticsearch.hosts=["http://elasticsearch:9200"]
-#     - TZ=America/Sao_Paulo
-#     - setup.template.enabled=true
-#     - apm-server.host=0.0.0.0:8200
-#     - apm-server.rum.enabled=true
-#     - output.elasticsearch.ssl.enabled=false
-#   healthcheck:
-#     test: ["CMD", "curl", "-f", "http://localhost:8200/"]
-#     interval: 30s
-#     timeout: 10s
-#     retries: 2
-#     start_period: 60s
-#   networks:
-#     - empregaNet_network
+# .env (Exemplo)
+# ----------------
+# Ambiente
+# ASPNETCORE_ENVIRONMENT=Development
+
+# # PostgreSQL
+# POSTGRES_HOST=postgres
+# POSTGRES_PORT=5432
+# POSTGRES_DB=EmpregaNetDB
+# POSTGRES_USER=postgres
+# POSTGRES_PASSWORD=postgres
+
+# # Redis
+# REDIS_HOST=redis
+# REDIS_PORT=6379
+# REDIS_INSIGHT_PORT=5540
+
+# # Aplicações
+# BFF_PORT=8080
+# API_PORT=8081
