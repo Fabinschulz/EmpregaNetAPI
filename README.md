@@ -71,7 +71,44 @@ As migrações são gerenciadas pelo projeto **Infrastructure**, execute os coma
     No terminal via CLI navega para o path *src/EmpregaNet.Infra* e 
     rode o comando *dotnet ef database update* 
 ```
+---
 
+## Execução com Docker Compose
+
+O ambiente de desenvolvimento pode ser inicializado utilizando Docker Compose, que gerencia os serviços Redis, RedisInsight e a aplicação WebApp.
+Certifique-se de ter o **Docker** e **Docker Compose** instalados.
+Configure o arquivo `.env` com as variáveis de ambiente do **SQL Server**.
+
+### Como Executar
+
+No terminal, execute o comando abaixo para **construir a imagem** (caso haja mudanças no Dockerfile) e iniciar todos os serviços em modo **detached** (segundo plano):
+
+> docker compose up --build -d
+
+
+### Após a Inicialização
+
+Se as portas padrão forem usadas, as aplicações e ferramentas estarão acessíveis em:
+
+- **BFF (Backend for Frontend):** [http://localhost:8080](http://localhost:8080)  
+- **API (Core Service):** [http://localhost:8081](http://localhost:8081)  
+- **RedisInsight (UI):** [http://localhost:5540](http://localhost:5540)  
+---
+
+### Comandos Úteis
+
+- Para verificar o status dos containers:
+
+```bash
+docker compose ps
+docker compose up -d
+```
+
+- Para parar os containers, execute:
+
+```bash
+docker compose down
+```
 ---
 
 ```mermaid
