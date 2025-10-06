@@ -91,6 +91,7 @@ services:
       - "${API_PORT}:8081"
     environment:
       ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT}
+      ASPNETCORE_URLS: "http://+:8081" 
       ConnectionStrings__PostgreSQLConnection: "Host=${POSTGRES_HOST};Port=${POSTGRES_PORT};Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};Pooling=true;Persist Security Info=true;"
       Redis__Connection: "${REDIS_HOST}:${REDIS_PORT}"
     depends_on:
