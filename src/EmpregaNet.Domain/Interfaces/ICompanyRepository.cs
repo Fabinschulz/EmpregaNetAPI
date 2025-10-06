@@ -1,7 +1,6 @@
 using EmpregaNet.Domain.Entities;
-using EmpregaNet.Domain.Interfaces;
 
-namespace EmpregaNet.Application.Interfaces;
+namespace EmpregaNet.Domain.Interfaces;
 
 public interface ICompanyRepository : IBaseRepository<Company>
 {

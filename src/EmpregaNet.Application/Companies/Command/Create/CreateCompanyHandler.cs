@@ -7,7 +7,7 @@ using EmpregaNet.Application.Jobs.Commands;
 using EmpregaNet.Application.Common.Exceptions;
 using EmpregaNet.Application.Common.Base;
 using EmpregaNet.Application.Companies.Factories;
-using EmpregaNet.Application.Interfaces;
+using EmpregaNet.Domain.Interfaces;
 
 namespace EmpregaNet.Application.Companies.Command;
 

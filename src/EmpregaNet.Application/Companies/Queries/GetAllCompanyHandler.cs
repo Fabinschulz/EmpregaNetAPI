@@ -3,7 +3,7 @@ using FluentValidation;
 using Microsoft.Extensions.Logging;
 using EmpregaNet.Application.Common.Base;
 using EmpregaNet.Application.Companies.ViewModel;
-using EmpregaNet.Application.Interfaces;
+using EmpregaNet.Domain.Interfaces;
 
 namespace EmpregaNet.Application.Companies.Queries;
 

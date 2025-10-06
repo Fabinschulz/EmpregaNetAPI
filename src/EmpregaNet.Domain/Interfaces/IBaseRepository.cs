@@ -1,7 +1,7 @@
 
 using EmpregaNet.Domain.Common;
 
-namespace EmpregaNet.Application.Interfaces;
+namespace EmpregaNet.Domain.Interfaces;
 
 public interface IBaseRepository<T> where T : BaseEntity
 {
