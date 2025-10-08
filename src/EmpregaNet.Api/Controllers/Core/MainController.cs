@@ -127,7 +127,7 @@ namespace EmpregaNet.Api.Controllers.Core
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(DomainError))]
         public virtual async Task<IActionResult> Delete([FromRoute] long id)
         {
-            await _mediator.Send(new DeleteCommand<TCreateCommand>(id));
+            await _mediator.Send(new DeleteCommand<TViewModel>(id));
             await InvalidateCacheForEntity(id);
             return NoContent();
         }
