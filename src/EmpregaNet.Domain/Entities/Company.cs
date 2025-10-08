@@ -11,13 +11,15 @@ namespace EmpregaNet.Domain.Entities
     public class Company : BaseEntity, IAggregateRoot
     {
         [EnumDataType(typeof(TypeOfActivityEnum))]
-        public TypeOfActivityEnum? TypeOfActivity { get; private set; }
-        public string CompanyName { get; private set; }
-        public Address Address { get; private set; }
-        public string RegistrationNumber { get; private set; } // CNPJ
-        public string Email { get; private set; }
-        public string Phone { get; private set; }
+        public TypeOfActivityEnum? TypeOfActivity { get; private set; } = null!;
+        public string CompanyName { get; private set; } = null!;
+        public Address Address { get; private set; } = null!;
+        public string RegistrationNumber { get; private set; } = null!;
+        public string Email { get; private set; } = null!;
+        public string Phone { get; private set; } = null!;
         public ICollection<Job>? Jobs { get; private set; } = new List<Job>();
+
+        private Company() { }
 
         public Company(string companyName, Address address, string registrationNumber, string email, string phone, TypeOfActivityEnum? typeOfActivity = null)
         {

@@ -13,6 +13,17 @@ namespace EmpregaNet.Infra.Persistence.Repositories
             builder.HasKey(x => x.Id);
             builder.Property(x => x.Id).ValueGeneratedOnAdd();
 
+            builder.OwnsOne(c => c.Address, a =>
+            {
+                a.Property(p => p.Street).HasColumnName("Street").IsRequired().HasMaxLength(200);
+                a.Property(p => p.Number).HasColumnName("Number").IsRequired().HasMaxLength(20);
+                a.Property(p => p.Complement).HasColumnName("Complement").HasMaxLength(100);
+                a.Property(p => p.Neighborhood).HasColumnName("Neighborhood").IsRequired().HasMaxLength(100);
+                a.Property(p => p.City).HasColumnName("City").IsRequired().HasMaxLength(100);
+                a.Property(p => p.State).HasColumnName("State").IsRequired().HasMaxLength(50);
+                a.Property(p => p.ZipCode).HasColumnName("ZipCode").IsRequired().HasMaxLength(20);
+            });
+
             builder.HasMany(v => v.Applications)
                    .WithOne(e => e.User)
                    .HasForeignKey(v => v.UserId);

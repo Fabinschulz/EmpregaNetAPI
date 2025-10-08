@@ -20,7 +20,7 @@ namespace EmpregaNet.Domain.Entities
         [EnumDataType(typeof(UF))]
         public required UF State { get; set; }
 
-        public required string District { get; set; } // Bairro
+        public required string Neighborhood { get; set; } // Bairro
 
         public required string Number { get; set; }
 

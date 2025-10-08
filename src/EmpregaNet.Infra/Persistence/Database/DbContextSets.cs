@@ -12,7 +12,5 @@ namespace EmpregaNet.Infra.Persistence.Database
         public DbSet<Company> Companies => Set<Company>();
         public DbSet<Job> Jobs => Set<Job>();
         public DbSet<JobApplication> JobApplications => Set<JobApplication>();
-        public DbSet<Address> Addresses => Set<Address>();
-
     }
 }
