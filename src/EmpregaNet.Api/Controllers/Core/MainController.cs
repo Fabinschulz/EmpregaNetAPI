@@ -35,7 +35,7 @@ namespace EmpregaNet.Api.Controllers.Core
         /// Utiliza cache para otimização de leitura.
         /// </summary>
         [HttpGet]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ListDataPagination<object>))]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(DomainError))]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(DomainError))]
