@@ -92,7 +92,7 @@ namespace EmpregaNet.Api.Controllers.Core
         {
             var id = await _mediator.Send(new CreateCommand<TCreateCommand>(entity));
             await InvalidateCacheForEntity();
-            var successMessage = $"{typeof(TCreateCommand).Name.Replace("Command", "")} registrado(a) com sucesso. ID: {id}";
+            var successMessage = $"Recurso criado com sucesso. ID: {id}";
 
             return Created($"api/{_entityName.ToLower()}/{id}", successMessage);
         }

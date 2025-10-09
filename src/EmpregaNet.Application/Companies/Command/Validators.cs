@@ -2,13 +2,15 @@ using FluentValidation;
 using EmpregaNet.Domain.Entities;
 using EmpregaNet.Application.Common.Base;
 using EmpregaNet.Domain.Enums;
+using EmpregaNet.Application.Utils.Helpers;
+using System.Text.RegularExpressions;
 
 namespace EmpregaNet.Application.Companies.Command;
 
 public interface ICompanyCommand
 {
     string CompanyName { get; }
-    string RegistrationNumber { get; }
+    string Cnpj { get; }
     string Email { get; }
     string Phone { get; }
     TypeOfActivityEnum TypeOfActivity { get; }
@@ -31,11 +33,15 @@ public sealed class CompanyDataValidator<T> : AbstractValidator<T> where T : ICo
             .MinimumLength(3).WithMessage("O nome da empresa deve ter no mínimo 3 caracteres.")
             .MaximumLength(100).WithMessage("O nome da empresa deve ter no máximo 100 caracteres.");
 
-        RuleFor(x => x.RegistrationNumber)
-            .NotEmpty()
-            .WithMessage("O número de registro da empresa é obrigatório.")
-            .Matches(@"^\d{14}$")
-            .WithMessage("CNPJ inválido. Deve conter exatamente 14 dígitos.");
+        RuleFor(x => x.Cnpj)
+                 .NotEmpty()
+                 .WithMessage("O CNPJ é obrigatório.")
+                 .Must(cnpj =>
+                 {
+                     var cleanedCnpj = cnpj.OnlyNumbers().Trim();
+                     return Regex.IsMatch(cleanedCnpj, @"^\d{14}$");
+                 })
+                 .WithMessage("O campo 'CNPJ' deve conter exatamente 14 dígitos numéricos.");
 
         RuleFor(x => x.Email)
             .NotEmpty()
@@ -57,6 +63,9 @@ public sealed class CompanyDataValidator<T> : AbstractValidator<T> where T : ICo
 
         RuleFor(x => x.TypeOfActivity)
             .IsInEnum()
-            .WithMessage("Tipo de atividade inválido.");
+            .WithMessage("Tipo de atividade inválido.")
+            .NotEqual(TypeOfActivityEnum.NaoSelecionado)
+            .WithMessage("O tipo de atividade é obrigatório.")
+            .When(x => Enum.IsDefined(typeof(TypeOfActivityEnum), x.TypeOfActivity));
     }
 }

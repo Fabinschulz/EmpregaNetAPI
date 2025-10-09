@@ -15,7 +15,7 @@ public abstract record CompanyFactory
         var company = new Company(
             companyName: command.CompanyName,
             address: command.Address,
-            registrationNumber: command.RegistrationNumber,
+            registrationNumber: command.Cnpj,
             email: command.Email,
             phone: command.Phone,
             typeOfActivity: command.TypeOfActivity
@@ -32,7 +32,7 @@ public abstract record CompanyFactory
         company.UpdateDetails(
             companyName: command.CompanyName,
             address: command.Address,
-            registrationNumber: command.RegistrationNumber,
+            registrationNumber: command.Cnpj,
             email: command.Email,
             phone: command.Phone,
             typeOfActivity: command.TypeOfActivity

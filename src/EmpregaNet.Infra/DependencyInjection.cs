@@ -43,8 +43,8 @@ public static class DependencyInjection
         // Ele intercepta a requisição, executa as validações necessárias e, se falhar, evita que o Handler seja executado.
         services.AddScoped(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
         services.AddScoped(typeof(IPipelineBehavior<,>), typeof(TransactionBehavior<,>));
-        services.AddScoped<IUnityOfWork, UnityOfWork>();
         // services.AddScoped(typeof(IPipelineBehavior<,>), typeof(PerformanceBehaviour<,>));
+        services.AddScoped<IUnityOfWork, UnityOfWork>();
 
         #region Repositories
         services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));

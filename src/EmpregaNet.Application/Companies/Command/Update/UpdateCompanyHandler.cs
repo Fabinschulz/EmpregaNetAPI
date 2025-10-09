@@ -15,13 +15,13 @@ namespace EmpregaNet.Application.Companies.Command
 {
     public sealed record UpdateCompanyCommand(
         string CompanyName,
-        string RegistrationNumber,
+        string Cnpj,
         string Email,
         string Phone,
         [EnumDataType(typeof(TypeOfActivityEnum))]
         TypeOfActivityEnum TypeOfActivity,
         Address Address,
-        ICollection<CreateJobCommand>? Jobs = null
+        ICollection<CreateJobCommand> Jobs
     ) : ICompanyCommand;
 
     public sealed class UpdateCompanyHandler : IRequestHandler<UpdateCommand<UpdateCompanyCommand, CompanyViewModel>, CompanyViewModel>

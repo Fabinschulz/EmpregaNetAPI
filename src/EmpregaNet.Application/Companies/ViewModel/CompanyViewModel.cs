@@ -3,6 +3,7 @@ using EmpregaNet.Domain.Enums;
 using EmpregaNet.Application.Jobs.ViewModel;
 using System.Diagnostics.CodeAnalysis;
 using EmpregaNet.Application.Common.Base;
+using EmpregaNet.Application.Utils.Helpers;
 
 namespace EmpregaNet.Application.Companies.ViewModel;
 
@@ -30,7 +31,7 @@ public static class CompanyMapper
             CompanyName = entity.CompanyName,
             TypeOfActivity = entity.TypeOfActivity,
             Address = entity.Address,
-            RegistrationNumber = entity.RegistrationNumber,
+            RegistrationNumber = entity.RegistrationNumber.FormatCNPJ(),
             Email = entity.Email,
             Phone = entity.Phone,
             Jobs = entity.Jobs?.Select(job => job.ToViewModel()).ToList() ?? new List<JobViewModel>(),

@@ -17,4 +17,11 @@ public class CompanyRepository : BaseRepository<Company>, ICompanyRepository
                              .AsNoTracking()
                              .FirstOrDefaultAsync(c => c.RegistrationNumber == registrationNumber);
     }
+
+    public async Task<bool> ExistsByCnpjAsync(string cnpj)
+    {
+        return await _context.Companies
+                             .AsNoTracking()
+                             .AnyAsync(c => c.RegistrationNumber == cnpj);
+    }
 }

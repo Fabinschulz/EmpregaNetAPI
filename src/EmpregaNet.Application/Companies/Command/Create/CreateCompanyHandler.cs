@@ -3,23 +3,22 @@ using Microsoft.Extensions.Logging;
 using EmpregaNet.Domain.Enums;
 using System.ComponentModel.DataAnnotations;
 using EmpregaNet.Domain.Entities;
-using EmpregaNet.Application.Jobs.Commands;
 using EmpregaNet.Application.Common.Exceptions;
 using EmpregaNet.Application.Common.Base;
 using EmpregaNet.Application.Companies.Factories;
 using EmpregaNet.Domain.Interfaces;
+using EmpregaNet.Application.Utils.Helpers;
 
 namespace EmpregaNet.Application.Companies.Command;
 
 public sealed record CreateCompanyCommand(
     string CompanyName,
-    string RegistrationNumber,
+    string Cnpj,
     string Email,
     string Phone,
     [EnumDataType(typeof(TypeOfActivityEnum))]
     TypeOfActivityEnum TypeOfActivity,
-    Address Address,
-    ICollection<CreateJobCommand>? Jobs = null
+    Address Address
 ) : ICompanyCommand;
 
 public sealed class CreateCompanyCommandHandler : IRequestHandler<CreateCommand<CreateCompanyCommand>, long>
@@ -42,14 +41,14 @@ public sealed class CreateCompanyCommandHandler : IRequestHandler<CreateCommand<
 
         try
         {
-
-            var existingCompany = await _companyRepository.GetByRegistrationNumberAsync(request.entity.RegistrationNumber);
-            if (existingCompany is not null)
+            var cnpjCleaned = request.entity.Cnpj.OnlyNumbers().Trim();
+            var existingCompany = await _companyRepository.ExistsByCnpjAsync(cnpjCleaned);
+            if (existingCompany)
             {
-                _logger.LogWarning("Tentativa de criar empresa com registro já existente: {RegistrationNumber}", request.entity.RegistrationNumber);
+                _logger.LogWarning("Tentativa de criar empresa com CNPJ já existente: {CNPJ}", cnpjCleaned);
                 throw new ValidationAppException(
-                    nameof(request.entity.RegistrationNumber),
-                    $"Já existe uma empresa registrada com o número de registro '{request.entity.RegistrationNumber}'.",
+                    nameof(cnpjCleaned),
+                    $"Já existe uma empresa registrada com o CNPJ '{cnpjCleaned}'.",
                     DomainErrorEnum.RESOURCE_ALREADY_EXISTS);
             }
 

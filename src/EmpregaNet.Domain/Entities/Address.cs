@@ -6,11 +6,10 @@ namespace EmpregaNet.Domain.Entities
 {
     /// <summary>
     /// Entidade que representa um endereço
+    /// Obs: Não é uma tabela no banco, mas um objeto de valor (Value Object).
     /// </summary>
     public class Address : IAggregateRoot
     {
-        [Key]
-        public long Id { get; set; }
         public required string Street { get; set; }
 
         public required string ZipCode { get; set; }
@@ -20,7 +19,7 @@ namespace EmpregaNet.Domain.Entities
         [EnumDataType(typeof(UF))]
         public required UF State { get; set; }
 
-        public required string Neighborhood { get; set; } // Bairro
+        public required string Neighborhood { get; set; }
 
         public required string Number { get; set; }
 
