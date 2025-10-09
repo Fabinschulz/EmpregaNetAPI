@@ -32,12 +32,9 @@ namespace EmpregaNet.Infra.Persistence.Repositories
         {
             _context = context;
         }
-        public async Task<T?> GetByIdAsync(long id)
-        {
-            return await _context.Set<T>().FirstOrDefaultAsync(x => x.Id == id);
-        }
+        public async Task<T?> GetByIdAsync(long id, CancellationToken cancellationToken) => await _context.Set<T>().FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
 
-        public async Task<ListDataPagination<T>> GetAllAsync(int Page, int Size, string? orderBy)
+        public async Task<ListDataPagination<T>> GetAllAsync(CancellationToken cancellationToken, int Page, int Size, string? orderBy = null)
         {
             var query = _context.Set<T>().AsNoTracking();
 
@@ -46,27 +43,27 @@ namespace EmpregaNet.Infra.Persistence.Repositories
                 query = ApplyOrderBy(query, orderBy);
             }
 
-            var result = await query.ToPaginatedListAsync(Page, Size);
+            var result = await query.ToPaginatedListAsync(Page, Size, cancellationToken);
             return result;
         }
 
-        public async Task<T> CreateAsync(T entity)
+        public async Task<T> CreateAsync(T entity, CancellationToken cancellationToken)
         {
-            await _context.Set<T>().AddAsync(entity);
-            await _context.SaveChangesAsync();
+            await _context.Set<T>().AddAsync(entity, cancellationToken);
+            await _context.SaveChangesAsync(cancellationToken);
             return entity;
         }
 
-        public virtual async Task<T> UpdateAsync(T entity)
+        public virtual async Task<T> UpdateAsync(T entity, CancellationToken cancellationToken)
         {
             _context.Set<T>().Update(entity);
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync(cancellationToken);
             return entity;
         }
 
-        public async Task<bool> DeleteAsync(long id)
+        public async Task<bool> DeleteAsync(long id, CancellationToken cancellationToken)
         {
-            var entity = await GetByIdAsync(id);
+            var entity = await GetByIdAsync(id, cancellationToken);
             if (entity == null)
                 throw new KeyNotFoundException($"{typeof(T).Name} com ID {id} não encontrado");
 

@@ -24,7 +24,7 @@ namespace EmpregaNet.Application.Companies.Command.Delete
 
             try
             {
-                await _repository.DeleteAsync(request.Id);
+                await _repository.DeleteAsync(request.Id, cancellationToken);
                 _logger.LogInformation("Empresa removida com sucesso. ID: {Id}", request.Id);
                 return true;
             }

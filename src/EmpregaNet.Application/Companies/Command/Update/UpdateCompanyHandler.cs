@@ -66,7 +66,7 @@ namespace EmpregaNet.Application.Companies.Command
                 }
 
                 var updatedCompany = CompanyFactory.Update(company, request.entity);
-                await _companyRepository.UpdateAsync(updatedCompany);
+                await _companyRepository.UpdateAsync(updatedCompany, cancellationToken);
 
                 return updatedCompany.ToViewModel();
             }

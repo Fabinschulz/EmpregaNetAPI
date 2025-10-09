@@ -54,7 +54,7 @@ public sealed class CreateCompanyCommandHandler : IRequestHandler<CreateCommand<
 
             var company = CompanyFactory.Create(request.entity);
 
-            var createdCompanyId = await _companyRepository.CreateAsync(company);
+            var createdCompanyId = await _companyRepository.CreateAsync(company, cancellationToken);
             _logger.LogInformation("Empresa criada com sucesso. ID: {CompanyId}", createdCompanyId);
 
             return createdCompanyId.Id;
