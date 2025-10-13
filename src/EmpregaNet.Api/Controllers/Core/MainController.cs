@@ -91,7 +91,7 @@ namespace EmpregaNet.Api.Controllers.Core
         public virtual async Task<IActionResult> Create([FromBody] TCreateCommand entity)
         {
             var id = await _mediator.Send(new CreateCommand<TCreateCommand>(entity));
-            await InvalidateCacheForEntity();
+            await InvalidateCacheForEntity(id);
             var successMessage = $"Recurso criado com sucesso. ID: {id}";
 
             return Created($"api/{_entityName.ToLower()}/{id}", successMessage);
