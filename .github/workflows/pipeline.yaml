@@ -51,7 +51,7 @@ jobs:
           name: eb-deployment-package
           path: ${{ env.ZIP_FILE_NAME }}
           retention-days: 1 
-
+          
   test:
     name: Testes Unitários e de Integração
     runs-on: ubuntu-latest
@@ -66,11 +66,8 @@ jobs:
         with:
           dotnet-version: 9.x
           
-      - name: Restore dependencies
-        run: dotnet restore ${{ env.SOLUTION_FILE }}
-
       - name: Run Tests
-        run: dotnet test ${{ env.TESTS_PROJECT_PATH }} --configuration Release --no-build --verbosity normal
+        run: dotnet test ${{ env.TESTS_PROJECT_PATH }} --configuration Release --verbosity normal
 
   deploy:
     name: Deploy para Elastic Beanstalk
