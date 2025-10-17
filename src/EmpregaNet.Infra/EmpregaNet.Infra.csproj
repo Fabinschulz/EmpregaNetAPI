@@ -30,6 +30,7 @@
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4" />
     <PackageReference Include="Sentry.AspNetCore" Version="5.8.1" />
     <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="9.0.5" />
+    <PackageReference Include="System.Threading.RateLimiting" Version="9.0.10" />
   </ItemGroup>
 
   <ItemGroup>

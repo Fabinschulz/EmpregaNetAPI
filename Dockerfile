@@ -13,13 +13,8 @@ ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 
 # Copia os arquivos de solução e os csproj de todas as camadas.
+COPY src/ ./src/
 COPY EmpregaNet.sln .
-COPY src/EmpregaNet.BFF/*.csproj src/EmpregaNet.BFF/
-COPY src/EmpregaNet.Api/*.csproj src/EmpregaNet.Api/
-COPY src/EmpregaNet.Application/*.csproj src/EmpregaNet.Application/
-COPY src/EmpregaNet.Domain/*.csproj src/EmpregaNet.Domain/
-COPY src/EmpregaNet.Infra/*.csproj src/EmpregaNet.Infra/
-COPY src/EmpregaNet.Tests/*.csproj src/EmpregaNet.Tests/
 
 RUN dotnet restore EmpregaNet.sln
 

@@ -21,6 +21,7 @@ var app = builder.Build();
 app.SetupApiServices();
 app.UseExceptionHandler();
 app.UseSentryTracingMiddleware();
+app.UseRateLimiter();
 app.Run();
 
 #endregion

@@ -1,9 +1,9 @@
-﻿using EmpregaNet.Application.Interfaces;
-using EmpregaNet.Domain.Interfaces;
+﻿using EmpregaNet.Domain.Interfaces;
 using EmpregaNet.Infra.Behaviors;
 using EmpregaNet.Infra.Cache.MemoryService;
 using EmpregaNet.Infra.Cache.RedisServiceCollection;
 using EmpregaNet.Infra.Configurations;
+using EmpregaNet.Infra.Extensions;
 using EmpregaNet.Infra.Persistence.Repositories;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
@@ -31,6 +31,7 @@ public static class DependencyInjection
         services.SetupDependencyInjection();
         services.AddProblemDetails();
         services.ApplyMigrations();
+        services.SetupRateLimiter(configuration);
     }
 
     private static void SetupDependencyInjection(this IServiceCollection services)
