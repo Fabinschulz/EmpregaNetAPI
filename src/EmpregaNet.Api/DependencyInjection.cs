@@ -1,6 +1,7 @@
 using System.Text.Json.Serialization;
 using EmpregaNet.Api.Configuration;
 using EmpregaNet.Application.Auth;
+using EmpregaNet.Infra.Extensions;
 using Newtonsoft.Json;
 
 public static class DependencyInjection
@@ -22,7 +23,8 @@ public static class DependencyInjection
                     await next.Invoke();
                 });
 
-        app.MapControllers();
+        app.MapControllers()
+           .RequireRateLimiting(RateLimit.PolicyName);
         app.MapHealthChecks("/health");
         // app.MapIdentityApi<Usuario>();
 

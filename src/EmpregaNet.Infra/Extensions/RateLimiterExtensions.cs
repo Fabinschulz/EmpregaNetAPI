@@ -10,8 +10,8 @@ namespace EmpregaNet.Infra.Extensions;
 public class RateLimit
 {
     public const string SectionName = "RateLimiting";
+    public const string PolicyName = "FixedWindowPolicy";
 
-    public string PolicyName { get; set; } = "DefaultPolicy";
     public int PermitLimit { get; set; } = 5;
     public int WindowInSeconds { get; set; } = 10;
     public int QueueLimit { get; set; } = 0;
@@ -24,7 +24,7 @@ public static class RateLimiterExtensions
         var options = configuration.GetSection(RateLimit.SectionName).Get<RateLimit>() ?? new RateLimit();
         services.AddRateLimiter(rateLimiterOptions =>
         {
-            rateLimiterOptions.AddFixedWindowLimiter(policyName: options.PolicyName, fixedWindowOptions =>
+            rateLimiterOptions.AddFixedWindowLimiter(policyName: RateLimit.PolicyName, fixedWindowOptions =>
             {
                 fixedWindowOptions.PermitLimit = options.PermitLimit;
                 fixedWindowOptions.Window = TimeSpan.FromSeconds(options.WindowInSeconds);
