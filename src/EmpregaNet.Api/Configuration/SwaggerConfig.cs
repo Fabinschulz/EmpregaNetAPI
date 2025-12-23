@@ -74,20 +74,18 @@ namespace EmpregaNet.Api.Configuration
                 s.IncludeXmlComments(xmlPath);
                 s.DocumentFilter<TagDescriptionsDocumentFilter>();
                 s.SchemaFilter<DescribeEnumMembers>(XDocument.Load(xmlPath));
-                s.SchemaFilter<IgnoreEnumSchemaFilter>(XDocument.Load(xmlPath));
 
                 var appName = "EmpregaNet";
                 // Inclui comentários e filtros do projeto Application
                 xmlPath = Path.Combine(AppContext.BaseDirectory, $"{appName}.Application.xml");
                 s.IncludeXmlComments(xmlPath);
                 s.SchemaFilter<DescribeEnumMembers>(XDocument.Load(xmlPath));
-                s.SchemaFilter<IgnoreEnumSchemaFilter>(XDocument.Load(xmlPath));
 
                 // Inclui comentários e filtros do projeto Domain
                 xmlPath = Path.Combine(AppContext.BaseDirectory, $"{appName}.Domain.xml");
                 s.IncludeXmlComments(xmlPath);
                 s.SchemaFilter<DescribeEnumMembers>(XDocument.Load(xmlPath));
-                s.SchemaFilter<IgnoreEnumSchemaFilter>(XDocument.Load(xmlPath));
+                s.SchemaFilter<IgnoreEnumSchemaFilter>();
 
             });
 

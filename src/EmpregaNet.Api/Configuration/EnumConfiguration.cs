@@ -55,30 +55,26 @@ public sealed class IgnoreEnumSchemaFilter : ISchemaFilter
 
     public void Apply(IOpenApiSchema schema, SchemaFilterContext context)
     {
-        if (!context.Type.IsEnum)
+        if (!context.Type.IsEnum || schema.Enum == null)
             return;
 
         var allowedValues = Enum.GetValues(context.Type)
             .Cast<object>()
-            .Where(value =>
+            .Where(v =>
             {
-                var member = context.Type
-                    .GetMember(value.ToString()!)[0];
-
+                var member = context.Type.GetMember(v.ToString()!)[0];
                 return !member.IsDefined(typeof(IgnoreEnumAttribute), false);
             })
             .Select(v => v.ToString()!)
-            .ToList();
+            .ToHashSet();
 
-        if (schema.Enum != null)
+        var filteredEnum = schema.Enum.Where(e => allowedValues.Contains(e.ToString())).ToList();
+        schema.Enum.Clear();
+        foreach (var item in filteredEnum)
         {
-            schema.Enum.Clear();
-
-            foreach (var value in allowedValues)
-            {
-                schema.Enum.Add(value);
-            }
+            schema.Enum.Add(item);
         }
     }
 }
+
 

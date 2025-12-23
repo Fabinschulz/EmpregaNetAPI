@@ -50,7 +50,7 @@ Execute os comandos a partir da **raiz da solução** (onde está o arquivo `Emp
 
 | API | Comando de Execução | Endpoint Típico |
 |------|----------------------|----------------|
-| **BFF API (Web)** | `dotnet run --project src/EmpregaNet.BFF` | [http://localhost:5134](http://localhost:5134/swagger/index.html) |
+| **BFF API (Web)** | `dotnet run --project Bff/BFF.WebApi` | [http://localhost:5134](http://localhost:5134/swagger/index.html) |
 | **API** | `dotnet run --project src/EmpregaNet.Api` | [http://localhost:5065](http://localhost:5065/swagger/index.html) |
 
 ---
