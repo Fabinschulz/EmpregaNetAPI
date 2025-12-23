@@ -1,4 +1,4 @@
-﻿namespace EmpregaNet.Tests;
+﻿namespace tests;
 
 public class UnitTest1
 {

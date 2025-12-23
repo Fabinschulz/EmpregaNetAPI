@@ -23,7 +23,7 @@ RUN dotnet build EmpregaNet.sln -c $BUILD_CONFIGURATION -o /app/build --no-resto
 
 FROM build AS publish-bff
 ARG BUILD_CONFIGURATION=Release
-WORKDIR /src/src/EmpregaNet.BFF
+WORKDIR /src/bff
 # Publica o projeto BFF no diretório /app/bff (ignora o AppHost)
 RUN dotnet publish EmpregaNet.BFF.csproj -c $BUILD_CONFIGURATION -o /app/bff /p:UseAppHost=false
 

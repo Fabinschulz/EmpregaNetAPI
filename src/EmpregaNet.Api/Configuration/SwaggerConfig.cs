@@ -1,8 +1,7 @@
 using System.Reflection;
 using System.Xml.Linq;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.SwaggerGen;
-
 
 namespace EmpregaNet.Api.Configuration
 {
@@ -44,28 +43,28 @@ namespace EmpregaNet.Api.Configuration
                 });
 
                 // Exige o uso do esquema de segurança Bearer em todas as operações
-                s.AddSecurityRequirement(new OpenApiSecurityRequirement
-                {
-                    {
-                        new OpenApiSecurityScheme
-                        {
-                            Reference = new OpenApiReference
-                            {
-                                Type = ReferenceType.SecurityScheme,
-                                Id = "Bearer"
-                            }
-                        },
-                        new string[] {}
-                    }
-                });
+                // s.AddSecurityRequirement(new OpenApiSecurityRequirement
+                // {
+                //     {
+                //         new OpenApiSecurityScheme
+                //         {
+                //             Reference = new OpenApiReference
+                //             {
+                //                 Type = ReferenceType.SecurityScheme,
+                //                 Id = "Bearer"
+                //             }
+                //         },
+                //         new string[] {}
+                //     }
+                // });
 
                 // Excluding ASP.NET Identity endpoints
-               s.DocInclusionPredicate((docName, apiDesc) =>
-                {
-                    var relativePath = apiDesc.RelativePath;
+                s.DocInclusionPredicate((docName, apiDesc) =>
+                 {
+                     var relativePath = apiDesc.RelativePath;
 
-                    return !(relativePath?.StartsWith("Identity", StringComparison.OrdinalIgnoreCase) ?? false);
-                });
+                     return !(relativePath?.StartsWith("Identity", StringComparison.OrdinalIgnoreCase) ?? false);
+                 });
 
                 // Suporte a polimorfismo em schemas usando oneOf
                 s.UseOneOfForPolymorphism();
@@ -99,40 +98,16 @@ namespace EmpregaNet.Api.Configuration
         {
             public void Apply(OpenApiDocument swaggerDoc, DocumentFilterContext context)
             {
-                swaggerDoc.Tags = new List<OpenApiTag>
+                swaggerDoc.Tags = new HashSet<OpenApiTag>
                 {
-                    new OpenApiTag {
-                        Name = "Users",
-                        Description = "Endpoints para gestão de autenticação e autorização"
-                    },
-                    new OpenApiTag {
-                        Name = "Jobs",
-                        Description = "Endpoints para gerenciamento de oportunidades de emprego"
-                    },
-                    new OpenApiTag {
-                        Name = "Candidates",
-                        Description = "Endpoints para administração de cadastros de candidatos"
-                    },
-                    new OpenApiTag {
-                        Name = "Companies",
-                        Description = "Endpoints para administração de cadastros corporativos"
-                    },
-                    new OpenApiTag {
-                        Name = "JobApplications",
-                        Description = "Endpoints para processamento de inscrições em vagas"
-                    },
-                    new OpenApiTag {
-                        Name = "Search",
-                        Description = "Endpoints para consultas avançadas de vagas e empresas"
-                    },
-                    new OpenApiTag {
-                        Name = "Notifications",
-                        Description = "Endpoints para gestão de alertas e comunicações"
-                    },
-                    new OpenApiTag {
-                        Name = "Admin",
-                        Description = "Endpoints privilegiados para gestão do sistema"
-                    }
+                    new() { Name = "Users", Description = "Endpoints para gestão de autenticação e autorização" },
+                    new() { Name = "Jobs", Description = "Endpoints para gerenciamento de oportunidades de emprego" },
+                    new() { Name = "Candidates", Description = "Endpoints para administração de cadastros de candidatos" },
+                    new() { Name = "Companies", Description = "Endpoints para administração de cadastros corporativos" },
+                    new() { Name = "JobApplications", Description = "Endpoints para processamento de inscrições em vagas" },
+                    new() { Name = "Search", Description = "Endpoints para consultas avançadas de vagas e empresas" },
+                    new() { Name = "Notifications", Description = "Endpoints para gestão de alertas e comunicações" },
+                    new() { Name = "Admin", Description = "Endpoints privilegiados para gestão do sistema" }
                 };
             }
         }

@@ -1,6 +1,0 @@
-@EmpregaNet.BFF_HostAddress = http://localhost:5267
-
-GET {{EmpregaNet.BFF_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###

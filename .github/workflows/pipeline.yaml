@@ -9,14 +9,14 @@ on:
 env:
   TESTS_PROJECT_PATH: src/EmpregaNet.Tests/EmpregaNet.Tests.csproj
   SOLUTION_FILE: EmpregaNet.sln
-  REGION: us-west-2
+  REGION: us-east-2
   ECR_REPOSITORY_NAME: empreganet-api
   DOCKERFILE_PATH: Dockerfile
-  APPRUNNER_SERVICE_ARN: arn:aws:apprunner:us-west-2:000000000000:service/empreganet-dev # Substitua pelo ARN real do seu serviço App Runner
+  APPRUNNER_SERVICE_ARN: arn:aws:apprunner:us-east-2:000000000000:service/empreganet-dev # Substitua pelo ARN real do seu serviço App Runner
 
 jobs:
   ci:
-    name: Build e Testes (CI)
+    name: Build and Tests (CI)
     runs-on: ubuntu-latest
 
     steps:
@@ -38,7 +38,7 @@ jobs:
         run: dotnet test ${{ env.TESTS_PROJECT_PATH }} --configuration Release --verbosity normal
 
   ecr:
-    name: Build e Push da Imagem para ECR
+    name: Build and Push to ECR (CD)
     needs: [ci]
     runs-on: ubuntu-latest
 
@@ -59,7 +59,7 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
-      - name: Build, Tag e Push Docker Image
+      - name: Build and push Docker image
         run: |
           ECR_REGISTRY=${{ steps.login-ecr.outputs.registry }}
           IMAGE_TAG=${{ github.sha }}
@@ -72,7 +72,7 @@ jobs:
           docker push $IMAGE_URI
           docker push $ECR_REGISTRY/${{ env.ECR_REPOSITORY_NAME }}:latest
 
-      - name: Deploy e Atualização do Serviço App Runner (CD)
+      - name: Deploy and Update App Runner Service (CD)
         run: |
           echo "Forcing App Runner deployment for service: ${{ env.APPRUNNER_SERVICE_ARN }}"
           aws apprunner start-deployment --service-arn ${{ env.APPRUNNER_SERVICE_ARN }}

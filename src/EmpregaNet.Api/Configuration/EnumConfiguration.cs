@@ -1,7 +1,5 @@
-﻿using Microsoft.OpenApi.Any;
-using Microsoft.OpenApi.Models;
+﻿using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.SwaggerGen;
-using System.Reflection;
 using System.Text;
 using System.Xml.Linq;
 using System.Xml.XPath;
@@ -10,63 +8,39 @@ using System.Xml.XPath;
 /// Filtro de schema para o Swagger que adiciona à descrição dos enums os valores possíveis e suas descrições extraídas dos comentários XML.
 /// Exibe uma lista HTML com os nomes e descrições dos membros do enum na documentação gerada.
 /// </summary>
-public class DescribeEnumMembers : ISchemaFilter
+public sealed class DescribeEnumMembers : ISchemaFilter
 {
-    /// <summary>
-    /// Documento XML contendo os comentários extraídos do código (geralmente o arquivo de documentação XML do projeto).
-    /// </summary>
-    private readonly XDocument mXmlComments;
+    private readonly XDocument _xmlComments;
 
-    /// <summary>
-    /// Inicializa uma nova instância de <see cref="DescribeEnumMembers"/> com o documento XML de comentários.
-    /// </summary>
-    /// <param name="argXmlComments">Documento XML de comentários do código.</param>
-    public DescribeEnumMembers(XDocument argXmlComments)
+    public DescribeEnumMembers(XDocument xmlComments)
     {
-        mXmlComments = argXmlComments;
+        _xmlComments = xmlComments;
     }
 
-    /// <summary>
-    /// Aplica o filtro ao schema do Swagger, adicionando à descrição do enum os valores possíveis e suas descrições.
-    /// </summary>
-    /// <param name="argSchema">Schema OpenAPI a ser modificado.</param>
-    /// <param name="argContext">Contexto do filtro, contendo informações do tipo.</param>
-    public void Apply(OpenApiSchema argSchema, SchemaFilterContext argContext)
+    public void Apply(IOpenApiSchema schema, SchemaFilterContext context)
     {
-        var EnumType = argContext.Type;
+        if (!context.Type.IsEnum)
+            return;
 
-        // Só processa se o tipo for Enum
-        if (!EnumType.IsEnum) return;
+        var sb = new StringBuilder(schema.Description);
 
-        // Inicia a descrição com o texto já existente
-        var sb = new StringBuilder(argSchema.Description);
+        sb.AppendLine("<p>Valores possíveis:</p><ul>");
 
-        sb.AppendLine("<p>Valores Possíveis:</p>");
-        sb.AppendLine("<ul>");
-
-        // Para cada membro do enum, busca a descrição no XML e adiciona à lista
-        foreach (var enumMemberName in Enum.GetNames(EnumType))
+        foreach (var name in Enum.GetNames(context.Type))
         {
-            var FullEnumMemberName = $"F:{EnumType.FullName}.{enumMemberName}";
+            var memberName = $"F:{context.Type.FullName}.{name}";
+            var description = _xmlComments.XPathEvaluate(
+                $"normalize-space(//member[@name='{memberName}']/summary/text())"
+            ) as string;
 
-            // Busca a descrição do membro no XML de comentários
-            var EnumMemberDescription = mXmlComments.XPathEvaluate($"normalize-space(//member[@name = '{FullEnumMemberName}']/summary/text())") as string;
-
-            if (string.IsNullOrEmpty(EnumMemberDescription))
+            if (!string.IsNullOrWhiteSpace(description))
             {
-                // Se não encontrar descrição, interrompe o processamento
-                return;
-            }
-            else
-            {
-                sb.AppendLine($"<li><b>{enumMemberName}</b>: {EnumMemberDescription}</li>");
+                sb.AppendLine($"<li><b>{name}</b>: {description}</li>");
             }
         }
 
         sb.AppendLine("</ul>");
-
-        // Atualiza a descrição do schema
-        argSchema.Description = sb.ToString();
+        schema.Description = sb.ToString();
     }
 }
 
@@ -75,49 +49,36 @@ public class DescribeEnumMembers : ISchemaFilter
 /// caso estejam decorados com o atributo <c>IgnoreEnumAttribute</c>.
 /// Útil para ocultar valores de enumeração que não devem ser expostos na API.
 /// </summary>
-public class IgnoreEnumSchemaFilter : ISchemaFilter
+public sealed class IgnoreEnumSchemaFilter : ISchemaFilter
 {
-    /// <summary>
-    /// Documento XML contendo os comentários extraídos do código (não utilizado diretamente neste filtro, mas mantido para compatibilidade).
-    /// </summary>
-    private readonly XDocument mXmlComments;
+    public sealed class IgnoreEnumAttribute : Attribute { }
 
-    /// <summary>
-    /// Inicializa uma nova instância de <see cref="IgnoreEnumSchemaFilter"/> com o documento XML de comentários.
-    /// </summary>
-    /// <param name="argXmlComments">Documento XML de comentários do código.</param>
-    public IgnoreEnumSchemaFilter(XDocument argXmlComments)
+    public void Apply(IOpenApiSchema schema, SchemaFilterContext context)
     {
-        mXmlComments = argXmlComments;
-    }
+        if (!context.Type.IsEnum)
+            return;
 
-    public class IgnoreEnumAttribute : Attribute { }
-
-    /// <summary>
-    /// Aplica o filtro ao schema do Swagger, removendo valores de enum que estejam decorados com <c>IgnoreEnumAttribute</c>.
-    /// </summary>
-    /// <param name="schema">Schema OpenAPI a ser modificado.</param>
-    /// <param name="context">Contexto do filtro, contendo informações do tipo.</param>
-    public void Apply(OpenApiSchema schema, SchemaFilterContext context)
-    {
-        // Só processa se o tipo for Enum
-        if (context.Type.IsEnum)
-        {
-            var enumOpenApiStrings = new List<IOpenApiAny>();
-
-            // Para cada valor do enum, verifica se deve ser incluído na documentação
-            foreach (var enumValue in Enum.GetValues(context.Type))
+        var allowedValues = Enum.GetValues(context.Type)
+            .Cast<object>()
+            .Where(value =>
             {
-                var member = context.Type.GetMember(enumValue.ToString()!)[0];
-                // Só inclui se NÃO estiver decorado com IgnoreEnumAttribute
-                if (!member.GetCustomAttributes<IgnoreEnumAttribute>().Any())
-                {
-                    enumOpenApiStrings.Add(new OpenApiString(enumValue.ToString()));
-                }
-            }
+                var member = context.Type
+                    .GetMember(value.ToString()!)[0];
 
-            // Atualiza a lista de valores do enum no schema
-            schema.Enum = enumOpenApiStrings;
+                return !member.IsDefined(typeof(IgnoreEnumAttribute), false);
+            })
+            .Select(v => v.ToString()!)
+            .ToList();
+
+        if (schema.Enum != null)
+        {
+            schema.Enum.Clear();
+
+            foreach (var value in allowedValues)
+            {
+                schema.Enum.Add(value);
+            }
         }
     }
 }
+
