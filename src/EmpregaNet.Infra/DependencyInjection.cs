@@ -50,6 +50,7 @@ public static class DependencyInjection
         #region Repositories
         services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
         services.AddScoped<ICompanyRepository, CompanyRepository>();
+        services.AddScoped<IJobRepository, JobRepository>();
         #endregion
     }
 

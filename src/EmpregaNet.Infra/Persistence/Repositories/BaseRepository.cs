@@ -69,6 +69,7 @@ namespace EmpregaNet.Infra.Persistence.Repositories
 
             //_context.Set<T>().Remove(entity);
             _context.Set<T>().Update(entity);
+            entity.DeletedAt = DateTimeOffset.UtcNow;
             entity.IsDeleted = true;
             return true;
         }

@@ -4,7 +4,6 @@ using EmpregaNet.Domain.Enums;
 using EmpregaNet.Application.Jobs.ViewModel;
 using System.ComponentModel.DataAnnotations;
 using EmpregaNet.Domain.Entities;
-using EmpregaNet.Application.Jobs.Commands;
 using EmpregaNet.Application.Common.Exceptions;
 using EmpregaNet.Application.Companies.ViewModel;
 using EmpregaNet.Application.Common.Base;
@@ -20,8 +19,7 @@ namespace EmpregaNet.Application.Companies.Command
         string Phone,
         [EnumDataType(typeof(TypeOfActivityEnum))]
         string TypeOfActivity,
-        Address Address,
-        ICollection<CreateJobCommand> Jobs
+        Address Address
     ) : ICompanyCommand;
 
     public sealed class UpdateCompanyHandler : IRequestHandler<UpdateCommand<UpdateCompanyCommand, CompanyViewModel>, CompanyViewModel>

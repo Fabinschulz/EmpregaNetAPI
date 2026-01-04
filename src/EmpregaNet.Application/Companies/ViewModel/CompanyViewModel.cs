@@ -1,5 +1,4 @@
 using EmpregaNet.Domain.Entities;
-using EmpregaNet.Application.Jobs.ViewModel;
 using System.Diagnostics.CodeAnalysis;
 using EmpregaNet.Application.Common.Base;
 using EmpregaNet.Application.Utils.Helpers;
@@ -15,8 +14,6 @@ public sealed class CompanyViewModel : BaseViewModel
     public required string RegistrationNumber { get; set; }
     public required string Email { get; set; }
     public required string Phone { get; set; }
-    public ICollection<JobViewModel> Jobs { get; set; } = new List<JobViewModel>();
-
 }
 
 [ExcludeFromCodeCoverage]
