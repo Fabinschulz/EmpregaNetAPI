@@ -33,7 +33,6 @@ public static class CompanyMapper
             RegistrationNumber = entity.RegistrationNumber.FormatCNPJ(),
             Email = entity.Email,
             Phone = entity.Phone,
-            Jobs = entity.Jobs?.Select(job => job.ToViewModel()).ToList() ?? new List<JobViewModel>(),
             CreatedAtUtc = entity.CreatedAt,
             UpdatedAtUtc = entity.UpdatedAt,
             DeletedAtUtc = entity.DeletedAt,

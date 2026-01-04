@@ -13,7 +13,7 @@ public interface ICompanyCommand
     string Cnpj { get; }
     string Email { get; }
     string Phone { get; }
-    TypeOfActivityEnum TypeOfActivity { get; }
+    string TypeOfActivity { get; }
     Address Address { get; }
 }
 
@@ -62,10 +62,11 @@ public sealed class CompanyDataValidator<T> : AbstractValidator<T> where T : ICo
             .When(x => x.Address is not null);
 
         RuleFor(x => x.TypeOfActivity)
-            .IsInEnum()
-            .WithMessage("Tipo de atividade inválido.")
-            .NotEqual(TypeOfActivityEnum.NaoSelecionado)
+            .NotEmpty()
             .WithMessage("O tipo de atividade é obrigatório.")
-            .When(x => Enum.IsDefined(typeof(TypeOfActivityEnum), x.TypeOfActivity));
+            .Must(value => Enum.TryParse<TypeOfActivityEnum>(value, true, out var parsed)
+                        && parsed != TypeOfActivityEnum.NaoSelecionado)
+            .WithMessage("Tipo de atividade inválido.");
+
     }
 }

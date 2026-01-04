@@ -12,11 +12,6 @@ internal class CompanyConfiguration : IEntityTypeConfiguration<Company>
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id).ValueGeneratedOnAdd();
 
-        builder.HasMany(v => v.Jobs)
-               .WithOne(e => e.Company)
-               .HasForeignKey(v => v.CompanyId)
-               .OnDelete(DeleteBehavior.SetNull);
-
         builder.OwnsOne(c => c.Address, a =>
         {
             a.Property(p => p.Street).HasColumnName("Street").IsRequired().HasMaxLength(200);

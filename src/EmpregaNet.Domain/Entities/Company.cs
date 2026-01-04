@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations;
 using EmpregaNet.Domain.Common;
 using EmpregaNet.Domain.Enums;
 using EmpregaNet.Domain.Interfaces;
@@ -10,58 +9,27 @@ namespace EmpregaNet.Domain.Entities
     /// </summary>
     public class Company : BaseEntity, IAggregateRoot
     {
-        [EnumDataType(typeof(TypeOfActivityEnum))]
-        public TypeOfActivityEnum? TypeOfActivity { get; private set; } = null!;
-        public string CompanyName { get; private set; } = null!;
-        public Address Address { get; private set; } = null!;
-        public string RegistrationNumber { get; private set; } = null!;
-        public string Email { get; private set; } = null!;
-        public string Phone { get; private set; } = null!;
-        public ICollection<Job>? Jobs { get; private set; } = new List<Job>();
+        public required string CompanyName { get; set; }
+        public required string RegistrationNumber { get; set; }
+        public required string Email { get; set; }
+        public required string Phone { get; set; }
+        public required TypeOfActivityEnum TypeOfActivity { get; set; }
+        public required Address Address { get; set; }
 
-        private Company() { }
+        public Company() { }
 
-        public Company(string companyName, Address address, string registrationNumber, string email, string phone, TypeOfActivityEnum? typeOfActivity = null)
+        public void UpdateCompany(
+            string companyName,
+            string email,
+            string phone,
+            TypeOfActivityEnum typeOfActivity,
+            Address address)
         {
             CompanyName = companyName;
-            Address = address;
-            RegistrationNumber = registrationNumber;
             Email = email;
             Phone = phone;
             TypeOfActivity = typeOfActivity;
+            Address = address;
         }
-
-        public void UpdateDetails(string companyName, Address address, string registrationNumber, string email, string phone, TypeOfActivityEnum typeOfActivity)
-        {
-            this.CompanyName = companyName;
-            this.Address = address;
-            this.RegistrationNumber = registrationNumber;
-            this.Email = email;
-            this.Phone = phone;
-            this.TypeOfActivity = typeOfActivity;
-        }
-
-        public void AddJob(Job newJob)
-        {
-            if (Jobs is null)
-            {
-                Jobs = new List<Job>();
-            }
-            Jobs.Add(newJob);
-        }
-
-        public void RemoveJob(Job jobToRemove)
-        {
-            if (jobToRemove is null)
-                throw new ArgumentNullException(nameof(jobToRemove));
-
-            Jobs?.Remove(jobToRemove);
-        }
-
-        public void ClearJobs()
-        {
-            Jobs?.Clear();
-        }
-
     }
 }

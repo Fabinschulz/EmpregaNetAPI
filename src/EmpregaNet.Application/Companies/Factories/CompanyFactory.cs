@@ -1,6 +1,7 @@
 using EmpregaNet.Application.Companies.Command;
-using EmpregaNet.Application.Jobs.Factories;
+using EmpregaNet.Application.Utils.Helpers;
 using EmpregaNet.Domain.Entities;
+using EmpregaNet.Domain.Enums;
 
 namespace EmpregaNet.Application.Companies.Factories;
 
@@ -12,14 +13,15 @@ public abstract record CompanyFactory
     /// </summary>
     public static Company Create(CreateCompanyCommand command)
     {
-        var company = new Company(
-            companyName: command.CompanyName,
-            address: command.Address,
-            registrationNumber: command.Cnpj,
-            email: command.Email,
-            phone: command.Phone,
-            typeOfActivity: command.TypeOfActivity
-        );
+        var company = new Company
+        {
+            CompanyName = command.CompanyName,
+            Address = command.Address,
+            RegistrationNumber = command.Cnpj.OnlyNumbers().Trim(),
+            Email = command.Email,
+            Phone = command.Phone,
+            TypeOfActivity = Enum.TryParse<TypeOfActivityEnum>(command.TypeOfActivity, out var typeOfActivity) ? typeOfActivity : TypeOfActivityEnum.NaoSelecionado
+        };
 
         return company;
     }
@@ -29,46 +31,14 @@ public abstract record CompanyFactory
     /// </summary>
     public static Company Update(Company company, UpdateCompanyCommand command)
     {
-        company.UpdateDetails(
+        company.UpdateCompany(
             companyName: command.CompanyName,
             address: command.Address,
-            registrationNumber: command.Cnpj,
             email: command.Email,
             phone: command.Phone,
-            typeOfActivity: command.TypeOfActivity
+            typeOfActivity: Enum.TryParse<TypeOfActivityEnum>(command.TypeOfActivity, out var typeOfActivity) ? typeOfActivity : TypeOfActivityEnum.NaoSelecionado
         );
 
-        if (command.Jobs is null || !command.Jobs.Any())
-        {
-            company.ClearJobs();
-        }
-        else
-        {
-            var jobsToRemove = company.Jobs!
-                .Where(j => !command.Jobs.Any(cj => cj.Id == j.Id))
-                .ToList();
-
-            foreach (var job in jobsToRemove)
-            {
-                company.RemoveJob(job);
-            }
-
-            foreach (var jobCommand in command.Jobs)
-            {
-                var existingJob = company.Jobs?.FirstOrDefault(j => j.Id == jobCommand.Id);
-
-                if (existingJob is not null)
-                {
-                    JobFactory.Update(existingJob, jobCommand);
-                }
-                else
-                {
-                    var newJob = JobFactory.Create(jobCommand, company.Id);
-                    company.AddJob(newJob);
-                }
-            }
-        }
-        
         return company;
     }
 }

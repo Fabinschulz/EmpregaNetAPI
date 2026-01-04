@@ -9,20 +9,26 @@ internal class JobApplicationConfiguration : IEntityTypeConfiguration<JobApplica
     public void Configure(EntityTypeBuilder<JobApplication> builder)
     {
         builder.ToTable("JobApplications");
+
         builder.HasKey(x => x.Id);
-        builder.Property(x => x.Id).ValueGeneratedOnAdd();
 
-        builder.HasOne(v => v.Job)
-               .WithMany(e => e.Applications)
-               .HasForeignKey(v => v.JobId);
+        builder.Property(x => x.JobId)
+               .IsRequired();
 
-        builder.HasOne(v => v.User)
-               .WithMany(e => e.Applications)
-               .HasForeignKey(v => v.UserId);
+        builder.Property(x => x.UserId)
+               .IsRequired();
+
+        builder.Property(x => x.Status)
+               .IsRequired();
+
+        builder.Property(x => x.AppliedAt)
+               .IsRequired();
 
         builder.HasIndex(x => new { x.JobId, x.UserId })
                .IsUnique()
                .HasDatabaseName("IX_JobApplications_JobId_UserId");
-    }
 
+        builder.HasIndex(x => x.JobId)
+               .HasDatabaseName("IX_JobApplications_JobId");
+    }
 }

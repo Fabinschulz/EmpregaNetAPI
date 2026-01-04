@@ -25,7 +25,7 @@ namespace EmpregaNet.Api.Configuration
                 s.SwaggerDoc("v1", new OpenApiInfo
                 {
                     Version = "v1",
-                    Title = "Authentication and Authorization API",
+                    Title = "Gerenciamento de Vagas de Emprego - EmpregaNet",
                     Description = "EmpregaNet API Swagger surface",
                     Contact = new OpenApiContact { Name = "Freetech", Email = "freetech@outlook.com.br", Url = new Uri("https://freetech.vercel.app/") },
                     License = new OpenApiLicense { Name = "MIT" }

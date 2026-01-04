@@ -1,4 +1,3 @@
-
 using EmpregaNet.Domain.Common;
 using EmpregaNet.Domain.Enums;
 using EmpregaNet.Domain.Interfaces;
@@ -10,12 +9,24 @@ namespace EmpregaNet.Domain.Entities
     /// </summary>
     public class JobApplication : BaseEntity, IAggregateRoot
     {
-        public DateTimeOffset ApplicationDate { get; set; } = DateTimeOffset.Now;
-        public ApplicationStatusEnum Status { get; set; }
-        public long JobId { get; set; }
-        public Job? Job { get; set; }
-        public long UserId { get; set; }
-        public User? User { get; set; }
+        public long JobId { get; private set; }
+        public long UserId { get; private set; }
+        public ApplicationStatusEnum Status { get; private set; }
+        public DateTimeOffset AppliedAt { get; private set; }
 
+        private JobApplication() { }
+
+        public JobApplication(long jobId, long userId)
+        {
+            JobId = jobId;
+            UserId = userId;
+            Status = ApplicationStatusEnum.Processing;
+            AppliedAt = DateTimeOffset.UtcNow;
+        }
+
+        public void ChangeStatus(ApplicationStatusEnum status)
+        {
+            Status = status;
+        }
     }
 }

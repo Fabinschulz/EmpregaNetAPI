@@ -18,7 +18,7 @@ public abstract class JobFactory
 
     public static Job Update(Job job, CreateJobCommand command)
     {
-        job.UpdateDetails(
+        job.UpdateJob(
             title: command.Title,
             description: command.Description,
             salary: command.Salary,

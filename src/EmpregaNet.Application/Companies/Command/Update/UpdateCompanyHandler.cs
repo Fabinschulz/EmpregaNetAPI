@@ -19,7 +19,7 @@ namespace EmpregaNet.Application.Companies.Command
         string Email,
         string Phone,
         [EnumDataType(typeof(TypeOfActivityEnum))]
-        TypeOfActivityEnum TypeOfActivity,
+        string TypeOfActivity,
         Address Address,
         ICollection<CreateJobCommand> Jobs
     ) : ICompanyCommand;

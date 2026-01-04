@@ -1,13 +1,13 @@
 using FluentValidation;
 using Microsoft.Extensions.Logging;
 using EmpregaNet.Domain.Enums;
-using System.ComponentModel.DataAnnotations;
 using EmpregaNet.Domain.Entities;
 using EmpregaNet.Application.Common.Exceptions;
 using EmpregaNet.Application.Common.Base;
 using EmpregaNet.Application.Companies.Factories;
 using EmpregaNet.Domain.Interfaces;
 using EmpregaNet.Application.Utils.Helpers;
+using System.ComponentModel.DataAnnotations;
 
 namespace EmpregaNet.Application.Companies.Command;
 
@@ -17,9 +17,10 @@ public sealed record CreateCompanyCommand(
     string Email,
     string Phone,
     [EnumDataType(typeof(TypeOfActivityEnum))]
-    TypeOfActivityEnum TypeOfActivity,
+    string TypeOfActivity,
     Address Address
 ) : ICompanyCommand;
+
 
 public sealed class CreateCompanyCommandHandler : IRequestHandler<CreateCommand<CreateCompanyCommand>, long>
 {

@@ -24,10 +24,6 @@ namespace EmpregaNet.Infra.Persistence.Repositories
                 a.Property(p => p.ZipCode).HasColumnName("ZipCode").IsRequired().HasMaxLength(20);
             });
 
-            builder.HasMany(v => v.Applications)
-                   .WithOne(e => e.User)
-                   .HasForeignKey(v => v.UserId);
-
             builder.HasIndex(x => x.Email)
                    .IsUnique()
                    .HasDatabaseName("IX_Users_Email");
@@ -39,6 +35,9 @@ namespace EmpregaNet.Infra.Persistence.Repositories
             builder.HasIndex(x => x.PhoneNumber)
                    .IsUnique()
                    .HasDatabaseName("IX_Users_PhoneNumber");
+
+            builder.HasIndex(x => x.Id)
+                   .HasDatabaseName("IX_Users_Id");
         }
     }
 
