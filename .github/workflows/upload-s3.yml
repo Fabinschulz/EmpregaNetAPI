@@ -1,0 +1,45 @@
+name: Upload Repository to S3
+
+on:
+  workflow_call:
+    inputs:
+      s3_bucket_name:
+        required: true
+        type: string
+    outputs:
+      s3_key:
+        description: "S3 key gerada para o ZIP"
+        value: ${{ jobs.upload.outputs.s3_key }}
+
+env:
+  AWS_REGION: us-east-1
+
+jobs:
+  upload:
+    runs-on: ubuntu-latest
+    outputs:
+      s3_key: ${{ steps.export_s3_key.outputs.s3_key }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Create ZIP from repository
+        run: |
+          zip -r repository.zip . \
+            -x ".git/*" \
+               ".github/*"
+
+      - name: Upload ZIP to S3
+        id: export_s3_key
+        run: |
+          S3_KEY="deployments/${{ github.sha }}.zip"
+          aws s3 cp repository.zip s3://${{ inputs.s3_bucket_name }}/$S3_KEY
+          echo "s3_key=$S3_KEY" >> $GITHUB_OUTPUT

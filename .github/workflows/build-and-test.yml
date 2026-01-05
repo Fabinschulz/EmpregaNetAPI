@@ -1,0 +1,33 @@
+name: CI - Build and Tests
+
+on:
+  workflow_call:
+    inputs:
+      solution_file:
+        required: true
+        type: string
+      tests_project_path:
+        required: true
+        type: string
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.x
+
+      - name: Restore dependencies
+        run: dotnet restore ${{ inputs.solution_file }}
+
+      - name: Build solution
+        run: dotnet build ${{ inputs.solution_file }} --configuration Release --no-restore
+
+      - name: Run tests
+        run: dotnet test ${{ inputs.tests_project_path }} --configuration Release --verbosity normal
