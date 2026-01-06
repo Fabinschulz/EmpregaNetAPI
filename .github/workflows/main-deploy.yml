@@ -2,7 +2,7 @@ name: Main Deploy - EmpregaNet
 
 on:
   push:
-    branches: [ master ]
+    branches: [master]
   workflow_dispatch:
 
 jobs:
@@ -11,23 +11,23 @@ jobs:
     uses: ./.github/workflows/build-and-test.yml
     with:
       solution_file: EmpregaNet.sln
-      tests_project_path: src/EmpregaNet.Tests/EmpregaNet.Tests.csproj
+      tests_project_path: tests/tests.csproj
 
-  publish-ecr:
+  docker-ecr:
     name: CD - Publish ECR
     needs: [build-and-test]
     uses: ./.github/workflows/ecr.yml
     secrets: inherit
 
   deploy-ec2:
-    name: CD - Deploy EC2
-    needs: [publish-ecr]
-    uses: ./.github/workflows/ec2.yml
+    needs: docker-ecr
+    if: github.ref == 'refs/heads/main'
+    uses: ./.github/workflows/deploy-ec2.yml
     with:
-      image_uri: ${{ needs.publish-ecr.outputs.image_uri }}
-      ecr_registry: ${{ needs.publish-ecr.outputs.ecr_registry }}
+      image_uri: ${{ needs.docker-ecr.outputs.image_uri }}
+      ecr_registry: ${{ needs.docker-ecr.outputs.ecr_registry }}
     secrets: inherit
-
+    
 #   upload-s3:
 #     name: CD - Upload Repository to S3
 #     needs: [build-and-test]

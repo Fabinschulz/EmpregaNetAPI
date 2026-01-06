@@ -27,17 +27,29 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
 
-      - name: Trigger SSM Command
+      - name: Deploy container via SSM
         shell: bash
         run: |
+          set -e
+
+          IMAGE_URI="${{ inputs.image_uri }}"
+          ECR_REGISTRY="${{ inputs.ecr_registry }}"
+
+          if [ -z "$IMAGE_URI" ]; then
+            echo "IMAGE_URI is empty"
+            exit 1
+          fi
+
           aws ssm send-command \
             --instance-ids "${{ vars.EC2_INSTANCE_ID }}" \
-            --document-name "AWS-RunShellScript" \
+            --document-name AWS-RunShellScript \
+            --comment "Deploy EmpregaNet API" \
             --parameters commands="[
-              \"docker login --username AWS --password \$(aws ecr get-login-password --region $AWS_REGION) ${{ inputs.ecr_registry }}\",
-              \"docker pull ${{ inputs.image_uri }}\",
+              \"set -e\",
+              \"aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_REGISTRY\",
+              \"docker pull $IMAGE_URI\",
               \"docker stop $CONTAINER_NAME || true\",
               \"docker rm $CONTAINER_NAME || true\",
-              \"docker run -d --restart always -p 8080:8080 -p 8081:8081 --name $CONTAINER_NAME ${{ inputs.image_uri }}\"
+              \"docker run -d --restart always --name $CONTAINER_NAME -p 80:8080 $IMAGE_URI\"
             ]" \
             --region $AWS_REGION

@@ -2,6 +2,11 @@ name: Push Image to ECR
 
 on:
   workflow_call:
+    outputs:
+      image_uri:
+        value: ${{ jobs.push-image.outputs.image_uri }}
+      ecr_registry:
+        value: ${{ jobs.push-image.outputs.ecr_registry }}
 
 env:
   AWS_REGION: us-east-1
@@ -16,22 +21,18 @@ jobs:
       ecr_registry: ${{ steps.image-push.outputs.ecr_registry }}
 
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v4
+      - uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
 
-      - name: Login to Amazon ECR
-        id: login-ecr
+      - id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
-      - name: Build and Push Docker Image to ECR
-        id: image-push
+      - id: image-push
         shell: bash
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
@@ -42,14 +43,10 @@ jobs:
 
           echo "Building image $IMAGE_URI_SHA"
 
-          docker build \
-            --platform linux/amd64 \
-            -t "$IMAGE_URI_SHA" .
-
+          docker build --platform linux/amd64 -t "$IMAGE_URI_SHA" .
           docker tag "$IMAGE_URI_SHA" "$IMAGE_URI_LATEST"
 
           docker push "$IMAGE_URI_SHA"
           docker push "$IMAGE_URI_LATEST"
-
           echo "image_uri=$IMAGE_URI_SHA" >> "$GITHUB_OUTPUT"
           echo "ecr_registry=$ECR_REGISTRY" >> "$GITHUB_OUTPUT"
