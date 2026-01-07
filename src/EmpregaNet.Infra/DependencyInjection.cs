@@ -16,7 +16,6 @@ public static class DependencyInjection
 
     public static void RegisterCoreDependencies(this WebApplicationBuilder builder)
     {
-        builder.SetUpDatabaseConnection();
         builder.AddIdentityConfiguration();
         builder.Services.SetupInfrastructureServices(builder.Configuration);
         builder.AddSentryConfiguration();
@@ -30,8 +29,8 @@ public static class DependencyInjection
         services.AddEndpointsApiExplorer();
         services.SetupDependencyInjection();
         services.AddProblemDetails();
-        services.ApplyMigrations();
         services.SetupRateLimiter(configuration);
+        services.AddDatabaseConfiguration(configuration);
     }
 
     private static void SetupDependencyInjection(this IServiceCollection services)

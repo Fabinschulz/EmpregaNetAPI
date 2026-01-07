@@ -16,6 +16,12 @@ builder.RegisterCoreDependencies();
 
 var app = builder.Build();
 
+if (app.Environment.IsProduction()) 
+{
+    // Executa migrações apenas em produção/staging automaticamente
+    app.Services.ApplyPendingMigrations();
+}
+
 #region Configure Pipeline
 
 app.SetupApiServices();

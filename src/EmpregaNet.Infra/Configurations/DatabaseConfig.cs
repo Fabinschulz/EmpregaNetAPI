@@ -1,5 +1,4 @@
 using EmpregaNet.Infra.Persistence.Database;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -8,27 +7,26 @@ namespace EmpregaNet.Infra.Configurations;
 
 public static class DatabaseConfig
 {
-    public static void SetUpDatabaseConnection(this WebApplicationBuilder builder)
+    public static void AddDatabaseConfiguration(this IServiceCollection services, IConfiguration configuration)
     {
-        string connectionString = builder.Configuration.GetConnectionString("PostgreSQLConnection")!;
+        var connectionString = configuration.GetConnectionString("PostgreSQLConnection") ?? throw new Exception("PostgreSQLConnection não encontrada no arquivo de configuração.");
         Console.WriteLine("Initializing Database for API: " + connectionString.Substring(0, 49));
-
         try
         {
-            builder.Services.AddDbContext<PostgreSqlContext>(options =>
+            services.AddDbContext<PostgreSqlContext>(options =>
             {
                 options.UseNpgsql(connectionString, npgsqlOptions =>
-                        {
-                            npgsqlOptions.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
-                            npgsqlOptions.EnableRetryOnFailure(
-                                maxRetryCount: 2,
-                                maxRetryDelay: TimeSpan.FromSeconds(10),
-                                errorCodesToAdd: null);
-                        })
-                       .EnableDetailedErrors()
-                       .EnableSensitiveDataLogging(true);
-
+                {
+                    npgsqlOptions.MigrationsAssembly(typeof(PostgreSqlContext).Assembly.GetName().Name);
+                    npgsqlOptions.EnableRetryOnFailure(
+                               maxRetryCount: 2,
+                               maxRetryDelay: TimeSpan.FromSeconds(10),
+                               errorCodesToAdd: null);
+                })
+                        .EnableDetailedErrors()
+                        .EnableSensitiveDataLogging(true);
             });
+
             Console.WriteLine("Database connection established successfully.");
         }
         catch (Exception e)
@@ -38,23 +36,15 @@ public static class DatabaseConfig
         }
     }
 
-    public static void ApplyMigrations(this IServiceCollection services)
-    {
-        var postgreSql = GetPostgreSql(services);
-        try
-        {
-            postgreSql.MigrateAsync().GetAwaiter().GetResult();
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine("Não foi possível concluir a migração do DB." + ex.ToString());
-            throw;
-        }
-    }
 
-    private static PostgreSqlContext GetPostgreSql(IServiceCollection services)
+    public static void ApplyPendingMigrations(this IServiceProvider serviceProvider)
     {
-        return (PostgreSqlContext)(services.BuildServiceProvider().GetService(typeof(PostgreSqlContext))
-            ?? throw new InvalidOperationException("PostgreSqlContext service is not registered."));
+        using var scope = serviceProvider.CreateScope();
+        var context = scope.ServiceProvider.GetRequiredService<PostgreSqlContext>();
+
+        if (context.Database.GetPendingMigrations().Any())
+        {
+            context.Database.Migrate();
+        }
     }
 }
