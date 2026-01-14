@@ -30,32 +30,25 @@ jobs:
       - name: Deploy container via SSM
         shell: bash
         env:
-          DB_CONN: "Host=${{ secrets.DB_HOST }};Port=${{ vars.DB_PORT }};Database=${{ vars.DB_NAME }};Username=${{ secrets.DB_USERNAME }};Password=${{ secrets.DB_PASSWORD }};Connect Timeout=240;TrustServerCertificate=True"
-          REDIS_CONN: "${{ secrets.REDIS_HOST }}:${{ vars.REDIS_PORT }}"
-          IMAGE_URI: "${{ inputs.image_uri }}"
-          ECR_REGISTRY: "${{ inputs.ecr_registry }}"
+          IMAGE_URI: ${{ inputs.image_uri }}
+          ECR_REGISTRY: ${{ inputs.ecr_registry }}
+          DB_CONN: Host=${{ secrets.DB_HOST }};Port=${{ vars.DB_PORT }};Database=${{ vars.DB_NAME }};Username=${{ secrets.DB_USERNAME }};Password=${{ secrets.DB_PASSWORD }};Connect Timeout=240;TrustServerCertificate=True
+          REDIS_CONN: ${{ secrets.REDIS_HOST }}:${{ vars.REDIS_PORT }}
         run: |
           set -e
 
-          if [ -z "$IMAGE_URI" ]; then
-            echo "IMAGE_URI is empty"
-            exit 1
-          fi
-
-          DOCKER_CMD="docker run -d --restart always --name $CONTAINER_NAME -p $APP_PORT -e ConnectionStrings__PostgreSQLConnection='$DB_CONN' -e Redis__Connection='$REDIS_CONN' $IMAGE_URI"
+          [ -z "$IMAGE_URI" ] && echo "IMAGE_URI is empty" && exit 1
 
           aws ssm send-command \
             --instance-ids "${{ vars.EC2_INSTANCE_ID }}" \
             --document-name "AWS-RunShellScript" \
-            --comment "Deploy API EmpregaNet" \
             --region "${{ vars.AWS_REGION }}" \
-            --parameters "{
-              \"commands\": [
-                \"set -e\",
-                \"aws ecr get-login-password --region ${{ vars.AWS_REGION }} | docker login --username AWS --password-stdin $ECR_REGISTRY\",
-                \"docker pull $IMAGE_URI\",
-                \"docker stop $CONTAINER_NAME || true\",
-                \"docker rm $CONTAINER_NAME || true\",
-                \"$DOCKER_CMD\"
-              ]
-            }"
+            --comment "Deploy API EmpregaNet" \
+            --parameters "commands=[
+              \"set -e\",
+              \"aws ecr get-login-password --region ${{ vars.AWS_REGION }} | docker login --username AWS --password-stdin $ECR_REGISTRY\",
+              \"docker pull $IMAGE_URI\",
+              \"docker stop $CONTAINER_NAME || true\",
+              \"docker rm $CONTAINER_NAME || true\",
+              \"docker run -d --restart always --name $CONTAINER_NAME -p $APP_PORT -e ConnectionStrings__PostgreSQLConnection='$DB_CONN' -e Redis='$REDIS_CONN' $IMAGE_URI\"
+            ]"
