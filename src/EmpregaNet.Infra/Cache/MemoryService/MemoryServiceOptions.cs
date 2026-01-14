@@ -1,5 +1,5 @@
 ﻿
-namespace EmpregaNet.Infra.Cache.MemoryService;
+namespace EmpregaNet.Infra.Cache;
 
 public class MemoryServiceOptions
 {

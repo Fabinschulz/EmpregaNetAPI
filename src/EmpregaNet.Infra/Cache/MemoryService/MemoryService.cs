@@ -6,11 +6,11 @@ using StackExchange.Redis;
 using Newtonsoft.Json;
 using EmpregaNet.Domain.Interfaces;
 
-namespace EmpregaNet.Infra.Cache.MemoryService
+namespace EmpregaNet.Infra.Cache
 {
     public class MemoryService : IMemoryService
     {
-        private IConnectionMultiplexer _distributed;
+        private IConnectionMultiplexer? _distributed;
         private IMemoryCache _local;
         private readonly ILogger<MemoryService> _logger;
         private MemoryServiceOptions _options;
@@ -19,8 +19,8 @@ namespace EmpregaNet.Infra.Cache.MemoryService
         public MemoryService(
             IMemoryCache local,
             ILogger<MemoryService> logger,
-            IConnectionMultiplexer distributed,
-            IOptionsMonitor<MemoryServiceOptions> options)
+            IOptionsMonitor<MemoryServiceOptions> options,
+            IConnectionMultiplexer? distributed = null)
         {
             _local = local;
             _logger = logger;

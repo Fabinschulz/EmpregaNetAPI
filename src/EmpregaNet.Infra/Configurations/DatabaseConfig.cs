@@ -7,7 +7,7 @@ namespace EmpregaNet.Infra.Configurations;
 
 public static class DatabaseConfig
 {
-    public static void AddDatabaseConfiguration(this IServiceCollection services, IConfiguration configuration)
+    public static void SetupDatabase(this IServiceCollection services, IConfiguration configuration)
     {
         var connectionString = configuration.GetConnectionString("PostgreSQLConnection") ?? throw new Exception("PostgreSQLConnection não encontrada no arquivo de configuração.");
         Console.WriteLine("Initializing Database for API: " + connectionString.Substring(0, 49));

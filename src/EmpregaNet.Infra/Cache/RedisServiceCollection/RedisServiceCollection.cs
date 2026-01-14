@@ -1,19 +1,18 @@
+using EmpregaNet.Domain.Interfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using StackExchange.Redis;
 
-namespace EmpregaNet.Infra.Cache.RedisServiceCollection
-{
-    public static class RedisServiceCollection
-    {
-        public static IServiceCollection UseRedisCache(this IServiceCollection services, IConfiguration configuration)
-        {
-            var connectionString = configuration["Redis"];
+namespace EmpregaNet.Infra.Cache;
 
-            if (string.IsNullOrEmpty(connectionString))
-            {
-                throw new ArgumentException("A configuração do Redis não foi encontrada. Verifique a chave 'Redis' no arquivo de configuração.");
-            }
+public static class RedisServiceCollection
+{
+    public static IServiceCollection UseRedisCache(this IServiceCollection services, IConfiguration configuration)
+    {
+        var connectionString = configuration["Redis"];
+
+        if (!string.IsNullOrEmpty(connectionString))
+        {
 
             Action<ConfigurationOptions> defaultOptions = (opts) =>
             {
@@ -30,8 +29,20 @@ namespace EmpregaNet.Infra.Cache.RedisServiceCollection
             services.AddSingleton<IConnectionMultiplexer>(redis);
 
             Console.WriteLine("Redis IsConnected: " + redis.IsConnected);
-
-            return services;
         }
+        else
+        {
+            Console.WriteLine("A configuração do Redis não foi encontrada. Verifique a chave 'Redis' no arquivo de configuração.");
+        }
+
+        return services;
+    }
+
+    public static IServiceCollection UseMemoryService(this IServiceCollection services, Action<MemoryServiceOptions> configureOptions)
+    {
+        services.Configure(configureOptions);
+        services.AddMemoryCache().AddDataProtection();
+        services.AddSingleton<IMemoryService, MemoryService>();
+        return services;
     }
 }

@@ -1,6 +1,7 @@
 using EmpregaNet.Api.Middleware;
 using EmpregaNet.Infra;
 using EmpregaNet.Infra.Configurations;
+using EmpregaNet.Infra.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.EnvironmentConfig();

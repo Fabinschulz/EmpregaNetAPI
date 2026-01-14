@@ -2,6 +2,8 @@
 
   <ItemGroup>
     <!-- ELK -->
+    <PackageReference Include="AWS.Logger.AspNetCore" Version="4.0.2" />
+    <PackageReference Include="AWSSDK.Core" Version="4.0.3.8" />
     <PackageReference Include="Elastic.Apm.NetCoreAll" Version="1.34.1" />
     <PackageReference Include="Elastic.Apm.SerilogEnricher" Version="9.0.0" />
     <PackageReference Include="Elastic.Clients.Elasticsearch" Version="9.2.2" />
