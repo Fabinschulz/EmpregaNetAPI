@@ -7,9 +7,9 @@ using Serilog;
 using Serilog.Exceptions;
 using Serilog.Sinks.Elasticsearch;
 
-namespace EmpregaNet.Infra.Configurations
+namespace EmpregaNet.Infra.Extensions
 {
-    public static class SerilogConfig
+    public static class SerilogExtensions
     {
         public static WebApplicationBuilder AddSerilog(this WebApplicationBuilder builder)
         {

@@ -3,6 +3,7 @@ using EmpregaNet.Infra.Behaviors;
 using EmpregaNet.Infra.Cache;
 using EmpregaNet.Infra.Configurations;
 using EmpregaNet.Infra.Extensions;
+using EmpregaNet.Infra.Persistence.Database;
 using EmpregaNet.Infra.Persistence.Repositories;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
@@ -18,6 +19,7 @@ public static class DependencyInjection
         builder.AddIdentityConfiguration();
         builder.Services.SetupInfrastructureServices(builder.Configuration);
         builder.SetupSentryLogging();
+        // builder.AddElasticsearch();
     }
 
     private static void SetupInfrastructureServices(this IServiceCollection services, IConfiguration configuration)

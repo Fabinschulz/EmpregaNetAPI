@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 
-namespace EmpregaNet.Infra.Configurations
+namespace EmpregaNet.Infra.Extensions
 {
     public class ElasticsearchSettings
     {
@@ -17,7 +17,7 @@ namespace EmpregaNet.Infra.Configurations
         public string AppName { get; set; } = string.Empty;
     }
 
-    public static class ElasticsearchConfig
+    public static class ElasticsearchExtensions
     {
         public static void AddElasticsearch(this WebApplicationBuilder builder)
         {

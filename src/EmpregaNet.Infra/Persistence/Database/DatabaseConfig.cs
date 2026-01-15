@@ -1,9 +1,9 @@
-using EmpregaNet.Infra.Persistence.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace EmpregaNet.Infra.Configurations;
+
+namespace EmpregaNet.Infra.Persistence.Database;
 
 public static class DatabaseConfig
 {
