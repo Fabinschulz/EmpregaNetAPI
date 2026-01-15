@@ -16,11 +16,15 @@ jobs:
     runs-on: ubuntu-latest
 
     outputs:
-      image_uri: ${{ steps.image-push.outputs.image_uri }}
-      ecr_registry: ${{ steps.image-push.outputs.ecr_registry }}
+      image_uri: ${{ steps.publish.outputs.image_uri }}
+      ecr_registry: ${{ steps.publish.outputs.ecr_registry }}
 
     steps:
       - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
 
       - uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -40,12 +44,18 @@ jobs:
           IMAGE_URI_SHA="$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
           IMAGE_URI_LATEST="$ECR_REGISTRY/$ECR_REPOSITORY:latest"
 
-          echo "Building image $IMAGE_URI_SHA"
+          dotnet publish \
+            -c Release \
+            -p:PublishProfile=DefaultContainer \
+            -p:RuntimeIdentifier=linux-x64 \
+            -p:ContainerRegistry=$ECR_REGISTRY \
+            -p:ContainerImageName=$ECR_REPOSITORY \
+            -p:ContainerImageTag=$IMAGE_TAG
 
-          docker build --platform linux/amd64 -t "$IMAGE_URI_SHA" .
           docker tag "$IMAGE_URI_SHA" "$IMAGE_URI_LATEST"
 
           docker push "$IMAGE_URI_SHA"
           docker push "$IMAGE_URI_LATEST"
+
           echo "image_uri=$IMAGE_URI_SHA" >> "$GITHUB_OUTPUT"
           echo "ecr_registry=$ECR_REGISTRY" >> "$GITHUB_OUTPUT"

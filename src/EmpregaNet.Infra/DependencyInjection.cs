@@ -30,7 +30,7 @@ public static class DependencyInjection
         services.SetupDependencyInjection();
         services.SetupDatabase(configuration);
         services.SetupRateLimiter(configuration);
-        services.SetupAWSCloudWatchLogging(configuration);
+        // services.SetupAWSCloudWatchLogging(configuration);
     }
 
     private static void SetupDependencyInjection(this IServiceCollection services)

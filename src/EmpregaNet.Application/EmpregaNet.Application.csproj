@@ -17,6 +17,9 @@
     <Nullable>enable</Nullable>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>$(NoWarn);1591</NoWarn>
+    <ContainerImageTags>1.0.0;latest</ContainerImageTags>
+    <ContainerRepository>empreganet-api</ContainerRepository>
+    <PublishProfile>DefaultContainer</PublishProfile>
   </PropertyGroup>
 
 </Project>

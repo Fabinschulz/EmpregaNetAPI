@@ -24,17 +24,15 @@ jobs:
           aws-region: ${{ vars.AWS_REGION }}
 
       - name: Deploy container via SSM
-        shell: bash
+        id: ssm
         run: |
-          set -e
-
-          [ -z "${{ inputs.image_uri }}" ] && echo "image_uri is empty" && exit 1
-
-          aws ssm send-command \
+          COMMAND_ID=$(aws ssm send-command \
             --region "${{ vars.AWS_REGION }}" \
             --instance-ids "${{ vars.EC2_INSTANCE_ID }}" \
             --document-name "AWS-RunShellScript" \
-            --comment "Deploy API EmpregaNet" \
+            --comment "Deploy Docker container" \
+            --query "Command.CommandId" \
+            --output text \
             --parameters 'commands=[
               "set -e",
 
@@ -51,11 +49,24 @@ jobs:
               "docker pull $IMAGE_URI",
               "docker stop $CONTAINER_NAME || true",
               "docker rm $CONTAINER_NAME || true",
-              "docker run -d \
-                --name $CONTAINER_NAME \
-                --restart always \
-                -p $APP_PORT \
-                -e ConnectionStrings__PostgreSQLConnection=\"$DB_CONN\" \
-                -e Redis=\"$REDIS_CONN\" \
-                $IMAGE_URI"
-            ]'
+              "docker run -d \ 
+              --name $CONTAINER_NAME \
+              --restart always \
+              -p $APP_PORT \
+              -e ConnectionStrings__PostgreSQLConnection=\"$DB_CONN\" \
+              -e Redis=\"$REDIS_CONN\" \
+              $IMAGE_URI"
+            ]')
+
+          echo "command_id=$COMMAND_ID" >> $GITHUB_OUTPUT
+
+      - name: Fetch SSM execution logs
+        run: |
+          echo "Waiting for SSM command to finish..."
+          sleep 10
+
+          aws ssm get-command-invocation \
+            --region "${{ vars.AWS_REGION }}" \
+            --command-id "${{ steps.ssm.outputs.command_id }}" \
+            --instance-id "${{ vars.EC2_INSTANCE_ID }}" \
+            --output json
