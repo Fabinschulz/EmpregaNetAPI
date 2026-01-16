@@ -68,5 +68,4 @@ jobs:
           aws ssm get-command-invocation \
             --region "${{ vars.AWS_REGION }}" \
             --command-id "${{ steps.ssm.outputs.command_id }}" \
-            --instance-id "${{ vars.EC2_INSTANCE_ID }}" \
-            --output json
+            --instance-id "${{ vars.EC2_INSTANCE_ID }}"
