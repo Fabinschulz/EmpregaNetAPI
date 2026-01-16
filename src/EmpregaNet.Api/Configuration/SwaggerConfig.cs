@@ -36,27 +36,12 @@ namespace EmpregaNet.Api.Configuration
                 {
                     Description = "Insira o token JWT desta maneira: Bearer {seu token}",
                     Name = "Authorization",
-                    Scheme = "Bearer",
+                    Scheme = "bearer",
                     BearerFormat = "JWT",
                     In = ParameterLocation.Header,
-                    Type = SecuritySchemeType.ApiKey
+                    Type = SecuritySchemeType.Http
                 });
 
-                // Exige o uso do esquema de segurança Bearer em todas as operações
-                // s.AddSecurityRequirement(new OpenApiSecurityRequirement
-                // {
-                //     {
-                //         new OpenApiSecurityScheme
-                //         {
-                //             Reference = new OpenApiReference
-                //             {
-                //                 Type = ReferenceType.SecurityScheme,
-                //                 Id = "Bearer"
-                //             }
-                //         },
-                //         new string[] {}
-                //     }
-                // });
 
                 // Excluding ASP.NET Identity endpoints
                 s.DocInclusionPredicate((docName, apiDesc) =>
@@ -71,20 +56,34 @@ namespace EmpregaNet.Api.Configuration
 
                 var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
                 var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
-                s.IncludeXmlComments(xmlPath);
+
+                if (File.Exists(xmlPath))
+                {
+                    s.IncludeXmlComments(xmlPath);
+                    var xmlDoc = XDocument.Load(xmlPath);
+                    s.SchemaFilter<DescribeEnumMembers>(xmlDoc);
+                }
+
                 s.DocumentFilter<TagDescriptionsDocumentFilter>();
-                s.SchemaFilter<DescribeEnumMembers>(XDocument.Load(xmlPath));
+                s.SchemaFilter<IgnoreEnumSchemaFilter>();
 
                 var appName = "EmpregaNet";
-                // Inclui comentários e filtros do projeto Application
                 xmlPath = Path.Combine(AppContext.BaseDirectory, $"{appName}.Application.xml");
-                s.IncludeXmlComments(xmlPath);
-                s.SchemaFilter<DescribeEnumMembers>(XDocument.Load(xmlPath));
+                if (File.Exists(xmlPath))
+                {
+                    s.IncludeXmlComments(xmlPath);
+                    var xmlDoc = XDocument.Load(xmlPath);
+                    s.SchemaFilter<DescribeEnumMembers>(xmlDoc);
+                }
+                s.SchemaFilter<IgnoreEnumSchemaFilter>();
 
-                // Inclui comentários e filtros do projeto Domain
                 xmlPath = Path.Combine(AppContext.BaseDirectory, $"{appName}.Domain.xml");
-                s.IncludeXmlComments(xmlPath);
-                s.SchemaFilter<DescribeEnumMembers>(XDocument.Load(xmlPath));
+                if (File.Exists(xmlPath))
+                {
+                    s.IncludeXmlComments(xmlPath);
+                    var xmlDoc = XDocument.Load(xmlPath);
+                    s.SchemaFilter<DescribeEnumMembers>(xmlDoc);
+                }
                 s.SchemaFilter<IgnoreEnumSchemaFilter>();
 
             });

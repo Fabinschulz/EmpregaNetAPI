@@ -46,7 +46,8 @@ jobs:
               \"docker pull $IMAGE_URI\",
               \"docker stop $CONTAINER_NAME || true\",
               \"docker rm $CONTAINER_NAME || true\",
-              \"docker run -d --name $CONTAINER_NAME --restart always -p $APP_PORT -e ConnectionStrings__PostgreSQLConnection='$DB_CONN' e Redis='$REDIS_CONN' $IMAGE_URI\"
+              \"docker run -d --name $CONTAINER_NAME --restart always -p $APP_PORT -e ConnectionStrings__PostgreSQLConnection='$DB_CONN' e Redis='$REDIS_CONN' $IMAGE_URI\",
+              \"docker image prune -f\"
             ]")
 
           echo "command_id=$COMMAND_ID" >> $GITHUB_OUTPUT
