@@ -6,7 +6,6 @@ using EmpregaNet.Infra.Extensions;
 using EmpregaNet.Infra.Persistence.Database;
 using EmpregaNet.Infra.Persistence.Repositories;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace EmpregaNet.Infra;
@@ -17,22 +16,22 @@ public static class DependencyInjection
     public static void RegisterCoreDependencies(this WebApplicationBuilder builder)
     {
         builder.AddIdentityConfiguration();
-        builder.Services.SetupInfrastructureServices(builder.Configuration);
         builder.SetupSentryLogging();
+        builder.SetupDatabaseConnection();
+        builder.SetupInfrastructureServices();
         // builder.AddElasticsearch();
     }
 
-    private static void SetupInfrastructureServices(this IServiceCollection services, IConfiguration configuration)
+    private static void SetupInfrastructureServices(this WebApplicationBuilder builder)
     {
-        services.UseRedisCache(configuration);
-        services.UseMemoryService(opt => opt.KeyPrefix = "EmpregaNet_Cache_");
-        services.AddHttpContextAccessor();
-        services.AddEndpointsApiExplorer();
-        services.AddProblemDetails();
-        services.SetupDependencyInjection();
-        services.SetupDatabase(configuration);
-        services.SetupRateLimiter(configuration);
-        // services.SetupAWSCloudWatchLogging(configuration);
+        builder.UseRedisCache();
+        builder.UseMemoryService(opt => opt.KeyPrefix = "EmpregaNet_Cache_");
+        builder.Services.AddHttpContextAccessor();
+        builder.Services.AddEndpointsApiExplorer();
+        builder.Services.AddProblemDetails();
+        builder.Services.SetupDependencyInjection();
+        builder.Services.SetupRateLimiter(builder.Configuration);
+        // builder.Services.SetupAWSCloudWatchLogging(builder.Configuration);
     }
 
     private static void SetupDependencyInjection(this IServiceCollection services)

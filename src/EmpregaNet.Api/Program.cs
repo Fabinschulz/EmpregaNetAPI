@@ -1,7 +1,7 @@
 using EmpregaNet.Api.Middleware;
 using EmpregaNet.Infra;
-using EmpregaNet.Infra.Configurations;
 using EmpregaNet.Infra.Extensions;
+using EmpregaNet.Infra.Persistence.Database;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.EnvironmentConfig();
@@ -20,7 +20,7 @@ var app = builder.Build();
 if (app.Environment.IsProduction()) 
 {
     // Executa migrações apenas em produção/staging automaticamente
-    app.Services.ApplyPendingMigrations();
+    app.ApplyPendingMigrations();
 }
 
 #region Configure Pipeline

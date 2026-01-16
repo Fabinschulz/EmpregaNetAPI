@@ -1,5 +1,5 @@
 using EmpregaNet.Domain.Interfaces;
-using Microsoft.Extensions.Configuration;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using StackExchange.Redis;
 
@@ -7,9 +7,9 @@ namespace EmpregaNet.Infra.Cache;
 
 public static class RedisServiceCollection
 {
-    public static IServiceCollection UseRedisCache(this IServiceCollection services, IConfiguration configuration)
+    public static WebApplicationBuilder UseRedisCache(this WebApplicationBuilder builder)
     {
-        var connectionString = configuration["Redis"];
+        var connectionString = builder.Configuration["Redis"];
 
         if (!string.IsNullOrEmpty(connectionString))
         {
@@ -26,7 +26,7 @@ public static class RedisServiceCollection
             };
 
             ConnectionMultiplexer redis = ConnectionMultiplexer.Connect(connectionString, defaultOptions);
-            services.AddSingleton<IConnectionMultiplexer>(redis);
+            builder.Services.AddSingleton<IConnectionMultiplexer>(redis);
 
             Console.WriteLine("Redis IsConnected: " + redis.IsConnected);
         }
@@ -35,14 +35,15 @@ public static class RedisServiceCollection
             Console.WriteLine("A configuração do Redis não foi encontrada. Verifique a chave 'Redis' no arquivo de configuração.");
         }
 
-        return services;
+        return builder;
     }
 
-    public static IServiceCollection UseMemoryService(this IServiceCollection services, Action<MemoryServiceOptions> configureOptions)
+    public static WebApplicationBuilder UseMemoryService(this WebApplicationBuilder builder, Action<MemoryServiceOptions> configureOptions)
     {
-        services.Configure(configureOptions);
-        services.AddMemoryCache().AddDataProtection();
-        services.AddSingleton<IMemoryService, MemoryService>();
-        return services;
+        builder.Services.Configure(configureOptions);
+        builder.Services.AddMemoryCache().AddDataProtection();
+        builder.Services.AddSingleton<IMemoryService, MemoryService>();
+        
+        return builder;
     }
 }
