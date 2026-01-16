@@ -26,6 +26,13 @@ jobs:
       - name: Deploy container via SSM
         id: ssm
         run: |
+          DB_CONN="Host=${{ vars.DB_HOST }};Port=${{ vars.DB_PORT }};Database=${{ vars.DB_NAME }};Username=${{ secrets.DB_USERNAME }};Password=${{ secrets.DB_PASSWORD }};Pooling=true;Persist Security Info=true;"
+          REDIS_CONN="${{ secrets.REDIS_HOST }}:${{ vars.REDIS_PORT }}"
+          CONTAINER_NAME="empreganet-api"
+          APP_PORT="80:8080"
+          IMAGE_URI="${{ inputs.image_uri }}"
+          ECR_REGISTRY="${{ inputs.ecr_registry }}"
+
           COMMAND_ID=$(aws ssm send-command \
             --region "${{ vars.AWS_REGION }}" \
             --instance-ids "${{ vars.EC2_INSTANCE_ID }}" \
@@ -33,30 +40,14 @@ jobs:
             --comment "Deploy Docker container" \
             --query "Command.CommandId" \
             --output text \
-            --parameters 'commands=[
-              "set -e",
-
-              "CONTAINER_NAME=empreganet-api",
-              "APP_PORT=80:8080",
-
-              "IMAGE_URI=${{ inputs.image_uri }}",
-              "ECR_REGISTRY=${{ inputs.ecr_registry }}",
-
-              "DB_CONN=\"Host=${{ secrets.DB_HOST }};Port=${{ vars.DB_PORT }};Database=${{ vars.DB_NAME }};Username=${{ secrets.DB_USERNAME }};Password=${{ secrets.DB_PASSWORD }};Connect Timeout=240;TrustServerCertificate=True\"",
-              "REDIS_CONN=\"${{ secrets.REDIS_HOST }}:${{ vars.REDIS_PORT }}\"",
-
-              "aws ecr get-login-password --region ${{ vars.AWS_REGION }} | docker login --username AWS --password-stdin $ECR_REGISTRY",
-              "docker pull $IMAGE_URI",
-              "docker stop $CONTAINER_NAME || true",
-              "docker rm $CONTAINER_NAME || true",
-              "docker run -d \ 
-              --name $CONTAINER_NAME \
-              --restart always \
-              -p $APP_PORT \
-              -e ConnectionStrings__PostgreSQLConnection=\"$DB_CONN\" \
-              -e Redis=\"$REDIS_CONN\" \
-              $IMAGE_URI"
-            ]')
+            --parameters "commands=[
+              \"set -e\",
+              \"aws ecr get-login-password --region ${{ vars.AWS_REGION }} | docker login --username AWS --password-stdin $ECR_REGISTRY\",
+              \"docker pull $IMAGE_URI\",
+              \"docker stop $CONTAINER_NAME || true\",
+              \"docker rm $CONTAINER_NAME || true\",
+              \"docker run -d --name $CONTAINER_NAME --restart always -p $APP_PORT -e ConnectionStrings__PostgreSQLConnection='$DB_CONN' e Redis='$REDIS_CONN' $IMAGE_URI\"
+            ]")
 
           echo "command_id=$COMMAND_ID" >> $GITHUB_OUTPUT
 
