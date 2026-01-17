@@ -34,14 +34,18 @@ namespace EmpregaNet.Api.Configuration
                 // Configura autenticação JWT Bearer no Swagger
                 s.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                 {
-                    Description = "Insira o token JWT desta maneira: Bearer {seu token}",
+                    Description = "Insira o token JWT desta maneira: {seu token}",
                     Name = "Authorization",
-                    Scheme = "bearer",
+                    Scheme = "Bearer",
                     BearerFormat = "JWT",
                     In = ParameterLocation.Header,
                     Type = SecuritySchemeType.Http
                 });
 
+                s.AddSecurityRequirement(document => new OpenApiSecurityRequirement
+                {
+                    [new OpenApiSecuritySchemeReference("Bearer", document)] = []
+                });
 
                 // Excluding ASP.NET Identity endpoints
                 s.DocInclusionPredicate((docName, apiDesc) =>
