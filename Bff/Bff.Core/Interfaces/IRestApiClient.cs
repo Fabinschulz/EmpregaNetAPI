@@ -1,15 +1,9 @@
-using Refit;
-
 namespace Bff.Core.Interfaces;
 
 /// <summary>
-/// Interface para um cliente REST genérico usando Refit.
+/// Interface para um cliente REST genérico.
 /// </summary>
 public interface IRestApiClient
 {
-    [Get("/{path}")]
-    Task<IApiResponse<T>> GetAsync<T>(string path, [Header("Authorization")] string token = null!);
-
-    [Post("/{path}")]
-    Task<IApiResponse<T>> PostAsync<T>(string path, [Body] object data, [Header("Authorization")] string token = null!);
+    Task<TResponse?> PostAsync<TResponse>(string relativeUrl, object body, CancellationToken cancellationToken = default);
 }

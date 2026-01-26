@@ -13,7 +13,6 @@ public static class DependencyInjection
            .UseCors("AllowAll")
            .UseAuthentication()
            .UseAuthorization()
-           .UseRouting()
            .UseSwaggerSetup()
            .Use(async (context, next) =>
                 {

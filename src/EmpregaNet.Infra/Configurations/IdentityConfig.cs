@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using System.Text;
 using EmpregaNet.Domain.Entities;
 using EmpregaNet.Infra.Persistence.Database;
@@ -50,6 +51,15 @@ namespace EmpregaNet.Infra.Configurations
                     .AddApiEndpoints()
                     .AddDefaultTokenProviders(); // Adiciona suporte a tokens (confirmação de email, reset de senha, etc.)
 
+            builder.Services.AddAuthorization(options =>
+            {
+                options.AddPolicy("Administrador", policy =>
+                {
+                    policy.RequireAuthenticatedUser();
+                    policy.RequireRole("Admin");
+                });
+            });
+
             return builder;
         }
 
@@ -77,7 +87,8 @@ namespace EmpregaNet.Infra.Configurations
                                             ValidateAudience = true,
                                             ValidateLifetime = true,
                                             ValidAudience = jwtSettings.Audience,
-                                            ValidIssuer = jwtSettings.Issuer
+                                            ValidIssuer = jwtSettings.Issuer,
+                                            NameClaimType = ClaimTypes.NameIdentifier
                                         };
                                     }));
 

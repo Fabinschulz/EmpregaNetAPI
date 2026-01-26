@@ -2,6 +2,8 @@ using EmpregaNet.Domain.Common;
 using Microsoft.AspNetCore.Mvc;
 using EmpregaNet.Application.Common.Base;
 using EmpregaNet.Domain.Interfaces;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 
 namespace EmpregaNet.Api.Controllers.Core
 {
@@ -13,6 +15,7 @@ namespace EmpregaNet.Api.Controllers.Core
     /// <typeparam name="TUpdateCommand"></typeparam>
     /// <typeparam name="TViewModel"></typeparam>
     [ApiController]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public abstract class MainController<TCreateCommand, TUpdateCommand, TViewModel> : ControllerBase
         where TCreateCommand : class
         where TUpdateCommand : class
@@ -36,9 +39,9 @@ namespace EmpregaNet.Api.Controllers.Core
         /// </summary>
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ListDataPagination<object>))]
-        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(DomainError))]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(DomainError))]
+        [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(DomainError))]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(DomainError))]
         public virtual async Task<IActionResult> GetAll([FromQuery] int page = 1, [FromQuery] int size = 100, [FromQuery] string? orderBy = null)
         {
 
@@ -60,10 +63,9 @@ namespace EmpregaNet.Api.Controllers.Core
         /// <param name="id">O ID do recurso a ser obtido.</param>
         [HttpGet("{id:long}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(DomainError))]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(DomainError))]
+        [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(DomainError))]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(DomainError))]
         public virtual async Task<IActionResult> GetById([FromRoute] long id)
         {
             var cacheKey = $"{_entityName}_GetById_{id}";
@@ -86,8 +88,10 @@ namespace EmpregaNet.Api.Controllers.Core
         [HttpPost]
         [ProducesResponseType(typeof(string), StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(DomainError))]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(DomainError))]
+        [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(DomainError))]
         [ProducesResponseType(StatusCodes.Status409Conflict, Type = typeof(DomainError))]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(DomainError))]
         public virtual async Task<IActionResult> Create([FromBody] TCreateCommand entity)
         {
             var id = await _mediator.Send(new CreateCommand<TCreateCommand>(entity));
@@ -106,8 +110,9 @@ namespace EmpregaNet.Api.Controllers.Core
         [HttpPut("{id:long}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(DomainError))]
-        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(DomainError))]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(DomainError))]
+        [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(DomainError))]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(DomainError))]
         public virtual async Task<IActionResult> Update([FromRoute] long id, [FromBody] TUpdateCommand entity)
         {
             var result = await _mediator.Send(new UpdateCommand<TUpdateCommand, TViewModel>(id, entity));
@@ -122,9 +127,9 @@ namespace EmpregaNet.Api.Controllers.Core
         /// <param name="id">O ID do recurso a ser excluído.</param>
         [HttpDelete("{id:long}")]
         [ProducesResponseType(typeof(string), StatusCodes.Status204NoContent)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(DomainError))]
-        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(DomainError))]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(DomainError))]
+        [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(DomainError))]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(DomainError))]
         public virtual async Task<IActionResult> Delete([FromRoute] long id)
         {
             await _mediator.Send(new DeleteCommand<TViewModel>(id));

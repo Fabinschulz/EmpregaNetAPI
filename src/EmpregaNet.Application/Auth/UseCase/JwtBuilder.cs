@@ -89,7 +89,7 @@ public class JwtBuilder : IJwtBuilder
         return new[]
         {
                 new Claim("userId", user.Id.ToString()),
-                new Claim("userName", user.UserName ?? string.Empty),
+                new Claim(ClaimTypes.NameIdentifier, user.UserName ?? string.Empty),
                 new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
                 new Claim(JwtRegisteredClaimNames.Email, user.Email!),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),

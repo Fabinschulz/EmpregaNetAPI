@@ -4,7 +4,6 @@ using EmpregaNet.Infra.Extensions;
 using EmpregaNet.Infra.Persistence.Database;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.EnvironmentConfig();
 
 var builderServices = builder.Services;
 builderServices.AddMediator();

@@ -48,12 +48,12 @@ namespace EmpregaNet.Api.Configuration
                 });
 
                 // Excluding ASP.NET Identity endpoints
-                s.DocInclusionPredicate((docName, apiDesc) =>
-                 {
-                     var relativePath = apiDesc.RelativePath;
+                // s.DocInclusionPredicate((docName, apiDesc) =>
+                //  {
+                //      var relativePath = apiDesc.RelativePath;
 
-                     return !(relativePath?.StartsWith("Identity", StringComparison.OrdinalIgnoreCase) ?? false);
-                 });
+                //      return !(relativePath?.StartsWith("Identity", StringComparison.OrdinalIgnoreCase) ?? false);
+                //  });
 
                 // Suporte a polimorfismo em schemas usando oneOf
                 s.UseOneOfForPolymorphism();

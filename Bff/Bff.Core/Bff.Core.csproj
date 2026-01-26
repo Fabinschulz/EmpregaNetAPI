@@ -5,9 +5,5 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Refit.HttpClientFactory" Version="9.0.2" />
-  </ItemGroup>
-
+  
 </Project>

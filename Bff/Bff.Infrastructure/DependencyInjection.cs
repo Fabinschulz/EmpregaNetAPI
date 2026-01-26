@@ -1,5 +1,4 @@
-﻿using Bff.Core.Interfaces;
-using Bff.Core.Model;
+﻿using Bff.Core.Model;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -11,14 +10,13 @@ public static class DependencyInjection
     {
 
         var config = configuration.GetSection(EmpregaNetApi.SectionName).Get<EmpregaNetApi>();
-        if (config == null || string.IsNullOrEmpty(config.BaseUrl))
+        if (config is null || string.IsNullOrEmpty(config.BaseUrl))
         {
             Console.WriteLine("Aviso: Configuração 'EmpregaNetApi' não encontrada ou incompleta. Usando provedores de log padrão.");
             return services;
         }
 
-        services.AddResilientRefitClient<IRestApiClient>(config.BaseUrl);
-
+        services.AddHttpApiClient(config.BaseUrl);
         return services;
     }
 }
