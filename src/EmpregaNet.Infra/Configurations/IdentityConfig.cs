@@ -1,6 +1,8 @@
 using System.Security.Claims;
 using System.Text;
+using EmpregaNet.Domain.Common;
 using EmpregaNet.Domain.Entities;
+using EmpregaNet.Domain.Enums;
 using EmpregaNet.Infra.Persistence.Database;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -77,6 +79,50 @@ namespace EmpregaNet.Infra.Configurations
             builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                             .AddJwtBearer((options =>
                                     {
+                                        options.Events = new JwtBearerEvents
+                                        {
+                                            OnAuthenticationFailed = context =>
+                                            {
+                                                Console.WriteLine("TOKEN FALHOU: " + context.Exception.Message);
+                                                return Task.CompletedTask;
+                                            },
+
+                                            OnForbidden = async context =>
+                                            {
+                                                context.Response.StatusCode = StatusCodes.Status403Forbidden;
+                                                context.Response.ContentType = "application/json";
+
+                                                var domainError = new DomainError
+                                                {
+                                                    StatusCode = 403,
+                                                    Code = DomainErrorEnum.MISSING_RESOURCE_PERMISSION,
+                                                    Message = "Acesso negado. Você não possui permissão para esta operação.",
+                                                    CorrelationId = context.HttpContext.Items["Correlation-ID"]?.ToString() ?? Guid.NewGuid().ToString(),
+                                                    Details = null!
+                                                };
+
+                                                await context.Response.WriteAsJsonAsync(domainError);
+                                            },
+
+                                            OnChallenge = async context =>
+                                            {
+                                                context.HandleResponse();
+                                                context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                                                context.Response.ContentType = "application/json";
+
+                                                var domainError = new DomainError
+                                                {
+                                                    StatusCode = 401,
+                                                    Code = DomainErrorEnum.MISSING_RESOURCE_PERMISSION,
+                                                    Message = "Token inválido ou não informado.",
+                                                    CorrelationId = context.HttpContext.Items["Correlation-ID"]?.ToString() ?? Guid.NewGuid().ToString(),
+                                                    Details = null!
+                                                };
+
+                                                await context.Response.WriteAsJsonAsync(domainError);
+                                            }
+                                        };
+
                                         options.RequireHttpsMetadata = true;
                                         options.SaveToken = true;
                                         options.TokenValidationParameters = new TokenValidationParameters

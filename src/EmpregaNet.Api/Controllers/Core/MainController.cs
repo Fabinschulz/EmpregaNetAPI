@@ -65,6 +65,7 @@ namespace EmpregaNet.Api.Controllers.Core
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(DomainError))]
         [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(DomainError))]
+        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(DomainError))]
         [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(DomainError))]
         public virtual async Task<IActionResult> GetById([FromRoute] long id)
         {
@@ -129,6 +130,7 @@ namespace EmpregaNet.Api.Controllers.Core
         [ProducesResponseType(typeof(string), StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(DomainError))]
         [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(DomainError))]
+        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(DomainError))]
         [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(DomainError))]
         public virtual async Task<IActionResult> Delete([FromRoute] long id)
         {
