@@ -1,6 +1,6 @@
 using EmpregaNet.Application.Utils.Helpers;
 
-public static class FormatDocumentNo
+public static class FormatDocumentNoHelper
 {
     /// <summary>
     /// Formatar uma string CNPJ
@@ -58,12 +58,12 @@ public static class FormatDocumentNo
         cpfOrCnpj = cpfOrCnpj.RemoveSpecialChars();
         if (cpfOrCnpj.Length == 14)
         {
-            var formated = FormatDocumentNo.FormatCNPJ(cpfOrCnpj);
+            var formated = FormatDocumentNoHelper.FormatCNPJ(cpfOrCnpj);
             return "**" + formated.Substring(2, 8).Trim() + "/" + "****-**";
         }
         if (cpfOrCnpj.Length == 11)
         {
-            var formated = FormatDocumentNo.FormatCPF(cpfOrCnpj);
+            var formated = FormatDocumentNoHelper.FormatCPF(cpfOrCnpj);
             return "***" + formated.Substring(3, 9).Trim()  + "**";
         }
 

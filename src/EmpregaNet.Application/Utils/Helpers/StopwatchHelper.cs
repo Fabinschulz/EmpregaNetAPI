@@ -1,13 +1,13 @@
 using System.Diagnostics;
 
-namespace EmpregaNet.Application.Utils
+namespace EmpregaNet.Application.Utils.Helpers
 {
-    public class StopwatchUtil : IDisposable
+    public class StopwatchHelper : IDisposable
     {
         private readonly Stopwatch _stopwatch;
         private readonly string _operationName;
 
-        public StopwatchUtil(string operationName)
+        public StopwatchHelper(string operationName)
         {
             _operationName = operationName;
             _stopwatch = Stopwatch.StartNew();

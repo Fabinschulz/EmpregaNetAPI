@@ -26,6 +26,16 @@ namespace EmpregaNet.Domain.Entities
 
         public void ChangeStatus(ApplicationStatusEnum status)
         {
+            if (status == ApplicationStatusEnum.NaoSelecionado)
+            {
+                throw new InvalidOperationException("Status de candidatura inválido.");
+            }
+
+            if (Status == status)
+            {
+                throw new InvalidOperationException("A candidatura já está no status informado.");
+            }
+
             Status = status;
         }
     }

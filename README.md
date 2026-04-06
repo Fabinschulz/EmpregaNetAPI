@@ -1,6 +1,6 @@
 # 🚀 EmpregaNet API - Plataforma de Recrutamento Digital
 
-![.NET Version](https://img.shields.io/badge/.NET-9.0-blue)
+![.NET Version](https://img.shields.io/badge/.NET-10.0-blue)
 ![Architecture](https://img.shields.io/badge/Architecture-Clean%20Architecture-green)
 ![License](https://img.shields.io/badge/License-MIT-orange)
 
@@ -21,7 +21,7 @@ As camadas externas (BFF, Infraestrutura) dependem das camadas internas (Aplica�
 
 ### 1. Pré-requisitos
 
-- [.NET SDK 9](https://dotnet.microsoft.com/download/dotnet/9.0) ou superior  
+- [.NET SDK 10](https://dotnet.microsoft.com/download/dotnet/10.0) ou superior  
 - Acesso e credenciais válidas para o **Postgres SQL** (via VPN ou rede local)
 
 ---

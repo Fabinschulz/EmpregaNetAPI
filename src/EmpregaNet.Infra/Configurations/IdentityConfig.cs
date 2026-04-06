@@ -60,6 +60,12 @@ namespace EmpregaNet.Infra.Configurations
                     policy.RequireAuthenticatedUser();
                     policy.RequireRole("Admin");
                 });
+
+                options.AddPolicy("Recrutamento", policy =>
+                {
+                    policy.RequireAuthenticatedUser();
+                    policy.RequireRole("Admin", "Recruiter", "Manager");
+                });
             });
 
             return builder;

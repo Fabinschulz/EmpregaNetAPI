@@ -1,0 +1,102 @@
+using EmpregaNet.Application.Common.Base;
+using EmpregaNet.Api.Controllers.Core;
+using EmpregaNet.Application.JobApplications.Commands;
+using EmpregaNet.Application.JobApplications.Queries;
+using EmpregaNet.Application.JobApplications.ViewModel;
+using EmpregaNet.Domain.Common;
+using EmpregaNet.Domain.Interfaces;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+
+namespace EmpregaNet.Api.Controllers.JobApplications;
+
+[Route("api/[controller]")]
+[Authorize]
+public class JobApplicationsController : MainController<ApplyToJobCommand, ChangeJobApplicationStatusCommand, JobApplicationViewModel>
+{
+    public JobApplicationsController(IMemoryService cacheService)
+        : base(cacheService)
+    {
+    }
+
+    [HttpPost]
+    [ProducesResponseType(typeof(string), StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(DomainError))]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(DomainError))]
+    [ProducesResponseType(StatusCodes.Status409Conflict, Type = typeof(DomainError))]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(DomainError))]
+    public override async Task<IActionResult> Create([FromBody] ApplyToJobCommand command)
+    {
+        var id = await _mediator.Send(new CreateCommand<ApplyToJobCommand>(command));
+        await InvalidateCacheForEntity(id);
+        return Created($"api/jobapplications/{id}", $"Candidatura criada com sucesso. ID: {id}");
+    }
+
+    [HttpGet]
+    [Authorize(Policy = "Recrutamento")]
+    public override Task<IActionResult> GetAll([FromQuery] int page = 1, [FromQuery] int size = 100, [FromQuery] string? orderBy = null)
+        => base.GetAll(page, size, orderBy);
+
+    [HttpGet("mine")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ListDataPagination<JobApplicationViewModel>))]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(DomainError))]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(DomainError))]
+    public async Task<IActionResult> GetMine(
+        [FromQuery] int page = 1,
+        [FromQuery] int size = 100,
+        [FromQuery] string? status = null,
+        [FromQuery] string? orderBy = null)
+    {
+        var cacheKey = $"JobApplications_Mine_{page}_{size}_{status}_{orderBy}";
+        var cachedData = await _cacheService.GetValueAsync<ListDataPagination<JobApplicationViewModel>>(cacheKey);
+        if (cachedData is not null) return Ok(cachedData);
+
+        var result = await _mediator.Send(new GetMyJobApplicationsQuery(page, size, status, orderBy));
+        await _cacheService.SetValueAsync(cacheKey, result, TimeSpan.FromMinutes(5));
+        return Ok(result);
+    }
+
+    [HttpGet("job/{jobId:long}")]
+    [Authorize(Policy = "Recrutamento")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ListDataPagination<JobApplicationViewModel>))]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(DomainError))]
+    [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(DomainError))]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(DomainError))]
+    public async Task<IActionResult> GetByJob(
+        [FromRoute] long jobId,
+        [FromQuery] int page = 1,
+        [FromQuery] int size = 100,
+        [FromQuery] string? status = null,
+        [FromQuery] string? orderBy = null)
+    {
+        var cacheKey = $"JobApplications_Job_{jobId}_{page}_{size}_{status}_{orderBy}";
+        var cachedData = await _cacheService.GetValueAsync<ListDataPagination<JobApplicationViewModel>>(cacheKey);
+        if (cachedData is not null) return Ok(cachedData);
+
+        var result = await _mediator.Send(new GetJobApplicationsByJobIdQuery(jobId, page, size, status, orderBy));
+        await _cacheService.SetValueAsync(cacheKey, result, TimeSpan.FromMinutes(5));
+        return Ok(result);
+    }
+
+    [HttpPut("{id:long}")]
+    [Authorize(Policy = "Recrutamento")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(JobApplicationViewModel))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(DomainError))]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(DomainError))]
+    [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(DomainError))]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(DomainError))]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(DomainError))]
+    public override Task<IActionResult> Update([FromRoute] long id, [FromBody] ChangeJobApplicationStatusCommand entity)
+        => base.Update(id, entity);
+
+    [HttpDelete("{id:long}")]
+    [Authorize(Policy = "Recrutamento")]
+    public override Task<IActionResult> Delete([FromRoute] long id) => base.Delete(id);
+
+    protected override async Task InvalidateCacheForEntity(long id = default)
+    {
+        await base.InvalidateCacheForEntity(id);
+        await _cacheService.RemoveByPatternAsync("JobApplications_Mine_");
+        await _cacheService.RemoveByPatternAsync("JobApplications_Job_");
+    }
+}

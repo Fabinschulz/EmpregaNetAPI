@@ -1,0 +1,85 @@
+using EmpregaNet.Application.Common.Exceptions;
+using EmpregaNet.Domain.Entities;
+using EmpregaNet.Domain.Enums;
+using FluentValidation;
+using Microsoft.AspNetCore.Identity;
+
+namespace EmpregaNet.Application.Users.Commands;
+
+public sealed record RegisterUserCommand(
+    string Username,
+    string Email,
+    string Password,
+    string PasswordConfirmation,
+    string? PhoneNumber
+) : IRequest<long>;
+
+public sealed class RegisterUserHandler : IRequestHandler<RegisterUserCommand, long>
+{
+    private readonly UserManager<User> _userManager;
+    private readonly RoleManager<Role> _roleManager;
+    private readonly IValidator<RegisterUserCommand> _validator;
+
+    public RegisterUserHandler(
+        UserManager<User> userManager,
+        RoleManager<Role> roleManager,
+        IValidator<RegisterUserCommand> validator)
+    {
+        _userManager = userManager;
+        _roleManager = roleManager;
+        _validator = validator;
+    }
+
+    public async Task<long> Handle(RegisterUserCommand request, CancellationToken cancellationToken)
+    {
+        if (request.Password != request.PasswordConfirmation)
+        {
+            throw new ValidationAppException(
+                nameof(request.PasswordConfirmation),
+                "A confirmação de senha não confere.",
+                DomainErrorEnum.INVALID_PARAMS);
+        }
+
+        var existingByEmail = await _userManager.FindByEmailAsync(request.Email);
+        if (existingByEmail is not null)
+        {
+            throw new ValidationAppException(
+                nameof(request.Email),
+                "Já existe um usuário com este e-mail.",
+                DomainErrorEnum.RESOURCE_ALREADY_EXISTS);
+        }
+
+        var existingByUsername = await _userManager.FindByNameAsync(request.Username);
+        if (existingByUsername is not null)
+        {
+            throw new ValidationAppException(
+                nameof(request.Username),
+                "Já existe um usuário com este nome.",
+                DomainErrorEnum.RESOURCE_ALREADY_EXISTS);
+        }
+
+        var user = new User
+        {
+            UserName = request.Username,
+            Email = request.Email,
+            PhoneNumber = request.PhoneNumber,
+            UserType = UserTypeEnum.Candidate
+        };
+
+        var result = await _userManager.CreateAsync(user, request.Password);
+        if (!result.Succeeded)
+        {
+            var errorMessage = result.Errors.FirstOrDefault()?.Description ?? "Falha ao criar usuário.";
+            throw new ValidationAppException(nameof(request.Username), errorMessage, DomainErrorEnum.RESOURCE_CREATION_FAILED);
+        }
+
+        const string candidateRole = "Candidate";
+        if (!await _roleManager.RoleExistsAsync(candidateRole))
+        {
+            await _roleManager.CreateAsync(new Role { Name = candidateRole });
+        }
+
+        await _userManager.AddToRoleAsync(user, candidateRole);
+        return user.Id;
+    }
+}

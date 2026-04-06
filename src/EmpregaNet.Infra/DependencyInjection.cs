@@ -1,4 +1,4 @@
-﻿using EmpregaNet.Domain.Interfaces;
+using EmpregaNet.Domain.Interfaces;
 using EmpregaNet.Infra.Behaviors;
 using EmpregaNet.Infra.Cache;
 using EmpregaNet.Infra.Configurations;
@@ -50,6 +50,7 @@ public static class DependencyInjection
         services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
         services.AddScoped<ICompanyRepository, CompanyRepository>();
         services.AddScoped<IJobRepository, JobRepository>();
+        services.AddScoped<IJobApplicationRepository, JobApplicationRepository>();
         #endregion
     }
 

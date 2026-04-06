@@ -42,6 +42,7 @@ public class JwtBuilder : IJwtBuilder
 
     public async Task<UserLoggedViewModel> BuildUserTokenAsync(User user)
     {
+        var key = Convert.ToBase64String(Encoding.UTF8.GetBytes(user.Id.ToString()));
 
         var claimsIdentity = await BuildClaimsIdentityAsync(user);
         var token = GenerateToken(claimsIdentity);
@@ -67,7 +68,8 @@ public class JwtBuilder : IJwtBuilder
                     Type = Enum.Parse<PermissionTypeEnum>(c.Value.Split(':')[1])
                 })
                 .ToList()
-
+            ,
+            Key = key
         };
     }
 
@@ -86,9 +88,12 @@ public class JwtBuilder : IJwtBuilder
 
     private IEnumerable<Claim> GetBasicJwtClaims(User user)
     {
+        var key = Convert.ToBase64String(Encoding.UTF8.GetBytes(user.Id.ToString()));
         return new[]
         {
                 new Claim("userId", user.Id.ToString()),
+                new Claim("userName", user.UserName ?? string.Empty),
+                new Claim("key", key),
                 new Claim(ClaimTypes.NameIdentifier, user.UserName ?? string.Empty),
                 new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
                 new Claim(JwtRegisteredClaimNames.Email, user.Email!),

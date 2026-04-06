@@ -2,7 +2,7 @@ using System.Text;
 
 namespace EmpregaNet.Application.Utils.Helpers
 {
-    public class Conversor
+    public class ConversorHelper
     {
         static public string EncodeToBase64(string texto)
         {
