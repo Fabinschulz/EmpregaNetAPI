@@ -16,4 +16,6 @@ public sealed record GetByIdQuery<TResponse>(long Id) : IRequest<TResponse>;
 /// <param name="Page"></param>
 /// <param name="Size"></param>
 /// <param name="OrderBy"></param>
-public sealed record GetAllQuery<TResponse>(int Page, int Size, string? OrderBy) : IRequest<ListDataPagination<TResponse>>, IPaginatedQuery;
+/// <param name="IsDeleted"></param>
+/// <param name="IsActive"></param>
+public sealed record GetAllQuery<TResponse>(int Page, int Size, string? OrderBy, bool? IsDeleted = null, bool? IsActive = null) : IRequest<ListDataPagination<TResponse>>, IPaginatedQuery;

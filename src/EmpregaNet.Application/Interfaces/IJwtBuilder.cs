@@ -6,5 +6,4 @@ namespace EmpregaNet.Application.Interfaces;
 public interface IJwtBuilder
 {
     Task<UserLoggedViewModel> BuildUserTokenAsync(User user);
-    Task<List<UserPermissionVieModel>?> GetAllPermissions(string key);
 }

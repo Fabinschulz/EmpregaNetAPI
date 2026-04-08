@@ -16,11 +16,10 @@ builder.RegisterCoreDependencies();
 
 var app = builder.Build();
 
-if (app.Environment.IsProduction()) 
-{
-    // Executa migrações apenas em produção/staging automaticamente
-    app.ApplyPendingMigrations();
-}
+// Aplica migrações pendentes em qualquer ambiente - DEV/HML/PROD
+app.ApplyPendingMigrations();
+
+await IdentityDataSeeder.SeedAsync(app);
 
 #region Configure Pipeline
 

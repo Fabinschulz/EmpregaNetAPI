@@ -16,7 +16,7 @@ public sealed record GetJobApplicationsByJobIdQuery(long JobId, int Page, int Si
 public sealed class GetJobApplicationsByJobIdHandler :
     IRequestHandler<GetJobApplicationsByJobIdQuery, ListDataPagination<JobApplicationViewModel>>
 {
-    private static readonly string[] AllowedRoles = ["Admin", "Recruiter", "Manager"];
+    private static readonly string[] AllowedRoles = RecruitmentRoleNames.Staff;
     private readonly IJobRepository _jobRepository;
     private readonly IJobApplicationRepository _jobApplicationRepository;
     private readonly IHttpCurrentUser _httpCurrentUser;
@@ -77,10 +77,7 @@ public sealed class GetJobApplicationsByJobIdHandler :
                 DomainErrorEnum.MISSING_RESOURCE_PERMISSION);
         }
 
-        var userRoles = user.UserToken.Claims
-            .Where(c => c.Type.EndsWith("/claims/role", StringComparison.OrdinalIgnoreCase))
-            .Select(c => c.Value)
-            .ToHashSet(StringComparer.OrdinalIgnoreCase);
+        var userRoles = user.UserToken.GetRoleNames();
 
         if (!userRoles.Any(r => AllowedRoles.Contains(r, StringComparer.OrdinalIgnoreCase)))
         {

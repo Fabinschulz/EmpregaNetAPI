@@ -1,5 +1,9 @@
+using EmpregaNet.Application.Auth;
+using EmpregaNet.Application.Common.Exceptions;
+using EmpregaNet.Application.Interfaces;
 using Microsoft.Extensions.Logging;
 using EmpregaNet.Application.Common.Base;
+using EmpregaNet.Domain.Enums;
 using EmpregaNet.Domain.Interfaces;
 using EmpregaNet.Application.Jobs.ViewModel;
 
@@ -9,21 +13,40 @@ namespace EmpregaNet.Application.Jobs.Commands
     {
         private readonly IJobRepository _repository;
         private readonly ILogger<DeleteJobHandler> _logger;
+        private readonly IHttpCurrentUser _httpCurrentUser;
+        private readonly IJobEmployerAccess _jobEmployerAccess;
 
         public DeleteJobHandler(
             IJobRepository repository,
-            ILogger<DeleteJobHandler> logger)
+            ILogger<DeleteJobHandler> logger,
+            IHttpCurrentUser httpCurrentUser,
+            IJobEmployerAccess jobEmployerAccess)
         {
             _repository = repository ?? throw new ArgumentNullException(nameof(repository));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _httpCurrentUser = httpCurrentUser;
+            _jobEmployerAccess = jobEmployerAccess;
         }
 
         public async Task<bool> Handle(DeleteCommand<JobViewModel> request, CancellationToken cancellationToken)
         {
+            RecruitmentAccess.EnsureRecruitmentStaff(_httpCurrentUser);
+
             _logger.LogInformation("Iniciando remoção da vaga de emprego com ID: {Id}", request.Id);
 
             try
             {
+                var job = await _repository.GetByIdAsync(request.Id, cancellationToken);
+                if (job is null || job.IsDeleted)
+                {
+                    throw new ValidationAppException(
+                        nameof(request.Id),
+                        $"Vaga com ID '{request.Id}' não encontrada.",
+                        DomainErrorEnum.RESOURCE_ID_NOT_FOUND);
+                }
+
+                await _jobEmployerAccess.EnsureCanManageCompanyAsync(job.CompanyId, cancellationToken);
+
                 await _repository.DeleteAsync(request.Id, cancellationToken);
                 _logger.LogInformation("Vaga de emprego removida com sucesso. ID: {Id}", request.Id);
                 return true;

@@ -1,7 +1,9 @@
-﻿using EmpregaNet.Application.Auth.ViewModel;
+using EmpregaNet.Application.Auth;
+using EmpregaNet.Application.Auth.ViewModel;
 using EmpregaNet.Domain.Entities;
-using EmpregaNet.Domain.Enums;
 using Microsoft.AspNetCore.Http;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using System.Text;
 
 /// <summary>
@@ -111,25 +113,28 @@ public class HttpUserContext
             var userIdClaim = claims!.FirstOrDefault(s => s.Type == "userId")?.Value;
             if (!string.IsNullOrEmpty(userIdClaim) && long.TryParse(userIdClaim, out var userId))
             {
+                var claimList = claims!.ToList();
                 _userLogged = new UserLoggedViewModel
                 {
                     UserToken = new UserToken
                     {
                         Id = userId,
-                        Username = claims?.FirstOrDefault(s => s.Type == "userName")?.Value ?? string.Empty,
-                        Email = claims?.FirstOrDefault(s => s.Type == "email")?.Value ?? string.Empty,
-                        Claims = claims?.Select(c => new UserClaim { Type = c.Type, Value = c.Value }).ToList() ?? new List<UserClaim>()
+                        Username = claimList.FirstOrDefault(s => s.Type == "userName")?.Value ?? string.Empty,
+                        Email = claimList.FirstOrDefault(s => s.Type == JwtRegisteredClaimNames.Email || s.Type == "email")?.Value ?? string.Empty,
+                        Roles = claimList
+                            .Where(c => c.Type == ClaimTypes.Role)
+                            .Select(c => c.Value)
+                            .Distinct(StringComparer.Ordinal)
+                            .ToList(),
+                        Claims = claimList
+                            .Where(c => c.Type != PermissionClaims.JwtScopes
+                                        && c.Type != ClaimTypes.Role)
+                            .Select(c => new UserClaim { Type = ClaimPresentationHelper.ToShortType(c.Type), Value = c.Value })
+                            .ToList()
                     },
                     AccessToken = context!.Request.Headers["AccessToken"].ToString(),
                     ExpiresIn = TimeSpan.FromHours(1).TotalSeconds,
-                    Permissions = claims?
-                   .Where(c => c.Type == "permission")
-                   .Select(c => new UserPermissionVieModel
-                   {
-                       Resource = Enum.Parse<PermissionResourceEnum>(c.Value.Split(':')[0]),
-                       Type = Enum.Parse<PermissionTypeEnum>(c.Value.Split(':')[1])
-                   })
-                   .ToList() ?? new List<UserPermissionVieModel>()
+                    Permissions = PermissionClaimParser.ParseFromClaims(claimList)
                 };
             }
 

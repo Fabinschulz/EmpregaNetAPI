@@ -6,6 +6,8 @@ using EmpregaNet.Domain.Common;
 using EmpregaNet.Domain.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 
 namespace EmpregaNet.Api.Controllers.Users;
 
@@ -51,7 +53,16 @@ public class UsersController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(DomainError))]
     public async Task<IActionResult> Me()
     {
-        const string cacheKey = "Users_Me";
+        var userId = User.FindFirstValue("userId")
+            ?? User.FindFirstValue(JwtRegisteredClaimNames.Sub);
+
+        if (string.IsNullOrEmpty(userId))
+        {
+            var uncached = await Mediator.Send(new GetCurrentUserQuery());
+            return Ok(uncached);
+        }
+
+        var cacheKey = $"Users_Me_{userId}";
         var cached = await _cacheService.GetValueAsync<UserViewModel>(cacheKey);
         if (cached is not null) return Ok(cached);
 

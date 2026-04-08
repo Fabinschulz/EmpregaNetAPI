@@ -1,9 +1,7 @@
+using EmpregaNet.Application.Auth;
 using EmpregaNet.Application.Auth.ViewModel;
 using EmpregaNet.Application.Interfaces;
-using EmpregaNet.Domain.Common;
 using EmpregaNet.Domain.Entities;
-using EmpregaNet.Domain.Enums;
-using EmpregaNet.Domain.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -16,18 +14,15 @@ public class JwtBuilder : IJwtBuilder
     private readonly UserManager<User> _userManager;
     private readonly RoleManager<Role> _roleManager;
     private readonly JwtSettings _jwtSettings;
-    private readonly IMemoryService _memoryService;
 
     public JwtBuilder(
         UserManager<User> userManager,
         RoleManager<Role> roleManager,
-        IOptions<JwtSettings> jwtSettingsOptions,
-        IMemoryService memoryService)
+        IOptions<JwtSettings> jwtSettingsOptions)
     {
         _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
         _roleManager = roleManager ?? throw new ArgumentNullException(nameof(roleManager));
         _jwtSettings = jwtSettingsOptions.Value ?? throw new ArgumentNullException(nameof(jwtSettingsOptions));
-        _memoryService = memoryService ?? throw new ArgumentNullException(nameof(memoryService));
     }
 
     /// <summary>
@@ -47,6 +42,17 @@ public class JwtBuilder : IJwtBuilder
         var claimsIdentity = await BuildClaimsIdentityAsync(user);
         var token = GenerateToken(claimsIdentity);
 
+        var permissionModels = PermissionClaimParser.ParseFromClaims(claimsIdentity.Claims);
+        var roles = claimsIdentity.Claims
+            .Where(c => c.Type == ClaimTypes.Role)
+            .Select(c => c.Value)
+            .Distinct(StringComparer.Ordinal)
+            .ToList();
+
+        var clientClaims = claimsIdentity.Claims.Where(c =>
+            c.Type != PermissionClaims.JwtScopes
+            && c.Type != ClaimTypes.Role);
+
         return new UserLoggedViewModel
         {
             AccessToken = token,
@@ -56,19 +62,12 @@ public class JwtBuilder : IJwtBuilder
                 Id = user.Id,
                 Username = user.UserName ?? string.Empty,
                 Email = user.Email ?? string.Empty,
-                Claims = claimsIdentity.Claims
-                    .Select(c => new UserClaim { Type = c.Type, Value = c.Value })
+                Roles = roles,
+                Claims = clientClaims
+                    .Select(c => new UserClaim { Type = ClaimPresentationHelper.ToShortType(c.Type), Value = c.Value })
                     .ToList()
             },
-            Permissions = claimsIdentity.Claims
-                .Where(c => c.Type == "permission")
-                .Select(c => new UserPermissionVieModel
-                {
-                    Resource = Enum.Parse<PermissionResourceEnum>(c.Value.Split(':')[0]),
-                    Type = Enum.Parse<PermissionTypeEnum>(c.Value.Split(':')[1])
-                })
-                .ToList()
-            ,
+            Permissions = permissionModels,
             Key = key
         };
     }
@@ -111,45 +110,36 @@ public class JwtBuilder : IJwtBuilder
         }
     }
 
-    /// <summary>
-    /// Recupera todas as permissões do usuário autenticado a partir do cache.
-    /// </summary>
-    /// <param name="key">Chave única do usuário.</param>
-    /// <returns>Lista de permissões (<see cref="UserPermissionVieModel"/>) ou <c>null</c> se não houver permissões.</returns>
-    public async Task<List<UserPermissionVieModel>?> GetAllPermissions(string key)
-    {
-        var tokenPermission = $"{key}:{CacheKeyType.Permissions}";
-        var permissions = await _memoryService.GetValueAsync<List<UserPermissionVieModel>>(tokenPermission);
-
-        return permissions;
-    }
-
-    /// <summary>
-    /// Recupera todas as permissões do usuário autenticado a partir do cache.
-    /// </summary>
-    /// <param name="key">Chave única do usuário.</param>
-    /// <returns>Lista de permissões (<see cref="UserPermissionVieModel"/>) ou <c>null</c> se não houver permissões.</returns>
-    public async Task<List<UserPermissionVieModel>?> GetAllPermissionsAsync(string key)
-    {
-        var tokenPermission = $"{key}:{CacheKeyType.Permissions}";
-
-        var permissions = await _memoryService.GetValueAsync<List<UserPermissionVieModel>>(tokenPermission);
-        return permissions;
-    }
-
     private async Task AddPermissionClaimsFromRolesAsync(User user, ClaimsIdentity identity)
     {
         var userRoleNames = await _userManager.GetRolesAsync(user);
+        var codes = new HashSet<string>(StringComparer.Ordinal);
 
         foreach (var roleName in userRoleNames)
         {
             var role = await _roleManager.FindByNameAsync(roleName);
-            if (role != null)
+            if (role is null)
+                continue;
+
+            var roleClaims = await _roleManager.GetClaimsAsync(role);
+            foreach (var c in roleClaims.Where(c => c.Type == PermissionClaims.IdentityRolePermission))
             {
-                var roleClaims = await _roleManager.GetClaimsAsync(role);
-                identity.AddClaims(roleClaims.Where(c => c.Type == "permission"));
+                try
+                {
+                    codes.Add(UserPermissionVieModel.FromStoredPair(c.Value).Code);
+                }
+                catch (FormatException)
+                {
+                    // claim malformada no banco — ignora
+                }
             }
         }
+
+        if (codes.Count == 0)
+            return;
+
+        var joined = string.Join(' ', codes.OrderBy(x => x, StringComparer.Ordinal));
+        identity.AddClaim(new Claim(PermissionClaims.JwtScopes, joined));
     }
 
     /// <summary>

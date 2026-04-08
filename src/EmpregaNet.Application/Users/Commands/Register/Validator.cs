@@ -1,3 +1,5 @@
+using EmpregaNet.Application.Utils;
+using EmpregaNet.Application.Utils.Helpers;
 using FluentValidation;
 
 namespace EmpregaNet.Application.Users.Commands;
@@ -20,5 +22,10 @@ public sealed class RegisterUserCommandValidator : AbstractValidator<RegisterUse
 
         RuleFor(x => x.PasswordConfirmation)
             .NotEmpty().WithMessage("Confirmação de senha é obrigatória.");
+
+        RuleFor(x => x.PhoneNumber!)
+            .Cascade(CascadeMode.Stop)
+            .IsBrazilianCellPhone()
+            .When(x => !string.IsNullOrWhiteSpace(x.PhoneNumber));
     }
 }

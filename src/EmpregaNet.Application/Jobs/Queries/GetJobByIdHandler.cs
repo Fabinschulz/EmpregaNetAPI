@@ -1,3 +1,4 @@
+using EmpregaNet.Application.Auth;
 using Microsoft.Extensions.Logging;
 using EmpregaNet.Application.Jobs.ViewModel;
 using EmpregaNet.Application.Companies.ViewModel;
@@ -5,6 +6,7 @@ using EmpregaNet.Application.Common.Base;
 using EmpregaNet.Domain.Interfaces;
 using EmpregaNet.Application.Common.Exceptions;
 using EmpregaNet.Domain.Enums;
+using Microsoft.AspNetCore.Http;
 
 namespace EmpregaNet.Application.Jobs.Queries;
 
@@ -12,11 +14,16 @@ public sealed class GetJobByIdHandler : IRequestHandler<GetByIdQuery<JobViewMode
 {
     private readonly IJobRepository _repository;
     private readonly ILogger<GetJobByIdHandler> _logger;
+    private readonly IHttpContextAccessor _httpContextAccessor;
 
-    public GetJobByIdHandler(IJobRepository repository, ILogger<GetJobByIdHandler> logger)
+    public GetJobByIdHandler(
+        IJobRepository repository,
+        ILogger<GetJobByIdHandler> logger,
+        IHttpContextAccessor httpContextAccessor)
     {
         _repository = repository ?? throw new ArgumentNullException(nameof(repository));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _httpContextAccessor = httpContextAccessor;
     }
 
     public async Task<JobViewModel> Handle(GetByIdQuery<JobViewModel> request, CancellationToken cancellationToken)

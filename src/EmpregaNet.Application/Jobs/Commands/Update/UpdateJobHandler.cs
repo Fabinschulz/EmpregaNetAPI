@@ -1,3 +1,6 @@
+using EmpregaNet.Application.Auth;
+using EmpregaNet.Application.Interfaces;
+using EmpregaNet.Domain.Entities;
 using FluentValidation;
 using Microsoft.Extensions.Logging;
 using EmpregaNet.Domain.Enums;
@@ -8,6 +11,7 @@ using EmpregaNet.Application.Companies.ViewModel;
 using EmpregaNet.Application.Common.Base;
 using EmpregaNet.Domain.Interfaces;
 using EmpregaNet.Application.Jobs.Factories;
+using Microsoft.AspNetCore.Identity;
 
 namespace EmpregaNet.Application.Jobs.Commands
 {
@@ -26,19 +30,31 @@ namespace EmpregaNet.Application.Jobs.Commands
         private readonly ICompanyRepository _companyRepository;
         private readonly IValidator<UpdateCommand<UpdateJobCommand, JobViewModel>> _validator;
         private readonly ILogger<UpdateJobHandler> _logger;
+        private readonly IHttpCurrentUser _httpCurrentUser;
+        private readonly IJobEmployerAccess _jobEmployerAccess;
+        private readonly UserManager<User> _userManager;
+
         public UpdateJobHandler(IJobRepository jobRepository,
                                 ICompanyRepository companyRepository,
                                 IValidator<UpdateCommand<UpdateJobCommand, JobViewModel>> validator,
-                                ILogger<UpdateJobHandler> logger)
+                                ILogger<UpdateJobHandler> logger,
+                                IHttpCurrentUser httpCurrentUser,
+                                IJobEmployerAccess jobEmployerAccess,
+                                UserManager<User> userManager)
         {
             _jobRepository = jobRepository;
             _companyRepository = companyRepository;
             _validator = validator;
             _logger = logger;
+            _httpCurrentUser = httpCurrentUser;
+            _jobEmployerAccess = jobEmployerAccess;
+            _userManager = userManager;
         }
 
         public async Task<JobViewModel> Handle(UpdateCommand<UpdateJobCommand, JobViewModel> request, CancellationToken cancellationToken)
         {
+            RecruitmentAccess.EnsureRecruitmentStaff(_httpCurrentUser);
+
             _logger.LogInformation("Iniciando o processo de atualização da  vaga de emprego: {JobId}", request.Id);
 
             try
@@ -73,6 +89,19 @@ namespace EmpregaNet.Application.Jobs.Commands
                         $"Não é possível atualizar uma vaga de emprego excluída. ID '{request.Id}' já está marcado como excluído.",
                         DomainErrorEnum.INVALID_ACTION_FOR_STATUS);
                 }
+
+                var appUser = await _userManager.FindByIdAsync(_httpCurrentUser.UserId.ToString());
+                var roles = appUser is not null ? await _userManager.GetRolesAsync(appUser) : [];
+                var isAdmin = roles.Contains(RecruitmentRoleNames.Admin);
+                if (!isAdmin && request.entity.CompanyId != job.CompanyId)
+                {
+                    throw new ValidationAppException(
+                        nameof(request.entity.CompanyId),
+                        "Não é permitido transferir a vaga para outra empresa.",
+                        DomainErrorEnum.INVALID_PARAMS);
+                }
+
+                await _jobEmployerAccess.EnsureCanManageCompanyAsync(job.CompanyId, cancellationToken);
 
                 var updatedJob = JobFactory.Update(job, request.entity);
                 await _jobRepository.UpdateAsync(updatedJob, cancellationToken);

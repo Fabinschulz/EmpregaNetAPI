@@ -38,6 +38,16 @@ namespace EmpregaNet.Infra.Persistence.Repositories
 
             builder.HasIndex(x => x.Id)
                    .HasDatabaseName("IX_Users_Id");
+
+            builder.Property(x => x.EmployerCompanyId).IsRequired(false);
+            builder.HasIndex(x => x.EmployerCompanyId)
+                   .HasDatabaseName("IX_Users_EmployerCompanyId");
+
+            builder.HasOne<Company>()
+                   .WithMany()
+                   .HasForeignKey(x => x.EmployerCompanyId)
+                   .IsRequired(false)
+                   .OnDelete(DeleteBehavior.SetNull);
         }
     }
 

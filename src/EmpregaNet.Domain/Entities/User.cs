@@ -18,6 +18,10 @@ namespace EmpregaNet.Domain.Entities
         public CivilStatusEnum CivilStatus { get; set; }
         public GenderEnum? Gender { get; set; }
         public UserTypeEnum UserType { get; set; } = UserTypeEnum.Candidate; // converter para Roles depois
+
+        /// <summary>Empresa à qual o recrutador/gestor está vinculado (admin global deixa nulo).</summary>
+        public long? EmployerCompanyId { get; set; }
+
         public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
         public DateTimeOffset? UpdatedAt { get; set; } = null;
         public DateTimeOffset? DeletedAt { get; set; } = null;

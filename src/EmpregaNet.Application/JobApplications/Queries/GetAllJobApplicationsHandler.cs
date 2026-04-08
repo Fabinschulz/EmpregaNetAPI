@@ -26,8 +26,17 @@ public sealed class GetAllJobApplicationsHandler : IRequestHandler<GetAllQuery<J
     public async Task<ListDataPagination<JobApplicationViewModel>> Handle(GetAllQuery<JobApplicationViewModel> request, CancellationToken cancellationToken)
     {
         _logger.LogInformation("Listando candidaturas (page: {Page}, size: {Size})", request.Page, request.Size);
-        var result = await _repository.GetAllAsync(cancellationToken, request.Page, request.Size, request.OrderBy);
-        var data = result.Data.Select(a => a.ToViewModel()).ToList();
-        return new ListDataPagination<JobApplicationViewModel>(data, result.TotalItems, request.Page, request.Size);
+
+        try
+        {
+            var result = await _repository.GetAllAsync(cancellationToken, request.Page, request.Size, request.OrderBy);
+            var data = result.Data.Select(a => a.ToViewModel()).ToList();
+            return new ListDataPagination<JobApplicationViewModel>(data, result.TotalItems, request.Page, request.Size);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Erro inesperado ao buscar todas as vagas aplicadas. Query: {@Query}", request);
+            throw;
+        }
     }
 }

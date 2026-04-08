@@ -2,6 +2,7 @@ using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 using FluentValidation;
 using EmpregaNet.Application.Interfaces;
+using EmpregaNet.Application.Jobs.UseCase;
 
 public static class DependencyInjection
 {
@@ -10,6 +11,7 @@ public static class DependencyInjection
         var assemblies = Assembly.GetExecutingAssembly();
         services.AddValidatorsFromAssembly(assemblies);
         services.AddScoped<IJwtBuilder, JwtBuilder>();
+        services.AddScoped<IJobEmployerAccess, JobEmployerAccess>();
 
         return services;
     }

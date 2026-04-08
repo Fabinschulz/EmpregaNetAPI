@@ -1,3 +1,5 @@
+using EmpregaNet.Application.Auth;
+using EmpregaNet.Application.Interfaces;
 using FluentValidation;
 using Microsoft.Extensions.Logging;
 using EmpregaNet.Domain.Enums;
@@ -24,18 +26,29 @@ public sealed class CreateJobHandler : IRequestHandler<CreateCommand<CreateJobCo
     private readonly ICompanyRepository _companyRepository;
     private readonly IValidator<CreateCommand<CreateJobCommand>> _validator;
     private readonly ILogger<CreateJobHandler> _logger;
+    private readonly IHttpCurrentUser _httpCurrentUser;
+    private readonly IJobEmployerAccess _jobEmployerAccess;
+
     public CreateJobHandler(IJobRepository jobRepository,
                             ICompanyRepository companyRepository,
                             IValidator<CreateCommand<CreateJobCommand>> validator,
-                            ILogger<CreateJobHandler> logger)
+                            ILogger<CreateJobHandler> logger,
+                            IHttpCurrentUser httpCurrentUser,
+                            IJobEmployerAccess jobEmployerAccess)
     {
         _jobRepository = jobRepository;
         _companyRepository = companyRepository;
         _validator = validator;
         _logger = logger;
+        _httpCurrentUser = httpCurrentUser;
+        _jobEmployerAccess = jobEmployerAccess;
     }
+
     public async Task<long> Handle(CreateCommand<CreateJobCommand> request, CancellationToken cancellationToken)
     {
+        RecruitmentAccess.EnsureRecruitmentStaff(_httpCurrentUser);
+        await _jobEmployerAccess.EnsureCanManageCompanyAsync(request.entity.CompanyId, cancellationToken);
+
         _logger.LogInformation("Iniciando a criação de uma nova vaga de emprego.");
         try
         {

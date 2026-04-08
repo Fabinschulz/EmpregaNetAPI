@@ -116,3 +116,8 @@ volumes:
 # # Aplicações
 # BFF_PORT=8080
 # API_PORT=8081
+
+# # Seed (opcional — sobrescreve appsettings; em produção use senha forte)
+# Seed__AdminEmail=admin@suaempresa.com
+# Seed__AdminUserName=admin
+# Seed__AdminPassword=SuaSenhaForte1!

@@ -1,14 +1,11 @@
-﻿using System.Text;
+using System.Text;
 using EmpregaNet.Application.Auth.ViewModel;
-using EmpregaNet.Application.Interfaces;
 using EmpregaNet.Domain.Enums;
 
 namespace EmpregaNet.Application.Auth;
 
 /// <summary>
-/// Implementação de <see cref="IHttpCurrentUser"/> responsável por fornecer informações do usuário autenticado
-/// no contexto da requisição HTTP, bem como suas permissões e dados de autenticação.
-/// Utiliza <see cref="HttpUserContext"/> para obter o usuário corrente e <see cref="JwtBuilder"/> para consultar permissões.
+/// Informações do usuário autenticado e permissões derivadas do JWT no contexto HTTP.
 /// </summary>
 public class HttpCurrentUser : IHttpCurrentUser
 {
@@ -17,20 +14,9 @@ public class HttpCurrentUser : IHttpCurrentUser
     /// </summary>
     private readonly HttpUserContext _userContext;
 
-    /// <summary>
-    /// Serviço de autenticação utilizado para consultar permissões do usuário.
-    /// </summary>
-    private readonly IJwtBuilder _jwtBuilder;
-
-    /// <summary>
-    /// Inicializa uma nova instância de <see cref="HttpCurrentUser"/>.
-    /// </summary>
-    /// <param name="userContext">Contexto do usuário HTTP injetado.</param>
-    /// <param name="authService">Serviço de autenticação injetado.</param>
-    public HttpCurrentUser(HttpUserContext userContext, IJwtBuilder authService)
+    public HttpCurrentUser(HttpUserContext userContext)
     {
         _userContext = userContext;
-        _jwtBuilder = authService;
     }
 
     /// <summary>
@@ -72,7 +58,11 @@ public class HttpCurrentUser : IHttpCurrentUser
     /// Obtém todas as permissões do usuário autenticado consultando o serviço de autenticação.
     /// </summary>
     /// <returns>Lista de permissões (<see cref="UserPermissionVieModel"/>) ou <c>null</c> se não houver permissões.</returns>
-    public async Task<List<UserPermissionVieModel>?> GetAllPermissions() => await _jwtBuilder.GetAllPermissions(Key);
+    public Task<List<UserPermissionVieModel>?> GetAllPermissions()
+    {
+        var permissions = _userContext.GetContextuser()?.Permissions;
+        return Task.FromResult(permissions);
+    }
 
     /// <summary>
     /// Verifica se o usuário autenticado possui uma permissão específica para um recurso e tipo de ação.
@@ -83,14 +73,10 @@ public class HttpCurrentUser : IHttpCurrentUser
     public async Task<bool> HasPermission(PermissionResourceEnum resource, PermissionTypeEnum type)
     {
         var permissions = await GetAllPermissions();
-
-        if (permissions == null || !permissions.Any())
-        {
+        if (permissions is null || permissions.Count == 0)
             return false;
-        }
 
-        var permission = permissions.FirstOrDefault(p => p.Resource == resource && p.Type == type);
-        return permission != null;
+        return permissions.Any(p => p.Resource == resource && p.Type == type);
     }
 
     /// <summary>

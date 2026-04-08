@@ -34,7 +34,13 @@ public class JobApplicationsController : MainController<ApplyToJobCommand, Chang
 
     [HttpGet]
     [Authorize(Policy = "Recrutamento")]
-    public override Task<IActionResult> GetAll([FromQuery] int page = 1, [FromQuery] int size = 100, [FromQuery] string? orderBy = null)
+    public override Task<IActionResult> GetAll(
+        [FromQuery] int page = 1,
+        [FromQuery] int size = 100,
+        [FromQuery] string? orderBy = null,
+        [FromQuery] bool? isDeleted = null,
+        [FromQuery] bool? isActive = null
+        )
         => base.GetAll(page, size, orderBy);
 
     [HttpGet("mine")]

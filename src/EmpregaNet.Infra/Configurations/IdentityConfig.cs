@@ -1,9 +1,11 @@
 using System.Security.Claims;
 using System.Text;
+using EmpregaNet.Application.Auth;
 using EmpregaNet.Domain.Common;
 using EmpregaNet.Domain.Entities;
 using EmpregaNet.Domain.Enums;
 using EmpregaNet.Infra.Persistence.Database;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -19,9 +21,15 @@ namespace EmpregaNet.Infra.Configurations
 
         public static WebApplicationBuilder AddIdentityConfiguration(this WebApplicationBuilder builder)
         {
-
             builder.AddJwtSupport()
                    .AddIdentityApiSupport();
+
+
+            builder.Services.PostConfigure<AuthenticationOptions>(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            });
 
             return builder;
         }
@@ -58,13 +66,16 @@ namespace EmpregaNet.Infra.Configurations
                 options.AddPolicy("Administrador", policy =>
                 {
                     policy.RequireAuthenticatedUser();
-                    policy.RequireRole("Admin");
+                    policy.RequireRole(RecruitmentRoleNames.Admin);
                 });
 
                 options.AddPolicy("Recrutamento", policy =>
                 {
                     policy.RequireAuthenticatedUser();
-                    policy.RequireRole("Admin", "Recruiter", "Manager");
+                    policy.RequireRole(
+                        RecruitmentRoleNames.Admin,
+                        RecruitmentRoleNames.Recruiter,
+                        RecruitmentRoleNames.Manager);
                 });
             });
 
@@ -144,7 +155,6 @@ namespace EmpregaNet.Infra.Configurations
                                         };
                                     }));
 
-            builder.Services.AddAuthorization();
             builder.Services.AddHttpContextAccessor();
             builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             builder.Services.Configure<JwtSettings>(jwtSettingsSection);

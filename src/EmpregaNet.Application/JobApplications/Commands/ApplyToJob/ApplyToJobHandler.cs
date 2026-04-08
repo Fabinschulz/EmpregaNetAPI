@@ -47,10 +47,7 @@ public sealed class ApplyToJobHandler : IRequestHandler<CreateCommand<ApplyToJob
                 DomainErrorEnum.MISSING_RESOURCE_PERMISSION);
         }
 
-        var userRoles = user.UserToken.Claims
-            .Where(c => c.Type.EndsWith("/claims/role", StringComparison.OrdinalIgnoreCase))
-            .Select(c => c.Value)
-            .ToHashSet(StringComparer.OrdinalIgnoreCase);
+        var userRoles = user.UserToken.GetRoleNames();
 
         if (userRoles.Any(r => NonCandidateRoles.Contains(r, StringComparer.OrdinalIgnoreCase)))
         {

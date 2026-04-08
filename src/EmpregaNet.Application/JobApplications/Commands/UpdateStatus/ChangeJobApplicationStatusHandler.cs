@@ -18,7 +18,7 @@ public sealed record ChangeJobApplicationStatusCommand(
 public sealed class ChangeJobApplicationStatusCommandHandler :
     IRequestHandler<UpdateCommand<ChangeJobApplicationStatusCommand, JobApplicationViewModel>, JobApplicationViewModel>
 {
-    private static readonly string[] AllowedRoles = ["Admin", "Recruiter", "Manager"];
+    private static readonly string[] AllowedRoles = RecruitmentRoleNames.Staff;
     private readonly IJobApplicationRepository _jobApplicationRepository;
     private readonly IHttpCurrentUser _httpCurrentUser;
     private readonly IValidator<UpdateCommand<ChangeJobApplicationStatusCommand, JobApplicationViewModel>> _validator;
@@ -79,10 +79,7 @@ public sealed class ChangeJobApplicationStatusCommandHandler :
                 DomainErrorEnum.MISSING_RESOURCE_PERMISSION);
         }
 
-        var userRoles = user.UserToken.Claims
-            .Where(c => c.Type.EndsWith("/claims/role", StringComparison.OrdinalIgnoreCase))
-            .Select(c => c.Value)
-            .ToHashSet(StringComparer.OrdinalIgnoreCase);
+        var userRoles = user.UserToken.GetRoleNames();
 
         if (!userRoles.Any(r => AllowedRoles.Contains(r, StringComparer.OrdinalIgnoreCase)))
         {

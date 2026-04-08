@@ -8,7 +8,7 @@
 
 A **EmpregaNet API** é o coração de uma plataforma moderna de recrutamento, desenvolvida com:
 
-- **ASP.NET Core 9**
+- **ASP.NET Core 10**
 - **Padrão CQRS**
 - **Domain-Driven Design (DDD)**
 - **Clean Architecture**

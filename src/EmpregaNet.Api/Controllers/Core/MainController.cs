@@ -42,7 +42,12 @@ namespace EmpregaNet.Api.Controllers.Core
         [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(DomainError))]
         [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(DomainError))]
         [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(DomainError))]
-        public virtual async Task<IActionResult> GetAll([FromQuery] int page = 1, [FromQuery] int size = 100, [FromQuery] string? orderBy = null)
+        public virtual async Task<IActionResult> GetAll(
+            [FromQuery] int page = 1,
+            [FromQuery] int size = 100,
+            [FromQuery] string? orderBy = null,
+            [FromQuery] bool? isDeleted = null,
+            [FromQuery] bool? isActive = null)
         {
 
             var cacheKey = $"{_entityName}_GetAll_{page}_{size}_{orderBy}";
