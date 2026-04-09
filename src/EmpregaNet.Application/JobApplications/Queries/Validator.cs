@@ -1,8 +1,16 @@
 using EmpregaNet.Application.Common.Base;
+using EmpregaNet.Application.JobApplications.ViewModel;
 using EmpregaNet.Domain.Enums;
 using FluentValidation;
 
 namespace EmpregaNet.Application.JobApplications.Queries;
+
+public sealed class GetAllJobApplicationsValidator : BasePaginatedQueryValidator<GetAllQuery<JobApplicationViewModel>>
+{
+    public GetAllJobApplicationsValidator() : base()
+    {
+    }
+}
 
 public sealed class GetMyJobApplicationsQueryValidator : BasePaginatedQueryValidator<GetMyJobApplicationsQuery>
 {

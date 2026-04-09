@@ -19,3 +19,10 @@ public sealed class GetCandidateByIdQueryValidator : AbstractValidator<GetCandid
             .WithMessage("Id do candidato inválido.");
     }
 }
+
+public sealed class GetAllUsersQueryValidator : BasePaginatedQueryValidator<GetAllUsersQuery>
+{
+    public GetAllUsersQueryValidator() : base()
+    {
+    }
+}

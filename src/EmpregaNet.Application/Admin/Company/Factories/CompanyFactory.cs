@@ -1,19 +1,15 @@
-using EmpregaNet.Application.Companies.Command;
+using EmpregaNet.Application.Admin.Company.Commands;
 using EmpregaNet.Application.Utils.Helpers;
-using EmpregaNet.Domain.Entities;
 using EmpregaNet.Domain.Enums;
+using DomainCompany = EmpregaNet.Domain.Entities.Company;
 
-namespace EmpregaNet.Application.Companies.Factories;
+namespace EmpregaNet.Application.Admin.Company.Factories;
 
 public abstract record CompanyFactory
 {
-
-    /// <summary>
-    /// Cria uma nova entidade Company sem associar vagas.
-    /// </summary>
-    public static Company Create(CreateCompanyCommand command)
+    public static DomainCompany Create(CreateCompanyCommand command)
     {
-        var company = new Company
+        var company = new DomainCompany
         {
             CompanyName = command.CompanyName,
             Address = command.Address,
@@ -26,10 +22,7 @@ public abstract record CompanyFactory
         return company;
     }
 
-    /// <summary>
-    /// Atualiza uma entidade Company existente, incluindo a sincronização de vagas.
-    /// </summary>
-    public static Company Update(Company company, UpdateCompanyCommand command)
+    public static DomainCompany Update(DomainCompany company, UpdateCompanyCommand command)
     {
         company.UpdateCompany(
             companyName: command.CompanyName,

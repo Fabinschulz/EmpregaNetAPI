@@ -1,7 +1,7 @@
 using EmpregaNet.Application.Auth;
 using Microsoft.Extensions.Logging;
 using EmpregaNet.Application.Jobs.ViewModel;
-using EmpregaNet.Application.Companies.ViewModel;
+using EmpregaNet.Application.Admin.Company.ViewModel;
 using EmpregaNet.Application.Common.Base;
 using EmpregaNet.Domain.Interfaces;
 using EmpregaNet.Application.Common.Exceptions;

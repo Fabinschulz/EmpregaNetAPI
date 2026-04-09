@@ -14,9 +14,7 @@ public interface IJobCommand
 
 
 /// <summary>
-/// Validador específico para o DTO CompanyCommand, contendo as regras de validação
-/// de formato e tamanho para os dados de uma empresa.
-/// Este validador é reutilizado por validadores de comando específicos (Create, Update).
+/// Regras compartilhadas de dados da vaga (Create/Update).
 /// </summary>
 public sealed class JobDataValidator<T> : AbstractValidator<T> where T : IJobCommand
 {

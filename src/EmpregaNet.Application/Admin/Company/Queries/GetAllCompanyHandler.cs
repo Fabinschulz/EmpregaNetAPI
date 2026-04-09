@@ -2,10 +2,10 @@ using EmpregaNet.Domain.Common;
 using FluentValidation;
 using Microsoft.Extensions.Logging;
 using EmpregaNet.Application.Common.Base;
-using EmpregaNet.Application.Companies.ViewModel;
+using EmpregaNet.Application.Admin.Company.ViewModel;
 using EmpregaNet.Domain.Interfaces;
 
-namespace EmpregaNet.Application.Companies.Queries;
+namespace EmpregaNet.Application.Admin.Company.Queries;
 
 public sealed class GetAllValidator : BasePaginatedQueryValidator<GetAllQuery<CompanyViewModel>>
 {

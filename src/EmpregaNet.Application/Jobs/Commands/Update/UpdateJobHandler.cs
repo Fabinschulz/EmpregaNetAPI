@@ -7,7 +7,7 @@ using EmpregaNet.Domain.Enums;
 using EmpregaNet.Application.Jobs.ViewModel;
 using System.ComponentModel.DataAnnotations;
 using EmpregaNet.Application.Common.Exceptions;
-using EmpregaNet.Application.Companies.ViewModel;
+using EmpregaNet.Application.Admin.Company.ViewModel;
 using EmpregaNet.Application.Common.Base;
 using EmpregaNet.Domain.Interfaces;
 using EmpregaNet.Application.Jobs.Factories;

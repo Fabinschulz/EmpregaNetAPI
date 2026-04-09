@@ -1,6 +1,7 @@
 using EmpregaNet.Domain.Common;
 using Microsoft.AspNetCore.Mvc;
 using EmpregaNet.Application.Common.Base;
+using EmpregaNet.Application.Common.Cache;
 using EmpregaNet.Domain.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -49,13 +50,12 @@ namespace EmpregaNet.Api.Controllers.Core
             [FromQuery] bool? isDeleted = null,
             [FromQuery] bool? isActive = null)
         {
-
-            var cacheKey = $"{_entityName}_GetAll_{page}_{size}_{orderBy}";
+            var cacheKey = ApplicationCacheKeys.Entity.GetAll(_entityName, page, size, orderBy, isDeleted, isActive);
             var cachedData = await _cacheService.GetValueAsync<ListDataPagination<TViewModel>>(cacheKey);
 
             if (cachedData is not null) return Ok(cachedData);
 
-            var result = await _mediator.Send(new GetAllQuery<TViewModel>(page, size, orderBy));
+            var result = await _mediator.Send(new GetAllQuery<TViewModel>(page, size, orderBy, isDeleted, isActive));
             await _cacheService.SetValueAsync(cacheKey, result, TimeSpan.FromMinutes(5));
 
             return Ok(result);
@@ -74,7 +74,7 @@ namespace EmpregaNet.Api.Controllers.Core
         [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(DomainError))]
         public virtual async Task<IActionResult> GetById([FromRoute] long id)
         {
-            var cacheKey = $"{_entityName}_GetById_{id}";
+            var cacheKey = ApplicationCacheKeys.Entity.GetById(_entityName, id);
             var cachedData = await _cacheService.GetValueAsync<TViewModel>(cacheKey);
 
             if (cachedData is not null) return Ok(cachedData);
@@ -152,14 +152,9 @@ namespace EmpregaNet.Api.Controllers.Core
         /// <returns>Um Task que indica a conclusão da operação.</returns>
         protected virtual async Task InvalidateCacheForEntity(long id = default)
         {
-            // Invalida o cache do GetById específico, se o id for fornecido
             if (id != default)
-            {
-                var cacheKey = $"{_entityName}_GetById_{id}";
-                _cacheService.Remove(cacheKey);
-            }
+                await _cacheService.RemoveByPatternAsync(ApplicationCacheKeys.Entity.GetByIdPrefix(_entityName, id));
 
-            // Invalida todas as chaves de cache que começam com o prefixo do GetAll
             await InvalidateGetAllCache();
         }
 
@@ -169,8 +164,7 @@ namespace EmpregaNet.Api.Controllers.Core
         /// <returns>Um Task que indica a conclusão da operação.</returns>
         protected virtual Task InvalidateGetAllCache()
         {
-            var pattern = $"{_entityName}_GetAll_";
-            return _cacheService.RemoveByPatternAsync(pattern);
+            return _cacheService.RemoveByPatternAsync(ApplicationCacheKeys.Entity.GetAllPrefix(_entityName));
         }
     }
 }

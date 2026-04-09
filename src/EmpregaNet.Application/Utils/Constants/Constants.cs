@@ -1,22 +1,24 @@
-﻿namespace EmpregaNet.Application.Utils;
+namespace EmpregaNet.Application.Utils;
 
 public static partial class Constants
 {
-
-    public static class Group
+    /// <summary>
+    /// Nomes de políticas (<c>AddPolicy</c> em <c>IdentityConfig</c>).
+    /// </summary>
+    public static class AuthPolicies
     {
-        public const string CUSTOMER = "Customer";
-        public const string USER = "User";
-        public const string ADMIN = "Admin";
+        public const string Administrador = "Administrador";
+        public const string Recrutamento = "Recrutamento";
     }
 
-    public static class Policy_old
+    /// <summary>
+    /// Literais de documento/grupo Swagger (<see cref="Microsoft.AspNetCore.Mvc.ApiExplorerSettingsAttribute.GroupName"/>).
+    /// </summary>
+    public static class OpenApi
     {
-        public const string ALL = "Authenticated";
-        public const string CUSTOMER = "Customer";
-        public const string USER = "User";
-        public const string ADMIN = "Admin";
-
+        public const string V1 = "v1";
+        public const string Admin = "admin";
+        public const string Users = "users";
     }
 
     public static class Regex

@@ -1,9 +1,10 @@
-using EmpregaNet.Domain.Entities;
 using System.Diagnostics.CodeAnalysis;
 using EmpregaNet.Application.Common.Base;
 using EmpregaNet.Application.Utils.Helpers;
+using EmpregaNet.Domain.Entities;
+using DomainCompany = EmpregaNet.Domain.Entities.Company;
 
-namespace EmpregaNet.Application.Companies.ViewModel;
+namespace EmpregaNet.Application.Admin.Company.ViewModel;
 
 public sealed class CompanyViewModel : BaseViewModel
 {
@@ -19,7 +20,7 @@ public sealed class CompanyViewModel : BaseViewModel
 [ExcludeFromCodeCoverage]
 public static class CompanyMapper
 {
-    public static CompanyViewModel ToViewModel(this Company entity)
+    public static CompanyViewModel ToViewModel(this DomainCompany entity)
     {
         return new CompanyViewModel
         {

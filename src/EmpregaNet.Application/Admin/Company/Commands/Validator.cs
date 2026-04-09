@@ -5,7 +5,7 @@ using EmpregaNet.Domain.Enums;
 using EmpregaNet.Application.Utils.Helpers;
 using System.Text.RegularExpressions;
 
-namespace EmpregaNet.Application.Companies.Command;
+namespace EmpregaNet.Application.Admin.Company.Commands;
 
 public interface ICompanyCommand
 {
@@ -18,15 +18,12 @@ public interface ICompanyCommand
 }
 
 /// <summary>
-/// Validador específico para o DTO CompanyCommand, contendo as regras de validação
-/// de formato e tamanho para os dados de uma empresa.
-/// Este validador é reutilizado por validadores de comando específicos (Create, Update).
+/// Regras compartilhadas de dados da empresa (Create/Update).
 /// </summary>
 public sealed class CompanyDataValidator<T> : AbstractValidator<T> where T : ICompanyCommand
 {
     public CompanyDataValidator()
     {
-
         RuleFor(x => x.CompanyName)
             .NotEmpty()
             .WithMessage("O nome da empresa é obrigatório.")
@@ -34,14 +31,14 @@ public sealed class CompanyDataValidator<T> : AbstractValidator<T> where T : ICo
             .MaximumLength(100).WithMessage("O nome da empresa deve ter no máximo 100 caracteres.");
 
         RuleFor(x => x.Cnpj)
-                 .NotEmpty()
-                 .WithMessage("O CNPJ é obrigatório.")
-                 .Must(cnpj =>
-                 {
-                     var cleanedCnpj = cnpj.OnlyNumbers().Trim();
-                     return Regex.IsMatch(cleanedCnpj, @"^\d{14}$");
-                 })
-                 .WithMessage("O campo 'CNPJ' deve conter exatamente 14 dígitos numéricos.");
+            .NotEmpty()
+            .WithMessage("O CNPJ é obrigatório.")
+            .Must(cnpj =>
+            {
+                var cleanedCnpj = cnpj.OnlyNumbers().Trim();
+                return Regex.IsMatch(cleanedCnpj, @"^\d{14}$");
+            })
+            .WithMessage("O campo 'CNPJ' deve conter exatamente 14 dígitos numéricos.");
 
         RuleFor(x => x.Email)
             .NotEmpty()
@@ -53,7 +50,6 @@ public sealed class CompanyDataValidator<T> : AbstractValidator<T> where T : ICo
             .WithMessage("O telefone da empresa é obrigatório.")
             .Matches(@"^\d{10,11}$")
             .WithMessage("Telefone inválido. Deve conter entre 10 e 11 dígitos numéricos.");
-
 
         RuleFor(x => x.Address)
             .NotNull()
@@ -67,6 +63,5 @@ public sealed class CompanyDataValidator<T> : AbstractValidator<T> where T : ICo
             .Must(value => Enum.TryParse<TypeOfActivityEnum>(value, true, out var parsed)
                         && parsed != TypeOfActivityEnum.NaoSelecionado)
             .WithMessage("Tipo de atividade inválido.");
-
     }
 }

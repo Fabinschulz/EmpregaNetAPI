@@ -4,12 +4,12 @@ using EmpregaNet.Domain.Enums;
 using EmpregaNet.Domain.Entities;
 using EmpregaNet.Application.Common.Exceptions;
 using EmpregaNet.Application.Common.Base;
-using EmpregaNet.Application.Companies.Factories;
+using EmpregaNet.Application.Admin.Company.Factories;
 using EmpregaNet.Domain.Interfaces;
 using EmpregaNet.Application.Utils.Helpers;
 using System.ComponentModel.DataAnnotations;
 
-namespace EmpregaNet.Application.Companies.Command;
+namespace EmpregaNet.Application.Admin.Company.Commands;
 
 public sealed record CreateCompanyCommand(
     string CompanyName,
@@ -21,7 +21,6 @@ public sealed record CreateCompanyCommand(
     Address Address
 ) : ICompanyCommand;
 
-
 public sealed class CreateCompanyCommandHandler : IRequestHandler<CreateCommand<CreateCompanyCommand>, long>
 {
     private readonly ICompanyRepository _companyRepository;
@@ -29,13 +28,14 @@ public sealed class CreateCompanyCommandHandler : IRequestHandler<CreateCommand<
     private readonly ILogger<CreateCompanyCommandHandler> _logger;
 
     public CreateCompanyCommandHandler(ICompanyRepository companyRepository,
-                                       IValidator<CreateCommand<CreateCompanyCommand>> validator,
-                                       ILogger<CreateCompanyCommandHandler> logger)
+        IValidator<CreateCommand<CreateCompanyCommand>> validator,
+        ILogger<CreateCompanyCommandHandler> logger)
     {
         _companyRepository = companyRepository;
         _validator = validator;
         _logger = logger;
     }
+
     public async Task<long> Handle(CreateCommand<CreateCompanyCommand> request, CancellationToken cancellationToken)
     {
         _logger.LogInformation("Iniciando o processo de criação da empresa: {CompanyName}", request.entity.CompanyName);
@@ -56,10 +56,9 @@ public sealed class CreateCompanyCommandHandler : IRequestHandler<CreateCommand<
             var company = CompanyFactory.Create(request.entity);
 
             var createdCompanyId = await _companyRepository.CreateAsync(company, cancellationToken);
-            _logger.LogInformation("Empresa criada com sucesso. ID: {CompanyId}", createdCompanyId);
+            _logger.LogInformation("Empresa criada com sucesso. ID: {CompanyId}", createdCompanyId.Id);
 
             return createdCompanyId.Id;
-
         }
         catch (ValidationAppException ex)
         {
@@ -71,7 +70,5 @@ public sealed class CreateCompanyCommandHandler : IRequestHandler<CreateCommand<
             _logger.LogError(ex, "Erro inesperado ao criar empresa. Request: {@Request}", request);
             throw new Exception("Ocorreu um erro inesperado ao criar a empresa. Por favor, tente novamente mais tarde.");
         }
-
     }
-
 }

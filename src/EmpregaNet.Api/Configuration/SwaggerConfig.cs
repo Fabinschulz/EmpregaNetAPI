@@ -1,5 +1,6 @@
 using System.Reflection;
 using System.Xml.Linq;
+using EmpregaNet.Application.Utils;
 using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
@@ -22,14 +23,38 @@ namespace EmpregaNet.Api.Configuration
             // Define informações básicas da documentação Swagger
             services.AddSwaggerGen(s =>
             {
-                s.SwaggerDoc("v1", new OpenApiInfo
+                s.SwaggerDoc(Constants.OpenApi.V1, new OpenApiInfo
                 {
                     Version = "v1",
-                    Title = "Gerenciamento de Vagas de Emprego - EmpregaNet",
-                    Description = "EmpregaNet API Swagger surface",
+                    Title = "Gerenciamento de Vagas de Emprego",
+                    Description = "Superfície completa: conta, vagas, candidaturas e documentação agrupada por tags.",
                     Contact = new OpenApiContact { Name = "Freetech", Email = "freetech@outlook.com.br", Url = new Uri("https://freetech.vercel.app/") },
                     License = new OpenApiLicense { Name = "MIT" }
                 });
+
+                // s.SwaggerDoc(Constants.OpenApi.Admin, new OpenApiInfo
+                // {
+                //     Version = "v1",
+                //     Title = "EmpregaNet — Administração",
+                //     Description = "Somente endpoints privilegiados (políticas Administrador e fluxos de recrutamento alinhados ao grupo OpenAPI admin).",
+                //     Contact = new OpenApiContact { Name = "Freetech", Email = "freetech@outlook.com.br", Url = new Uri("https://freetech.vercel.app/") },
+                //     License = new OpenApiLicense { Name = "MIT" }
+                // });
+
+                // v1: superfície geral (conta, vagas, candidaturas, etc.). admin: somente [ApiExplorerSettings(GroupName = admin)].
+                // Server para ocultar endpoints administrativos do documento público (v1) e vice-versa, usando o GroupName definido nos controllers e ações.
+                // s.DocInclusionPredicate((docName, apiDesc) =>
+                // {
+                //     var isAdminSurface = string.Equals(apiDesc.GroupName, Constants.OpenApi.Admin, StringComparison.OrdinalIgnoreCase);
+
+                //     if (string.Equals(docName, Constants.OpenApi.V1, StringComparison.OrdinalIgnoreCase))
+                //         return !isAdminSurface;
+
+                //     if (string.Equals(docName, Constants.OpenApi.Admin, StringComparison.OrdinalIgnoreCase))
+                //         return isAdminSurface;
+
+                //     return false;
+                // });
 
                 // Configura autenticação JWT Bearer no Swagger
                 s.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
@@ -101,14 +126,13 @@ namespace EmpregaNet.Api.Configuration
             {
                 swaggerDoc.Tags = new HashSet<OpenApiTag>
                 {
-                    new() { Name = "Users", Description = "Endpoints para gestão de autenticação e autorização" },
-                    new() { Name = "Jobs", Description = "Endpoints para gerenciamento de oportunidades de emprego" },
-                    new() { Name = "Candidates", Description = "Endpoints para administração de cadastros de candidatos" },
+                    new() { Name = "Users", Description = "Conta do usuário: registro, login." },
+                    new() { Name = "Jobs", Description = "Oportunidades de emprego (leitura pública; mutações com política de recrutamento)." },
+                    new() { Name = "Candidates", Description = "Listagem e detalhe de candidatos (equipe de recrutamento)." },
+                    new() { Name = "JobApplications", Description = "Candidaturas e pipeline (candidato e recrutamento)." },
                     new() { Name = "Companies", Description = "Endpoints para administração de cadastros corporativos" },
-                    new() { Name = "JobApplications", Description = "Endpoints para processamento de inscrições em vagas" },
-                    new() { Name = "Search", Description = "Endpoints para consultas avançadas de vagas e empresas" },
-                    new() { Name = "Notifications", Description = "Endpoints para gestão de alertas e comunicações" },
-                    new() { Name = "Admin", Description = "Endpoints privilegiados para gestão do sistema" }
+                    new() { Name = "Notifications", Description = "Alertas e comunicações (reservado)." },
+                    new() { Name = "Admin", Description = "Superfície administrativa. Não aparece no documento EmpregaNet API (v1)." }
                 };
             }
         }
@@ -119,7 +143,8 @@ namespace EmpregaNet.Api.Configuration
             app.UseSwagger();
             app.UseSwaggerUI(c =>
             {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
+                c.SwaggerEndpoint($"/swagger/{Constants.OpenApi.V1}/swagger.json", "EmpregaNet API");
+                // c.SwaggerEndpoint($"/swagger/{Constants.OpenApi.Admin}/swagger.json", "Administração"); - documento separado para endpoints administrativos, se necessário.
                 c.DocExpansion(Swashbuckle.AspNetCore.SwaggerUI.DocExpansion.None);
                 c.DefaultModelsExpandDepth(-1);
             });

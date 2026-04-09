@@ -1,12 +1,11 @@
 using Microsoft.Extensions.Logging;
-using EmpregaNet.Application.Jobs.ViewModel;
-using EmpregaNet.Application.Companies.ViewModel;
+using EmpregaNet.Application.Admin.Company.ViewModel;
 using EmpregaNet.Application.Common.Base;
 using EmpregaNet.Domain.Interfaces;
 using EmpregaNet.Application.Common.Exceptions;
 using EmpregaNet.Domain.Enums;
 
-namespace EmpregaNet.Application.Companies.Queries;
+namespace EmpregaNet.Application.Admin.Company.Queries;
 
 public sealed class GetCompanyByIdHandler : IRequestHandler<GetByIdQuery<CompanyViewModel>, CompanyViewModel>
 {
@@ -30,9 +29,9 @@ public sealed class GetCompanyByIdHandler : IRequestHandler<GetByIdQuery<Company
             {
                 _logger.LogWarning("Empresa com ID {Id} não encontrada.", request.Id);
                 throw new ValidationAppException(
-                            nameof(request.Id),
-                            $"Empresa com ID '{request.Id}' não encontrada.",
-                            DomainErrorEnum.RECORD_NOT_EXISTS_OR_MISSING_PERMISSION);
+                    nameof(request.Id),
+                    $"Empresa com ID '{request.Id}' não encontrada.",
+                    DomainErrorEnum.RECORD_NOT_EXISTS_OR_MISSING_PERMISSION);
             }
 
             var viewModel = entity.ToViewModel();

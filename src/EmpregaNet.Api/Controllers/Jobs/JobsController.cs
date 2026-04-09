@@ -1,4 +1,5 @@
 using EmpregaNet.Api.Controllers.Core;
+using EmpregaNet.Application.Utils;
 using EmpregaNet.Domain.Common;
 using EmpregaNet.Application.Jobs.Commands;
 using EmpregaNet.Application.Jobs.ViewModel;
@@ -32,22 +33,21 @@ public class JobsController : MainController<CreateJobCommand, UpdateJobCommand,
     [HttpGet("{id:long}")]
     public override Task<IActionResult> GetById([FromRoute] long id) => base.GetById(id);
 
-    [Authorize(Policy = "Recrutamento")]
+    [Authorize(Policy = Constants.AuthPolicies.Recrutamento)]
     [HttpPost]
     public override Task<IActionResult> Create([FromBody] CreateJobCommand entity)
         => base.Create(entity);
 
-    [Authorize(Policy = "Recrutamento")]
+    [Authorize(Policy = Constants.AuthPolicies.Recrutamento)]
     [HttpPut("{id:long}")]
     public override Task<IActionResult> Update([FromRoute] long id, [FromBody] UpdateJobCommand entity)
         => base.Update(id, entity);
 
-    [Authorize(Policy = "Recrutamento")]
+    [Authorize(Policy = Constants.AuthPolicies.Recrutamento)]
     [HttpDelete("{id:long}")]
-    public override Task<IActionResult> Delete([FromRoute] long id)
-        => base.Delete(id);
+    public override Task<IActionResult> Delete([FromRoute] long id) => base.Delete(id);
 
-    [Authorize(Policy = "Recrutamento")]
+    [Authorize(Policy = Constants.AuthPolicies.Recrutamento)]
     [HttpPut("{id:long}/close")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(DomainError))]

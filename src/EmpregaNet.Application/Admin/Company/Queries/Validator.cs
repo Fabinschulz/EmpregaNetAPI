@@ -1,5 +1,7 @@
 using EmpregaNet.Application.Common.Base;
-using EmpregaNet.Application.Companies.ViewModel;
+using EmpregaNet.Application.Admin.Company.ViewModel;
+
+namespace EmpregaNet.Application.Admin.Company.Queries;
 
 public sealed class CompanyViewModelGetAllValidator : BasePaginatedQueryValidator<GetAllQuery<CompanyViewModel>>
 {

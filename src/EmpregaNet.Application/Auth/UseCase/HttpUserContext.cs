@@ -146,10 +146,9 @@ public class HttpUserContext
             var erro = ex;
 
 #if DEBUG
-            // Em ambiente de desenvolvimento, propaga a exceção original para facilitar o diagnóstico
+            //OBS: Em ambiente de desenvolvimento, propaga a exceção original para facilitar o diagnóstico
             throw new Exception(ex.Message, ex);
 #endif
-            // Em produção, retorna uma mensagem genérica
             throw new Exception("Usuário não autenticado!");
         }
     }

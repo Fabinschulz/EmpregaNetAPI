@@ -1,3 +1,5 @@
+using EmpregaNet.Application.Utils;
+using EmpregaNet.Application.Common.Cache;
 using EmpregaNet.Application.Users.Queries;
 using EmpregaNet.Application.Users.ViewModel;
 using EmpregaNet.Domain.Common;
@@ -9,7 +11,7 @@ namespace EmpregaNet.Api.Controllers.Candidates;
 
 [ApiController]
 [Route("api/[controller]")]
-[Authorize(Policy = "Recrutamento")]
+[Authorize(Policy = Constants.AuthPolicies.Recrutamento)]
 public class CandidatesController : ControllerBase
 {
     private IMediator _iMediator = null!;
@@ -27,7 +29,7 @@ public class CandidatesController : ControllerBase
     [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(DomainError))]
     public async Task<IActionResult> GetAll([FromQuery] int page = 1, [FromQuery] int size = 100, [FromQuery] string? orderBy = null)
     {
-        var cacheKey = $"Candidates_GetAll_{page}_{size}_{orderBy}";
+        var cacheKey = ApplicationCacheKeys.Candidates.GetAll(page, size, orderBy);
         var cached = await _cacheService.GetValueAsync<ListDataPagination<UserViewModel>>(cacheKey);
         if (cached is not null) return Ok(cached);
 
@@ -43,7 +45,7 @@ public class CandidatesController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(DomainError))]
     public async Task<IActionResult> GetById([FromRoute] long id)
     {
-        var cacheKey = $"Candidates_GetById_{id}";
+        var cacheKey = ApplicationCacheKeys.Candidates.GetById(id);
         var cached = await _cacheService.GetValueAsync<UserViewModel>(cacheKey);
         if (cached is not null) return Ok(cached);
 

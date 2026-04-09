@@ -1,14 +1,9 @@
 using EmpregaNet.Application.Common.Base;
-using EmpregaNet.Application.Companies.ViewModel;
+using EmpregaNet.Application.Admin.Company.ViewModel;
 using FluentValidation;
 
-namespace EmpregaNet.Application.Companies.Command;
+namespace EmpregaNet.Application.Admin.Company.Commands;
 
-/// <summary>
-/// Validador para o comando de atualização de empresa (UpdateCommand).
-/// Valida o ID do comando e garante a obrigatoriedade dos campos para atualização.
-/// Utiliza o CompanyDataValidator para validação de formato.
-/// </summary>
 public sealed class UpdateCompanyCommandValidator : AbstractValidator<UpdateCommand<UpdateCompanyCommand, CompanyViewModel>>
 {
     public UpdateCompanyCommandValidator()

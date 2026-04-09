@@ -1,11 +1,10 @@
 using EmpregaNet.Application.Common.Base;
 using FluentValidation;
 
-namespace EmpregaNet.Application.Companies.Command;
+namespace EmpregaNet.Application.Admin.Company.Commands;
 
 /// <summary>
 /// Validador para o comando de criação de empresa (CreateCommand).
-/// Garante a obrigatoriedade dos campos para criação e usa o CompanyDataValidator para validação de formato.
 /// </summary>
 public sealed class CreateCompanyCommandValidator : AbstractValidator<CreateCommand<CreateCompanyCommand>>
 {

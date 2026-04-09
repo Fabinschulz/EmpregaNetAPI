@@ -4,7 +4,7 @@ namespace EmpregaNet.Application.Auth;
 
 /// <summary>
 /// Perfis que podem gerenciar vagas, empresas (conforme policy) e pipeline de candidaturas.
-/// Alinhado às policies em <c>IdentityConfig</c> (Administrador / Recrutamento).
+/// Alinhado às policies em <c>IdentityConfig</c> (<see cref="Utils.Constants.AuthPolicies"/>).
 /// </summary>
 public static class RecruitmentRoleNames
 {

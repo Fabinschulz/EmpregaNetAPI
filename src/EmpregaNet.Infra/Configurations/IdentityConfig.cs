@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using System.Text;
 using EmpregaNet.Application.Auth;
+using EmpregaNet.Application.Utils;
 using EmpregaNet.Domain.Common;
 using EmpregaNet.Domain.Entities;
 using EmpregaNet.Domain.Enums;
@@ -63,13 +64,13 @@ namespace EmpregaNet.Infra.Configurations
 
             builder.Services.AddAuthorization(options =>
             {
-                options.AddPolicy("Administrador", policy =>
+                options.AddPolicy(Constants.AuthPolicies.Administrador, policy =>
                 {
                     policy.RequireAuthenticatedUser();
                     policy.RequireRole(RecruitmentRoleNames.Admin);
                 });
 
-                options.AddPolicy("Recrutamento", policy =>
+                options.AddPolicy(Constants.AuthPolicies.Recrutamento, policy =>
                 {
                     policy.RequireAuthenticatedUser();
                     policy.RequireRole(
