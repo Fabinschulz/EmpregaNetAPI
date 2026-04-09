@@ -12,6 +12,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace EmpregaNet.Api.Controllers.JobApplications;
 
+/// <summary>
+/// Candidaturas a vagas: candidatos criam e consultam as suas; recrutamento lista todas, por vaga e altera estado.
+/// </summary>
 [Route("api/[controller]")]
 [Authorize]
 public class JobApplicationsController : MainController<ApplyToJobCommand, ChangeJobApplicationStatusCommand, JobApplicationViewModel>
@@ -21,6 +24,7 @@ public class JobApplicationsController : MainController<ApplyToJobCommand, Chang
     {
     }
 
+    /// <summary>Candidata o utilizador autenticado a uma vaga.</summary>
     [HttpPost]
     [ProducesResponseType(typeof(string), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(DomainError))]
@@ -34,6 +38,7 @@ public class JobApplicationsController : MainController<ApplyToJobCommand, Chang
         return Created($"api/jobapplications/{id}", $"Candidatura criada com sucesso. ID: {id}");
     }
 
+    /// <summary>Lista todas as candidaturas (paginação; apenas recrutamento).</summary>
     [HttpGet]
     [Authorize(Policy = Constants.AuthPolicies.Recrutamento)]
     public override Task<IActionResult> GetAll(
@@ -44,6 +49,7 @@ public class JobApplicationsController : MainController<ApplyToJobCommand, Chang
         [FromQuery] bool? isActive = null)
         => base.GetAll(page, size, orderBy, isDeleted, isActive);
 
+    /// <summary>Lista as candidaturas do utilizador autenticado.</summary>
     [HttpGet("mine")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ListDataPagination<JobApplicationViewModel>))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(DomainError))]
@@ -63,6 +69,7 @@ public class JobApplicationsController : MainController<ApplyToJobCommand, Chang
         return Ok(result);
     }
 
+    /// <summary>Lista candidaturas associadas a uma vaga (apenas recrutamento).</summary>
     [HttpGet("job/{jobId:long}")]
     [Authorize(Policy = Constants.AuthPolicies.Recrutamento)]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ListDataPagination<JobApplicationViewModel>))]
@@ -85,6 +92,7 @@ public class JobApplicationsController : MainController<ApplyToJobCommand, Chang
         return Ok(result);
     }
 
+    /// <summary>Atualiza o estado de uma candidatura (apenas recrutamento).</summary>
     [HttpPut("{id:long}")]
     [Authorize(Policy = Constants.AuthPolicies.Recrutamento)]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(JobApplicationViewModel))]
@@ -96,6 +104,7 @@ public class JobApplicationsController : MainController<ApplyToJobCommand, Chang
     public override Task<IActionResult> Update([FromRoute] long id, [FromBody] ChangeJobApplicationStatusCommand entity)
         => base.Update(id, entity);
 
+    /// <summary>Remove uma candidatura (apenas recrutamento).</summary>
     [HttpDelete("{id:long}")]
     [Authorize(Policy = Constants.AuthPolicies.Recrutamento)]
     public override Task<IActionResult> Delete([FromRoute] long id) => base.Delete(id);

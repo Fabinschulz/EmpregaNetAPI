@@ -24,8 +24,6 @@ public sealed record AdminUsersCreateNotSupportedCommand;
 /// </summary>
 [Route("api/[controller]")]
 [Authorize(Policy = Constants.AuthPolicies.Administrador)]
-[ApiExplorerSettings(GroupName = Constants.OpenApi.Admin)]
-[Tags("Admin")]
 public class AdminController : MainController<AdminUsersCreateNotSupportedCommand, UpdateAdminUserCommand, UserViewModel>
 {
     public AdminController(IMemoryService cacheService) : base(cacheService)
@@ -51,6 +49,7 @@ public class AdminController : MainController<AdminUsersCreateNotSupportedComman
         return Ok(result);
     }
 
+    /// <summary>Obtém o detalhe de um utilizador pelo identificador (visão administrativa).</summary>
     public override async Task<IActionResult> GetById([FromRoute] long id)
     {
         var cacheKey = ApplicationCacheKeys.Users.AdminById(id);

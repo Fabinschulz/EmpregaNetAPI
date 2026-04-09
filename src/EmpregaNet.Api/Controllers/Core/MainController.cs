@@ -9,8 +9,7 @@ using Microsoft.AspNetCore.Authorization;
 namespace EmpregaNet.Api.Controllers.Core
 {
     /// <summary>
-    /// MainController é uma classe base para controladores que gerenciam entidades com operações CRUD.
-    /// Fornece endpoints para criar, ler, atualizar e excluir recursos, além de implementar
+    /// Classe base para controladores com operações CRUD genéricas: leitura com cache, criação, atualização e exclusão com invalidação de cache.
     /// </summary>
     /// <typeparam name="TCreateCommand"></typeparam>
     /// <typeparam name="TUpdateCommand"></typeparam>

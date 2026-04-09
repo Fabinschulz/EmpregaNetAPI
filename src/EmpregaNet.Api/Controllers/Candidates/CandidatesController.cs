@@ -9,6 +9,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace EmpregaNet.Api.Controllers.Candidates;
 
+/// <summary>
+/// Consulta de candidatos (utilizadores com perfil de candidato) para equipa de recrutamento.
+/// </summary>
 [ApiController]
 [Route("api/[controller]")]
 [Authorize(Policy = Constants.AuthPolicies.Recrutamento)]
@@ -23,6 +26,7 @@ public class CandidatesController : ControllerBase
         _cacheService = cacheService;
     }
 
+    /// <summary>Lista candidatos com paginação e ordenação.</summary>
     [HttpGet]
     [ProducesResponseType(typeof(ListDataPagination<UserViewModel>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(DomainError))]
@@ -38,6 +42,7 @@ public class CandidatesController : ControllerBase
         return Ok(result);
     }
 
+    /// <summary>Obtém o detalhe de um candidato pelo identificador.</summary>
     [HttpGet("{id:long}")]
     [ProducesResponseType(typeof(UserViewModel), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(DomainError))]

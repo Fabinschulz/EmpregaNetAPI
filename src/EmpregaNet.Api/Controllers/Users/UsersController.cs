@@ -4,9 +4,9 @@ using EmpregaNet.Application.Users.Commands;
 using EmpregaNet.Application.Users.Commands.Profile;
 using EmpregaNet.Application.Users.Queries;
 using EmpregaNet.Application.Users.ViewModel;
+using EmpregaNet.Application.Utils;
 using EmpregaNet.Domain.Common;
 using EmpregaNet.Domain.Interfaces;
-using EmpregaNet.Application.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.IdentityModel.Tokens.Jwt;
@@ -28,6 +28,7 @@ public class UsersController : ControllerBase
         _cacheService = cacheService;
     }
 
+    /// <summary>Registra um novo usuário com nome de usuário, e-mail e senha.</summary>
     [AllowAnonymous]
     [HttpPost("register")]
     [ProducesResponseType(typeof(string), StatusCodes.Status201Created)]
@@ -39,6 +40,7 @@ public class UsersController : ControllerBase
         return Created($"api/users/{id}", $"Usuário criado com sucesso. ID: {id}");
     }
 
+    /// <summary>Autentica um usuário e retorna um token JWT para acesso aos recursos protegidos.</summary>
     [AllowAnonymous]
     [HttpPost("login")]
     [ProducesResponseType(typeof(UserLoggedViewModel), StatusCodes.Status200OK)]
@@ -50,6 +52,9 @@ public class UsersController : ControllerBase
         return Ok(result);
     }
 
+    /// <summary>
+    /// Retorna os dados do usuário autenticado (ID, nome de usuário, e-mail, tipo de usuário, etc.).
+    /// </summary>
     [Authorize]
     [HttpGet("me")]
     [ProducesResponseType(typeof(UserViewModel), StatusCodes.Status200OK)]

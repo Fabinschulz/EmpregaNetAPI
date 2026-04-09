@@ -132,7 +132,7 @@ namespace EmpregaNet.Api.Configuration
                     new() { Name = "JobApplications", Description = "Candidaturas e pipeline (candidato e recrutamento)." },
                     new() { Name = "Companies", Description = "Endpoints para administração de cadastros corporativos" },
                     new() { Name = "Notifications", Description = "Alertas e comunicações (reservado)." },
-                    new() { Name = "Admin", Description = "Superfície administrativa. Não aparece no documento EmpregaNet API (v1)." }
+                    new() { Name = "Admin", Description = "Superfície administrativa." }
                 };
             }
         }
