@@ -21,6 +21,12 @@ public static partial class Constants
         public const string Users = "users";
     }
 
+    /// <summary>Valores de <see cref="Microsoft.AspNetCore.Identity.UserLoginInfo.LoginProvider"/>.</summary>
+    public static class ExternalLogin
+    {
+        public const string GoogleProvider = "Google";
+    }
+
     public static class Regex
     {
         public const string email = @"^(?!\.)(""([^""\r\\]|\\[""\r\\])*""|([-A-Za-z0-9!#$%&'*+/=?^_`{|}~]|(?<!\.)\.)*)(?<!\.)@[A-Za-z0-9][\w\.-]*[A-Za-z0-9]\.[A-Za-z][A-Za-z\.]*[A-Za-z]$";

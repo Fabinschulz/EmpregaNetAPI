@@ -15,9 +15,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 
-namespace EmpregaNet.Infra.Configurations
+namespace EmpregaNet.Infra.Extensions
 {
-    public static class IdentityConfig
+    public static class IdentityExtensions
     {
 
         public static WebApplicationBuilder AddIdentityConfiguration(this WebApplicationBuilder builder)

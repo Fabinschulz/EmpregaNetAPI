@@ -1,4 +1,5 @@
 using EmpregaNet.Application.Common.Exceptions;
+using EmpregaNet.Application.Users.Identity;
 using EmpregaNet.Domain.Entities;
 using EmpregaNet.Domain.Enums;
 using FluentValidation;
@@ -73,13 +74,7 @@ public sealed class RegisterUserHandler : IRequestHandler<RegisterUserCommand, l
             throw new ValidationAppException(nameof(request.Username), errorMessage, DomainErrorEnum.RESOURCE_CREATION_FAILED);
         }
 
-        const string candidateRole = "Candidate";
-        if (!await _roleManager.RoleExistsAsync(candidateRole))
-        {
-            await _roleManager.CreateAsync(new Role { Name = candidateRole });
-        }
-
-        await _userManager.AddToRoleAsync(user, candidateRole);
+        await CandidateRoleAssignment.EnsureCandidateRoleAsync(user, _userManager, _roleManager, cancellationToken);
         return user.Id;
     }
 }

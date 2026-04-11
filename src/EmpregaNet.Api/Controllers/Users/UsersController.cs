@@ -1,6 +1,8 @@
 using EmpregaNet.Application.Auth.ViewModel;
 using EmpregaNet.Application.Common.Cache;
 using EmpregaNet.Application.Users.Commands;
+using EmpregaNet.Application.Users.Commands.Google;
+using EmpregaNet.Application.Users.Commands.Password;
 using EmpregaNet.Application.Users.Commands.Profile;
 using EmpregaNet.Application.Users.Queries;
 using EmpregaNet.Application.Users.ViewModel;
@@ -17,6 +19,8 @@ namespace EmpregaNet.Api.Controllers.Users;
 /// <summary>Registro, login e gestão da própria conta (<c>/me</c>).</summary>
 [ApiController]
 [Route("api/[controller]")]
+[ApiExplorerSettings(GroupName = Constants.OpenApi.Users)]
+[Tags("Users")]
 public class UsersController : ControllerBase
 {
     private IMediator _iMediator = null!;
@@ -50,6 +54,39 @@ public class UsersController : ControllerBase
     {
         var result = await Mediator.Send(command);
         return Ok(result);
+    }
+
+    /// <summary>Autentica com Google: envie o <c>id_token</c> obtido no cliente (Sign-In SDK). Requer <c>GoogleAuth:ClientIds</c> configurado.</summary>
+    [AllowAnonymous]
+    [HttpPost("login/google")]
+    [ProducesResponseType(typeof(UserLoggedViewModel), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(DomainError))]
+    public async Task<IActionResult> LoginWithGoogle([FromBody] LoginWithGoogleCommand command)
+    {
+        var result = await Mediator.Send(command);
+        return Ok(result);
+    }
+
+    /// <summary>Solicita e-mail com link para redefinir senha (resposta genérica por segurança).</summary>
+    [AllowAnonymous]
+    [HttpPost("forgot-password")]
+    [ProducesResponseType(typeof(ForgotPasswordResult), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(DomainError))]
+    public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordCommand command)
+    {
+        var result = await Mediator.Send(command);
+        return Ok(result);
+    }
+
+    /// <summary>Redefine a senha com o token recebido por e-mail (query string do link).</summary>
+    [AllowAnonymous]
+    [HttpPost("reset-password")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(DomainError))]
+    public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordCommand command)
+    {
+        await Mediator.Send(command);
+        return Ok(new { message = "Senha redefinida com sucesso." });
     }
 
     /// <summary>
@@ -91,6 +128,18 @@ public class UsersController : ControllerBase
     {
         var result = await Mediator.Send(command);
         return Ok(result);
+    }
+
+    /// <summary>Altera a senha do utilizador autenticado (exige senha atual).</summary>
+    [Authorize]
+    [HttpPost("me/change-password")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(DomainError))]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(DomainError))]
+    public async Task<IActionResult> ChangeMyPassword([FromBody] ChangeMyPasswordCommand command)
+    {
+        await Mediator.Send(command);
+        return Ok(new { message = "Senha alterada com sucesso." });
     }
 
     /// <summary>Encerra a própria conta (exclusão lógica; o registro permanece para auditoria).</summary>

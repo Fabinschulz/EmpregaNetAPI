@@ -1,5 +1,6 @@
 using EmpregaNet.Application.Utils;
 using EmpregaNet.Application.Utils.Helpers;
+using EmpregaNet.Application.Users.Validation;
 using FluentValidation;
 
 namespace EmpregaNet.Application.Users.Commands;
@@ -16,9 +17,7 @@ public sealed class RegisterUserCommandValidator : AbstractValidator<RegisterUse
             .NotEmpty().WithMessage("E-mail é obrigatório.")
             .EmailAddress().WithMessage("E-mail inválido.");
 
-        RuleFor(x => x.Password)
-            .NotEmpty().WithMessage("Senha é obrigatória.")
-            .MinimumLength(8).WithMessage("Senha deve ter no mínimo 8 caracteres.");
+        RuleFor(x => x.Password).ApplyNewPassword();
 
         RuleFor(x => x.PasswordConfirmation)
             .NotEmpty().WithMessage("Confirmação de senha é obrigatória.");
