@@ -2,7 +2,7 @@ using EmpregaNet.Application.Users.Commands;
 using FluentAssertions;
 using FluentValidation;
 
-namespace EmpregaNet.Tests.Unit.Application.Users;
+namespace EmpregaNet.Tests.Unit;
 
 /// <summary>
 /// Objetivo: garantir regras de entrada do cadastro (senha forte, e-mail, telefone BR opcional)

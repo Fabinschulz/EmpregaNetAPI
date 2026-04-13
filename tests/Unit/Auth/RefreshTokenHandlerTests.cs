@@ -7,7 +7,7 @@ using EmpregaNet.Domain.Enums;
 using FluentAssertions;
 using Moq;
 
-namespace EmpregaNet.Tests.Unit.Application.Auth;
+namespace EmpregaNet.Tests.Unit;
 
 /// <summary>
 /// Objetivo: validar a regra de negócio do refresh — rotação delegada ao serviço, rejeição se token

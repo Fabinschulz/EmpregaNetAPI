@@ -2,7 +2,7 @@ using EmpregaNet.Application.Users.Commands;
 using FluentAssertions;
 using FluentValidation;
 
-namespace EmpregaNet.Tests.Unit.Application.Users;
+namespace EmpregaNet.Tests.Unit;
 
 /// <summary>
 /// Objetivo: validar contrato de entrada do reset de senha (userId, token, política de senha nova),
