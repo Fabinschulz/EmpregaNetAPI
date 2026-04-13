@@ -67,9 +67,15 @@ public sealed class RefreshTokenService : IRefreshTokenService
     public async Task RevokeAllForUserAsync(long userId, CancellationToken cancellationToken = default)
     {
         var now = DateTimeOffset.UtcNow;
-        await _db.UserRefreshTokens
+        var rows = await _db.UserRefreshTokens
             .Where(x => x.UserId == userId && x.RevokedAt == null && x.ExpiresAt >= now)
-            .ExecuteUpdateAsync(s => s.SetProperty(x => x.RevokedAt, now), cancellationToken);
+            .ToListAsync(cancellationToken);
+
+        foreach (var row in rows)
+            row.RevokedAt = now;
+
+        if (rows.Count > 0)
+            await _db.SaveChangesAsync(cancellationToken);
     }
 
     private static string CreateOpaqueToken()
