@@ -77,7 +77,6 @@ As migrações são gerenciadas pelo projeto **Infrastructure**, execute os coma
 
 O ambiente de desenvolvimento pode ser inicializado utilizando Docker Compose, que gerencia os serviços Redis, RedisInsight e a aplicação WebApp.
 Certifique-se de ter o **Docker** e **Docker Compose** instalados.
-Configure o arquivo `.env` com as variáveis de ambiente do **SQL Server**.
 
 ### Como Executar
 
