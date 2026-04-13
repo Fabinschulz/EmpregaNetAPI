@@ -15,17 +15,20 @@ public sealed class LoginUserHandler : IRequestHandler<LoginUserCommand, UserLog
     private readonly UserManager<User> _userManager;
     private readonly SignInManager<User> _signInManager;
     private readonly IJwtBuilder _jwtBuilder;
+    private readonly IRefreshTokenService _refreshTokens;
     private readonly IValidator<LoginUserCommand> _validator;
 
     public LoginUserHandler(
         UserManager<User> userManager,
         SignInManager<User> signInManager,
         IJwtBuilder jwtBuilder,
+        IRefreshTokenService refreshTokens,
         IValidator<LoginUserCommand> validator)
     {
         _userManager = userManager;
         _signInManager = signInManager;
         _jwtBuilder = jwtBuilder;
+        _refreshTokens = refreshTokens;
         _validator = validator;
     }
 
@@ -49,7 +52,31 @@ public sealed class LoginUserHandler : IRequestHandler<LoginUserCommand, UserLog
                 DomainErrorEnum.INVALID_PASSWORD);
         }
 
-        var result = await _signInManager.CheckPasswordSignInAsync(user, request.Password, false);
+        var result = await _signInManager.CheckPasswordSignInAsync(user, request.Password, lockoutOnFailure: true);
+        if (result.IsLockedOut)
+        {
+            throw new ValidationAppException(
+                nameof(request.Login),
+                "Conta temporariamente bloqueada por tentativas falhadas. Tente novamente mais tarde.",
+                DomainErrorEnum.INVALID_ACTION_FOR_STATUS);
+        }
+
+        if (result.RequiresTwoFactor)
+        {
+            throw new ValidationAppException(
+                nameof(request.Login),
+                "Esta conta requer autenticação em dois passos; contacte o suporte.",
+                DomainErrorEnum.UNSUPPORTED_OPERATION);
+        }
+
+        if (result.IsNotAllowed)
+        {
+            throw new ValidationAppException(
+                nameof(request.Login),
+                "Confirme o seu e-mail antes de iniciar sessão. Verifique a caixa de entrada ou solicite um novo link de confirmação.",
+                DomainErrorEnum.INVALID_ACTION_FOR_RECORD);
+        }
+
         if (!result.Succeeded)
         {
             throw new ValidationAppException(
@@ -58,6 +85,8 @@ public sealed class LoginUserHandler : IRequestHandler<LoginUserCommand, UserLog
                 DomainErrorEnum.INVALID_PASSWORD);
         }
 
-        return await _jwtBuilder.BuildUserTokenAsync(user);
+        var vm = await _jwtBuilder.BuildUserTokenAsync(user);
+        vm.RefreshToken = await _refreshTokens.IssueAsync(user.Id, cancellationToken);
+        return vm;
     }
 }

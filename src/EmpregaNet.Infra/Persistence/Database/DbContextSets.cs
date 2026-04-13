@@ -1,4 +1,4 @@
-﻿using EmpregaNet.Domain.Entities;
+using EmpregaNet.Domain.Entities;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,5 +12,6 @@ namespace EmpregaNet.Infra.Persistence.Database
         public DbSet<Company> Companies => Set<Company>();
         public DbSet<Job> Jobs => Set<Job>();
         public DbSet<JobApplication> JobApplications => Set<JobApplication>();
+        public DbSet<UserRefreshToken> UserRefreshTokens => Set<UserRefreshToken>();
     }
 }

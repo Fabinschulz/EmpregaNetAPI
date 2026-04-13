@@ -44,6 +44,12 @@ public class UserLoggedViewModel
 
     public string Key { get; set; } = string.Empty;
 
+    /// <summary>
+    /// Refresh token opaco (cliente não pode ler ou decodificar seu conteúdo, apenas armazená-lo e enviá-lo de volta para o servidor.)
+    /// OBS: No frontend, utilize armazenamento seguro no cliente (ex.: cookie HttpOnly).
+    /// </summary>
+    public string? RefreshToken { get; set; }
+
     public UserLoggedViewModel()
     {
     }

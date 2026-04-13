@@ -1,9 +1,6 @@
 using EmpregaNet.Application.Auth.ViewModel;
 using EmpregaNet.Application.Common.Cache;
 using EmpregaNet.Application.Users.Commands;
-using EmpregaNet.Application.Users.Commands.Google;
-using EmpregaNet.Application.Users.Commands.Password;
-using EmpregaNet.Application.Users.Commands.Profile;
 using EmpregaNet.Application.Users.Queries;
 using EmpregaNet.Application.Users.ViewModel;
 using EmpregaNet.Application.Utils;
@@ -19,8 +16,6 @@ namespace EmpregaNet.Api.Controllers.Users;
 /// <summary>Registro, login e gestão da própria conta (<c>/me</c>).</summary>
 [ApiController]
 [Route("api/[controller]")]
-[ApiExplorerSettings(GroupName = Constants.OpenApi.Users)]
-[Tags("Users")]
 public class UsersController : ControllerBase
 {
     private IMediator _iMediator = null!;
@@ -41,7 +36,7 @@ public class UsersController : ControllerBase
     public async Task<IActionResult> Register([FromBody] RegisterUserCommand command)
     {
         var id = await Mediator.Send(command);
-        return Created($"api/users/{id}", $"Usuário criado com sucesso. ID: {id}");
+        return Created($"api/users/{id}", $"Usuário criado com sucesso. ID: {id}. Confirme o e-mail para poder iniciar sessão.");
     }
 
     /// <summary>Autentica um usuário e retorna um token JWT para acesso aos recursos protegidos.</summary>
@@ -51,6 +46,17 @@ public class UsersController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(DomainError))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(DomainError))]
     public async Task<IActionResult> Login([FromBody] LoginUserCommand command)
+    {
+        var result = await Mediator.Send(command);
+        return Ok(result);
+    }
+
+    /// <summary>Renova o access token com um refresh token válido (rotação: o refresh antigo deixa de ser válido).</summary>
+    [AllowAnonymous]
+    [HttpPost("refresh-token")]
+    [ProducesResponseType(typeof(UserLoggedViewModel), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(DomainError))]
+    public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenCommand command)
     {
         var result = await Mediator.Send(command);
         return Ok(result);
@@ -73,6 +79,28 @@ public class UsersController : ControllerBase
     [ProducesResponseType(typeof(ForgotPasswordResult), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(DomainError))]
     public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordCommand command)
+    {
+        var result = await Mediator.Send(command);
+        return Ok(result);
+    }
+
+    /// <summary>Confirma o e-mail com <c>userId</c> e <c>token</c> do link enviado após o registo.</summary>
+    [AllowAnonymous]
+    [HttpPost("confirm-email")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(DomainError))]
+    public async Task<IActionResult> ConfirmEmail([FromBody] ConfirmEmailCommand command)
+    {
+        await Mediator.Send(command);
+        return Ok(new { message = "E-mail confirmado com sucesso. Já pode iniciar sessão." });
+    }
+
+    /// <summary>Reenvia o link de confirmação de e-mail (resposta genérica por segurança).</summary>
+    [AllowAnonymous]
+    [HttpPost("resend-email-confirmation")]
+    [ProducesResponseType(typeof(ResendEmailConfirmationResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(DomainError))]
+    public async Task<IActionResult> ResendEmailConfirmation([FromBody] ResendEmailConfirmationCommand command)
     {
         var result = await Mediator.Send(command);
         return Ok(result);

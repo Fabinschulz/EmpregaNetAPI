@@ -3,8 +3,6 @@ using EmpregaNet.Application.Interfaces;
 using Google.Apis.Auth;
 using Microsoft.Extensions.Options;
 
-namespace EmpregaNet.Infra.Security;
-
 public sealed class GoogleIdTokenValidator : IGoogleIdTokenValidator
 {
     private readonly GoogleAuthOptions _options;

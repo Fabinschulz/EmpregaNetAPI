@@ -1,12 +1,13 @@
 using EmpregaNet.Application.Common.Cache;
 using EmpregaNet.Application.Common.Exceptions;
+using EmpregaNet.Application.Interfaces;
 using EmpregaNet.Domain.Entities;
 using EmpregaNet.Domain.Enums;
 using EmpregaNet.Domain.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 
-namespace EmpregaNet.Application.Users.Commands.Password;
+namespace EmpregaNet.Application.Users.Commands;
 
 public sealed record ChangeMyPasswordCommand(
     string CurrentPassword,
@@ -18,17 +19,20 @@ public sealed class ChangeMyPasswordHandler : IRequestHandler<ChangeMyPasswordCo
     private readonly UserManager<User> _userManager;
     private readonly IHttpCurrentUser _httpCurrentUser;
     private readonly IMemoryService _memoryService;
+    private readonly IRefreshTokenService _refreshTokens;
     private readonly ILogger<ChangeMyPasswordHandler> _logger;
 
     public ChangeMyPasswordHandler(
         UserManager<User> userManager,
         IHttpCurrentUser httpCurrentUser,
         IMemoryService memoryService,
+        IRefreshTokenService refreshTokens,
         ILogger<ChangeMyPasswordHandler> logger)
     {
         _userManager = userManager;
         _httpCurrentUser = httpCurrentUser;
         _memoryService = memoryService;
+        _refreshTokens = refreshTokens;
         _logger = logger;
     }
 
@@ -65,6 +69,8 @@ public sealed class ChangeMyPasswordHandler : IRequestHandler<ChangeMyPasswordCo
 
         _memoryService.Remove(ApplicationCacheKeys.Users.Me(user.Id));
         await _memoryService.RemoveByPatternAsync(ApplicationCacheKeys.Users.AdminPrefix);
+
+        await _refreshTokens.RevokeAllForUserAsync(user.Id, cancellationToken);
 
         return true;
     }

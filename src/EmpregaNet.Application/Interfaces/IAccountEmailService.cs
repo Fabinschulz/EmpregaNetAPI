@@ -5,6 +5,9 @@ namespace EmpregaNet.Application.Interfaces;
 /// </summary>
 public interface IAccountEmailService
 {
-    /// <summary>Envia o e-mail com o link para redefinir a senha (conteúdo já com identidade EmpregaNet).</summary>
+    /// <summary>Envia o e-mail com o link para redefinir a senha.</summary>
     Task SendPasswordResetLinkAsync(string toEmail, string resetLink, CancellationToken cancellationToken = default);
+
+    /// <summary>Envia o e-mail com o link para confirmar o endereço de e-mail após o registo.</summary>
+    Task SendEmailConfirmationLinkAsync(string toEmail, string confirmationLink, CancellationToken cancellationToken = default);
 }

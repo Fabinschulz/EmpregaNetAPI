@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace EmpregaNet.Application.Users.Commands.Password;
+namespace EmpregaNet.Application.Users.Commands;
 
 public sealed record ForgotPasswordCommand(string Email) : IRequest<ForgotPasswordResult>;
 

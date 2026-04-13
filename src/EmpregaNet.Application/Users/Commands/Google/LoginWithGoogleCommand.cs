@@ -8,7 +8,7 @@ using EmpregaNet.Domain.Enums;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 
-namespace EmpregaNet.Application.Users.Commands.Google;
+namespace EmpregaNet.Application.Users.Commands;
 
 public sealed record LoginWithGoogleCommand(string IdToken) : IRequest<UserLoggedViewModel>;
 
@@ -18,6 +18,7 @@ public sealed class LoginWithGoogleHandler : IRequestHandler<LoginWithGoogleComm
     private readonly UserManager<User> _userManager;
     private readonly RoleManager<Role> _roleManager;
     private readonly IJwtBuilder _jwtBuilder;
+    private readonly IRefreshTokenService _refreshTokens;
     private readonly ILogger<LoginWithGoogleHandler> _logger;
 
     public LoginWithGoogleHandler(
@@ -25,12 +26,14 @@ public sealed class LoginWithGoogleHandler : IRequestHandler<LoginWithGoogleComm
         UserManager<User> userManager,
         RoleManager<Role> roleManager,
         IJwtBuilder jwtBuilder,
+        IRefreshTokenService refreshTokens,
         ILogger<LoginWithGoogleHandler> logger)
     {
         _googleTokens = googleTokens;
         _userManager = userManager;
         _roleManager = roleManager;
         _jwtBuilder = jwtBuilder;
+        _refreshTokens = refreshTokens;
         _logger = logger;
     }
 
@@ -86,7 +89,7 @@ public sealed class LoginWithGoogleHandler : IRequestHandler<LoginWithGoogleComm
             }
 
             _logger.LogInformation("Login Google associado ao usuário existente {UserId}.", user.Id);
-            return await _jwtBuilder.BuildUserTokenAsync(user);
+            return await BuildTokenWithRefreshAsync(user, cancellationToken);
         }
 
         var userName = await BuildUniqueUserNameAsync(payload.Email);
@@ -116,7 +119,14 @@ public sealed class LoginWithGoogleHandler : IRequestHandler<LoginWithGoogleComm
         }
 
         _logger.LogInformation("Novo usuário {UserId} criado via Google.", user.Id);
-        return await _jwtBuilder.BuildUserTokenAsync(user);
+        return await BuildTokenWithRefreshAsync(user, cancellationToken);
+    }
+
+    private async Task<UserLoggedViewModel> BuildTokenWithRefreshAsync(User user, CancellationToken cancellationToken)
+    {
+        var vm = await _jwtBuilder.BuildUserTokenAsync(user);
+        vm.RefreshToken = await _refreshTokens.IssueAsync(user.Id, cancellationToken);
+        return vm;
     }
 
     private async Task<string> BuildUniqueUserNameAsync(string email)

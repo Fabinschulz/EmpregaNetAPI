@@ -1,6 +1,5 @@
 using EmpregaNet.Application.Common.Cache;
 using EmpregaNet.Application.Common.Exceptions;
-using EmpregaNet.Application.Interfaces;
 using EmpregaNet.Application.Users.ViewModel;
 using EmpregaNet.Domain.Entities;
 using EmpregaNet.Domain.Enums;
@@ -8,7 +7,7 @@ using EmpregaNet.Domain.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 
-namespace EmpregaNet.Application.Users.Commands.Profile;
+namespace EmpregaNet.Application.Users.Commands;
 
 /// <summary>Dados que o próprio usuário pode alterar (sem mudar tipo/perfil administrativo).</summary>
 public sealed record UpdateMyProfileCommand(

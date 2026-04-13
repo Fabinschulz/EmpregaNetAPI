@@ -1,12 +1,13 @@
 using EmpregaNet.Application.Common.Cache;
 using EmpregaNet.Application.Common.Exceptions;
+using EmpregaNet.Application.Interfaces;
 using EmpregaNet.Domain.Entities;
 using EmpregaNet.Domain.Enums;
 using EmpregaNet.Domain.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 
-namespace EmpregaNet.Application.Users.Commands.Password;
+namespace EmpregaNet.Application.Users.Commands;
 
 public sealed record ResetPasswordCommand(
     long UserId,
@@ -18,15 +19,18 @@ public sealed class ResetPasswordHandler : IRequestHandler<ResetPasswordCommand,
 {
     private readonly UserManager<User> _userManager;
     private readonly IMemoryService _memoryService;
+    private readonly IRefreshTokenService _refreshTokens;
     private readonly ILogger<ResetPasswordHandler> _logger;
 
     public ResetPasswordHandler(
         UserManager<User> userManager,
         IMemoryService memoryService,
+        IRefreshTokenService refreshTokens,
         ILogger<ResetPasswordHandler> logger)
     {
         _userManager = userManager;
         _memoryService = memoryService;
+        _refreshTokens = refreshTokens;
         _logger = logger;
     }
 
@@ -64,6 +68,8 @@ public sealed class ResetPasswordHandler : IRequestHandler<ResetPasswordCommand,
 
         _memoryService.Remove(ApplicationCacheKeys.Users.Me(user.Id));
         await _memoryService.RemoveByPatternAsync(ApplicationCacheKeys.Users.AdminPrefix);
+
+        await _refreshTokens.RevokeAllForUserAsync(user.Id, cancellationToken);
 
         return true;
     }

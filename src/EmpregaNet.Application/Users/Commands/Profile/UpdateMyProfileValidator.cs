@@ -1,6 +1,6 @@
 using FluentValidation;
 
-namespace EmpregaNet.Application.Users.Commands.Profile;
+namespace EmpregaNet.Application.Users.Commands;
 
 public sealed class UpdateMyProfileCommandValidator : AbstractValidator<UpdateMyProfileCommand>
 {

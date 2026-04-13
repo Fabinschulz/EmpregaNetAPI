@@ -54,6 +54,8 @@ namespace EmpregaNet.Infra.Extensions
                         // Configurações de usuário
                         options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+ ";
                         options.User.RequireUniqueEmail = true;
+
+                        options.SignIn.RequireConfirmedEmail = true;
                     })
                     .AddEntityFrameworkStores<PostgreSqlContext>()
                     .AddRoleManager<RoleManager<Role>>()

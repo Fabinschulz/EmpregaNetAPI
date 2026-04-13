@@ -1,13 +1,12 @@
 using EmpregaNet.Application.Common.Cache;
 using EmpregaNet.Application.Common.Exceptions;
-using EmpregaNet.Application.Interfaces;
 using EmpregaNet.Domain.Entities;
 using EmpregaNet.Domain.Enums;
 using EmpregaNet.Domain.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 
-namespace EmpregaNet.Application.Users.Commands.Profile;
+namespace EmpregaNet.Application.Users.Commands;
 
 public sealed record DeleteMyProfileCommand : IRequest<bool>;
 

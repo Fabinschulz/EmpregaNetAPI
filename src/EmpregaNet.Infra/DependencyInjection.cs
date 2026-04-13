@@ -7,7 +7,6 @@ using EmpregaNet.Infra.Extensions;
 using EmpregaNet.Infra.Persistence.Database;
 using EmpregaNet.Infra.Persistence.Repositories;
 using EmpregaNet.Infra.Email;
-using EmpregaNet.Infra.Security;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.Extensions.Configuration;
@@ -46,6 +45,7 @@ public static class DependencyInjection
 
         builder.Services.AddScoped<IGoogleIdTokenValidator, GoogleIdTokenValidator>();
         builder.Services.AddScoped<IAccountEmailService, AccountEmailService>();
+        builder.Services.AddScoped<IRefreshTokenService, RefreshTokenService>();
     }
 
     private static void EnsureSmtpConfiguredForProduction(IHostEnvironment env, SmtpEmailOptions smtp)

@@ -12,4 +12,7 @@ public sealed class AppUrlsOptions
 
     /// <summary>Caminho da página de nova senha (ex.: /auth/reset-password).</summary>
     public string PasswordResetPath { get; set; } = "/auth/reset-password";
+
+    /// <summary>Caminho da página que confirma o e-mail (ex.: /auth/confirm-email).</summary>
+    public string EmailConfirmationPath { get; set; } = "/auth/confirm-email";
 }

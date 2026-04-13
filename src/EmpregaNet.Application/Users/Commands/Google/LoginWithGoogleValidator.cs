@@ -1,6 +1,6 @@
 using FluentValidation;
 
-namespace EmpregaNet.Application.Users.Commands.Google;
+namespace EmpregaNet.Application.Users.Commands;
 
 public sealed class LoginWithGoogleCommandValidator : AbstractValidator<LoginWithGoogleCommand>
 {
