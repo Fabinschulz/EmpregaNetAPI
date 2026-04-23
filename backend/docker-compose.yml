@@ -53,13 +53,13 @@ services:
   bff:
     container_name: empreganet_bff
     build:
-      context: .
+      context: ../bff
       dockerfile: Dockerfile
-      target: bff
+    env_file:
+      - ../bff/.env
     ports:
       - "${BFF_PORT}:8080"
     environment:
-      ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT}
       EmpregaNetApi__BaseUrl: "http://api:8080"
     networks:
       - empreganet_network
@@ -70,11 +70,11 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-      target: api
+    env_file:
+      - .env
     ports:
       - "${API_PORT}:8080"
     environment:
-      ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT}
       ConnectionStrings__PostgreSQLConnection: "Host=postgres;Port=5432;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};"
       Redis__Connection: "redis:6379"
     depends_on:
@@ -94,30 +94,3 @@ volumes:
   postgres_data:
   redis_data:
   redisinsight_data:
-
-
-# .env (Exemplo)
-# ----------------
-# Ambiente
-# ASPNETCORE_ENVIRONMENT=Development
-
-# # PostgreSQL
-# POSTGRES_HOST=postgres
-# POSTGRES_PORT=5432
-# POSTGRES_DB=EmpregaNetDB
-# POSTGRES_USER=postgres
-# POSTGRES_PASSWORD=postgres
-
-# # Redis
-# REDIS_HOST=redis
-# REDIS_PORT=6379
-# REDIS_INSIGHT_PORT=5540
-
-# # Aplicações
-# BFF_PORT=8080
-# API_PORT=8081
-
-# # Seed (opcional — sobrescreve appsettings; em produção use senha forte)
-# Seed__AdminEmail=admin@suaempresa.com
-# Seed__AdminUserName=admin
-# Seed__AdminPassword=SuaSenhaForte1!

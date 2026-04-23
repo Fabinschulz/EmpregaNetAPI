@@ -1,0 +1,8 @@
+**/.env
+**/.git
+**/.vs
+**/.vscode
+**/*.*proj.user
+**/bin
+**/obj
+**/node_modules

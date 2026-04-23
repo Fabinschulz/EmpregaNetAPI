@@ -10,8 +10,8 @@ jobs:
     name: CI - Build and Tests
     uses: ./.github/workflows/build-and-test.yml
     with:
-      solution_file: EmpregaNet.sln
-      tests_project_path: tests/tests.csproj
+      solution_file: backend/EmpregaNet.sln
+      tests_project_path: backend/tests/tests.csproj
 
   docker-ecr:
     name: CD - Publish ECR
@@ -41,8 +41,8 @@ jobs:
 #     needs: [build-and-test]
 #     uses: ./.github/workflows/elastic-beans.yml
 #     with:
-#       solution_file: EmpregaNet.sln
-#       api_project_path: src/EmpregaNet.Api
+#       solution_file: backend/EmpregaNet.sln
+#       api_project_path: backend/src/EmpregaNet.Api
 #       eb_application_name: empreganet-api-app
 #       eb_environment_name: empreganet-api-prod-env
 #       aws_region: us-west-2

@@ -1,170 +1,138 @@
-# 🚀 EmpregaNet API - Plataforma de Recrutamento Digital
+# EmpregaNet — monorepo (backend, BFF e frontend)
 
 ![.NET Version](https://img.shields.io/badge/.NET-10.0-blue)
 ![Architecture](https://img.shields.io/badge/Architecture-Clean%20Architecture-green)
 ![License](https://img.shields.io/badge/License-MIT-orange)
 
-## 🔍 Visão Geral
+## Visão geral
 
-A **EmpregaNet API** é o coração de uma plataforma moderna de recrutamento, desenvolvida com:
+Repositório **monolítico**: um único Git com pastas por camada na raiz.
 
-- **ASP.NET Core 10**
-- **Padrão CQRS**
-- **Domain-Driven Design (DDD)**
-- **Clean Architecture**
+| Pasta | Responsabilidade |
+|--------|-------------------|
+| **`backend/`** | Stack .NET da API: `EmpregaNet.sln`, `Dockerfile`, `docker-compose.yml`, `.gitignore` e `.dockerignore` do core, mais `src/` (Domain, Application, Infra, Api) e `tests/`. |
+| **`bff/`** | BFF em .NET: `EmpregaNet.Bff.sln`, `Dockerfile` e projetos `Bff.*`. |
+| **`frontend/`** | Reservado para a aplicação cliente em react. |
 
-## Estrutura da Solução e Fluxo de Dependência
+### Estrutura do projeto
 
-A estrutura da solução segue o **princípio da dependência de dentro para fora**.  
-As camadas externas (BFF, Infraestrutura) dependem das camadas internas (Aplicação, Domínio), mas nunca o contrário.
-
-
-### 1. Pré-requisitos
-
-- [.NET SDK 10](https://dotnet.microsoft.com/download/dotnet/10.0) ou superior  
-- Acesso e credenciais válidas para o **Postgres SQL** (via VPN ou rede local)
-
----
-
-### 2. Configuração de Variáveis de Ambiente
-
-O projeto utiliza variáveis de ambiente para a **Connection String**.  
-Defina os seguintes valores em um arquivo `.env` ou nas configurações do seu IDE:
-
-```bash
-POSTGRES_PORT=5432
-POSTGRES_HOST=""
-POSTGRES_DB=""
-POSTGRES_USER=""
-POSTGRES_PASSWORD=""
+```
+backend/
+  EmpregaNet.sln
+  Dockerfile
+  docker-compose.yml
+  .dockerignore
+  .gitignore
+  .env    
+  src/   … Domain, Application, Infra, Api
+  tests/
+bff/
+  EmpregaNet.Bff.sln
+  Dockerfile
+  .dockerignore
+  .env      
+  Bff.Core/
+  Bff.Infrastructure/
+  Bff.WebApi/
+frontend/
+  README.md
+  .env   
+.gitignore          
 ```
 
-> ⚠️ **Importante:**  
-> Nunca versionar o arquivo `.env` no controle de versão (Git).
+### Fluxo de dependência (API)
+
+`Api` e `Infra` referenciam `Application`; `Application` referencia `Domain`. O BFF comunica com a API por HTTP.
 
 ---
 
-### 3. Como Rodar as APIs
+## Pré-requisitos
 
-Execute os comandos a partir da **raiz da solução** (onde está o arquivo `EmpregaNet.sln`):
-
-| API | Comando de Execução | Endpoint Típico |
-|------|----------------------|----------------|
-| **BFF API (Web)** | `dotnet run --project Bff/BFF.WebApi` | [http://localhost:5134](http://localhost:5134/swagger/index.html) |
-| **API** | `dotnet run --project src/EmpregaNet.Api` | [http://localhost:5065](http://localhost:5065/swagger/index.html) |
+- [.NET SDK 10](https://dotnet.microsoft.com/download/dotnet/10.0)
+- PostgreSQL quando correr a API fora do Docker
+- Docker e Docker Compose (stack com Postgres, Redis, API e BFF)
 
 ---
 
-## 4. Migrações do Entity Framework Core
+## Variáveis de ambiente (um `.env` por aplicação)
 
-As migrações são gerenciadas pelo projeto **Infrastructure**, execute os comandos abaixo na **raiz da solução**:
+Cada aplicação mantém o **seu** `.env` na própria pasta (não há `.env` único na raiz do monorepo):
 
-### Criar uma Nova Migração
+| Aplicação | Ficheiro |
+|-----------|----------|
+| API + stack Docker (Postgres, Redis, portas da API) | `backend/.env` |
+| BFF | `bff/.env` |
+| Frontend | `frontend/.env` |
+
+---
+### Docker Compose (pasta `backend/`)
+
+A interpolação `${BFF_PORT}` e outras variáveis do BFF vêm do `.env` do BFF. Execute a partir de `backend/` passando **os dois** ficheiros:
 
 ```bash
-     No terminal via CLI navega para o path *src/EmpregaNet.Infra* e
-     rode o comando *dotnet ef migrations add [NomeDescritivoDaMigracao]  --context PostgreSqlContext --output-dir Persistence/Migrations*
- ```
-
-### Aplicar Migrações (Atualizar o Banco de Dados) 
-```bash
-    No terminal via CLI navega para o path *src/EmpregaNet.Infra* e 
-    rode o comando *dotnet ef database update* 
+cd backend
+docker compose --env-file .env --env-file ../bff/.env up --build -d
 ```
+
+O serviço **api** carrega também `backend/.env` no contentor (`env_file`). O **bff** carrega `bff/.env` no contentor.
+
 ---
 
-## Execução com Docker Compose
+## Executar a API e o BFF (desenvolvimento)
 
-O ambiente de desenvolvimento pode ser inicializado utilizando Docker Compose, que gerencia os serviços Redis, RedisInsight e a aplicação WebApp.
-Certifique-se de ter o **Docker** e **Docker Compose** instalados.
+| Alvo | Comando |
+|--------|---------|
+| **Abrir / compilar API** | `dotnet build backend/EmpregaNet.sln` |
+| **API** | `dotnet run --project backend/src/EmpregaNet.Api/EmpregaNet.Api.csproj` |
+| **BFF** | `dotnet run --project bff/Bff.WebApi/Bff.WebApi.csproj` |
+| **BFF (via solução)** | `dotnet build bff/EmpregaNet.Bff.sln` |
 
-### Como Executar
-
-No terminal, execute o comando abaixo para **construir a imagem** (caso haja mudanças no Dockerfile) e iniciar todos os serviços em modo **detached** (segundo plano):
-
-> docker compose up --build -d
-
-
-### Após a Inicialização
-
-Se as portas padrão forem usadas, as aplicações e ferramentas estarão acessíveis em:
-
-- **BFF (Backend for Frontend):** [http://localhost:8080](http://localhost:8080)  
-- **API (Core Service):** [http://localhost:8081](http://localhost:8081)  
-- **RedisInsight (UI):** [http://localhost:5540](http://localhost:5540)  
 ---
 
-### Comandos Úteis
+## Migrações (EF Core)
 
-- Para verificar o status dos containers:
+```bash
+cd backend/src/EmpregaNet.Infra
+dotnet ef migrations add NomeDaMigracao --context PostgreSqlContext --output-dir Persistence/Migrations
+dotnet ef database update
+```
+
+---
+
+## Docker Compose (API + BFF + infra)
+
+O ficheiro de orquestração está em **`backend/docker-compose.yml`**. O serviço `api` usa o contexto `backend/`; o `bff` usa `../bff`.
+
+```bash
+cd backend
+docker compose --env-file .env --env-file ../bff/.env up --build -d
+```
+
+Comandos úteis (a partir de `backend/`):
 
 ```bash
 docker compose ps
-docker compose up -d
-```
-
-- Para parar os containers, execute:
-
-```bash
 docker compose down
 ```
+
+### Imagem só da API (CI / ECR)
+
+A partir da **raiz** do repositório:
+
+```bash
+docker build -f backend/Dockerfile -t empreganet-api ./backend
+```
+
+### Testes
+
+A partir da raiz:
+
+```bash
+dotnet test backend/tests/tests.csproj
+```
+
 ---
 
-```mermaid
-graph TD
-    A[Clientes] --> B[API]
-    B --> C[Application Layer]
-    C --> D[Domain Layer]
-    C --> E[Infrastructure Layer]
-    E --> F[(Database)]
-```
---- 
+## Licença
 
-## Estrutura do Projeto
-
-A solução `EmpregaNet.sln` é organizada em uma arquitetura de camadas, promovendo **separação de responsabilidades**, **facilidade de manutenção**, **testabilidade** e **escalabilidade**:
-
-```
-├── EmpregaNet.sln
-├── EmpregaNet.Api/                  # 🖥️ Camada de Apresentação
-│   ├── Configuration/               # Configurações do sistema
-│   ├── Controllers/                 # Endpoints da API
-│   ├── Middleware/                  # Middlewares customizados
-│   ├── appsettings.Development.json
-│   │── appsettings.json  
-│   ├── Program.cs                   # Configuração inicial
-│   └── EmpregaNet.Api.csproj
-│
-├── EmpregaNet.Application/          # 🧠 Lógica de Aplicação
-│   ├── Common/                      # Objetos compartilhados
-│   ├── Company/                     # Casos de uso de Empresas
-│   ├── Job/                         # Casos de uso de Vagas
-│   ├── Service/                     # Serviços da aplicação
-│   ├── ViewModel/                   # Modelos de visualização
-│   └── EmpregaNet.Application.csproj
-│
-├── EmpregaNet.Domain/               # 💡 Modelos de Domínio
-│   ├── Entities/                    # Entidades do negócio
-│   ├── Enums/                       # Enumerações
-│   ├── Interfaces/                  # Contratos do domínio
-│   └── EmpregaNet.Domain.csproj
-│
-├── EmpregaNet.Infra/                # 🔌 Infraestrutura
-│   ├── Cache/                       # Implementações de cache
-│   ├── Configurations/              # Configurações de banco
-│   ├── Persistence/                 # Repositórios e DbContext
-│   ├── Utils/                       # Utilitários
-│   ├── DependencyInjection.cs       # Injeção de dependências
-│   └── EmpregaNet.Infra.csproj
-│
-└── EmpregaNet.Tests/                # 🧪 Testes
-    ├── IntegrationTests/
-    ├── UnitTests/
-    ├── dockerignore
-    ├── .gitignore
-    └── docker-compose.yml
-```
----
-
-## 📜 Licença
-Distribuído sob licença MIT. Veja LICENSE para mais informações.
+Distribuído sob licença MIT, quando aplicável.

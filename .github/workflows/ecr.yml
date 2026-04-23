@@ -41,7 +41,7 @@ jobs:
 
           echo "Building image $IMAGE_URI"
 
-          docker build --platform linux/amd64 -t "$IMAGE_URI" .
+          docker build --platform linux/amd64 -f backend/Dockerfile -t "$IMAGE_URI" ./backend
 
           docker push "$IMAGE_URI"
 

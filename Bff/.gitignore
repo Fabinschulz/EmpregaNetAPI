@@ -1,0 +1,7 @@
+.vs/
+*.user
+*.suo
+appsettings*.json
+secrets.json
+.env
+.env.local

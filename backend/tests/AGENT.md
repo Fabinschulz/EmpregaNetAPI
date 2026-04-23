@@ -30,7 +30,7 @@ Este documento define o **padrão** para implementar testes de unidade e integra
 ## 3. Organização de pastas (sugestão)
 
 ```
-tests/
+backend/tests/
   AGENT.MD
   Unit/
     Application/
@@ -162,13 +162,13 @@ public sealed class MeuHandlerTests
 Na raiz do repositório:
 
 ```bash
-dotnet test tests/tests.csproj
+dotnet test backend/tests/tests.csproj
 ```
 
 Com cobertura (se configurado com coverlet):
 
 ```bash
-dotnet test tests/tests.csproj --collect:"XPlat Code Coverage"
+dotnet test backend/tests/tests.csproj --collect:"XPlat Code Coverage"
 ```
 
 ---
