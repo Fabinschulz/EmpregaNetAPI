@@ -1,0 +1,88 @@
+.command {
+  display: flex;
+  height: 100%;
+  width: 100%;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: 12px;
+  background: transparent;
+  color: var(--text);
+}
+
+.input {
+  display: flex;
+  height: 36px;
+  width: 100%;
+  border: 0;
+  border-bottom: 1px solid var(--border);
+  background: transparent;
+  padding: 8px 12px;
+  font-size: 14px;
+  color: var(--text);
+  outline: none;
+}
+
+.input::placeholder {
+  color: var(--muted);
+}
+
+.list {
+  max-height: 240px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.empty {
+  padding: 24px 12px;
+  text-align: center;
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.group {
+  overflow: hidden;
+  padding: 4px;
+  color: var(--text);
+}
+
+.groupHeading {
+  padding: 6px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.item {
+  position: relative;
+  display: flex;
+  cursor: pointer;
+  user-select: none;
+  align-items: center;
+  gap: 8px;
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-size: 14px;
+  outline: none;
+}
+
+.item[data-disabled="true"] {
+  pointer-events: none;
+  opacity: 0.45;
+}
+
+.item[data-selected="true"] {
+  background: rgba(96, 165, 250, 0.22);
+  color: var(--text);
+}
+
+.itemSelectedAccent[data-selected="true"] {
+  background: rgba(96, 165, 250, 0.28);
+}
+
+.separator {
+  margin: 4px -4px;
+  height: 1px;
+  background: var(--border);
+}

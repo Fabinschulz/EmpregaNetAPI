@@ -1,0 +1,12 @@
+.content {
+  z-index: 50;
+  width: var(--radix-popover-trigger-width);
+  max-width: min(calc(100vw - 2rem), var(--radix-popover-trigger-width));
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--panel);
+  color: var(--text);
+  box-shadow: var(--shadow);
+  padding: 8px;
+  outline: none;
+}

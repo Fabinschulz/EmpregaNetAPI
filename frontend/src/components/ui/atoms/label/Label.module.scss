@@ -1,0 +1,11 @@
+.root {
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.25;
+  color: var(--muted);
+}
+
+.root[data-disabled="true"] {
+  cursor: not-allowed;
+  opacity: 0.6;
+}

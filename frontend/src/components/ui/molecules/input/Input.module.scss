@@ -1,0 +1,23 @@
+.field {
+  display: grid;
+  gap: 8px;
+}
+
+.input {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 10px 12px;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text);
+}
+
+.hint {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.error {
+  font-size: 12px;
+  color: var(--danger);
+}

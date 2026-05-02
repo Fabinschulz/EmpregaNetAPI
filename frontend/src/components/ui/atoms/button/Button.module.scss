@@ -1,0 +1,124 @@
+.root {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  white-space: nowrap;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.25;
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text);
+  cursor: pointer;
+  transition: transform 120ms ease, background 120ms ease, border-color 120ms ease, color 120ms ease;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
+}
+
+.root:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.22);
+  transform: translateY(-1px);
+}
+
+.root:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.root:disabled {
+  pointer-events: none;
+  cursor: not-allowed;
+  opacity: 0.6;
+  transform: none;
+}
+
+.variantDefault {
+
+}
+
+.variantPrimary {
+  background: linear-gradient(135deg, rgba(96, 165, 250, 0.22), rgba(34, 197, 94, 0.14));
+  border-color: rgba(96, 165, 250, 0.35);
+}
+
+.variantDestructive {
+  background: rgba(239, 68, 68, 0.16);
+  border-color: rgba(239, 68, 68, 0.35);
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.variantOutline {
+  background: transparent;
+  border-color: var(--border);
+  box-shadow: none;
+}
+
+.variantSecondary {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.12);
+  box-shadow: none;
+}
+
+.variantGhost {
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
+}
+
+.variantGhost:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.variantLink {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  color: var(--brand);
+}
+
+.variantLink:hover {
+  transform: none;
+  color: rgba(147, 197, 253, 1);
+}
+
+.sizeDefault {
+  padding: 10px 14px;
+}
+
+.sizeSm {
+  padding: 8px 12px;
+  font-size: 13px;
+  border-radius: 10px;
+}
+
+.sizeLg {
+  padding: 12px 18px;
+  font-size: 15px;
+  border-radius: 14px;
+}
+
+.sizeIcon {
+  padding: 10px;
+  width: 40px;
+  height: 40px;
+}
+
+.icon {
+  flex-shrink: 0;
+  pointer-events: none;
+  width: 16px;
+  height: 16px;
+}
+
+.iconStart {
+  margin-inline-end: 2px;
+}
+
+.iconEnd {
+  margin-inline-start: 2px;
+}

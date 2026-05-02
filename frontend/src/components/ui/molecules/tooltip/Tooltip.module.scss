@@ -1,0 +1,12 @@
+.content {
+  z-index: 60;
+  border-radius: calc(var(--radius) - 4px);
+  border: 1px solid var(--border);
+  background: var(--panel-2);
+  color: var(--text);
+  padding: 6px 10px;
+  font-size: 12px;
+  line-height: 1.35;
+  max-width: 280px;
+  box-shadow: var(--shadow);
+}

@@ -4,6 +4,8 @@
 .env
 .env.local
 .env.*.local
+.next/
+.cursor/
 
 node_modules/
 **/node_modules/
