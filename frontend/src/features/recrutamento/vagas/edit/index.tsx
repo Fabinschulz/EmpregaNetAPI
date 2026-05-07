@@ -1,11 +1,12 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { startTransition, useEffect, useMemo, useState, useTransition } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Alert, Button, FormSubmitButton, InputField, TextareaField } from "@/components";
 import { FormProvider, useFormContext } from "@/context";
 import { closeJob, getJob, jobFormSchema, updateJob, type JobFormValues } from "@/services";
 import { useAuth } from "@/features/auth";
+import { startRouterTransition } from "@/utils/lib";
 
 function SaveJobButton() {
   const { submitting } = useFormContext();
@@ -19,7 +20,7 @@ export function RecruitmentEditJobPage() {
   const { token } = useAuth();
 
   const [pending, setPending] = useState(true);
-  const [saving, setSaving] = useState(false);
+  const [isMutating, startMutatingTransition] = useTransition();
   const [apiError, setApiError] = useState<string | null>(null);
   const [initial, setInitial] = useState<JobFormValues | null>(null);
 
@@ -31,14 +32,18 @@ export function RecruitmentEditJobPage() {
       try {
         const res = await getJob(jobId);
         if (!mounted) return;
-        setInitial({
-          title: res.title,
-          description: res.description ?? "",
-          location: res.location ?? "",
+        startTransition(() => {
+          setInitial({
+            title: res.title,
+            description: res.description ?? "",
+            location: res.location ?? "",
+          });
         });
       } catch (err) {
         if (!mounted) return;
-        setApiError(err instanceof Error ? err.message : "Erro ao carregar vaga.");
+        startTransition(() =>
+          setApiError(err instanceof Error ? err.message : "Erro ao carregar vaga.")
+        );
       } finally {
         if (mounted) setPending(false);
       }
@@ -57,24 +62,27 @@ export function RecruitmentEditJobPage() {
         description: data.description.trim() || null,
         location: data.location.trim() || null,
       });
-      router.push("/recrutamento/vagas");
+      startRouterTransition(() => router.push("/recrutamento/vagas"));
     } catch (err) {
-      setApiError(err instanceof Error ? err.message : "Falha ao salvar.");
+      startTransition(() =>
+        setApiError(err instanceof Error ? err.message : "Falha ao salvar.")
+      );
     }
   }
 
-  async function onClose() {
+  function onClose() {
     if (!token) return;
-    setSaving(true);
     setApiError(null);
-    try {
-      await closeJob(token, jobId);
-      router.push("/recrutamento/vagas");
-    } catch (err) {
-      setApiError(err instanceof Error ? err.message : "Falha ao encerrar.");
-    } finally {
-      setSaving(false);
-    }
+    startMutatingTransition(async () => {
+      try {
+        await closeJob(token, jobId);
+        startRouterTransition(() => router.push("/recrutamento/vagas"));
+      } catch (err) {
+        startTransition(() =>
+          setApiError(err instanceof Error ? err.message : "Falha ao encerrar.")
+        );
+      }
+    });
   }
 
   return (
@@ -100,7 +108,7 @@ export function RecruitmentEditJobPage() {
             <TextareaField name="description" label="Descrição" rows={5} />
             <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
               <SaveJobButton />
-              <Button type="button" onClick={onClose} disabled={saving}>
+              <Button type="button" onClick={onClose} disabled={isMutating}>
                 Encerrar vaga
               </Button>
             </div>

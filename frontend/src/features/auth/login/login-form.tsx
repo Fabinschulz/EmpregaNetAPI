@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { startTransition, useState } from "react";
 import { useRouter } from "next/navigation";
 import { z } from "zod";
 import { Alert, InputField } from "@/components";
 import { FormProvider } from "@/context";
 import { login } from "@/services";
 import { useAuth } from "@/features/auth";
+import { startRouterTransition } from "@/utils/lib";
 import { LOGIN_FIELDS_GRID_STYLE } from "./constants";
 import { loginDefaultValues, loginSchema } from "./login-schema";
 import type { LoginDto } from "./login-schema";
@@ -22,11 +23,13 @@ export function LoginForm() {
     try {
       const res = await login(data);
       setLoggedUser(res);
-      router.push("/dashboard");
+      startRouterTransition(() => router.push("/dashboard"));
     } catch (err) {
-      if (err instanceof z.ZodError) setApiError("Resposta do servidor inesperada.");
-      else if (err instanceof Error) setApiError(err.message);
-      else setApiError("Erro inesperado.");
+      startTransition(() => {
+        if (err instanceof z.ZodError) setApiError("Resposta do servidor inesperada.");
+        else if (err instanceof Error) setApiError(err.message);
+        else setApiError("Erro inesperado.");
+      });
     }
   }
 

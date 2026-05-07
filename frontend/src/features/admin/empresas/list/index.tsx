@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { startTransition, useEffect, useState } from "react";
 import Link from "next/link";
 import { Alert, Button } from "@/components/ui";
 import { listCompanies } from "@/services";
@@ -21,10 +21,14 @@ export function AdminCompaniesPage() {
       try {
         const res = await listCompanies(token, { page: 1, size: 100 });
         if (!mounted) return;
-        setItems(res.data.map((c) => ({ id: c.id, name: c.name })));
+        startTransition(() => {
+          setItems(res.data.map((c) => ({ id: c.id, name: c.name })));
+        });
       } catch (err) {
         if (!mounted) return;
-        setError(err instanceof Error ? err.message : "Erro ao carregar empresas.");
+        startTransition(() =>
+          setError(err instanceof Error ? err.message : "Erro ao carregar empresas.")
+        );
       } finally {
         if (mounted) setPending(false);
       }
@@ -42,7 +46,7 @@ export function AdminCompaniesPage() {
           <p style={{ color: "var(--muted)" }}>Gestão de empresas (Admin).</p>
         </div>
         <Button variant="primary" asChild>
-          <Link href="/admin/empresas/nova">Nova empresa</Link>
+          <Link href="/admin/empresas/new">Nova empresa</Link>
         </Button>
       </div>
 
@@ -73,7 +77,7 @@ export function AdminCompaniesPage() {
             >
               <div style={{ fontWeight: 700 }}>{c.name}</div>
               <Button asChild>
-                <Link href={`/admin/empresas/${c.id}/editar`}>Editar</Link>
+                <Link href={`/admin/empresas/${c.id}`}>Editar</Link>
               </Button>
             </div>
           ))}

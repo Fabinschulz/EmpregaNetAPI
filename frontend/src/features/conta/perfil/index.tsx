@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { startTransition, useEffect, useState } from "react";
 import { Alert } from "@/components/ui";
 import { me } from "@/services";
 import { useAuth } from "@/features/auth";
@@ -20,10 +20,14 @@ export function ProfilePage() {
       try {
         const res = await me(token);
         if (!mounted) return;
-        setUser({ id: res.id, username: res.username, email: res.email });
+        startTransition(() => {
+          setUser({ id: res.id, username: res.username, email: res.email });
+        });
       } catch (err) {
         if (!mounted) return;
-        setError(err instanceof Error ? err.message : "Erro ao carregar perfil.");
+        startTransition(() =>
+          setError(err instanceof Error ? err.message : "Erro ao carregar perfil.")
+        );
       } finally {
         if (mounted) setPending(false);
       }

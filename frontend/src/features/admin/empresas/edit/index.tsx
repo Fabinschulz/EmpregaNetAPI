@@ -1,11 +1,12 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { startTransition, useEffect, useMemo, useState, useTransition } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Alert, Button, FormSubmitButton, InputField } from "@/components";
 import { FormProvider, useFormContext } from "@/context";
 import { companyFormSchema, deleteCompany, getCompany, updateCompany, type CompanyFormValues } from "@/services";
 import { useAuth } from "@/features/auth";
+import { startRouterTransition } from "@/utils/lib";
 
 function SaveCompanyButton() {
   const { submitting } = useFormContext();
@@ -19,7 +20,7 @@ export function AdminEditCompanyPage() {
   const { token } = useAuth();
 
   const [pending, setPending] = useState(true);
-  const [saving, setSaving] = useState(false);
+  const [isMutating, startMutatingTransition] = useTransition();
   const [apiError, setApiError] = useState<string | null>(null);
   const [initial, setInitial] = useState<CompanyFormValues | null>(null);
 
@@ -32,15 +33,19 @@ export function AdminEditCompanyPage() {
       try {
         const res = await getCompany(token, id);
         if (!mounted) return;
-        setInitial({
-          name: res.name,
-          email: res.email ?? "",
-          phone: res.phone ?? "",
-          documentNo: res.documentNo ?? "",
+        startTransition(() => {
+          setInitial({
+            name: res.name,
+            email: res.email ?? "",
+            phone: res.phone ?? "",
+            documentNo: res.documentNo ?? "",
+          });
         });
       } catch (err) {
         if (!mounted) return;
-        setApiError(err instanceof Error ? err.message : "Erro ao carregar empresa.");
+        startTransition(() =>
+          setApiError(err instanceof Error ? err.message : "Erro ao carregar empresa.")
+        );
       } finally {
         if (mounted) setPending(false);
       }
@@ -60,24 +65,27 @@ export function AdminEditCompanyPage() {
         phone: data.phone.trim() || null,
         documentNo: data.documentNo.trim() || null,
       });
-      router.push("/admin/empresas");
+      startRouterTransition(() => router.push("/admin/empresas"));
     } catch (err) {
-      setApiError(err instanceof Error ? err.message : "Falha ao salvar.");
+      startTransition(() =>
+        setApiError(err instanceof Error ? err.message : "Falha ao salvar.")
+      );
     }
   }
 
-  async function onDelete() {
+  function onDelete() {
     if (!token) return;
-    setSaving(true);
     setApiError(null);
-    try {
-      await deleteCompany(token, id);
-      router.push("/admin/empresas");
-    } catch (err) {
-      setApiError(err instanceof Error ? err.message : "Falha ao excluir.");
-    } finally {
-      setSaving(false);
-    }
+    startMutatingTransition(async () => {
+      try {
+        await deleteCompany(token, id);
+        startRouterTransition(() => router.push("/admin/empresas"));
+      } catch (err) {
+        startTransition(() =>
+          setApiError(err instanceof Error ? err.message : "Falha ao excluir.")
+        );
+      }
+    });
   }
 
   return (
@@ -104,7 +112,7 @@ export function AdminEditCompanyPage() {
             <InputField name="documentNo" label="Documento" />
             <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
               <SaveCompanyButton />
-              <Button variant="destructive" type="button" onClick={onDelete} disabled={saving}>
+              <Button variant="destructive" type="button" onClick={onDelete} disabled={isMutating}>
                 Excluir
               </Button>
             </div>

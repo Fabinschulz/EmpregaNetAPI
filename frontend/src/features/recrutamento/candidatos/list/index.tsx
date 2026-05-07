@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { startTransition, useEffect, useState } from "react";
 import Link from "next/link";
 import { Alert, Button } from "@/components/ui";
 import { listCandidates } from "@/services";
@@ -21,10 +21,14 @@ export function RecruitmentCandidatesPage() {
       try {
         const res = await listCandidates(token, { page: 1, size: 100 });
         if (!mounted) return;
-        setItems(res.data.map((u) => ({ id: u.id, username: u.username, email: u.email })));
+        startTransition(() => {
+          setItems(res.data.map((u) => ({ id: u.id, username: u.username, email: u.email })));
+        });
       } catch (err) {
         if (!mounted) return;
-        setError(err instanceof Error ? err.message : "Erro ao carregar candidatos.");
+        startTransition(() =>
+          setError(err instanceof Error ? err.message : "Erro ao carregar candidatos.")
+        );
       } finally {
         if (mounted) setPending(false);
       }

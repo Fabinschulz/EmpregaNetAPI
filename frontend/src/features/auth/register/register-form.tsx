@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { startTransition, useState } from "react";
 import { z } from "zod";
 import { Alert, InputField } from "@/components";
 import { FormProvider } from "@/context";
@@ -19,11 +19,15 @@ export function RegisterForm() {
     setSuccess(null);
     try {
       const res = await register(data);
-      setSuccess(typeof res === "string" ? res : "Conta criada. Confirme o e-mail para entrar.");
+      startTransition(() => {
+        setSuccess(typeof res === "string" ? res : "Conta criada. Confirme o e-mail para entrar.");
+      });
     } catch (err) {
-      if (err instanceof z.ZodError) setApiError("Resposta do servidor inesperada.");
-      else if (err instanceof Error) setApiError(err.message);
-      else setApiError("Erro inesperado.");
+      startTransition(() => {
+        if (err instanceof z.ZodError) setApiError("Resposta do servidor inesperada.");
+        else if (err instanceof Error) setApiError(err.message);
+        else setApiError("Erro inesperado.");
+      });
     }
   }
 

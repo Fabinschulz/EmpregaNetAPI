@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { startTransition, useEffect, useState } from "react";
 import Link from "next/link";
 import { Alert, Button } from "@/components/ui";
 import { listJobs } from "@/services";
@@ -18,10 +18,14 @@ export function JobsPage() {
       try {
         const res = await listJobs({ page: 1, size: 50, isActive: true });
         if (!mounted) return;
-        setData(res.data.map((j) => ({ id: j.id, title: j.title, location: j.location })));
+        startTransition(() => {
+          setData(res.data.map((j) => ({ id: j.id, title: j.title, location: j.location })));
+        });
       } catch (err) {
         if (!mounted) return;
-        setError(err instanceof Error ? err.message : "Erro ao carregar vagas.");
+        startTransition(() =>
+          setError(err instanceof Error ? err.message : "Erro ao carregar vagas.")
+        );
       } finally {
         if (mounted) setPending(false);
       }

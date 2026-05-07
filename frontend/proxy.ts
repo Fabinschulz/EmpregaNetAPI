@@ -4,7 +4,7 @@ import { canAccessPath } from "@/utils/lib";
 
 const PUBLIC_PATHS = ["/login", "/register"];
 
-export function middleware(req: NextRequest) {
+export function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
   if (pathname.startsWith("/_next") || pathname.startsWith("/favicon") || pathname.startsWith("/assets")) {
@@ -34,4 +34,3 @@ export function middleware(req: NextRequest) {
 export const config = {
   matcher: ["/((?!api).*)"],
 };
-

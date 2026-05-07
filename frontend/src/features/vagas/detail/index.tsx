@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { startTransition, useEffect, useMemo, useState, useTransition } from "react";
 import { useParams } from "next/navigation";
 import { Alert, Button } from "@/components/ui";
 import { applyToJob, getJob } from "@/services";
@@ -38,21 +38,24 @@ export function JobDetailPage() {
     };
   }, [jobId]);
 
-  async function onApply() {
+  function onApply() {
     if (!token) {
       setAppMsg("Você precisa estar logado para se candidatar.");
       return;
     }
-    setAppPending(true);
     setAppMsg(null);
-    try {
-      const res = await applyToJob(token, { jobId });
-      setAppMsg(typeof res === "string" ? res : "Candidatura enviada.");
-    } catch (err) {
-      setAppMsg(err instanceof Error ? err.message : "Falha ao se candidatar.");
-    } finally {
-      setAppPending(false);
-    }
+    startApplyTransition(async () => {
+      try {
+        const res = await applyToJob(token, { jobId });
+        startTransition(() => {
+          setAppMsg(typeof res === "string" ? res : "Candidatura enviada.");
+        });
+      } catch (err) {
+        startTransition(() => {
+          setAppMsg(err instanceof Error ? err.message : "Falha ao se candidatar.");
+        });
+      }
+    });
   }
 
   return (
@@ -69,8 +72,8 @@ export function JobDetailPage() {
           <p style={{ color: "var(--muted)" }}>{job.description ?? "Sem descrição."}</p>
 
           <div style={{ marginTop: 14, display: "flex", gap: 10, flexWrap: "wrap" }}>
-            <Button variant="primary" onClick={onApply} disabled={appPending}>
-              {appPending ? "Enviando..." : "Candidatar-me"}
+            <Button variant="primary" onClick={onApply} disabled={isApplyPending}>
+              {isApplyPending ? "Enviando..." : "Candidatar-me"}
             </Button>
           </div>
           {appMsg ? (

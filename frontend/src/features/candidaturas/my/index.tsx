@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { startTransition, useEffect, useState } from "react";
 import { Alert } from "@/components/ui";
 import { listMine } from "@/services";
 import { useAuth } from "@/features/auth";
@@ -20,10 +20,14 @@ export function MyApplicationsPage() {
       try {
         const res = await listMine(token, { page: 1, size: 50 });
         if (!mounted) return;
-        setItems(res.data.map((x) => ({ id: x.id, status: x.status, jobId: x.jobId })));
+        startTransition(() => {
+          setItems(res.data.map((x) => ({ id: x.id, status: x.status, jobId: x.jobId })));
+        });
       } catch (err) {
         if (!mounted) return;
-        setError(err instanceof Error ? err.message : "Erro ao carregar candidaturas.");
+        startTransition(() =>
+          setError(err instanceof Error ? err.message : "Erro ao carregar candidaturas.")
+        );
       } finally {
         if (mounted) setPending(false);
       }

@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { startTransition, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Alert, FormSubmitButton, InputField, TextareaField } from "@/components";
 import { FormProvider, useFormContext } from "@/context";
 import { createJob, jobFormSchema, type JobFormValues } from "@/services";
 import { useAuth } from "@/features/auth";
+import { startRouterTransition } from "@/utils/lib";
 
 const jobEmpty: JobFormValues = {
   title: "",
@@ -32,9 +33,11 @@ export function RecruitmentNewJobPage() {
         description: data.description.trim() || null,
         location: data.location.trim() || null,
       });
-      router.push("/recrutamento/vagas");
+      startRouterTransition(() => router.push("/recrutamento/vagas"));
     } catch (err) {
-      setApiError(err instanceof Error ? err.message : "Falha ao criar vaga.");
+      startTransition(() =>
+        setApiError(err instanceof Error ? err.message : "Falha ao criar vaga.")
+      );
     }
   }
 

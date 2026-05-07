@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { startTransition, useEffect, useState } from "react";
 import { Alert } from "@/components/ui";
 import { listAll } from "@/services";
 import { useAuth } from "@/features/auth";
@@ -20,10 +20,14 @@ export function RecruitmentApplicationsPage() {
       try {
         const res = await listAll(token, { page: 1, size: 100 });
         if (!mounted) return;
-        setItems(res.data.map((x) => ({ id: x.id, jobId: x.jobId, status: x.status })));
+        startTransition(() => {
+          setItems(res.data.map((x) => ({ id: x.id, jobId: x.jobId, status: x.status })));
+        });
       } catch (err) {
         if (!mounted) return;
-        setError(err instanceof Error ? err.message : "Erro ao carregar candidaturas.");
+        startTransition(() =>
+          setError(err instanceof Error ? err.message : "Erro ao carregar candidaturas.")
+        );
       } finally {
         if (mounted) setPending(false);
       }

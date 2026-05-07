@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { startTransition, useEffect, useMemo, useState } from "react";
 import { useParams } from "next/navigation";
 import { Alert } from "@/components/ui";
 import { getCandidate } from "@/services";
@@ -24,10 +24,14 @@ export function CandidateDetailPage() {
       try {
         const res = await getCandidate(token, id);
         if (!mounted) return;
-        setUser({ id: res.id, username: res.username, email: res.email });
+        startTransition(() => {
+          setUser({ id: res.id, username: res.username, email: res.email });
+        });
       } catch (err) {
         if (!mounted) return;
-        setError(err instanceof Error ? err.message : "Erro ao carregar candidato.");
+        startTransition(() =>
+          setError(err instanceof Error ? err.message : "Erro ao carregar candidato.")
+        );
       } finally {
         if (mounted) setPending(false);
       }

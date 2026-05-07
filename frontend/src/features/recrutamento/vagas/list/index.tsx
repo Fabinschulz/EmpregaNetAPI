@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { startTransition, useEffect, useState } from "react";
 import Link from "next/link";
 import { Alert, Button } from "@/components/ui";
 import { listJobs } from "@/services";
@@ -21,10 +21,14 @@ export function RecruitmentJobsPage() {
         // GET /api/jobs é AllowAnonymous, mas aqui é gestão (listagem completa).
         const res = await listJobs({ page: 1, size: 100 });
         if (!mounted) return;
-        setJobs(res.data.map((j) => ({ id: j.id, title: j.title })));
+        startTransition(() => {
+          setJobs(res.data.map((j) => ({ id: j.id, title: j.title })));
+        });
       } catch (err) {
         if (!mounted) return;
-        setError(err instanceof Error ? err.message : "Erro ao carregar vagas.");
+        startTransition(() =>
+          setError(err instanceof Error ? err.message : "Erro ao carregar vagas.")
+        );
       } finally {
         if (mounted) setPending(false);
       }
@@ -42,7 +46,7 @@ export function RecruitmentJobsPage() {
           <p style={{ color: "var(--muted)" }}>Gestão de vagas (criar/editar/fechar/excluir).</p>
         </div>
         <Button variant="primary" asChild>
-          <Link href="/recrutamento/vagas/nova">Nova vaga</Link>
+          <Link href="/recrutamento/vagas/new">Nova vaga</Link>
         </Button>
       </div>
 
@@ -73,7 +77,7 @@ export function RecruitmentJobsPage() {
             >
               <div style={{ fontWeight: 700 }}>{j.title}</div>
               <Button asChild>
-                <Link href={`/recrutamento/vagas/${j.id}/editar`}>Editar</Link>
+                <Link href={`/recrutamento/vagas/${j.id}`}>Editar</Link>
               </Button>
             </div>
           ))}

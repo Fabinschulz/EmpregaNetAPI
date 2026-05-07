@@ -2,7 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { ReactNode } from "react";
-import React, { createContext, useContext, useEffect, useRef, useState } from "react";
+import React, { createContext, useContext, useEffect, useRef, useTransition } from "react";
 import type {
   DefaultValues,
   FieldErrors,
@@ -115,8 +115,8 @@ export function FormProvider<T extends FieldValues = FieldValues>({
   onChangeField,
   readOnly = false,
 }: FormProviderProps<T>) {
-  const [submitting, setSubmitting] = useState(false);
-  const wasSubmitting = useRef(false);
+  const [isSubmitPending, startSubmitTransition] = useTransition();
+  const wasPendingRef = useRef(false);
 
   const {
     handleSubmit,
@@ -135,22 +135,26 @@ export function FormProvider<T extends FieldValues = FieldValues>({
   });
 
   useEffect(() => {
-    if (wasSubmitting.current && !submitting) {
+    if (wasPendingRef.current && !isSubmitPending) {
       reset(getValues());
     }
-    wasSubmitting.current = submitting;
-  }, [submitting, reset, getValues]);
+    wasPendingRef.current = isSubmitPending;
+  }, [isSubmitPending, reset, getValues]);
 
   const { errors } = useFormState({ control });
   const validationErrors = Object.keys(errors ?? {}).length ? errors : undefined;
 
-  const formSubmit = async (values: T) => {
-    setSubmitting(true);
-    try {
-      return await onSubmit(values);
-    } finally {
-      setSubmitting(false);
-    }
+  const formSubmit = (values: T) => {
+    return new Promise<void>((resolve, reject) => {
+      startSubmitTransition(async () => {
+        try {
+          await onSubmit(values);
+          resolve();
+        } catch (err) {
+          reject(err);
+        }
+      });
+    });
   };
 
   const htmlSubmit = (event: React.FormEvent<HTMLFormElement>) => {
@@ -172,7 +176,7 @@ export function FormProvider<T extends FieldValues = FieldValues>({
     getValues,
     validationErrors,
     watch,
-    submitting,
+    submitting: isSubmitPending,
     isDirty,
     isValid,
     dirtyFields,

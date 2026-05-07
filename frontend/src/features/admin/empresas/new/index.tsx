@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { startTransition, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Alert, FormSubmitButton, InputField } from "@/components";
 import { FormProvider, useFormContext } from "@/context";
 import { companyFormSchema, createCompany, type CompanyFormValues } from "@/services";
 import { useAuth } from "@/features/auth";
+import { startRouterTransition } from "@/utils/lib";
 
 const companyEmpty: CompanyFormValues = {
   name: "",
@@ -34,9 +35,11 @@ export function AdminNewCompanyPage() {
         phone: data.phone.trim() || null,
         documentNo: data.documentNo.trim() || null,
       });
-      router.push("/admin/empresas");
+      startRouterTransition(() => router.push("/admin/empresas"));
     } catch (err) {
-      setApiError(err instanceof Error ? err.message : "Falha ao criar empresa.");
+      startTransition(() =>
+        setApiError(err instanceof Error ? err.message : "Falha ao criar empresa.")
+      );
     }
   }
 

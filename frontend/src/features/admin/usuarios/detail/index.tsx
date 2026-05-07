@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { startTransition, useEffect, useMemo, useState, useTransition } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Alert, Button, FormSubmitButton, InputField } from "@/components";
 import { FormProvider, useFormContext } from "@/context";
@@ -12,6 +12,7 @@ import {
   type AdminUserUpdateFormValues,
 } from "@/services";
 import { useAuth } from "@/features/auth";
+import { startRouterTransition } from "@/utils/lib";
 
 function SaveUserButton() {
   const { submitting } = useFormContext();
@@ -25,7 +26,7 @@ export function AdminUserDetailPage() {
   const { token } = useAuth();
 
   const [pending, setPending] = useState(true);
-  const [saving, setSaving] = useState(false);
+  const [isMutating, startMutatingTransition] = useTransition();
   const [apiError, setApiError] = useState<string | null>(null);
   const [user, setUser] = useState<{ id: number; username: string; email: string } | null>(null);
   const [initial, setInitial] = useState<AdminUserUpdateFormValues | null>(null);
@@ -39,11 +40,15 @@ export function AdminUserDetailPage() {
       try {
         const res = await getAdminUser(token, id);
         if (!mounted) return;
-        setUser({ id: res.id, username: res.username, email: res.email });
-        setInitial({ userType: (res.userType ?? "") as string });
+        startTransition(() => {
+          setUser({ id: res.id, username: res.username, email: res.email });
+          setInitial({ userType: (res.userType ?? "") as string });
+        });
       } catch (err) {
         if (!mounted) return;
-        setApiError(err instanceof Error ? err.message : "Erro ao carregar usuário.");
+        startTransition(() =>
+          setApiError(err instanceof Error ? err.message : "Erro ao carregar usuário.")
+        );
       } finally {
         if (mounted) setPending(false);
       }
@@ -58,24 +63,27 @@ export function AdminUserDetailPage() {
     setApiError(null);
     try {
       await updateAdminUser(token, id, { userType: data.userType.trim() || null });
-      router.push("/admin/usuarios");
+      startRouterTransition(() => router.push("/admin/usuarios"));
     } catch (err) {
-      setApiError(err instanceof Error ? err.message : "Falha ao salvar.");
+      startTransition(() =>
+        setApiError(err instanceof Error ? err.message : "Falha ao salvar.")
+      );
     }
   }
 
-  async function onDelete() {
+  function onDelete() {
     if (!token) return;
-    setSaving(true);
     setApiError(null);
-    try {
-      await deleteAdminUser(token, id);
-      router.push("/admin/usuarios");
-    } catch (err) {
-      setApiError(err instanceof Error ? err.message : "Falha ao excluir.");
-    } finally {
-      setSaving(false);
-    }
+    startMutatingTransition(async () => {
+      try {
+        await deleteAdminUser(token, id);
+        startRouterTransition(() => router.push("/admin/usuarios"));
+      } catch (err) {
+        startTransition(() =>
+          setApiError(err instanceof Error ? err.message : "Falha ao excluir.")
+        );
+      }
+    });
   }
 
   return (
@@ -123,7 +131,7 @@ export function AdminUserDetailPage() {
                 />
                 <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
                   <SaveUserButton />
-                  <Button variant="destructive" type="button" onClick={onDelete} disabled={saving}>
+                  <Button variant="destructive" type="button" onClick={onDelete} disabled={isMutating}>
                     Excluir (lógico)
                   </Button>
                 </div>
