@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
-import * as React from "react";
-import { Slot } from "@radix-ui/react-slot";
-import { cva, type VariantProps } from "class-variance-authority";
-import type { LucideIcon } from "lucide-react";
-import { cn } from "@/utils/lib";
-import styles from "./Button.module.scss";
+import * as React from 'react';
+import { Slot } from '@radix-ui/react-slot';
+import { cva, type VariantProps } from 'class-variance-authority';
+import type { LucideIcon } from 'lucide-react';
+import { cn } from '@/utils/lib';
+import styles from './Button.module.scss';
 
 const buttonVariants = cva(styles.root, {
   variants: {
@@ -16,22 +16,22 @@ const buttonVariants = cva(styles.root, {
       outline: styles.variantOutline,
       secondary: styles.variantSecondary,
       ghost: styles.variantGhost,
-      link: styles.variantLink,
+      link: styles.variantLink
     },
     size: {
       default: styles.sizeDefault,
       sm: styles.sizeSm,
       lg: styles.sizeLg,
-      icon: styles.sizeIcon,
-    },
+      icon: styles.sizeIcon
+    }
   },
   defaultVariants: {
-    variant: "default",
-    size: "default",
-  },
+    variant: 'default',
+    size: 'default'
+  }
 });
 
-export type ButtonProps = Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "className"> &
+export type ButtonProps = Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'className'> &
   VariantProps<typeof buttonVariants> & {
     className?: string;
     asChild?: boolean;
@@ -55,7 +55,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     },
     ref
   ) => {
-    const Comp = asChild ? Slot : "button";
+    const Comp = asChild ? Slot : 'button';
     const showIcons = !asChild && (!!StartIcon || !!EndIcon);
     return (
       <Comp className={cn(buttonVariants({ variant, size }), className)} ref={ref} {...props}>
@@ -76,6 +76,6 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     );
   }
 );
-Button.displayName = "Button";
+Button.displayName = 'Button';
 
 export { Button, buttonVariants };

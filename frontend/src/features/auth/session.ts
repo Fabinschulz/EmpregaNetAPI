@@ -1,6 +1,6 @@
-import { jwtDecode } from "jwt-decode";
-import { AUTH_COOKIE, REFRESH_COOKIE } from "@/services";
-import { deleteClientCookie, parseCookieHeader, setClientCookie } from "@/utils/lib";
+import { jwtDecode } from 'jwt-decode';
+import { AUTH_COOKIE, REFRESH_COOKIE } from '@/services';
+import { deleteClientCookie, parseCookieHeader, setClientCookie } from '@/utils/lib';
 
 type JwtPayload = {
   exp?: number;
@@ -12,23 +12,25 @@ export type Session = {
   refreshToken?: string | null;
   roles: string[];
   exp?: number;
+  username: string | null;
+  email: string | null;
 };
 
 export function normalizeBearer(token: string): string {
-  return token.startsWith("Bearer ") ? token : `Bearer ${token}`;
+  return token.startsWith('Bearer ') ? token : `Bearer ${token}`;
 }
 
 export function stripBearer(token: string): string {
-  return token.startsWith("Bearer ") ? token.slice("Bearer ".length) : token;
+  return token.startsWith('Bearer ') ? token.slice('Bearer '.length) : token;
 }
 
 export function decodeRolesFromJwt(token: string): string[] {
   try {
     const raw = stripBearer(token);
     const payload = jwtDecode<Record<string, unknown>>(raw);
-    const roles = payload["role"];
-    if (typeof roles === "string") return [roles];
-    if (Array.isArray(roles) && roles.every((r) => typeof r === "string")) return roles;
+    const roles = payload['role'];
+    if (typeof roles === 'string') return [roles];
+    if (Array.isArray(roles) && roles.every((r) => typeof r === 'string')) return roles;
     return [];
   } catch {
     return [];
@@ -42,6 +44,41 @@ export function decodeExp(token: string): number | undefined {
     return payload.exp;
   } catch {
     return undefined;
+  }
+}
+
+const EMAIL_CLAIM_URIS = [
+  'email',
+  'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress'
+] as const;
+
+const USERNAME_CLAIM_KEYS = [
+  'userName',
+  'unique_name',
+  'name',
+  'preferred_username',
+  'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name'
+] as const;
+
+/** Lê nome e e-mail embutidos no JWT (claims usadas pelo backend EmpregaNet). */
+export function decodeUserDisplayFromJwt(token: string): { username: string | null; email: string | null } {
+  const str = (v: unknown) => (typeof v === 'string' && v.trim().length > 0 ? v.trim() : null);
+  try {
+    const raw = stripBearer(token);
+    const payload = jwtDecode<Record<string, unknown>>(raw);
+    let email: string | null = null;
+    for (const k of EMAIL_CLAIM_URIS) {
+      email = str(payload[k]);
+      if (email) break;
+    }
+    let username: string | null = null;
+    for (const k of USERNAME_CLAIM_KEYS) {
+      username = str(payload[k]);
+      if (username) break;
+    }
+    return { username, email };
+  } catch {
+    return { username: null, email: null };
   }
 }
 
@@ -61,11 +98,19 @@ export function readSessionFromCookieHeader(cookieHeader: string | null | undefi
   const token = cookies[AUTH_COOKIE];
   if (!token) return null;
   const refreshToken = cookies[REFRESH_COOKIE];
+  const { username, email } = decodeUserDisplayFromJwt(token);
   return {
     token,
     refreshToken,
     roles: decodeRolesFromJwt(token),
     exp: decodeExp(token),
+    username,
+    email
   };
 }
 
+/** Sessão a partir de `document.cookie` (apenas browser). */
+export function readSessionFromBrowser(): Session | null {
+  if (typeof document === 'undefined') return null;
+  return readSessionFromCookieHeader(document.cookie);
+}

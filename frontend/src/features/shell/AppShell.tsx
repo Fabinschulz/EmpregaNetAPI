@@ -1,63 +1,203 @@
-"use client";
+'use client';
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import clsx from "clsx";
-import styles from "./AppShell.module.scss";
-import { Button } from "@/components/ui";
-import { useAuth } from "@/features/auth";
-import { isAdmin, isRecruitmentStaff } from "@/utils/lib";
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import Link from 'next/link';
+import { usePathname, useRouter } from 'next/navigation';
+import clsx from 'clsx';
+import type { LucideIcon } from 'lucide-react';
+import {
+  Briefcase,
+  Building2,
+  FileText,
+  LayoutDashboard,
+  Menu,
+  PanelLeftClose,
+  PanelLeft,
+  UserCircle,
+  Users,
+  X
+} from 'lucide-react';
+import styles from './AppShell.module.scss';
+import { Button } from '@/components/ui';
+import { useAuth } from '@/features/auth';
+import { isAdmin, isRecruitmentStaff, startRouterTransition, toastSuccess } from '@/utils/lib';
 
-type NavItem = { href: string; label: string; visible: boolean };
+type NavItem = { href: string; label: string; icon: LucideIcon; visible: boolean };
+
+type NavGroup = { id: string; title: string; items: NavItem[] };
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const { roles, logout } = useAuth();
+  const router = useRouter();
+  const { roles, logout, username, email } = useAuth();
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [railCollapsed, setRailCollapsed] = useState(false);
 
-  const items: NavItem[] = [
-    { href: "/dashboard", label: "Dashboard", visible: true },
-    { href: "/vagas", label: "Vagas", visible: true },
-    { href: "/candidaturas", label: "Minhas candidaturas", visible: true },
-    { href: "/conta/perfil", label: "Minha conta", visible: true },
-    { href: "/recrutamento/vagas", label: "Recrutamento: Vagas", visible: isRecruitmentStaff(roles) },
-    { href: "/recrutamento/candidaturas", label: "Recrutamento: Candidaturas", visible: isRecruitmentStaff(roles) },
-    { href: "/recrutamento/candidatos", label: "Recrutamento: Candidatos", visible: isRecruitmentStaff(roles) },
-    { href: "/admin/usuarios", label: "Admin: Usuários", visible: isAdmin(roles) },
-    { href: "/admin/empresas", label: "Admin: Empresas", visible: isAdmin(roles) }
-  ];
+  const displayName = username?.trim() || email?.trim() || 'Utilizador';
+  const displaySub = username?.trim() && email?.trim() && username !== email ? email : null;
 
-  return (
-    <div className={styles.shell}>
-      <aside className={styles.sidebar}>
-        <div className={styles.brand}>EmpregaNet</div>
-        <nav className={styles.nav} aria-label="Navegação principal">
-          {items
-            .filter((i) => i.visible)
-            .map((item) => {
-              const active = pathname === item.href || pathname?.startsWith(item.href + "/");
-              return (
-                <Button
-                  key={item.href}
-                  asChild
-                  variant="ghost"
-                  className={clsx(styles.navButton, styles.link, active && styles.active)}
-                >
-                  <Link href={item.href}>{item.label}</Link>
-                </Button>
-              );
-            })}
-        </nav>
-      </aside>
-      <section className={styles.content}>
-        <div className={styles.topbar}>
-          <div className={styles.user}>Sessão ativa</div>
-          <Button variant="ghost" onClick={logout}>
-            Sair
+  const navGroups: NavGroup[] = useMemo(() => {
+    const principal: NavItem[] = [
+      { href: '/dashboard', label: 'Painel', icon: LayoutDashboard, visible: true },
+      { href: '/vagas', label: 'Vagas', icon: Briefcase, visible: true },
+      { href: '/candidaturas', label: 'Minhas candidaturas', icon: FileText, visible: true },
+      { href: '/conta/perfil', label: 'Conta e perfil', icon: UserCircle, visible: true }
+    ];
+    const recruitment: NavItem[] = [
+      { href: '/recrutamento/vagas', label: 'Vagas (equipa)', icon: Briefcase, visible: isRecruitmentStaff(roles) },
+      {
+        href: '/recrutamento/candidaturas',
+        label: 'Candidaturas',
+        icon: FileText,
+        visible: isRecruitmentStaff(roles)
+      },
+      { href: '/recrutamento/candidatos', label: 'Candidatos', icon: Users, visible: isRecruitmentStaff(roles) }
+    ];
+    const admin: NavItem[] = [
+      { href: '/admin/usuarios', label: 'Utilizadores', icon: Users, visible: isAdmin(roles) },
+      { href: '/admin/empresas', label: 'Empresas', icon: Building2, visible: isAdmin(roles) }
+    ];
+    const groups: NavGroup[] = [{ id: 'main', title: 'Principal', items: principal }];
+    if (recruitment.some((i) => i.visible)) {
+      groups.push({ id: 'recruitment', title: 'Recrutamento', items: recruitment });
+    }
+    if (admin.some((i) => i.visible)) {
+      groups.push({ id: 'admin', title: 'Administração', items: admin });
+    }
+    return groups;
+  }, [roles]);
+
+  const closeMobile = useCallback(() => setMobileOpen(false), []);
+
+  useEffect(() => {
+    closeMobile();
+  }, [pathname, closeMobile]);
+
+  const handleLogout = useCallback(() => {
+    logout();
+    toastSuccess('Sessão terminada', 'Terminou sessão com segurança. Até breve.');
+    startRouterTransition(() => router.push('/login'));
+  }, [logout, router]);
+
+  const sidebarInner = (
+    <>
+      <div className={styles.sidebarHeader}>
+        <Link href="/dashboard" className={styles.brand} onClick={closeMobile}>
+          EmpregaNet
+        </Link>
+        <div className={styles.sidebarHeaderActions}>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            className={styles.desktopRailToggle}
+            aria-label={railCollapsed ? 'Expandir menu lateral' : 'Compactar menu lateral'}
+            onClick={() => setRailCollapsed((v) => !v)}
+          >
+            {railCollapsed ? <PanelLeft className={styles.headerIcon} /> : <PanelLeftClose className={styles.headerIcon} />}
+          </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            className={styles.mobileClose}
+            aria-label="Fechar menu"
+            onClick={closeMobile}
+          >
+            <X className={styles.headerIcon} />
           </Button>
         </div>
+      </div>
+
+      <nav className={styles.sidebarScroll} aria-label="Navegação principal">
+        {navGroups.map((group) => {
+          const visibleItems = group.items.filter((i) => i.visible);
+          if (visibleItems.length === 0) return null;
+          return (
+            <div key={group.id} className={styles.navGroup}>
+              {!railCollapsed ? <div className={styles.navGroupTitle}>{group.title}</div> : null}
+              <div className={styles.navList}>
+                {visibleItems.map((item) => {
+                  const active = pathname === item.href || pathname?.startsWith(item.href + '/');
+                  const Icon = item.icon;
+                  return (
+                    <Button
+                      key={item.href}
+                      asChild
+                      variant="ghost"
+                      className={clsx(styles.navButton, styles.link, active && styles.active, railCollapsed && styles.linkIconOnly)}
+                    >
+                      <Link href={item.href} onClick={closeMobile} title={railCollapsed ? item.label : undefined}>
+                        <Icon className={styles.navIcon} aria-hidden />
+                        {!railCollapsed ? <span className={styles.navLabel}>{item.label}</span> : null}
+                      </Link>
+                    </Button>
+                  );
+                })}
+              </div>
+            </div>
+          );
+        })}
+      </nav>
+
+      <div className={styles.sidebarFooter}>
+        <div className={styles.userBlock} title={displaySub ?? undefined}>
+          <div className={styles.userAvatar} aria-hidden>
+            {(displayName.slice(0, 1) || '?').toUpperCase()}
+          </div>
+          {!railCollapsed ? (
+            <div className={styles.userText}>
+              <div className={styles.userName}>{displayName}</div>
+              {displaySub ? <div className={styles.userEmail}>{displaySub}</div> : null}
+            </div>
+          ) : null}
+        </div>
+        <Button variant="outline" size="sm" className={styles.logoutBtn} onClick={handleLogout}>
+          Sair
+        </Button>
+      </div>
+    </>
+  );
+
+  return (
+    <div className={clsx(styles.shell, railCollapsed && styles.shellCollapsed)}>
+      <div
+        className={clsx(styles.overlay, mobileOpen && styles.overlayVisible)}
+        aria-hidden={!mobileOpen}
+        onClick={closeMobile}
+      />
+
+      <aside
+        id="app-sidebar"
+        className={clsx(styles.sidebar, railCollapsed && styles.sidebarCollapsed, mobileOpen && styles.sidebarMobileOpen)}
+      >
+        {sidebarInner}
+      </aside>
+
+      <section className={styles.content}>
+        <header className={styles.topbar}>
+          <div className={styles.topbarLeft}>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              className={styles.menuToggle}
+              aria-label="Abrir menu de navegação"
+              aria-expanded={mobileOpen}
+              aria-controls="app-sidebar"
+              onClick={() => setMobileOpen(true)}
+            >
+              <Menu className={styles.headerIcon} />
+            </Button>
+            <div className={styles.topbarContext}>
+              <span className={styles.topbarEyebrow}>Área autenticada</span>
+              <span className={styles.topbarHint}>Utilize o menu para aceder às áreas do portal.</span>
+            </div>
+          </div>
+        </header>
+
         <div className={styles.main}>{children}</div>
       </section>
     </div>
   );
 }
-

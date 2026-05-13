@@ -1,12 +1,12 @@
-import { axiosApi, createAxiosConfig } from "../axios-api";
-import { adminUsersListResponseSchema, type AdminUsersListResponseDto } from "./admin-schema";
-import { userSchema } from "../users/users-schema";
+import { axiosApi, createAxiosConfig } from '../axios';
+import { adminUsersListResponseSchema, type AdminUsersListResponseDto } from './admin-schema';
+import { userSchema } from '../users/users-schema';
 
 export async function listAdminUsers(
   token: string,
   params?: { page?: number; size?: number; orderBy?: string; isDeleted?: boolean }
 ): Promise<AdminUsersListResponseDto> {
-  const res = await axiosApi.get<unknown>("/api/admin", createAxiosConfig(token, params));
+  const res = await axiosApi.get<unknown>('/api/admin', createAxiosConfig(token, params));
   return adminUsersListResponseSchema.parse(res.data);
 }
 

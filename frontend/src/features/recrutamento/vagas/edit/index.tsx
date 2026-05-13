@@ -1,16 +1,16 @@
-"use client";
+'use client';
 
-import { startTransition, useEffect, useMemo, useState, useTransition } from "react";
-import { useParams, useRouter } from "next/navigation";
-import { Alert, Button, FormSubmitButton, InputField, TextareaField } from "@/components";
-import { FormProvider, useFormContext } from "@/context";
-import { closeJob, getJob, jobFormSchema, updateJob, type JobFormValues } from "@/services";
-import { useAuth } from "@/features/auth";
-import { startRouterTransition } from "@/utils/lib";
+import { startTransition, useEffect, useMemo, useState, useTransition } from 'react';
+import { useParams, useRouter } from 'next/navigation';
+import { Alert, Button, FormSubmitButton, InputField, TextareaField } from '@/components';
+import { FormProvider, useFormContext } from '@/context';
+import { closeJob, getJob, jobFormSchema, updateJob, type JobFormValues } from '@/services';
+import { useAuth } from '@/features/auth';
+import { startRouterTransition } from '@/utils/lib';
 
 function SaveJobButton() {
   const { submitting } = useFormContext();
-  return <FormSubmitButton variant="primary">{submitting ? "Salvando..." : "Salvar"}</FormSubmitButton>;
+  return <FormSubmitButton variant="primary">{submitting ? 'Salvando...' : 'Salvar'}</FormSubmitButton>;
 }
 
 export function RecruitmentEditJobPage() {
@@ -35,15 +35,13 @@ export function RecruitmentEditJobPage() {
         startTransition(() => {
           setInitial({
             title: res.title,
-            description: res.description ?? "",
-            location: res.location ?? "",
+            description: res.description ?? '',
+            location: res.location ?? ''
           });
         });
       } catch (err) {
         if (!mounted) return;
-        startTransition(() =>
-          setApiError(err instanceof Error ? err.message : "Erro ao carregar vaga.")
-        );
+        startTransition(() => setApiError(err instanceof Error ? err.message : 'Erro ao carregar vaga.'));
       } finally {
         if (mounted) setPending(false);
       }
@@ -60,13 +58,11 @@ export function RecruitmentEditJobPage() {
       await updateJob(token, jobId, {
         title: data.title,
         description: data.description.trim() || null,
-        location: data.location.trim() || null,
+        location: data.location.trim() || null
       });
-      startRouterTransition(() => router.push("/recrutamento/vagas"));
+      startRouterTransition(() => router.push('/recrutamento/vagas'));
     } catch (err) {
-      startTransition(() =>
-        setApiError(err instanceof Error ? err.message : "Falha ao salvar.")
-      );
+      startTransition(() => setApiError(err instanceof Error ? err.message : 'Falha ao salvar.'));
     }
   }
 
@@ -76,11 +72,9 @@ export function RecruitmentEditJobPage() {
     startMutatingTransition(async () => {
       try {
         await closeJob(token, jobId);
-        startRouterTransition(() => router.push("/recrutamento/vagas"));
+        startRouterTransition(() => router.push('/recrutamento/vagas'));
       } catch (err) {
-        startTransition(() =>
-          setApiError(err instanceof Error ? err.message : "Falha ao encerrar.")
-        );
+        startTransition(() => setApiError(err instanceof Error ? err.message : 'Falha ao encerrar.'));
       }
     });
   }
@@ -102,11 +96,11 @@ export function RecruitmentEditJobPage() {
           defaultValues={initial}
           onSubmit={handleSubmit}
         >
-          <div style={{ display: "grid", gap: 12, maxWidth: 640, marginTop: 12 }}>
+          <div style={{ display: 'grid', gap: 12, maxWidth: 640, marginTop: 12 }}>
             <InputField name="title" label="Título" required />
             <InputField name="location" label="Localização" />
             <TextareaField name="description" label="Descrição" rows={5} />
-            <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+            <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
               <SaveJobButton />
               <Button type="button" onClick={onClose} disabled={isMutating}>
                 Encerrar vaga
@@ -118,4 +112,3 @@ export function RecruitmentEditJobPage() {
     </div>
   );
 }
-

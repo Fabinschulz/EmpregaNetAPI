@@ -1,22 +1,22 @@
-"use client";
+'use client';
 
-import { startTransition, useEffect, useMemo, useState, useTransition } from "react";
-import { useParams, useRouter } from "next/navigation";
-import { Alert, Button, FormSubmitButton, InputField } from "@/components";
-import { FormProvider, useFormContext } from "@/context";
+import { startTransition, useEffect, useMemo, useState, useTransition } from 'react';
+import { useParams, useRouter } from 'next/navigation';
+import { Alert, Button, FormSubmitButton, InputField } from '@/components';
+import { FormProvider, useFormContext } from '@/context';
 import {
   adminUserUpdateFormSchema,
   deleteAdminUser,
   getAdminUser,
   updateAdminUser,
-  type AdminUserUpdateFormValues,
-} from "@/services";
-import { useAuth } from "@/features/auth";
-import { startRouterTransition } from "@/utils/lib";
+  type AdminUserUpdateFormValues
+} from '@/services';
+import { useAuth } from '@/features/auth';
+import { startRouterTransition } from '@/utils/lib';
 
 function SaveUserButton() {
   const { submitting } = useFormContext();
-  return <FormSubmitButton variant="primary">{submitting ? "Salvando..." : "Salvar"}</FormSubmitButton>;
+  return <FormSubmitButton variant="primary">{submitting ? 'Salvando...' : 'Salvar'}</FormSubmitButton>;
 }
 
 export function AdminUserDetailPage() {
@@ -42,13 +42,11 @@ export function AdminUserDetailPage() {
         if (!mounted) return;
         startTransition(() => {
           setUser({ id: res.id, username: res.username, email: res.email });
-          setInitial({ userType: (res.userType ?? "") as string });
+          setInitial({ userType: (res.userType ?? '') as string });
         });
       } catch (err) {
         if (!mounted) return;
-        startTransition(() =>
-          setApiError(err instanceof Error ? err.message : "Erro ao carregar usuário.")
-        );
+        startTransition(() => setApiError(err instanceof Error ? err.message : 'Erro ao carregar usuário.'));
       } finally {
         if (mounted) setPending(false);
       }
@@ -63,11 +61,9 @@ export function AdminUserDetailPage() {
     setApiError(null);
     try {
       await updateAdminUser(token, id, { userType: data.userType.trim() || null });
-      startRouterTransition(() => router.push("/admin/usuarios"));
+      startRouterTransition(() => router.push('/admin/usuarios'));
     } catch (err) {
-      startTransition(() =>
-        setApiError(err instanceof Error ? err.message : "Falha ao salvar.")
-      );
+      startTransition(() => setApiError(err instanceof Error ? err.message : 'Falha ao salvar.'));
     }
   }
 
@@ -77,11 +73,9 @@ export function AdminUserDetailPage() {
     startMutatingTransition(async () => {
       try {
         await deleteAdminUser(token, id);
-        startRouterTransition(() => router.push("/admin/usuarios"));
+        startRouterTransition(() => router.push('/admin/usuarios'));
       } catch (err) {
-        startTransition(() =>
-          setApiError(err instanceof Error ? err.message : "Falha ao excluir.")
-        );
+        startTransition(() => setApiError(err instanceof Error ? err.message : 'Falha ao excluir.'));
       }
     });
   }
@@ -99,10 +93,10 @@ export function AdminUserDetailPage() {
         <>
           <div
             style={{
-              border: "1px solid var(--border)",
-              borderRadius: "var(--radius)",
+              border: '1px solid var(--border)',
+              borderRadius: 'var(--radius)',
               padding: 14,
-              background: "rgba(255,255,255,0.05)",
+              background: 'rgba(255,255,255,0.05)'
             }}
           >
             <div>
@@ -123,13 +117,13 @@ export function AdminUserDetailPage() {
               defaultValues={initial}
               onSubmit={handleSubmit}
             >
-              <div style={{ display: "grid", gap: 12, maxWidth: 520, marginTop: 12 }}>
+              <div style={{ display: 'grid', gap: 12, maxWidth: 520, marginTop: 12 }}>
                 <InputField
                   name="userType"
                   label="UserType (ex.: Admin, Recruiter, Manager, Candidate)"
                   hint="O backend valida/normaliza; aqui enviamos o valor diretamente."
                 />
-                <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+                <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
                   <SaveUserButton />
                   <Button variant="destructive" type="button" onClick={onDelete} disabled={isMutating}>
                     Excluir (lógico)
@@ -143,4 +137,3 @@ export function AdminUserDetailPage() {
     </div>
   );
 }
-

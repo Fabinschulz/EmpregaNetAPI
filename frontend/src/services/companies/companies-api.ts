@@ -1,11 +1,11 @@
-import { axiosApi, createAxiosConfig } from "../axios-api";
-import { companiesListResponseSchema, companySchema, type CompaniesListResponseDto } from "./companies-schema";
+import { axiosApi, createAxiosConfig } from '../axios';
+import { companiesListResponseSchema, companySchema, type CompaniesListResponseDto } from './companies-schema';
 
 export async function listCompanies(
   token: string,
   params?: { page?: number; size?: number; orderBy?: string; isDeleted?: boolean; isActive?: boolean }
 ): Promise<CompaniesListResponseDto> {
-  const res = await axiosApi.get<unknown>("/api/companies", createAxiosConfig(token, params));
+  const res = await axiosApi.get<unknown>('/api/companies', createAxiosConfig(token, params));
   return companiesListResponseSchema.parse(res.data);
 }
 
@@ -15,7 +15,7 @@ export async function getCompany(token: string, id: number) {
 }
 
 export async function createCompany(token: string, dto: unknown): Promise<string> {
-  const res = await axiosApi.post<string>("/api/companies", dto, createAxiosConfig(token));
+  const res = await axiosApi.post<string>('/api/companies', dto, createAxiosConfig(token));
   return res.data;
 }
 

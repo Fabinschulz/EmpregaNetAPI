@@ -1,6 +1,27 @@
-import { MainLayout } from "@/features/shell";
+import { Suspense } from 'react';
+import { MainLayout } from '@/features/shell';
 
-export default function MainSegmentLayout({ children }: { children: React.ReactNode }) {
-  return <MainLayout>{children}</MainLayout>;
+function MainChromeFallback() {
+  return (
+    <div
+      style={{
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        color: 'var(--muted)',
+        fontFamily: 'var(--font-sans)'
+      }}
+    >
+      A carregar…
+    </div>
+  );
 }
 
+export default function MainSegmentLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <Suspense fallback={<MainChromeFallback />}>
+      <MainLayout>{children}</MainLayout>
+    </Suspense>
+  );
+}

@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import {
   Command,
@@ -8,13 +8,13 @@ import {
   CommandList,
   Popover,
   PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui";
-import { useFormContext } from "@/context";
-import { cn, getFieldErrorMessage } from "@/utils/utils";
-import { Check, ChevronDown } from "lucide-react";
-import * as React from "react";
-import styles from "./autocomplete.module.scss";
+  PopoverTrigger
+} from '@/components/ui';
+import { useFormContext } from '@/context';
+import { cn, getFieldErrorMessage } from 'src/utils/helpers/helpers';
+import { Check, ChevronDown } from 'lucide-react';
+import * as React from 'react';
+import styles from './autocomplete.module.scss';
 
 export interface AutocompleteOption {
   label: string;
@@ -35,12 +35,12 @@ export const AutocompleteField: React.FC<AutocompleteFieldProps> = ({
   label,
   required,
   options,
-  placeholder = "Selecione",
-  className,
+  placeholder = 'Selecione',
+  className
 }) => {
   const { setValue, watch, validationErrors, readOnly } = useFormContext();
   const [open, setOpen] = React.useState(false);
-  const [input, setInput] = React.useState("");
+  const [input, setInput] = React.useState('');
   const selectedValue = watch(name) as string | undefined;
   const selectedOption = options.find((opt) => opt.value === selectedValue);
   const error = getFieldErrorMessage(name, validationErrors);
@@ -49,7 +49,7 @@ export const AutocompleteField: React.FC<AutocompleteFieldProps> = ({
   const handleSelect = (value: string) => {
     setValue(name, value, { shouldDirty: true });
     setOpen(false);
-    setInput("");
+    setInput('');
   };
 
   return (
@@ -65,19 +65,13 @@ export const AutocompleteField: React.FC<AutocompleteFieldProps> = ({
             aria-expanded={open}
             aria-haspopup="listbox"
           >
-            <span className={cn(!selectedOption && styles.triggerMuted)}>
-              {selectedOption?.label ?? placeholder}
-            </span>
+            <span className={cn(!selectedOption && styles.triggerMuted)}>{selectedOption?.label ?? placeholder}</span>
             <ChevronDown className={styles.chevron} size={16} aria-hidden />
           </button>
         </PopoverTrigger>
         <PopoverContent align="start" className={styles.popoverContent}>
           <Command shouldFilter={false}>
-            <CommandInput
-              placeholder="Pesquisar..."
-              value={input}
-              onValueChange={setInput}
-            />
+            <CommandInput placeholder="Pesquisar..." value={input} onValueChange={setInput} />
             <CommandList>
               <CommandEmpty>Nenhuma opção encontrada.</CommandEmpty>
               {options

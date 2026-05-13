@@ -1,22 +1,22 @@
-"use client";
+'use client';
 
-import { startTransition, useState } from "react";
-import { useRouter } from "next/navigation";
-import { Alert, FormSubmitButton, InputField, TextareaField } from "@/components";
-import { FormProvider, useFormContext } from "@/context";
-import { createJob, jobFormSchema, type JobFormValues } from "@/services";
-import { useAuth } from "@/features/auth";
-import { startRouterTransition } from "@/utils/lib";
+import { startTransition, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { Alert, FormSubmitButton, InputField, TextareaField } from '@/components';
+import { FormProvider, useFormContext } from '@/context';
+import { createJob, jobFormSchema, type JobFormValues } from '@/services';
+import { useAuth } from '@/features/auth';
+import { startRouterTransition } from '@/utils/lib';
 
 const jobEmpty: JobFormValues = {
-  title: "",
-  description: "",
-  location: "",
+  title: '',
+  description: '',
+  location: ''
 };
 
 function SaveJobButton({ label }: { label: string }) {
   const { submitting } = useFormContext();
-  return <FormSubmitButton variant="primary">{submitting ? "Salvando..." : label}</FormSubmitButton>;
+  return <FormSubmitButton variant="primary">{submitting ? 'Salvando...' : label}</FormSubmitButton>;
 }
 
 export function RecruitmentNewJobPage() {
@@ -31,13 +31,11 @@ export function RecruitmentNewJobPage() {
       await createJob(token, {
         title: data.title,
         description: data.description.trim() || null,
-        location: data.location.trim() || null,
+        location: data.location.trim() || null
       });
-      startRouterTransition(() => router.push("/recrutamento/vagas"));
+      startRouterTransition(() => router.push('/recrutamento/vagas'));
     } catch (err) {
-      startTransition(() =>
-        setApiError(err instanceof Error ? err.message : "Falha ao criar vaga.")
-      );
+      startTransition(() => setApiError(err instanceof Error ? err.message : 'Falha ao criar vaga.'));
     }
   }
 
@@ -51,7 +49,7 @@ export function RecruitmentNewJobPage() {
       ) : null}
 
       <FormProvider validationSchema={jobFormSchema} defaultValues={jobEmpty} onSubmit={handleSubmit}>
-        <div style={{ display: "grid", gap: 12, maxWidth: 640, marginTop: 12 }}>
+        <div style={{ display: 'grid', gap: 12, maxWidth: 640, marginTop: 12 }}>
           <InputField name="title" label="Título" required />
           <InputField name="location" label="Localização" />
           <TextareaField name="description" label="Descrição" rows={5} />
@@ -61,4 +59,3 @@ export function RecruitmentNewJobPage() {
     </div>
   );
 }
-

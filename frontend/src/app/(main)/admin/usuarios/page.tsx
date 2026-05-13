@@ -1,7 +1,5 @@
-import { AdminUsersPage } from "@/features/admin/usuarios/list";
+import { AdminUsersPage } from '@/features/admin/usuarios/list';
 
 export default function Page() {
   return <AdminUsersPage />;
 }
-
-

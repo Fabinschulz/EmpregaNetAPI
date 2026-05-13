@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import type { ReactNode } from "react";
-import { AuthLayoutFrame } from "./auth-layout-frame";
-import { AuthSessionBoundary } from "./auth-session-boundary";
+import type { ReactNode } from 'react';
+import { AuthLayoutFrame } from './auth-layout-frame';
+import { AuthSessionBoundary } from './auth-session-boundary';
 
 type AuthLayoutProps = {
   children: ReactNode;

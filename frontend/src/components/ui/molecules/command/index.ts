@@ -5,5 +5,5 @@ export {
   CommandInput,
   CommandItem,
   CommandList,
-  CommandSeparator,
-} from "./Command";
+  CommandSeparator
+} from './Command';

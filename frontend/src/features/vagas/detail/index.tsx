@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import { startTransition, useEffect, useMemo, useState, useTransition } from "react";
-import { useParams } from "next/navigation";
-import { Alert, Button } from "@/components/ui";
-import { applyToJob, getJob } from "@/services";
-import { useAuth } from "@/features/auth";
+import { startTransition, useEffect, useMemo, useState, useTransition } from 'react';
+import { useParams } from 'next/navigation';
+import { Alert, Button } from '@/components/ui';
+import { applyToJob, getJob } from '@/services';
+import { useAuth } from '@/features/auth';
 
 export function JobDetailPage() {
   const params = useParams<{ id: string }>();
@@ -14,8 +14,8 @@ export function JobDetailPage() {
   const [pending, setPending] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [job, setJob] = useState<{ id: number; title: string; description?: string | null } | null>(null);
-  const [appPending, setAppPending] = useState(false);
   const [appMsg, setAppMsg] = useState<string | null>(null);
+  const [isApplyPending, startApplyTransition] = useTransition();
 
   useEffect(() => {
     let mounted = true;
@@ -28,7 +28,7 @@ export function JobDetailPage() {
         setJob(res);
       } catch (err) {
         if (!mounted) return;
-        setError(err instanceof Error ? err.message : "Erro ao carregar vaga.");
+        setError(err instanceof Error ? err.message : 'Erro ao carregar vaga.');
       } finally {
         if (mounted) setPending(false);
       }
@@ -40,7 +40,7 @@ export function JobDetailPage() {
 
   function onApply() {
     if (!token) {
-      setAppMsg("Você precisa estar logado para se candidatar.");
+      setAppMsg('Você precisa estar logado para se candidatar.');
       return;
     }
     setAppMsg(null);
@@ -48,11 +48,11 @@ export function JobDetailPage() {
       try {
         const res = await applyToJob(token, { jobId });
         startTransition(() => {
-          setAppMsg(typeof res === "string" ? res : "Candidatura enviada.");
+          setAppMsg(typeof res === 'string' ? res : 'Candidatura enviada.');
         });
       } catch (err) {
         startTransition(() => {
-          setAppMsg(err instanceof Error ? err.message : "Falha ao se candidatar.");
+          setAppMsg(err instanceof Error ? err.message : 'Falha ao se candidatar.');
         });
       }
     });
@@ -69,11 +69,11 @@ export function JobDetailPage() {
       {job ? (
         <>
           <h1>{job.title}</h1>
-          <p style={{ color: "var(--muted)" }}>{job.description ?? "Sem descrição."}</p>
+          <p style={{ color: 'var(--muted)' }}>{job.description ?? 'Sem descrição.'}</p>
 
-          <div style={{ marginTop: 14, display: "flex", gap: 10, flexWrap: "wrap" }}>
+          <div style={{ marginTop: 14, display: 'flex', gap: 10, flexWrap: 'wrap' }}>
             <Button variant="primary" onClick={onApply} disabled={isApplyPending}>
-              {isApplyPending ? "Enviando..." : "Candidatar-me"}
+              {isApplyPending ? 'Enviando...' : 'Candidatar-me'}
             </Button>
           </div>
           {appMsg ? (
@@ -86,4 +86,3 @@ export function JobDetailPage() {
     </div>
   );
 }
-

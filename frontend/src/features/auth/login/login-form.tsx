@@ -1,42 +1,33 @@
-"use client";
+'use client';
 
-import { startTransition, useState } from "react";
-import { useRouter } from "next/navigation";
-import { z } from "zod";
-import { Alert, InputField } from "@/components";
-import { FormProvider } from "@/context";
-import { login } from "@/services";
-import { useAuth } from "@/features/auth";
-import { startRouterTransition } from "@/utils/lib";
-import { LOGIN_FIELDS_GRID_STYLE } from "./constants";
-import { loginDefaultValues, loginSchema } from "./login-schema";
-import type { LoginDto } from "./login-schema";
-import { LoginSubmitButton } from "./login-submit-button";
+import { useRouter } from 'next/navigation';
+import { InputField } from '@/components';
+import { FormProvider } from '@/context';
+import { login } from '@/services';
+import { useAuth } from '@/features/auth';
+import { notifyApiError, startRouterTransition, toastSuccess } from '@/utils/lib';
+import { LOGIN_FIELDS_GRID_STYLE } from './constants';
+import { loginDefaultValues, loginSchema } from './login-schema';
+import type { LoginDto } from './login-schema';
+import { LoginSubmitButton } from './login-submit-button';
 
 export function LoginForm() {
   const router = useRouter();
   const { setLoggedUser } = useAuth();
-  const [apiError, setApiError] = useState<string | null>(null);
 
   async function handleSubmit(data: LoginDto) {
-    setApiError(null);
     try {
       const res = await login(data);
       setLoggedUser(res);
-      startRouterTransition(() => router.push("/dashboard"));
+      toastSuccess('Sessão iniciada com sucesso', 'Bem-vindo de volta. Estamos a preparar o seu painel.');
+      startRouterTransition(() => router.push('/dashboard'));
     } catch (err) {
-      startTransition(() => {
-        if (err instanceof z.ZodError) setApiError("Resposta do servidor inesperada.");
-        else if (err instanceof Error) setApiError(err.message);
-        else setApiError("Erro inesperado.");
-      });
+      notifyApiError(err, 'Início de sessão');
     }
   }
 
   return (
     <>
-      {apiError ? <Alert variant="destructive" title="Falha ao entrar">{apiError}</Alert> : null}
-
       <FormProvider validationSchema={loginSchema} defaultValues={loginDefaultValues} onSubmit={handleSubmit}>
         <div style={LOGIN_FIELDS_GRID_STYLE}>
           <InputField name="email" label="E-mail" type="email" autoComplete="email" required />

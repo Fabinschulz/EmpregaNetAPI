@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { startTransition, useEffect, useState } from "react";
-import { Alert } from "@/components/ui";
-import { listMine } from "@/services";
-import { useAuth } from "@/features/auth";
+import { startTransition, useEffect, useState } from 'react';
+import { Alert } from '@/components/ui';
+import { listMine } from '@/services';
+import { useAuth } from '@/features/auth';
 
 export function MyApplicationsPage() {
   const { token } = useAuth();
@@ -25,9 +25,7 @@ export function MyApplicationsPage() {
         });
       } catch (err) {
         if (!mounted) return;
-        startTransition(() =>
-          setError(err instanceof Error ? err.message : "Erro ao carregar candidaturas.")
-        );
+        startTransition(() => setError(err instanceof Error ? err.message : 'Erro ao carregar candidaturas.'));
       } finally {
         if (mounted) setPending(false);
       }
@@ -40,7 +38,7 @@ export function MyApplicationsPage() {
   return (
     <div>
       <h1>Minhas candidaturas</h1>
-      <p style={{ color: "var(--muted)" }}>Acompanhe o status das suas candidaturas.</p>
+      <p style={{ color: 'var(--muted)' }}>Acompanhe o status das suas candidaturas.</p>
 
       {error ? (
         <Alert variant="destructive" title="Erro">
@@ -52,20 +50,20 @@ export function MyApplicationsPage() {
       {!pending && items.length === 0 ? (
         <Alert title="Nenhuma candidatura">Você ainda não se candidatou a nenhuma vaga.</Alert>
       ) : (
-        <div style={{ display: "grid", gap: 10, marginTop: 12 }}>
+        <div style={{ display: 'grid', gap: 10, marginTop: 12 }}>
           {items.map((it) => (
             <div
               key={it.id}
               style={{
-                border: "1px solid var(--border)",
-                borderRadius: "var(--radius)",
-                background: "rgba(255,255,255,0.05)",
-                padding: 14,
+                border: '1px solid var(--border)',
+                borderRadius: 'var(--radius)',
+                background: 'rgba(255,255,255,0.05)',
+                padding: 14
               }}
             >
               <div style={{ fontWeight: 700 }}>Candidatura #{it.id}</div>
-              <div style={{ color: "var(--muted)", fontSize: 14 }}>
-                Job: {it.jobId ?? "—"} • Status: {it.status ?? "—"}
+              <div style={{ color: 'var(--muted)', fontSize: 14 }}>
+                Job: {it.jobId ?? '—'} • Status: {it.status ?? '—'}
               </div>
             </div>
           ))}
@@ -74,4 +72,3 @@ export function MyApplicationsPage() {
     </div>
   );
 }
-

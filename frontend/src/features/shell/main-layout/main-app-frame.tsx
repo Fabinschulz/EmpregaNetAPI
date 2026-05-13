@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import type { ReactNode } from "react";
-import { AppShell } from "../AppShell";
+import type { ReactNode } from 'react';
+import { AppShell } from '../AppShell';
 
 type MainAppFrameProps = {
   children: ReactNode;

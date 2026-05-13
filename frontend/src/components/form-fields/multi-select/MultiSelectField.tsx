@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import {
   Command,
@@ -13,13 +13,13 @@ import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui";
-import { useFormContext } from "@/context";
-import { cn, getFieldErrorMessage, truncateText } from "@/utils/utils";
-import { ChevronDown, X } from "lucide-react";
-import * as React from "react";
-import styles from "./multi-select.module.scss";
+  TooltipTrigger
+} from '@/components/ui';
+import { useFormContext } from '@/context';
+import { cn, getFieldErrorMessage, truncateText } from 'src/utils/helpers/helpers';
+import { ChevronDown, X } from 'lucide-react';
+import * as React from 'react';
+import styles from './multi-select.module.scss';
 
 export interface MultiSelectOption {
   label: string;
@@ -40,12 +40,12 @@ export const MultiSelectField: React.FC<MultiSelectFieldProps> = ({
   options,
   required,
   label,
-  placeholder = "Selecione",
-  className,
+  placeholder = 'Selecione',
+  className
 }) => {
   const { validationErrors, setValue, watch, readOnly } = useFormContext();
   const [open, setOpen] = React.useState(false);
-  const [query, setQuery] = React.useState("");
+  const [query, setQuery] = React.useState('');
 
   const errorsMessage = getFieldErrorMessage(name, validationErrors);
   const raw = watch(name);
@@ -82,9 +82,7 @@ export const MultiSelectField: React.FC<MultiSelectFieldProps> = ({
   };
 
   const filteredOptions = options.filter(
-    (o) =>
-      o.label.toLowerCase().includes(query.toLowerCase()) ||
-      o.value.toLowerCase().includes(query.toLowerCase())
+    (o) => o.label.toLowerCase().includes(query.toLowerCase()) || o.value.toLowerCase().includes(query.toLowerCase())
   );
 
   return (
@@ -128,11 +126,7 @@ export const MultiSelectField: React.FC<MultiSelectFieldProps> = ({
           </PopoverTrigger>
           <PopoverContent align="start" className={styles.popoverContent}>
             <Command shouldFilter={false}>
-              <CommandInput
-                placeholder="Pesquisar opção..."
-                value={query}
-                onValueChange={setQuery}
-              />
+              <CommandInput placeholder="Pesquisar opção..." value={query} onValueChange={setQuery} />
               <CommandList>
                 <CommandEmpty>Nenhuma opção encontrada.</CommandEmpty>
                 <CommandGroup className={styles.commandGroup}>
@@ -142,15 +136,8 @@ export const MultiSelectField: React.FC<MultiSelectFieldProps> = ({
                     const displayText = truncateText(optLabel, 210);
 
                     return (
-                      <CommandItem
-                        key={value}
-                        value={`${optLabel} ${value}`}
-                        onSelect={() => handleSelect(value)}
-                      >
-                        <span
-                          className={cn(styles.checkCell, isSelected && styles.checkCellOn)}
-                          aria-hidden
-                        >
+                      <CommandItem key={value} value={`${optLabel} ${value}`} onSelect={() => handleSelect(value)}>
+                        <span className={cn(styles.checkCell, isSelected && styles.checkCellOn)} aria-hidden>
                           {isSelected ? <span className={styles.checkDot} /> : null}
                         </span>
                         {isLong ? (

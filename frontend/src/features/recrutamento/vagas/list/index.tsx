@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import { startTransition, useEffect, useState } from "react";
-import Link from "next/link";
-import { Alert, Button } from "@/components/ui";
-import { listJobs } from "@/services";
-import { useAuth } from "@/features/auth";
+import { startTransition, useEffect, useState } from 'react';
+import Link from 'next/link';
+import { Alert, Button } from '@/components/ui';
+import { listJobs } from '@/services';
+import { useAuth } from '@/features/auth';
 
 export function RecruitmentJobsPage() {
   const { token } = useAuth();
@@ -26,9 +26,7 @@ export function RecruitmentJobsPage() {
         });
       } catch (err) {
         if (!mounted) return;
-        startTransition(() =>
-          setError(err instanceof Error ? err.message : "Erro ao carregar vagas.")
-        );
+        startTransition(() => setError(err instanceof Error ? err.message : 'Erro ao carregar vagas.'));
       } finally {
         if (mounted) setPending(false);
       }
@@ -40,10 +38,10 @@ export function RecruitmentJobsPage() {
 
   return (
     <div>
-      <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 12 }}>
+      <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 12 }}>
         <div>
           <h1>Recrutamento: Vagas</h1>
-          <p style={{ color: "var(--muted)" }}>Gestão de vagas (criar/editar/fechar/excluir).</p>
+          <p style={{ color: 'var(--muted)' }}>Gestão de vagas (criar/editar/fechar/excluir).</p>
         </div>
         <Button variant="primary" asChild>
           <Link href="/recrutamento/vagas/new">Nova vaga</Link>
@@ -60,19 +58,19 @@ export function RecruitmentJobsPage() {
       {!pending && jobs.length === 0 ? (
         <Alert title="Nenhuma vaga">Ainda não há vagas cadastradas.</Alert>
       ) : (
-        <div style={{ display: "grid", gap: 10, marginTop: 12 }}>
+        <div style={{ display: 'grid', gap: 10, marginTop: 12 }}>
           {jobs.map((j) => (
             <div
               key={j.id}
               style={{
-                border: "1px solid var(--border)",
-                borderRadius: "var(--radius)",
+                border: '1px solid var(--border)',
+                borderRadius: 'var(--radius)',
                 padding: 14,
-                background: "rgba(255,255,255,0.05)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                gap: 12,
+                background: 'rgba(255,255,255,0.05)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                gap: 12
               }}
             >
               <div style={{ fontWeight: 700 }}>{j.title}</div>
@@ -86,4 +84,3 @@ export function RecruitmentJobsPage() {
     </div>
   );
 }
-

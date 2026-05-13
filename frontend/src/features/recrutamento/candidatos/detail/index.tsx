@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import { startTransition, useEffect, useMemo, useState } from "react";
-import { useParams } from "next/navigation";
-import { Alert } from "@/components/ui";
-import { getCandidate } from "@/services";
-import { useAuth } from "@/features/auth";
+import { startTransition, useEffect, useMemo, useState } from 'react';
+import { useParams } from 'next/navigation';
+import { Alert } from '@/components/ui';
+import { getCandidate } from '@/services';
+import { useAuth } from '@/features/auth';
 
 export function CandidateDetailPage() {
   const params = useParams<{ id: string }>();
@@ -29,9 +29,7 @@ export function CandidateDetailPage() {
         });
       } catch (err) {
         if (!mounted) return;
-        startTransition(() =>
-          setError(err instanceof Error ? err.message : "Erro ao carregar candidato.")
-        );
+        startTransition(() => setError(err instanceof Error ? err.message : 'Erro ao carregar candidato.'));
       } finally {
         if (mounted) setPending(false);
       }
@@ -53,10 +51,10 @@ export function CandidateDetailPage() {
       {user ? (
         <div
           style={{
-            border: "1px solid var(--border)",
-            borderRadius: "var(--radius)",
+            border: '1px solid var(--border)',
+            borderRadius: 'var(--radius)',
             padding: 14,
-            background: "rgba(255,255,255,0.05)",
+            background: 'rgba(255,255,255,0.05)'
           }}
         >
           <div>
@@ -73,4 +71,3 @@ export function CandidateDetailPage() {
     </div>
   );
 }
-

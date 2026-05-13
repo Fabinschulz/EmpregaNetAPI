@@ -1,16 +1,16 @@
-"use client";
+'use client';
 
-import { startTransition, useEffect, useMemo, useState, useTransition } from "react";
-import { useParams, useRouter } from "next/navigation";
-import { Alert, Button, FormSubmitButton, InputField } from "@/components";
-import { FormProvider, useFormContext } from "@/context";
-import { companyFormSchema, deleteCompany, getCompany, updateCompany, type CompanyFormValues } from "@/services";
-import { useAuth } from "@/features/auth";
-import { startRouterTransition } from "@/utils/lib";
+import { startTransition, useEffect, useMemo, useState, useTransition } from 'react';
+import { useParams, useRouter } from 'next/navigation';
+import { Alert, Button, FormSubmitButton, InputField } from '@/components';
+import { FormProvider, useFormContext } from '@/context';
+import { companyFormSchema, deleteCompany, getCompany, updateCompany, type CompanyFormValues } from '@/services';
+import { useAuth } from '@/features/auth';
+import { startRouterTransition } from '@/utils/lib';
 
 function SaveCompanyButton() {
   const { submitting } = useFormContext();
-  return <FormSubmitButton variant="primary">{submitting ? "Salvando..." : "Salvar"}</FormSubmitButton>;
+  return <FormSubmitButton variant="primary">{submitting ? 'Salvando...' : 'Salvar'}</FormSubmitButton>;
 }
 
 export function AdminEditCompanyPage() {
@@ -36,16 +36,14 @@ export function AdminEditCompanyPage() {
         startTransition(() => {
           setInitial({
             name: res.name,
-            email: res.email ?? "",
-            phone: res.phone ?? "",
-            documentNo: res.documentNo ?? "",
+            email: res.email ?? '',
+            phone: res.phone ?? '',
+            documentNo: res.documentNo ?? ''
           });
         });
       } catch (err) {
         if (!mounted) return;
-        startTransition(() =>
-          setApiError(err instanceof Error ? err.message : "Erro ao carregar empresa.")
-        );
+        startTransition(() => setApiError(err instanceof Error ? err.message : 'Erro ao carregar empresa.'));
       } finally {
         if (mounted) setPending(false);
       }
@@ -63,13 +61,11 @@ export function AdminEditCompanyPage() {
         name: data.name,
         email: data.email.trim() || null,
         phone: data.phone.trim() || null,
-        documentNo: data.documentNo.trim() || null,
+        documentNo: data.documentNo.trim() || null
       });
-      startRouterTransition(() => router.push("/admin/empresas"));
+      startRouterTransition(() => router.push('/admin/empresas'));
     } catch (err) {
-      startTransition(() =>
-        setApiError(err instanceof Error ? err.message : "Falha ao salvar.")
-      );
+      startTransition(() => setApiError(err instanceof Error ? err.message : 'Falha ao salvar.'));
     }
   }
 
@@ -79,11 +75,9 @@ export function AdminEditCompanyPage() {
     startMutatingTransition(async () => {
       try {
         await deleteCompany(token, id);
-        startRouterTransition(() => router.push("/admin/empresas"));
+        startRouterTransition(() => router.push('/admin/empresas'));
       } catch (err) {
-        startTransition(() =>
-          setApiError(err instanceof Error ? err.message : "Falha ao excluir.")
-        );
+        startTransition(() => setApiError(err instanceof Error ? err.message : 'Falha ao excluir.'));
       }
     });
   }
@@ -105,12 +99,12 @@ export function AdminEditCompanyPage() {
           defaultValues={initial}
           onSubmit={handleSubmit}
         >
-          <div style={{ display: "grid", gap: 12, maxWidth: 640, marginTop: 12 }}>
+          <div style={{ display: 'grid', gap: 12, maxWidth: 640, marginTop: 12 }}>
             <InputField name="name" label="Nome" required />
             <InputField name="email" label="E-mail" type="email" />
             <InputField name="phone" label="Telefone" />
             <InputField name="documentNo" label="Documento" />
-            <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+            <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
               <SaveCompanyButton />
               <Button variant="destructive" type="button" onClick={onDelete} disabled={isMutating}>
                 Excluir
@@ -122,4 +116,3 @@ export function AdminEditCompanyPage() {
     </div>
   );
 }
-

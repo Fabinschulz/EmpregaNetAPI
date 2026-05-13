@@ -1,16 +1,9 @@
-"use client";
+'use client';
 
-import { zodResolver } from "@hookform/resolvers/zod";
-import type { ReactNode } from "react";
-import React, { createContext, useContext, useEffect, useRef, useTransition } from "react";
-import type {
-  DefaultValues,
-  FieldErrors,
-  FieldValues,
-  FormState,
-  Path,
-  Resolver,
-} from "react-hook-form";
+import { zodResolver } from '@hookform/resolvers/zod';
+import type { ReactNode } from 'react';
+import React, { createContext, useContext, useEffect, useRef, useTransition } from 'react';
+import type { DefaultValues, FieldErrors, FieldValues, FormState, Path, Resolver } from 'react-hook-form';
 import {
   useForm,
   useFormState,
@@ -23,11 +16,11 @@ import {
   type UseFormReset,
   type UseFormSetValue,
   type UseFormTrigger,
-  type UseFormWatch,
-} from "react-hook-form";
-import type { ZodType } from "zod";
+  type UseFormWatch
+} from 'react-hook-form';
+import type { ZodType } from 'zod';
 
-export type FormMode = "create" | "update";
+export type FormMode = 'create' | 'update';
 
 export type FormContextProps<T extends FieldValues = FieldValues> = {
   onSubmit: (values: T) => void | Promise<unknown>;
@@ -113,7 +106,7 @@ export function FormProvider<T extends FieldValues = FieldValues>({
   onSubmit,
   onError,
   onChangeField,
-  readOnly = false,
+  readOnly = false
 }: FormProviderProps<T>) {
   const [isSubmitPending, startSubmitTransition] = useTransition();
   const wasPendingRef = useRef(false);
@@ -128,10 +121,10 @@ export function FormProvider<T extends FieldValues = FieldValues>({
     watch,
     trigger,
     register,
-    formState: { isDirty, isValid, dirtyFields },
+    formState: { isDirty, isValid, dirtyFields }
   } = useForm<T>({
     resolver: zodResolver(validationSchema as never) as Resolver<T>,
-    defaultValues: defaultValues as DefaultValues<T>,
+    defaultValues: defaultValues as DefaultValues<T>
   });
 
   useEffect(() => {
@@ -181,7 +174,7 @@ export function FormProvider<T extends FieldValues = FieldValues>({
     isValid,
     dirtyFields,
     trigger,
-    register,
+    register
   };
 
   return (
@@ -198,8 +191,7 @@ export function FormProvider<T extends FieldValues = FieldValues>({
 export function useFormContext<T extends FieldValues = FieldValues>() {
   const ctx = useContext(FormContext) as FormContextProps<T> | null;
   if (!ctx) {
-    throw new Error("useFormContext deve ser usado dentro de FormProvider.");
+    throw new Error('useFormContext deve ser usado dentro de FormProvider.');
   }
   return ctx;
 }
-

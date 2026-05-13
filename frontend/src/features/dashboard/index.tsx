@@ -1,4 +1,4 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui';
 
 export function DashboardPage() {
   return (
@@ -10,10 +10,9 @@ export function DashboardPage() {
           <CardDescription>Relatórios de vagas e candidaturas.</CardDescription>
         </CardHeader>
         <CardContent>
-          <p style={{ margin: 0, color: "var(--muted)" }}>Use o menu lateral para navegar.</p>
+          <p style={{ margin: 0, color: 'var(--muted)' }}>Use o menu lateral para navegar.</p>
         </CardContent>
       </Card>
     </div>
   );
 }
-

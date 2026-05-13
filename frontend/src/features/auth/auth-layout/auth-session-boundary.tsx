@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import type { ReactNode } from "react";
-import { AuthProvider } from "@/context";
+import type { ReactNode } from 'react';
+import { AuthProvider } from '@/context';
 
 type AuthSessionBoundaryProps = {
   children: ReactNode;

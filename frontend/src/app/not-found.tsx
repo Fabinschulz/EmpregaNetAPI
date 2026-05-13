@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { ErrorFallback } from "@/components";
-import { ArrowLeft } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { startRouterTransition } from "@/utils/lib";
+import { ErrorFallback } from '@/components';
+import { ArrowLeft } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { startRouterTransition } from '@/utils/lib';
 
 export default function NotFoundPage() {
   const router = useRouter();
@@ -15,7 +15,7 @@ export default function NotFoundPage() {
         buttonText="Voltar para a página inicial"
         message="A página que você está tentando acessar não existe ou foi removida."
         Icon={ArrowLeft}
-        onButtonClick={() => startRouterTransition(() => router.push("/"))}
+        onButtonClick={() => startRouterTransition(() => router.push('/'))}
       />
     </div>
   );

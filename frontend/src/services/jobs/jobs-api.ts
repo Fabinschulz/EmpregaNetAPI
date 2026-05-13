@@ -1,5 +1,5 @@
-import { axiosApi, createAxiosConfig } from "../axios-api";
-import { jobSchema, jobsListResponseSchema, type JobDto, type JobsListResponseDto } from "./jobs-schema";
+import { axiosApi, createAxiosConfig } from '../axios';
+import { jobSchema, jobsListResponseSchema, type JobDto, type JobsListResponseDto } from './jobs-schema';
 
 export async function listJobs(params?: {
   page?: number;
@@ -7,7 +7,7 @@ export async function listJobs(params?: {
   orderBy?: string;
   isActive?: boolean;
 }): Promise<JobsListResponseDto> {
-  const res = await axiosApi.get<unknown>("/api/jobs", { params });
+  const res = await axiosApi.get<unknown>('/api/jobs', { params });
   return jobsListResponseSchema.parse(res.data);
 }
 
@@ -17,7 +17,7 @@ export async function getJob(id: number): Promise<JobDto> {
 }
 
 export async function createJob(token: string, dto: unknown): Promise<string> {
-  const res = await axiosApi.post<string>("/api/jobs", dto, createAxiosConfig(token));
+  const res = await axiosApi.post<string>('/api/jobs', dto, createAxiosConfig(token));
   return res.data;
 }
 

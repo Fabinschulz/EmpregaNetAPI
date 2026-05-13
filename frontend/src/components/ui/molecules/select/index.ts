@@ -6,5 +6,5 @@ export {
   SelectLabel,
   SelectSeparator,
   SelectTrigger,
-  SelectValue,
-} from "./Select";
+  SelectValue
+} from './Select';

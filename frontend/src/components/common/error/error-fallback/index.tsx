@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import type { LucideIcon } from "lucide-react";
-import { RefreshCw } from "lucide-react";
-import { Button } from "@/components/ui";
-import styles from "./error-fallback.module.scss";
+import type { LucideIcon } from 'lucide-react';
+import { RefreshCw } from 'lucide-react';
+import { Button } from '@/components/ui';
+import styles from './error-fallback.module.scss';
 
 export type ErrorFallbackProps = {
   statusCode: number;
@@ -18,9 +18,9 @@ export function ErrorFallback({
   statusCode,
   title,
   message,
-  buttonText = "Tentar novamente",
+  buttonText = 'Tentar novamente',
   Icon = RefreshCw,
-  onButtonClick,
+  onButtonClick
 }: ErrorFallbackProps) {
   return (
     <div className={styles.root}>

@@ -12,7 +12,11 @@
   background: rgba(255, 255, 255, 0.08);
   color: var(--text);
   cursor: pointer;
-  transition: transform 120ms ease, background 120ms ease, border-color 120ms ease, color 120ms ease;
+  transition:
+    transform 120ms ease,
+    background 120ms ease,
+    border-color 120ms ease,
+    color 120ms ease;
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
 }
 
@@ -35,7 +39,6 @@
 }
 
 .variantDefault {
-
 }
 
 .variantPrimary {

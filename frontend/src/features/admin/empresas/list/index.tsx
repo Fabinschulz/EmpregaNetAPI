@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import { startTransition, useEffect, useState } from "react";
-import Link from "next/link";
-import { Alert, Button } from "@/components/ui";
-import { listCompanies } from "@/services";
-import { useAuth } from "@/features/auth";
+import { startTransition, useEffect, useState } from 'react';
+import Link from 'next/link';
+import { Alert, Button } from '@/components/ui';
+import { listCompanies } from '@/services';
+import { useAuth } from '@/features/auth';
 
 export function AdminCompaniesPage() {
   const { token } = useAuth();
@@ -26,9 +26,7 @@ export function AdminCompaniesPage() {
         });
       } catch (err) {
         if (!mounted) return;
-        startTransition(() =>
-          setError(err instanceof Error ? err.message : "Erro ao carregar empresas.")
-        );
+        startTransition(() => setError(err instanceof Error ? err.message : 'Erro ao carregar empresas.'));
       } finally {
         if (mounted) setPending(false);
       }
@@ -40,10 +38,10 @@ export function AdminCompaniesPage() {
 
   return (
     <div>
-      <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 12 }}>
+      <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 12 }}>
         <div>
           <h1>Admin: Empresas</h1>
-          <p style={{ color: "var(--muted)" }}>Gestão de empresas (Admin).</p>
+          <p style={{ color: 'var(--muted)' }}>Gestão de empresas (Admin).</p>
         </div>
         <Button variant="primary" asChild>
           <Link href="/admin/empresas/new">Nova empresa</Link>
@@ -60,19 +58,19 @@ export function AdminCompaniesPage() {
       {!pending && items.length === 0 ? (
         <Alert title="Nenhuma empresa">Nenhuma empresa encontrada.</Alert>
       ) : (
-        <div style={{ display: "grid", gap: 10, marginTop: 12 }}>
+        <div style={{ display: 'grid', gap: 10, marginTop: 12 }}>
           {items.map((c) => (
             <div
               key={c.id}
               style={{
-                border: "1px solid var(--border)",
-                borderRadius: "var(--radius)",
+                border: '1px solid var(--border)',
+                borderRadius: 'var(--radius)',
                 padding: 14,
-                background: "rgba(255,255,255,0.05)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                gap: 12,
+                background: 'rgba(255,255,255,0.05)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                gap: 12
               }}
             >
               <div style={{ fontWeight: 700 }}>{c.name}</div>
@@ -86,4 +84,3 @@ export function AdminCompaniesPage() {
     </div>
   );
 }
-

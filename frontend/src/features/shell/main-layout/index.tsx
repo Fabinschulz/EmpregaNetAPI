@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import type { ReactNode } from "react";
-import { MainAppFrame } from "./main-app-frame";
-import { MainSessionBoundary } from "./main-session-boundary";
+import type { ReactNode } from 'react';
+import { MainAppFrame } from './main-app-frame';
+import { MainSessionBoundary } from './main-session-boundary';
 
 type MainLayoutProps = {
   children: ReactNode;

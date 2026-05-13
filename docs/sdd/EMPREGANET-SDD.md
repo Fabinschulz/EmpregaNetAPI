@@ -15,7 +15,7 @@ Documento vivo: descreve **como** especificação, implementação e validação
 ### 1.2 Princípios (arquitectura + IA)
 
 | Princípio | Implicação prática |
-|-----------|-------------------|
+| --------- | ------------------- |
 | **Single source of truth** | Comportamento de negócio: linguagem ubíqua + testes/regras na Application (.NET). Contrato HTTP: ViewModels/DTOs estáveis; no frontend, **Zod** espelha o contrato consumido. |
 | **Human-in-the-loop** | IA (agentes em `docs/agents/`) acelera redacção, implementação e revisão; **merge** e decisões de risco ficam com humanos. |
 | **Least power** | Preferir o mecanismo mais simples que satisfaz a spec (YAGNI, KISS, DRY). |
@@ -43,9 +43,21 @@ flowchart LR
   API --> CACHE
 ```
 
-- **`frontend/`**: experiência utilizador, sessão/cookies, RBAC de UI, chamadas ao BFF ou API conforme configuração.
-- **`bff/`**: agregação/orquestração HTTP para o cliente; reduz acoplamento e pode simplificar contratos públicos.
-- **`backend/`**: domínio, casos de uso, persistência (EF Core), autenticação/autorização da API.
+- **`frontend/`**: experiência utilizador, sessão/cookies, RBAC de UI, chamadas ao BFF ou API conforme configuração (Next.js na raiz; ver `frontend/package.json` — gestor **pnpm**).
+- **`Bff/`**: projeto .NET de agregação/orquestração HTTP para o cliente (`Bff/EmpregaNet.Bff.sln`).
+- **`backend/`**: domínio, casos de uso, persistência (EF Core, PostgreSQL), cache Redis opcional, autenticação/autorização da API (`backend/EmpregaNet.sln`; testes em `backend/tests/`).
+
+### 1.4 Mapa de pastas (contexto efectivo)
+
+Referência rápida alinhada ao **estado actual** do repo; detalhes e comandos em [`../README.md`](../README.md).
+
+| Local | Função principal |
+| ----- | ----------------- |
+| `backend/src/EmpregaNet.*` | Camadas Domain, Application, Infra, Api (.NET — target conforme `.csproj` do projeto) |
+| `backend/tests/` | Testes automatizados (xUnit + FluentAssertions + Moq, integração com fixtures partilhadas quando aplicável) |
+| `Bff/` | BFF .NET com solução dedicada |
+| `frontend/` | UI Next.js (App Router), TypeScript, SCSS, Zod, RBAC em UI |
+| `docs/` | SDD, agentes, skills e `docs/features/<id>/` para specs opcionais |
 
 ---
 
@@ -59,6 +71,19 @@ Ordem sugerida de riqueza vs custo de manutenção:
 4. **Testes automatizados**: unitários na Application; integração para EF/HTTP; e2e mínimos para fluxos críticos (login, candidatura, etc., conforme produto).
 
 **Regra de ouro**: alterar contrato sem actualizar consumidor + spec + testes relevantes é **deriva intencional**, deve ser explícita no changelog do PR.
+
+### 2.1 Especificação por feature (orquestrador — *best of both worlds*)
+
+Para trabalho com **artefactos dedicados por pasta** (como em projectos SDD com `prd` / `design` / `spec` / `tasks`):
+
+| Fase global (acima) | Artefactos em `docs/features/<feature-id>/` |
+| ------------------- | --------------------------------------------- |
+| A — Descoberta e especificação | `prd.md` (negócio e CA; **sem** pormenor técnico) |
+| B — Desenho técnico | `design.md` (contratos, HTTP, diagramas, infra relevante) |
+| Preparação da implementação | `spec.md` (matriz CA → cobertura), `tasks.md` (plano + *deviation notes*) |
+| Congelamento opcional | `state.md` quando a spec estiver aprovada para desenvolvimento |
+
+Regras operacionais, versionamento em frontmatter e **gate** “sem código até aprovação por fase”: [`SDD-ORCHESTRATOR.md`](SDD-ORCHESTRATOR.md). Templates de acionamento e geração de `state.md`: [`SDD-USAGE-GUIDE.md`](SDD-USAGE-GUIDE.md). Índice de pastas: [`../features/README.md`](../features/README.md). Skill de IA: [`../skills/sdd-orchestrator/SKILL.md`](../skills/sdd-orchestrator/SKILL.md).
 
 ---
 
@@ -85,11 +110,11 @@ Ordem sugerida de riqueza vs custo de manutenção:
 ### Fase D — Verificação (gates)
 
 | Gate | Mínimo esperado |
-|------|-----------------|
-| **Build** | `dotnet build` soluções API e BFF; `pnpm build` ou `pnpm lint` no frontend conforme CI. |
-| **Testes** | Novos caminhos cobertos na Application ou integração; regressão verde. |
+| --------- | ----------------- |
+| **Build** | Na raiz do repo: `dotnet build backend/EmpregaNet.sln` e `dotnet build Bff/EmpregaNet.Bff.sln`; em `frontend/`: `pnpm lint` e `pnpm build`. |
+| **Testes** | `dotnet test backend/tests/tests.csproj` verde quando aplicável; novos caminhos cobertos em Application ou integração. |
 | **Segurança** | Sem secrets no repo; validação de input; autorização nos endpoints sensíveis. |
-| **Revisão** | Humano + opcional passagem mental alinhada a `docs/agents/code-reviewer.md`. |
+| **Revisão** | Humano + opcional passagem mental alinhada a [`docs/agents/code-reviewer.md`](../agents/code-reviewer.md). |
 
 ### Fase E — Entrega e observabilidade
 
@@ -125,7 +150,8 @@ Positivas e negativas; o que fica proibido ou obrigatório daqui em diante.
 Os prompts em `docs/agents/` são **perfis cognitivos** especializados. Use-os para reduzir erro de “generalista” em tarefas exigentes:
 
 | Fase / necessidade | Agente sugerido |
-|--------------------|-----------------|
+| -------------------- | ----------------- |
+| Especificação formal (PRD → tasks antes de código) | Fluxo [`SDD-ORCHESTRATOR.md`](SDD-ORCHESTRATOR.md) + opcionalmente `meta-agent` para encaminhar depois |
 | PR ou diff | `code-reviewer` |
 | Bug ou incidente | `debug-specialist` |
 | Novo módulo API / fronteiras | `dotnet-architect` → `dotnet-implementer` |
@@ -135,7 +161,9 @@ Os prompts em `docs/agents/` são **perfis cognitivos** especializados. Use-os p
 | Performance com números ou suspeita forte | `performance-optimizer` |
 | Pedido vago ou multi-domínio | `meta-agent` |
 
-A regra está em `.cursor/rules/empreganet-docs-context.mdc` força o contexto deste documento e das skills em sessões de edição.
+O ficheiro [`.cursor/rules/empreganet-docs-context.mdc`](../../.cursor/rules/empreganet-docs-context.mdc) garante que este SDD e as skills façam parte do contexto em sessões de edição.
+
+Índice geral dos documentos desta pasta: [`../README.md`](../README.md).
 
 ---
 
@@ -150,7 +178,8 @@ A regra está em `.cursor/rules/empreganet-docs-context.mdc` força o contexto d
 
 ## 7. Roadmap deste SDD
 
-- Preencher `docs/sdd/adrs/` quando surgirem decisões estruturais (ex.: estratégia BFF vs chamada directa, política de cache).
+- Preencher `docs/sdd/adrs/` quando surgirem decisões estruturais (ex.: uso do BFF (`Bff/`) vs chamada directa ao `backend/` para algumas telas, política de cache).
+- Usar `docs/features/<feature-id>/` para specs completas quando o fluxo orquestrador (`SDD-ORCHESTRATOR.md`) estiver em vigor para um incremento.
 - Opcional: gerar ou anexar OpenAPI a partir da API para fonte única de contrato HTTP.
 - Opcional: definir um conjunto mínimo de cenários e2e “golden path” alinhados ao negócio EmpregaNet.
 
@@ -159,12 +188,18 @@ A regra está em `.cursor/rules/empreganet-docs-context.mdc` força o contexto d
 ## 8. Referências internas
 
 | Recurso | Path |
-|---------|------|
-| Regras (sempre aplicável) | `.cursor/rules/empreganet-docs-context.mdc` |
+| --------- | ------ |
+| Índice `docs/` (mapa repo + comandos) | [`../README.md`](../README.md) |
+| Regras Cursor (sempre aplicável) | [`.cursor/rules/empreganet-docs-context.mdc`](../../.cursor/rules/empreganet-docs-context.mdc) |
 | Agentes | `docs/agents/*.md` |
-| Skills | `docs/skills/*/SKILL.md` |
-| SDD | `docs/sdd/EMPREGANET-SDD.md` |
+| Skills | `docs/skills/*/SKILL.md` (backend, frontend, orquestrador SDD) |
+| SDD (este documento) | `docs/sdd/EMPREGANET-SDD.md` |
+| Orquestrador SDD (fases PRD→tasks) | `docs/sdd/SDD-ORCHESTRATOR.md` |
+| Guia de uso (templates, `state.md`) | `docs/sdd/SDD-USAGE-GUIDE.md` |
+| Pastas de feature | `docs/features/<feature-id>/` |
+| ADRs | `docs/sdd/adrs/` |
+| Backlog index (opcional) | `docs/sdd/FEATURES-BACKLOG.md` |
 
 ---
 
-*Última actualização conceitual: alinhada ao monorepo EmpregaNet (backend .NET Clean Architecture, BFF .NET, frontend Next.js 15 + React 19).*
+*Última revisão conceitual: monorepo EmpregaNet (`backend/` + `Bff/` + `frontend/`) — backend .NET Clean Architecture, mediator interno (`EmpregaNet.Domain.Libs.Mediator`), PostgreSQL + Redis opcional, frontend Next.js 16 + React 19 (pnpm).*

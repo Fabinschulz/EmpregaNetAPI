@@ -1,12 +1,12 @@
-"use client";
+'use client';
 
-import { Label } from "@/components/ui";
-import { useFormContext } from "@/context";
-import { cn, getFieldErrorMessage } from "@/utils/utils";
-import type React from "react";
-import styles from "./textarea.module.scss";
+import { Label } from '@/components/ui';
+import { useFormContext } from '@/context';
+import { cn, getFieldErrorMessage } from 'src/utils/helpers/helpers';
+import type React from 'react';
+import styles from './textarea.module.scss';
 
-export type TextareaFieldProps = Omit<React.ComponentProps<"textarea">, "className"> & {
+export type TextareaFieldProps = Omit<React.ComponentProps<'textarea'>, 'className'> & {
   name: string;
   label?: string;
   className?: string;

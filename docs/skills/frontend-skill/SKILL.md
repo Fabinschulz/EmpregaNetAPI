@@ -1,70 +1,181 @@
 ---
 name: frontend-skill
 description: >-
-  Implementa frontends Next.js (App Router) com UI alinhada ao design system, Atomic Design, TypeScript,
-  SCSS, ShadCN sem Tailwind, DTOs Zod, React Hook Form, middleware/auth, RBAC na UI,
-  estados de carregamento/erro e SSE quando o produto exigir. Use ao criar ou alterar
-  páginas, componentes, hooks, integração com API ou qualquer UI neste repositório.
+  Skill completa EmpregaNet Frontend: Next.js App Router, TypeScript estrito, SCSS + Radix/ShadCN sem Tailwind,
+  Zod e React Hook Form, serviços por domínio, auth/RBAC, estados UX, SSE opcional, testes (Testing Library, E2E quando existir).
+  Use ao criar ou alterar UI, hooks, cliente HTTP, fluxos ou acessibilidade no monorepo frontend.
+author: EmpregaNet
+version: 2.0.0
+date: 2026-05-07
+status: Approved
 ---
 
-# Skill — Frontend (Next.js, monorepo EmpregaNet)
+# Frontend (Next.js — monorepo EmpregaNet)
 
-Documento único: regras para humanos e para o agente de IA. Mantém o mesmo conteúdo de referência.
+Documento **único** que combina disciplina tipo “skills de referência” (clean component, DIP, UX rigorosa,
+estrategias de erro) com as **decisões fechadas** deste projeto (Tailwind não entra na stack atual).
 
-## Quando esta skill se aplica
+---
 
-Qualquer trabalho no frontend: novas telas, componentes, hooks, camada de API, fluxos de autenticação, tempo real (SSE) ou refatorações que toquem na UI.
+## 1. Quando aplicar
 
-## Alinhamento com o agente
+| Situação | Usar esta skill |
+| -------- | ---------------- |
+| Todo o trabalho em `frontend/` (App Router), ou caminhos equivalentes no repo | Sim |
+| Novas páginas, componentes, hooks, estilos, rotas middleware | Sim |
+| Integração APIs + validação ao renderizar dados | Sim |
+| Refactors que dividem componentes grandes ou melhoram a11y | Sim |
 
-Para **implementação**, siga as mesmas regras do agente **`frontend-engineer`**. Leia e respeite [`docs/agents/frontend-engineer.md`](../../agents/frontend-engineer.md) antes de escrever código (stack, o que evitar, organização de pastas).
+Este monorepo inclui **`frontend/`** na raiz do Git ao lado de **`backend/`** e **`Bff/`** — aplica esta skill sempre que editares esse código (ou clones do mesmo repo noutras máquinas).
 
-## Resumo
+---
 
-- Usar o perfil **`frontend-engineer`** para implementação (link acima).
-- Respeitar a estrutura do monorepo em `frontend/`.
-- **Não** introduzir Tailwind nem expandir o seu uso.
-- **SCSS** e componentes no estilo ShadCN/Radix já adaptados ao projeto.
-- Acessibilidade e estados de UI (carregamento, erro, vazio, retry) sempre explícitos.
+## 2. Ligações obrigatórias
 
-## Regras obrigatórias
+| Recurso | Path |
+| ------- | ---- |
+| Mapa `docs/` e estrutura do monorepo | [`docs/README.md`](../../README.md) |
+| Agente de implementação frontend | [`docs/agents/frontend-engineer.md`](../../agents/frontend-engineer.md) |
+| Fluxo especificação (quando há pasta `docs/features/`) | [`docs/sdd/SDD-ORCHESTRATOR.md`](../../sdd/SDD-ORCHESTRATOR.md) |
+| Skill backend (paridade contratos) | [`docs/skills/backend-skill/SKILL.md`](../backend-skill/SKILL.md) |
 
-- **Arquitetura**: estrutura por **feature**; separação clara entre UI, lógica de aplicação e **serviços** (cliente HTTP em `frontend/src/services/`, barril conforme convenção do repositório).
-- **Estilo**: **SCSS** + padrões ShadCN já usados. **Não introduzir Tailwind.**
-- **Tipos nas fronteiras**: DTOs tipados com **Zod** (validar entradas da API e variáveis de ambiente quando fizer sentido).
-- **Acessibilidade**: HTML semântico, rótulos, teclado, foco em overlays; ARIA só quando a semântica nativa não bastar.
-- **UX**: estados explícitos de **carregamento**, **vazio**, **erro** e **retry** — nunca falha silenciosa nem tela em branco.
+---
 
-## Checklist de entrega de feature
+## 3. Princípios (fusão Senior React × pragmatismo EmpregaNet)
 
-Use como guia ao construir uma feature:
+| Princípio | Prática obrigatória |
+| --------- | -------------------- |
+| **SRP nos componentes** | Componente faz **uma** parcela óbvia de UI; dados/efeitos vão para hooks/services. |
+| **Backend é fonte de verdade** | Não re-implementar regras densas já garantidas pela API só “por conveniência de UI”; duplicação apenas para ergonomia (**com** parity Zod só na fronteira). |
+| **Inversão de dependência na fronteira API** | Páginas/hooks chamam services (`src/services/` ou convenção igual) — evitar `fetch` disperso nos componentes. |
+| **KISS/YAGNI** | Não criar `core/domain/` profundo até haver comportamento repetido com valor claro — mas **isolá-lo** antes de segunda duplicação real. |
+| **Type safety** | TypeScript **`strict`**; **proibido** `any`; `unknown` + *narrowing* quando preciso. |
 
-1. [ ] **Pasta da feature** — `features/<feature>/` (ou convenção do projeto): UI, hooks, tipos e serviços específicos colocados juntos.
-2. [ ] **Componentes de UI** — peças enxutas e apresentacionais; reutilizar primitivos do design system.
-3. [ ] **Lógica** — hooks e/ou serviços pequenos para dados, validação e efeitos colaterais (não dentro de árvores JSX grandes).
-4. [ ] **Camada de API** — cliente centralizado; requisições/respostas tipadas (Zod); evitar `fetch` espalhado sem padrão.
-5. [ ] **Carregamento / erro** — UI de pendência e falha; política de reconexão se usar streams.
-6. [ ] **Acessibilidade** — teclado e leitor de ecrã nas partes interativas.
-7. [ ] **SSE** — só se o produto exigir push no servidor: reutilizar ou criar hook/serviço com backoff, reconexão e erro visível.
+---
 
-## Sempre incluir (quando relevante)
+## 4. Stack técnica (fechamento explícito)
 
-- **Pastas claras** — limites entre `components/`, hooks/serviços por feature; API + Zod por domínio em `services/<domínio>/` (`*-api.ts`, `*-schema.ts`); tipos locais na feature quando fizer sentido.
-- **Middleware / auth** — middleware do Next.js em rotas protegidas; sessão ou JWT conforme padrão do projeto.
-- **UI por papéis** — menus, ações e rotas condicionadas a papéis/permissões; centralizar verificações de capacidade; evitar strings mágicas duplicadas.
+| Usar | Não usar (neste projeto) |
+| ------ | ---------------------------- |
+| Next.js App Router + TypeScript | Tailwind novo ou aumento de uso |
+| SCSS (módulos `.module.scss` quando existir convénio) | misturar múltiplos sistemas de estilo divergentes |
+| Radix + ShadCN **adaptados a SCSS** | copiar verbatim kits que dependem só de Tailwind |
+| React Hook Form + resolver Zod | validação apenas no submit sem mensagens tratadas |
+| Zod para validar payloads e env vars sensíveis | confiar sempre em texto cru da rede |
 
-## Stack técnica (estrita)
+> **Legado Tailwind:** se existir código antigo que já usa Tailwind, não expandir esse padrão; migrar apenas com tarefa explícita.
 
-| Usar | Não usar |
-|------|----------|
-| Next.js App Router, TypeScript | Tailwind (novo ou expansão) |
-| SCSS para estilo | Lógica de negócio inchada em componentes de UI |
-| ShadCN adaptado a SCSS | Acoplamento forte a detalhes internos do backend |
-| Zod para DTOs / validação | — |
-| React Hook Form + resolvers Zod | — |
+---
 
-## Expectativas de saída
+## 5. Arquitectura de pastas / responsabilidades
 
-- Seguir naming, layout de ficheiros e estilo de imports já existentes no repositório.
-- Texto voltado ao utilizador em **português (Brasil)** quando o produto for em português.
-- Explicar só estrutura ou limites de estado não óbvios; priorizar código que funciona.
+| Camada lógica | Onde típico | Regra |
+| --------------- | ------------ | ----- |
+| UI pura (“dumb”) | `components/` + subpastas primitives | só props/handlers declarados; não side-effects escondidos |
+| Feature cohesion | `features/<nome>/...` quando criares área nova consistente | colocate hooks, wrappers de pagina específicos, assets locais |
+| API + schemas | `src/services/<domínio>/`*(`*-api.ts`, `*-schema.ts` conforme projeto)* | Zod primeiro contacto ao JSON entrante ou env vars |
+| Cross-feature UI helpers | apenas se **3+ consumidores** confirmados | senão duplication controlada até estabilizar |
+
+---
+
+## 6. Estado, dados e comunicação servidor
+
+| Tópico | Expectativa |
+| ------ | ----------- |
+| **Loading / error / empty** | Sempre tratados visualmente explicitamente (+ retry onde UX exigir) |
+| **Mutations idempotentes** | Evitar POST duplo: disable progressivo botão debounce/leveraging server idempotência |
+| **Optimistic UI** | Só com caminho compensatório quando falhar request — não esconder erros silenciosos |
+| **SSE / tempo real** | hook dedicado quando produto usar: reconexão, backoff UI explicável, cancel on unmount |
+
+---
+
+## 7. Autenticação e RBAC
+
+- Middleware/App Router shields para rotas sensíveis (seguindo arquitectura existente).
+- **Capacidades** centralizadas; evitar *strings mágicas* espalhadas — extrair enums/helpers compartilhados.
+- UI condicional menus/ações sempre coerentes com papel real do backend (**nunca** apenas esconder link).
+
+---
+
+## 8. UX, estética e acessibilidade
+
+| Âmbito | Orientação |
+| ------ | ----------- |
+| Leiaute e espaçamentos | Seguir grid/design system existente; evitar valores arbitrários que quebrem harmonização com o resto da UI. |
+| Interação | Estados de foco e navegação por teclado; modais prendem e devolvem foco corretamente. |
+| a11y | HTML semântico; ícones com `aria-label`; imagens com texto alternativo. |
+| Reduced motion | Respeitar preferências já suportadas no projeto (hooks/utilitários existentes). |
+
+Feedback visual sempre claro (**loading/disabled/errors** durante requests).
+
+---
+
+## 9. Documentação em TypeScript / hooks
+
+Hooks ou utilidades **não triviais**:
+
+```typescript
+/**
+ * Descreve intenção, parâmetros e retorno quando o nome sozinho não basta.
+ * Texto pode ser PT-BR alinhando copy do produto.
+ */
+```
+
+Evitar JSDoc barroco em wrappers de uma linha.
+
+---
+
+## 10. Testes
+
+### Hierarquia de valor
+
+| Prioridade | Ferramentas / foco |
+| ---------- | ------------------ |
+| 1º | Behavioral tests com Testing Library (**usuário/evento/DOM**) — mocking network via padrações do projeto (MSW/axios mocks se já existentes) |
+| 2º | Snapshots apenas layout extremamente estável e pequenos |
+| 3º | E2E `cypress` / `playwright` **somente quando diretório & pipeline existirem no repo |
+
+### Diretrizes E2E herdadas das boas referências
+
+| Regra | Detalhe |
+| ----- | ------- |
+| Estabilidade de selectores | preferir **`data-testid`** sem depender só de classe CSS efémeras |
+| Isolamento | não depender ordenação implícito de suites sem `cy.session` equivalente já modelado |
+| Interceptações | mocks de erro/sucesso externos para flaky reduzidos |
+
+Adaptar comandos aos ficheiros reais sob `**/cypress/**` ou `**/e2e/**` só **se** existirem.
+
+---
+
+## 11. Checklist de entrega (feature UI)
+
+1. [ ] Pasta feature coesa + componentes suficientemente pequenos.
+2. [ ] Service/API layer Zod-validada na fronteira.
+3. [ ] Estados **loading/error/empty retry** tratados onde há fetch.
+4. [ ] Form com RHF + Zod + mensagens utilizador PT-BR.
+5. [ ] a11y navegação básica (tab order overlays).
+6. [ ] Testes comportamentais atualizados/criados (quando infra presente).
+
+---
+
+## 12. Anti-patterns
+
+| Bloqueado | Motivo |
+| --------- | ------- |
+| Lógica de negócio densa JSX | impossibilita reuso/test isolado |
+| Introdução ou expansão de Tailwind | política atual explícita |
+| `fetch` espalhado sem service | regressão rápida de contratos inconsistentes |
+
+---
+
+## 13. Idioma
+
+Copy UI usuário final preferencialmente **português Brasil** onde produto assim definir — nomes código **inglês**.
+
+---
+
+## Histórico versão skill
+
+| Versão | Mudança |
+| ------ | ------- |
+| 2.0.0 | Formalização estrutura + boas-práticas agnósticas fundidas aos guardrails EmpregaNet |

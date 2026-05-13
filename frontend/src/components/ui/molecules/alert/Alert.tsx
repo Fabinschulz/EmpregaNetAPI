@@ -1,21 +1,21 @@
-"use client";
+'use client';
 
-import * as React from "react";
-import { cva, type VariantProps } from "class-variance-authority";
-import { cn } from "@/utils/lib";
-import styles from "./Alert.module.scss";
+import * as React from 'react';
+import { cva, type VariantProps } from 'class-variance-authority';
+import { cn } from '@/utils/lib';
+import styles from './Alert.module.scss';
 
 const alertVariants = cva(styles.alert, {
   variants: {
     variant: {
-      default: "",
+      default: '',
       destructive: styles.destructive,
-      success: styles.success,
-    },
+      success: styles.success
+    }
   },
   defaultVariants: {
-    variant: "default",
-  },
+    variant: 'default'
+  }
 });
 
 export type AlertProps = React.HTMLAttributes<HTMLDivElement> &
@@ -26,7 +26,7 @@ export type AlertProps = React.HTMLAttributes<HTMLDivElement> &
 function Alert({ className, variant, title, children, ...props }: AlertProps) {
   return (
     <div
-      role={variant === "destructive" ? "alert" : "status"}
+      role={variant === 'destructive' ? 'alert' : 'status'}
       className={cn(alertVariants({ variant }), className)}
       {...props}
     >

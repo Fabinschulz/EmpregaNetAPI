@@ -1,4 +1,4 @@
-import { startTransition } from "react";
+import { startTransition } from 'react';
 
 /**
  * Encapsula navegação do App Router numa Transition, para não bloquear

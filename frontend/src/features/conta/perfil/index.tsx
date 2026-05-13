@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { startTransition, useEffect, useState } from "react";
-import { Alert } from "@/components/ui";
-import { me } from "@/services";
-import { useAuth } from "@/features/auth";
+import { startTransition, useEffect, useState } from 'react';
+import { Alert } from '@/components/ui';
+import { me } from '@/services';
+import { useAuth } from '@/features/auth';
 
 export function ProfilePage() {
   const { token, roles } = useAuth();
@@ -25,9 +25,7 @@ export function ProfilePage() {
         });
       } catch (err) {
         if (!mounted) return;
-        startTransition(() =>
-          setError(err instanceof Error ? err.message : "Erro ao carregar perfil.")
-        );
+        startTransition(() => setError(err instanceof Error ? err.message : 'Erro ao carregar perfil.'));
       } finally {
         if (mounted) setPending(false);
       }
@@ -40,7 +38,7 @@ export function ProfilePage() {
   return (
     <div>
       <h1>Minha conta</h1>
-      <p style={{ color: "var(--muted)" }}>Informações do usuário autenticado.</p>
+      <p style={{ color: 'var(--muted)' }}>Informações do usuário autenticado.</p>
 
       {error ? (
         <Alert variant="destructive" title="Erro">
@@ -52,10 +50,10 @@ export function ProfilePage() {
       {user ? (
         <div
           style={{
-            border: "1px solid var(--border)",
-            borderRadius: "var(--radius)",
+            border: '1px solid var(--border)',
+            borderRadius: 'var(--radius)',
             padding: 14,
-            background: "rgba(255,255,255,0.05)",
+            background: 'rgba(255,255,255,0.05)'
           }}
         >
           <div>
@@ -68,11 +66,10 @@ export function ProfilePage() {
             <strong>E-mail:</strong> {user.email}
           </div>
           <div>
-            <strong>Roles:</strong> {roles.length ? roles.join(", ") : "—"}
+            <strong>Roles:</strong> {roles.length ? roles.join(', ') : '—'}
           </div>
         </div>
       ) : null}
     </div>
   );
 }
-

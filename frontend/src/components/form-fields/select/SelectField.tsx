@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import {
   Select,
@@ -10,12 +10,12 @@ import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui";
-import { useFormContext } from "@/context";
-import { cn, getFieldErrorMessage, truncateText } from "@/utils/utils";
-import type React from "react";
-import styles from "./select.module.scss";
+  TooltipTrigger
+} from '@/components/ui';
+import { useFormContext } from '@/context';
+import { cn, getFieldErrorMessage, truncateText } from 'src/utils/helpers/helpers';
+import type React from 'react';
+import styles from './select.module.scss';
 
 export interface SelectOption {
   label: string;
@@ -36,8 +36,8 @@ export const SelectField: React.FC<SelectFieldProps> = ({
   options,
   required,
   label,
-  placeholder = "Selecione",
-  className,
+  placeholder = 'Selecione',
+  className
 }) => {
   const { validationErrors, setValue, watch, readOnly } = useFormContext();
   const errorsMessage = getFieldErrorMessage(name, validationErrors);
@@ -57,19 +57,12 @@ export const SelectField: React.FC<SelectFieldProps> = ({
 
       <TooltipProvider delayDuration={200}>
         <Select
-          value={
-            currentValue != null && currentValue !== ""
-              ? String(currentValue)
-              : undefined
-          }
+          value={currentValue != null && currentValue !== '' ? String(currentValue) : undefined}
           onValueChange={onChange}
           disabled={!!readOnly}
           name={name}
         >
-          <SelectTrigger
-            aria-invalid={!!errorsMessage}
-            data-testid={`select-${name}-id`}
-          >
+          <SelectTrigger aria-invalid={!!errorsMessage} data-testid={`select-${name}-id`}>
             <SelectValue placeholder={placeholder} />
           </SelectTrigger>
           <SelectContent>

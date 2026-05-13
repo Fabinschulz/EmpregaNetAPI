@@ -1,10 +1,10 @@
-import { registerFormSchema, type RegisterDto } from "@/services";
+import { registerFormSchema, type RegisterDto } from '@/services';
 
 export { registerFormSchema, type RegisterDto };
 
 export const registerDefaultValues: RegisterDto = {
-  username: "",
-  email: "",
-  password: "",
-  passwordConfirmation: "",
+  username: '',
+  email: '',
+  password: '',
+  passwordConfirmation: ''
 };

@@ -1,6 +1,6 @@
-import axios, { type AxiosInstance, type AxiosRequestConfig } from "axios";
-import * as Qs from "qs";
-import { getPublicEnv } from "@/utils/lib";
+import axios, { type AxiosInstance, type AxiosRequestConfig } from 'axios';
+import * as Qs from 'qs';
+import { getPublicEnv } from '@/utils/lib';
 
 let instance: AxiosInstance | null = null;
 
@@ -9,9 +9,8 @@ const createAxiosInstance = async () => {
 
   const axiosParams: AxiosRequestConfig = {
     baseURL: NEXT_PUBLIC_API_BASE_URL,
-    responseType: "json" as const,
-    paramsSerializer: (params: unknown) =>
-      Qs.stringify(params as Record<string, unknown>, { arrayFormat: "repeat" }),
+    responseType: 'json' as const,
+    paramsSerializer: (params: unknown) => Qs.stringify(params as Record<string, unknown>, { arrayFormat: 'repeat' })
   };
 
   return axios.create(axiosParams);
@@ -40,19 +39,18 @@ export const axiosApi = {
   },
   delete: <T>(url: string, config?: AxiosRequestConfig) => {
     return getAxiosInstance().then((instance) => instance.delete<T>(url, config));
-  },
+  }
 };
 
 function normalizeAuthorizationHeader(token: string) {
-  return token.startsWith("Bearer ") ? token : `Bearer ${token}`;
+  return token.startsWith('Bearer ') ? token : `Bearer ${token}`;
 }
 
 export function createAxiosConfig<T>(token: string, params?: T) {
   return {
     headers: {
-      Authorization: normalizeAuthorizationHeader(token),
+      Authorization: normalizeAuthorizationHeader(token)
     },
-    params,
+    params
   } satisfies AxiosRequestConfig;
 }
-

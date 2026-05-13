@@ -67,17 +67,17 @@
   outline: none;
 }
 
-.item[data-disabled="true"] {
+.item[data-disabled='true'] {
   pointer-events: none;
   opacity: 0.45;
 }
 
-.item[data-selected="true"] {
+.item[data-selected='true'] {
   background: rgba(96, 165, 250, 0.22);
   color: var(--text);
 }
 
-.itemSelectedAccent[data-selected="true"] {
+.itemSelectedAccent[data-selected='true'] {
   background: rgba(96, 165, 250, 0.28);
 }
 

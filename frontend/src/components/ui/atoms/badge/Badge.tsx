@@ -1,21 +1,21 @@
-"use client";
+'use client';
 
-import * as React from "react";
-import { cva, type VariantProps } from "class-variance-authority";
-import { cn } from "@/utils/lib";
-import styles from "./Badge.module.scss";
+import * as React from 'react';
+import { cva, type VariantProps } from 'class-variance-authority';
+import { cn } from '@/utils/lib';
+import styles from './Badge.module.scss';
 
 const badgeVariants = cva(styles.root, {
   variants: {
     variant: {
       default: styles.variantDefault,
       secondary: styles.variantSecondary,
-      destructive: styles.variantDestructive,
-    },
+      destructive: styles.variantDestructive
+    }
   },
   defaultVariants: {
-    variant: "default",
-  },
+    variant: 'default'
+  }
 });
 
 export type BadgeProps = React.HTMLAttributes<HTMLSpanElement> &

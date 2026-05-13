@@ -1,12 +1,12 @@
-"use client";
+'use client';
 
-import { Label } from "@/components/ui";
-import { useFormContext } from "@/context";
-import { cn, getFieldErrorMessage } from "@/utils/utils";
-import type React from "react";
-import styles from "./input.module.scss";
+import { Label } from '@/components/ui';
+import { useFormContext } from '@/context';
+import type React from 'react';
+import { cn, getFieldErrorMessage } from 'src/utils/helpers/helpers';
+import styles from './input.module.scss';
 
-export type InputFieldProps = Omit<React.ComponentProps<"input">, "className"> & {
+export type InputFieldProps = Omit<React.ComponentProps<'input'>, 'className'> & {
   name: string;
   label?: string;
   className?: string;
@@ -25,7 +25,7 @@ export const InputField: React.FC<InputFieldProps> = ({
   label,
   required,
   placeholder,
-  type = "text",
+  type = 'text',
   className,
   startIcon: StartIcon,
   endIcon: EndIcon,
@@ -69,7 +69,6 @@ export const InputField: React.FC<InputFieldProps> = ({
           disabled={!!readOnly}
           aria-invalid={!!errorsMessage}
           className={styles.input}
-          required={required}
           onChange={(e) => {
             void regOnChange(e);
             propOnChange?.(e);
@@ -77,13 +76,7 @@ export const InputField: React.FC<InputFieldProps> = ({
           }}
         />
         {EndIcon ? (
-          <button
-            type="button"
-            className={styles.iconBtn}
-            onClick={onEndIconClick}
-            tabIndex={-1}
-            aria-label="Ação"
-          >
+          <button type="button" className={styles.iconBtn} onClick={onEndIconClick} tabIndex={-1} aria-label="Ação">
             <EndIcon width={18} height={18} />
           </button>
         ) : null}
