@@ -1,26 +1,30 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import { Button } from '@/components/ui';
+import { useTheme } from '@/context';
+import { useAuth } from '@/features/auth';
+import { isAdmin, isRecruitmentStaff, startRouterTransition, toastSuccess } from '@/utils/lib';
 import clsx from 'clsx';
 import type { LucideIcon } from 'lucide-react';
 import {
-  Briefcase,
-  Building2,
-  FileText,
-  LayoutDashboard,
-  Menu,
-  PanelLeftClose,
-  PanelLeft,
-  UserCircle,
-  Users,
-  X
+    Briefcase,
+    Building2,
+    FileText,
+    LayoutDashboard,
+    Menu,
+    Moon,
+    PanelLeft,
+    PanelLeftClose,
+    Sun,
+    UserCircle,
+    Users,
+    X
 } from 'lucide-react';
+import Link from 'next/link';
+import { usePathname, useRouter } from 'next/navigation';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useHasMounted } from '@/hooks/use-has-mounted';
 import styles from './AppShell.module.scss';
-import { Button } from '@/components/ui';
-import { useAuth } from '@/features/auth';
-import { isAdmin, isRecruitmentStaff, startRouterTransition, toastSuccess } from '@/utils/lib';
 
 type NavItem = { href: string; label: string; icon: LucideIcon; visible: boolean };
 
@@ -30,10 +34,16 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const { roles, logout, username, email } = useAuth();
+  const { resolvedTheme, setTheme } = useTheme();
+  const themeMounted = useHasMounted();
+  const toggleLightDark = () => {
+    if (!themeMounted) return;
+    setTheme(resolvedTheme === 'dark' ? 'light' : 'dark');
+  };
   const [mobileOpen, setMobileOpen] = useState(false);
   const [railCollapsed, setRailCollapsed] = useState(false);
 
-  const displayName = username?.trim() || email?.trim() || 'Utilizador';
+  const displayName = username?.trim() || email?.trim() || 'Usuário';
   const displaySub = username?.trim() && email?.trim() && username !== email ? email : null;
 
   const navGroups: NavGroup[] = useMemo(() => {
@@ -109,7 +119,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         </div>
       </div>
 
-      <nav className={styles.sidebarScroll} aria-label="Navegação principal">
+      <nav
+        className={styles.sidebarScroll}
+        aria-label="Navegação principal"
+        suppressHydrationWarning
+      >
         {navGroups.map((group) => {
           const visibleItems = group.items.filter((i) => i.visible);
           if (visibleItems.length === 0) return null;
@@ -170,6 +184,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <aside
         id="app-sidebar"
         className={clsx(styles.sidebar, railCollapsed && styles.sidebarCollapsed, mobileOpen && styles.sidebarMobileOpen)}
+        suppressHydrationWarning
       >
         {sidebarInner}
       </aside>
@@ -193,6 +208,27 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               <span className={styles.topbarEyebrow}>Área autenticada</span>
               <span className={styles.topbarHint}>Utilize o menu para aceder às áreas do portal.</span>
             </div>
+          </div>
+          <div className={styles.topbarRight}>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              aria-label={
+                !themeMounted
+                  ? 'Alternar tema'
+                  : resolvedTheme === 'dark'
+                    ? 'Alternar para tema claro'
+                    : 'Alternar para tema escuro'
+              }
+              onClick={toggleLightDark}
+            >
+              {themeMounted && resolvedTheme === 'dark' ? (
+                <Sun className={styles.headerIcon} />
+              ) : (
+                <Moon className={styles.headerIcon} />
+              )}
+            </Button>
           </div>
         </header>
 

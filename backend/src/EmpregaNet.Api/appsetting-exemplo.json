@@ -1,0 +1,52 @@
+{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning",
+      "Microsoft.EntityFrameworkCore": "Warning"
+    }
+  },
+  "AllowedHosts": "*",
+  "ConnectionStrings": {
+    "PostgreSQLConnection": "Host=localhost;Port=5432;Database=empreganet;Username=postgres;Password=postgres;"
+  },
+  "Redis": "localhost:6379",
+  "JwtSettings": {
+    "SecretKey": "TroqueEstaChavePorUmSegredoLongoDePeloMenos32Caracteres!",
+    "ExpirationHours": 8,
+    "Issuer": "EmpregaNet.Api",
+    "Audience": "EmpregaNet.App",
+    "RefreshTokenExpirationDays": 14
+  },
+  "AppUrls": {
+    "PublicAppBaseUrl": "https://localhost:3000",
+    "PasswordResetPath": "/auth/reset-password",
+    "EmailConfirmationPath": "/auth/confirm-email"
+  },
+  "GoogleAuth": {
+    "ClientIds": []
+  },
+  "Smtp": {
+    "Enabled": false,
+    "Host": "",
+    "Port": 587,
+    "Security": "StartTls",
+    "UserName": "",
+    "Password": "",
+    "FromEmail": "",
+    "FromName": "EmpregaNet"
+  },
+  "Seed": {
+    "AdminEmail": "admin@empreganet.com",
+    "AdminUserName": "admin",
+    "AdminPassword": "Mudar@123"
+  },
+  "RateLimiting": {
+    "PermitLimit": 100,
+    "WindowInSeconds": 10,
+    "QueueLimit": 0
+  },
+  "Sentry": {
+    "Dsn": ""
+  }
+}

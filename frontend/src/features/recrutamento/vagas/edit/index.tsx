@@ -2,6 +2,7 @@
 
 import { startTransition, useEffect, useMemo, useState, useTransition } from 'react';
 import { useParams, useRouter } from 'next/navigation';
+import { FormFieldsSkeleton } from '@/components/common';
 import { Alert, Button, FormSubmitButton, InputField, TextareaField } from '@/components';
 import { FormProvider, useFormContext } from '@/context';
 import { closeJob, getJob, jobFormSchema, updateJob, type JobFormValues } from '@/services';
@@ -88,7 +89,7 @@ export function RecruitmentEditJobPage() {
         </Alert>
       ) : null}
       {pending ? (
-        <p>Carregando...</p>
+        <FormFieldsSkeleton fields={8} />
       ) : initial ? (
         <FormProvider
           key={`job-${jobId}`}

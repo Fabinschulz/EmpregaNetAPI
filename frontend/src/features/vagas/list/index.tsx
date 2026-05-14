@@ -2,6 +2,7 @@
 
 import { startTransition, useEffect, useState } from 'react';
 import Link from 'next/link';
+import { ListRowsSkeleton } from '@/components/common';
 import { Alert, Button } from '@/components/ui';
 import { listJobs } from '@/services';
 
@@ -45,7 +46,7 @@ export function JobsPage() {
       ) : null}
 
       {pending ? (
-        <p>Carregando...</p>
+        <ListRowsSkeleton rows={6} />
       ) : data.length === 0 ? (
         <Alert title="Nenhuma vaga" variant="default">
           Não encontramos vagas ativas no momento.
@@ -58,7 +59,7 @@ export function JobsPage() {
               style={{
                 border: '1px solid var(--border)',
                 borderRadius: 'var(--radius)',
-                background: 'rgba(255,255,255,0.05)',
+                background: 'var(--card-bg)',
                 padding: 14
               }}
             >

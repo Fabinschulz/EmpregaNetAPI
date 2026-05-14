@@ -3,6 +3,7 @@
  * Barril público: `import { Button, Input } from "@/components/ui"`.
  * Dentro de `components/ui/*`, importar entre átomos/moléculas por caminho relativo (evita ciclo com este index).
  */
+export { Skeleton, type SkeletonProps } from './atoms/skeleton';
 export { Badge, badgeVariants, type BadgeProps } from './atoms/badge';
 export { Button, buttonVariants, type ButtonProps } from './atoms/button';
 export { Label } from './atoms/label';

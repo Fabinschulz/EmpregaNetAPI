@@ -2,6 +2,7 @@
 
 import { startTransition, useEffect, useMemo, useState } from 'react';
 import { useParams } from 'next/navigation';
+import { FormFieldsSkeleton } from '@/components/common';
 import { Alert } from '@/components/ui';
 import { getCandidate } from '@/services';
 import { useAuth } from '@/features/auth';
@@ -47,14 +48,14 @@ export function CandidateDetailPage() {
           {error}
         </Alert>
       ) : null}
-      {pending ? <p>Carregando...</p> : null}
+      {pending ? <FormFieldsSkeleton fields={5} /> : null}
       {user ? (
         <div
           style={{
             border: '1px solid var(--border)',
             borderRadius: 'var(--radius)',
             padding: 14,
-            background: 'rgba(255,255,255,0.05)'
+            background: 'var(--card-bg)'
           }}
         >
           <div>

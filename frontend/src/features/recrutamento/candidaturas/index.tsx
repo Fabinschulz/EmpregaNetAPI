@@ -1,6 +1,7 @@
 'use client';
 
 import { startTransition, useEffect, useState } from 'react';
+import { ListRowsSkeleton } from '@/components/common';
 import { Alert } from '@/components/ui';
 import { listAll } from '@/services';
 import { useAuth } from '@/features/auth';
@@ -45,7 +46,7 @@ export function RecruitmentApplicationsPage() {
           {error}
         </Alert>
       ) : null}
-      {pending ? <p>Carregando...</p> : null}
+      {pending ? <ListRowsSkeleton rows={6} /> : null}
 
       {!pending && items.length === 0 ? (
         <Alert title="Nenhuma candidatura">Nenhuma candidatura encontrada.</Alert>
@@ -58,7 +59,7 @@ export function RecruitmentApplicationsPage() {
                 border: '1px solid var(--border)',
                 borderRadius: 'var(--radius)',
                 padding: 14,
-                background: 'rgba(255,255,255,0.05)'
+                background: 'var(--card-bg)'
               }}
             >
               <div style={{ fontWeight: 700 }}>#{it.id}</div>

@@ -1,0 +1,54 @@
+.wrap {
+  margin-top: 12px;
+  display: grid;
+  gap: 10px;
+}
+
+.row {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--card-bg);
+  padding: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.col {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.lineLg {
+  height: 18px;
+  width: min(100%, 280px);
+}
+
+.lineSm {
+  height: 14px;
+  width: min(100%, 180px);
+  opacity: 0.92;
+}
+
+.btn {
+  height: 38px;
+  width: 118px;
+  border-radius: 12px;
+  flex-shrink: 0;
+}
+
+@media (max-width: 520px) {
+  .row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .btn {
+    width: 100%;
+  }
+}

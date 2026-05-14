@@ -1,0 +1,11 @@
+.wrap {
+  position: fixed;
+  top: clamp(10px, 2.5vw, 16px);
+  right: clamp(10px, 2.5vw, 16px);
+  z-index: 50;
+}
+
+.icon {
+  width: 20px;
+  height: 20px;
+}

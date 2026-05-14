@@ -8,7 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
-namespace EmpregaNet.Infra.Persistence.Database;
+namespace EmpregaNet.Infra.Persistence.Seeds;
 
 /// <summary>
 /// Garante roles padrão e um usuário administrador inicial (idempotente).

@@ -2,6 +2,7 @@
 
 import { startTransition, useEffect, useMemo, useState, useTransition } from 'react';
 import { useParams, useRouter } from 'next/navigation';
+import { FormFieldsSkeleton } from '@/components/common';
 import { Alert, Button, FormSubmitButton, InputField } from '@/components';
 import { FormProvider, useFormContext } from '@/context';
 import { companyFormSchema, deleteCompany, getCompany, updateCompany, type CompanyFormValues } from '@/services';
@@ -91,7 +92,7 @@ export function AdminEditCompanyPage() {
         </Alert>
       ) : null}
       {pending ? (
-        <p>Carregando...</p>
+        <FormFieldsSkeleton fields={8} />
       ) : initial ? (
         <FormProvider
           key={`company-${id}`}

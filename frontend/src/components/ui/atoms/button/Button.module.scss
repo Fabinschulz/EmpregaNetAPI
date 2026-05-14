@@ -125,3 +125,33 @@
 .iconEnd {
   margin-inline-start: 2px;
 }
+
+:global(html[data-theme='light']) {
+  .root {
+    background: rgba(255, 255, 255, 0.92);
+    box-shadow: 0 10px 28px rgba(22, 24, 31, 0.08);
+  }
+
+  .root:hover {
+    background: rgba(255, 255, 255, 1);
+    border-color: rgba(22, 24, 31, 0.16);
+  }
+
+  .variantDestructive {
+    color: rgba(90, 18, 18, 0.98);
+  }
+
+  .variantGhost:hover {
+    background: rgba(22, 24, 31, 0.06);
+    border-color: rgba(22, 24, 31, 0.1);
+  }
+
+  .variantSecondary {
+    background: rgba(22, 24, 31, 0.04);
+    border-color: rgba(22, 24, 31, 0.1);
+  }
+
+  .variantLink:hover {
+    color: #1d4ed8;
+  }
+}

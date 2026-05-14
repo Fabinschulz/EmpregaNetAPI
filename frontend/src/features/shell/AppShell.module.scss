@@ -20,7 +20,7 @@
   flex-direction: column;
   min-height: 100vh;
   border-right: 1px solid var(--border);
-  background: linear-gradient(165deg, rgba(255, 255, 255, 0.06) 0%, rgba(15, 23, 42, 0.55) 100%);
+  background: linear-gradient(165deg, var(--sidebar-start) 0%, var(--sidebar-end) 100%);
   backdrop-filter: blur(12px);
   box-shadow: inset -1px 0 0 rgba(255, 255, 255, 0.04);
 }
@@ -200,10 +200,17 @@
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding: 14px 20px 12px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-  background: rgba(11, 18, 32, 0.35);
+  padding: 12px clamp(14px, 3vw, 20px);
+  border-bottom: 1px solid var(--border);
+  background: var(--topbar-bg);
   backdrop-filter: blur(8px);
+}
+
+.topbarRight {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
 }
 
 .topbarLeft {
@@ -230,7 +237,7 @@
 
 .topbarHint {
   font-size: 13px;
-  color: rgba(255, 255, 255, 0.82);
+  color: var(--muted);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -238,8 +245,8 @@
 
 .main {
   flex: 1;
-  padding: 20px 24px 32px;
-  max-width: 1120px;
+  padding: clamp(14px, 3vw, 22px) clamp(14px, 4vw, 28px) clamp(24px, 5vw, 36px);
+  max-width: min(1120px, 100%);
   width: 100%;
   margin: 0 auto;
 }
@@ -307,6 +314,10 @@
   .overlayVisible {
     opacity: 1;
     pointer-events: auto;
+  }
+
+  :global(html[data-theme='light']) .overlay {
+    background: rgba(22, 24, 31, 0.28);
   }
 
   .sidebar {

@@ -9,18 +9,18 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace EmpregaNet.Infra.Persistence.Database.Migrations
+namespace EmpregaNet.Infra.Persistence.Migrations
 {
     [DbContext(typeof(PostgreSqlContext))]
-    [Migration("20260407195049_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20260514030250_InitialMigration")]
+    partial class InitialMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.1")
+                .HasAnnotation("ProductVersion", "10.0.8")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -253,6 +253,9 @@ namespace EmpregaNet.Infra.Persistence.Database.Migrations
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("boolean");
 
+                    b.Property<long?>("EmployerCompanyId")
+                        .HasColumnType("bigint");
+
                     b.Property<int?>("Gender")
                         .HasColumnType("integer");
 
@@ -307,6 +310,9 @@ namespace EmpregaNet.Infra.Persistence.Database.Migrations
                         .IsUnique()
                         .HasDatabaseName("IX_Users_Email");
 
+                    b.HasIndex("EmployerCompanyId")
+                        .HasDatabaseName("IX_Users_EmployerCompanyId");
+
                     b.HasIndex("Id")
                         .HasDatabaseName("IX_Users_Id");
 
@@ -326,6 +332,43 @@ namespace EmpregaNet.Infra.Persistence.Database.Migrations
                         .HasDatabaseName("IX_Users_UserName");
 
                     b.ToTable("Users", (string)null);
+                });
+
+            modelBuilder.Entity("EmpregaNet.Domain.Entities.UserRefreshToken", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset>("ExpiresAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset?>("RevokedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("TokenHash")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character(64)")
+                        .IsFixedLength();
+
+                    b.Property<long>("UserId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TokenHash")
+                        .HasDatabaseName("IX_UserRefreshTokens_TokenHash");
+
+                    b.HasIndex("UserId")
+                        .HasDatabaseName("IX_UserRefreshTokens_UserId");
+
+                    b.ToTable("UserRefreshTokens", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<long>", b =>
@@ -501,6 +544,11 @@ namespace EmpregaNet.Infra.Persistence.Database.Migrations
 
             modelBuilder.Entity("EmpregaNet.Domain.Entities.User", b =>
                 {
+                    b.HasOne("EmpregaNet.Domain.Entities.Company", null)
+                        .WithMany()
+                        .HasForeignKey("EmployerCompanyId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
                     b.OwnsOne("EmpregaNet.Domain.Entities.Address", "Address", b1 =>
                         {
                             b1.Property<long>("UserId")
@@ -555,6 +603,17 @@ namespace EmpregaNet.Infra.Persistence.Database.Migrations
                         });
 
                     b.Navigation("Address");
+                });
+
+            modelBuilder.Entity("EmpregaNet.Domain.Entities.UserRefreshToken", b =>
+                {
+                    b.HasOne("EmpregaNet.Domain.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<long>", b =>

@@ -1,4 +1,4 @@
-namespace EmpregaNet.Infra.Persistence.Database;
+namespace EmpregaNet.Infra.Persistence.Seeds;
 
 /// <summary>
 /// Credenciais e opções do seed inicial (roles e usuário administrador).

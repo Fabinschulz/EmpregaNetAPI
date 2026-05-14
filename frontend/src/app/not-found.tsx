@@ -1,14 +1,14 @@
 'use client';
 
 import { ErrorFallback } from '@/components';
+import { startRouterTransition } from '@/utils/lib';
 import { ArrowLeft } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { startRouterTransition } from '@/utils/lib';
 
 export default function NotFoundPage() {
   const router = useRouter();
   return (
-    <div className="flex items-center justify-center h-screen">
+    <div className="not-found-page">
       <ErrorFallback
         statusCode={404}
         title="Ops! Página não encontrada"

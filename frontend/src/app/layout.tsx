@@ -1,10 +1,12 @@
-import type { Metadata } from 'next';
 import { AppProviders } from '@/components/providers';
+import type { Metadata } from 'next';
 import './globals.scss';
 
 export const metadata: Metadata = {
   title: 'EmpregaNet',
-  description: 'Portal de vagas e recrutamento'
+  description: 'Plataforma de gestão de candidaturas e vagas de emprego',
+  keywords: 'emprego, vagas, candidaturas, recrutamento, gestão de talentos',
+  authors: [{ name: 'Fábio Correa', url: 'https://github.com/Fabinschulz' }]
 };
 
 export default function RootLayout({

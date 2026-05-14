@@ -2,6 +2,7 @@
 
 import { startTransition, useEffect, useState } from 'react';
 import Link from 'next/link';
+import { ListRowsSkeleton } from '@/components/common';
 import { Alert, Button } from '@/components/ui';
 import { listAdminUsers } from '@/services';
 import { useAuth } from '@/features/auth';
@@ -46,7 +47,7 @@ export function AdminUsersPage() {
           {error}
         </Alert>
       ) : null}
-      {pending ? <p>Carregando...</p> : null}
+      {pending ? <ListRowsSkeleton rows={6} /> : null}
 
       {!pending && items.length === 0 ? (
         <Alert title="Nenhum usuário">Nenhum usuário encontrado.</Alert>
@@ -59,7 +60,7 @@ export function AdminUsersPage() {
                 border: '1px solid var(--border)',
                 borderRadius: 'var(--radius)',
                 padding: 14,
-                background: 'rgba(255,255,255,0.05)',
+                background: 'var(--card-bg)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',

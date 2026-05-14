@@ -2,6 +2,7 @@
 
 import { startTransition, useEffect, useMemo, useState, useTransition } from 'react';
 import { useParams } from 'next/navigation';
+import { DetailPageSkeleton } from '@/components/common';
 import { Alert, Button } from '@/components/ui';
 import { applyToJob, getJob } from '@/services';
 import { useAuth } from '@/features/auth';
@@ -60,7 +61,7 @@ export function JobDetailPage() {
 
   return (
     <div>
-      {pending ? <p>Carregando...</p> : null}
+      {pending ? <DetailPageSkeleton bodyLines={5} /> : null}
       {error ? (
         <Alert variant="destructive" title="Erro">
           {error}

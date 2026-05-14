@@ -1,6 +1,7 @@
 'use client';
 
 import { startTransition, useEffect, useState } from 'react';
+import { FormFieldsSkeleton } from '@/components/common';
 import { Alert } from '@/components/ui';
 import { me } from '@/services';
 import { useAuth } from '@/features/auth';
@@ -45,7 +46,7 @@ export function ProfilePage() {
           {error}
         </Alert>
       ) : null}
-      {pending ? <p>Carregando...</p> : null}
+      {pending ? <FormFieldsSkeleton fields={5} /> : null}
 
       {user ? (
         <div
@@ -53,7 +54,7 @@ export function ProfilePage() {
             border: '1px solid var(--border)',
             borderRadius: 'var(--radius)',
             padding: 14,
-            background: 'rgba(255,255,255,0.05)'
+            background: 'var(--card-bg)'
           }}
         >
           <div>

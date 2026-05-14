@@ -2,3 +2,5 @@ export type { ChangeFieldDelegate, FormContextProps, FormMode, FormProviderProps
 export { FormProvider, useFormContext } from './form-context';
 
 export { AuthProvider, useAuth } from './auth-context';
+export { ThemeProvider } from '@/components/providers/theme-provider';
+export { useTheme } from 'next-themes';

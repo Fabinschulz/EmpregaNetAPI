@@ -2,6 +2,7 @@
 
 import { startTransition, useEffect, useMemo, useState, useTransition } from 'react';
 import { useParams, useRouter } from 'next/navigation';
+import { FormFieldsSkeleton } from '@/components/common';
 import { Alert, Button, FormSubmitButton, InputField } from '@/components';
 import { FormProvider, useFormContext } from '@/context';
 import {
@@ -88,7 +89,7 @@ export function AdminUserDetailPage() {
           {apiError}
         </Alert>
       ) : null}
-      {pending ? <p>Carregando...</p> : null}
+      {pending ? <FormFieldsSkeleton fields={6} /> : null}
       {user ? (
         <>
           <div
@@ -96,7 +97,7 @@ export function AdminUserDetailPage() {
               border: '1px solid var(--border)',
               borderRadius: 'var(--radius)',
               padding: 14,
-              background: 'rgba(255,255,255,0.05)'
+              background: 'var(--card-bg)'
             }}
           >
             <div>

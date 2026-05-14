@@ -2,6 +2,7 @@ using EmpregaNet.Api.Middleware;
 using EmpregaNet.Infra;
 using EmpregaNet.Infra.Extensions;
 using EmpregaNet.Infra.Persistence.Database;
+using EmpregaNet.Infra.Persistence.Seeds;
 
 var builder = WebApplication.CreateBuilder(args);
 
