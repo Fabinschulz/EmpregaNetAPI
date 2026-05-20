@@ -1,12 +1,11 @@
 'use client';
 
-import { startTransition, useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { Alert, FormSubmitButton, InputField } from '@/components';
 import { FormProvider, useFormContext } from '@/context';
-import { companyFormSchema, createCompany, type CompanyFormValues } from '@/services';
-import { useAuth } from '@/features/auth';
-import { startRouterTransition } from '@/utils/lib';
+import { companyFormSchema, useCreateCompanyMutation, type CompanyFormValues } from '@/services';
+import { getApiErrorMessage, startRouterTransition } from '@/utils';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 
 const companyEmpty: CompanyFormValues = {
   name: '',
@@ -22,23 +21,25 @@ function SaveCompanyButton({ label }: { label: string }) {
 
 export function AdminNewCompanyPage() {
   const router = useRouter();
-  const { token } = useAuth();
+  const createMutation = useCreateCompanyMutation();
   const [apiError, setApiError] = useState<string | null>(null);
 
   async function handleSubmit(data: CompanyFormValues) {
-    if (!token) return;
     setApiError(null);
-    try {
-      await createCompany(token, {
-        name: data.name,
-        email: data.email.trim() || null,
-        phone: data.phone.trim() || null,
-        documentNo: data.documentNo.trim() || null
-      });
-      startRouterTransition(() => router.push('/admin/empresas'));
-    } catch (err) {
-      startTransition(() => setApiError(err instanceof Error ? err.message : 'Falha ao criar empresa.'));
-    }
+    createMutation.mutate(
+      {
+        dto: {
+          name: data.name,
+          email: data.email.trim() || null,
+          phone: data.phone.trim() || null,
+          documentNo: data.documentNo.trim() || null
+        }
+      },
+      {
+        onSuccess: () => startRouterTransition(() => router.push('/admin/empresas')),
+        onError: (err) => setApiError(getApiErrorMessage(err, 'empresa'))
+      }
+    );
   }
 
   return (

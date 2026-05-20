@@ -1,10 +1,11 @@
 import { axiosApi, createAxiosConfig } from '../axios';
-import { candidatesListResponseSchema, type CandidatesListResponseDto } from './candidates-schema';
+import type { CandidatesListQueryParams } from '../shared';
 import { userSchema } from '../users/users-schema';
+import { candidatesListResponseSchema, type CandidatesListResponseDto } from './candidates-schema';
 
 export async function listCandidates(
   token: string,
-  params?: { page?: number; size?: number; orderBy?: string }
+  params?: CandidatesListQueryParams
 ): Promise<CandidatesListResponseDto> {
   const res = await axiosApi.get<unknown>('/api/candidates', createAxiosConfig(token, params));
   return candidatesListResponseSchema.parse(res.data);

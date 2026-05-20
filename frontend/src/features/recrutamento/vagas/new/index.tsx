@@ -1,11 +1,11 @@
 'use client';
 
-import { startTransition, useState } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Alert, FormSubmitButton, InputField, TextareaField } from '@/components';
 import { FormProvider, useFormContext } from '@/context';
-import { createJob, jobFormSchema, type JobFormValues } from '@/services';
-import { useAuth } from '@/features/auth';
+import { jobFormSchema, useCreateJobMutation, type JobFormValues } from '@/services';
+import { getApiErrorMessage } from '@/utils/helpers';
 import { startRouterTransition } from '@/utils/lib';
 
 const jobEmpty: JobFormValues = {
@@ -21,22 +21,24 @@ function SaveJobButton({ label }: { label: string }) {
 
 export function RecruitmentNewJobPage() {
   const router = useRouter();
-  const { token } = useAuth();
+  const createMutation = useCreateJobMutation();
   const [apiError, setApiError] = useState<string | null>(null);
 
   async function handleSubmit(data: JobFormValues) {
-    if (!token) return;
     setApiError(null);
-    try {
-      await createJob(token, {
-        title: data.title,
-        description: data.description.trim() || null,
-        location: data.location.trim() || null
-      });
-      startRouterTransition(() => router.push('/recrutamento/vagas'));
-    } catch (err) {
-      startTransition(() => setApiError(err instanceof Error ? err.message : 'Falha ao criar vaga.'));
-    }
+    createMutation.mutate(
+      {
+        dto: {
+          title: data.title,
+          description: data.description.trim() || null,
+          location: data.location.trim() || null
+        }
+      },
+      {
+        onSuccess: () => startRouterTransition(() => router.push('/recrutamento/vagas')),
+        onError: (err) => setApiError(getApiErrorMessage(err, 'vaga'))
+      }
+    );
   }
 
   return (

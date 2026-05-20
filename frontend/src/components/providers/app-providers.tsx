@@ -1,9 +1,10 @@
 'use client';
 
-import { TooltipProvider } from '@/components/ui';
+import { TooltipProvider } from '@/components';
+import { ThemeProvider, useTheme } from '@/context';
+import { QueryProvider } from '@/utils';
 import type { ReactNode } from 'react';
 import { Toaster } from 'sonner';
-import { ThemeProvider, useTheme } from '@/context';
 
 type AppProvidersProps = {
   children: ReactNode;
@@ -34,11 +35,13 @@ function ThemedToaster() {
 
 export function AppProviders({ children }: AppProvidersProps) {
   return (
-    <ThemeProvider>
-      <TooltipProvider delayDuration={280}>
-        {children}
-        <ThemedToaster />
-      </TooltipProvider>
-    </ThemeProvider>
+    <QueryProvider>
+      <ThemeProvider>
+        <TooltipProvider delayDuration={280}>
+          {children}
+          <ThemedToaster />
+        </TooltipProvider>
+      </ThemeProvider>
+    </QueryProvider>
   );
 }

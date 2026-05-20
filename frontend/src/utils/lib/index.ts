@@ -1,6 +1,7 @@
 export * from './cookies';
 export * from './env';
 export * from './format-app-error';
+export * from './query-client';
 export * from './rbac';
 export * from './router-transition';
 export * from './toast';

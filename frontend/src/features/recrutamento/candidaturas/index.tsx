@@ -1,75 +1,50 @@
 'use client';
 
-import { startTransition, useEffect, useState } from 'react';
-import { ListRowsSkeleton } from '@/components/common';
-import { Alert } from '@/components/ui';
-import { listAll } from '@/services';
-import { useAuth } from '@/features/auth';
+import { Alert, ApiQueryBoundary, ListRowsSkeleton } from '@/components';
+import { useAllJobApplicationsQuery } from '@/services';
 
 export function RecruitmentApplicationsPage() {
-  const { token } = useAuth();
-  const [pending, setPending] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [items, setItems] = useState<{ id: number; jobId?: number; status?: string | null }[]>([]);
-
-  useEffect(() => {
-    let mounted = true;
-    (async () => {
-      if (!token) return;
-      setPending(true);
-      setError(null);
-      try {
-        const res = await listAll(token, { page: 1, size: 100 });
-        if (!mounted) return;
-        startTransition(() => {
-          setItems(res.data.map((x) => ({ id: x.id, jobId: x.jobId, status: x.status })));
-        });
-      } catch (err) {
-        if (!mounted) return;
-        startTransition(() => setError(err instanceof Error ? err.message : 'Erro ao carregar candidaturas.'));
-      } finally {
-        if (mounted) setPending(false);
-      }
-    })();
-    return () => {
-      mounted = false;
-    };
-  }, [token]);
+  const { data, isPending, isError, error, refetch } = useAllJobApplicationsQuery();
+  const items = data?.data.map((x) => ({ id: x.id, jobId: x.jobId, status: x.status })) ?? [];
 
   return (
-    <div>
-      <h1>Recrutamento: Candidaturas</h1>
-      <p style={{ color: 'var(--muted)' }}>Listagem de candidaturas (equipe de recrutamento).</p>
+    <ApiQueryBoundary
+      fallback="candidaturas"
+      isPending={isPending}
+      isError={isError}
+      error={error}
+      resource="candidaturas"
+      onRetry={() => void refetch()}
+    >
+      <section>
+        <h1>Recrutamento: Candidaturas</h1>
+        <p style={{ color: 'var(--muted)' }}>Listagem de candidaturas (equipe de recrutamento).</p>
 
-      {error ? (
-        <Alert variant="destructive" title="Erro">
-          {error}
-        </Alert>
-      ) : null}
-      {pending ? <ListRowsSkeleton rows={6} /> : null}
+        {isPending ? <ListRowsSkeleton rows={6} /> : null}
 
-      {!pending && items.length === 0 ? (
-        <Alert title="Nenhuma candidatura">Nenhuma candidatura encontrada.</Alert>
-      ) : (
-        <div style={{ display: 'grid', gap: 10, marginTop: 12 }}>
-          {items.map((it) => (
-            <div
-              key={it.id}
-              style={{
-                border: '1px solid var(--border)',
-                borderRadius: 'var(--radius)',
-                padding: 14,
-                background: 'var(--card-bg)'
-              }}
-            >
-              <div style={{ fontWeight: 700 }}>#{it.id}</div>
-              <div style={{ color: 'var(--muted)', fontSize: 14 }}>
-                Job: {it.jobId ?? '—'} • Status: {it.status ?? '—'}
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
+        {!isPending && items.length === 0 ? (
+          <Alert title="Nenhuma candidatura">Nenhuma candidatura encontrada.</Alert>
+        ) : (
+          <ul style={{ display: 'grid', gap: 10, marginTop: 12, listStyle: 'none', padding: 0 }}>
+            {items.map((it) => (
+              <li
+                key={it.id}
+                style={{
+                  border: '1px solid var(--border)',
+                  borderRadius: 'var(--radius)',
+                  padding: 14,
+                  background: 'var(--card-bg)'
+                }}
+              >
+                <strong>#{it.id}</strong>
+                <p style={{ color: 'var(--muted)', fontSize: 14, margin: '4px 0 0' }}>
+                  Job: {it.jobId ?? '—'} • Status: {it.status ?? '—'}
+                </p>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+    </ApiQueryBoundary>
   );
 }

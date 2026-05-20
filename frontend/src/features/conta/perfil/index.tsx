@@ -1,76 +1,52 @@
 'use client';
 
-import { startTransition, useEffect, useState } from 'react';
-import { FormFieldsSkeleton } from '@/components/common';
-import { Alert } from '@/components/ui';
-import { me } from '@/services';
+import { ApiQueryBoundary, FormFieldsSkeleton } from '@/components';
 import { useAuth } from '@/features/auth';
+import { useMeQuery } from '@/services';
 
 export function ProfilePage() {
-  const { token, roles } = useAuth();
-  const [pending, setPending] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [user, setUser] = useState<{ id: number; username: string; email: string } | null>(null);
-
-  useEffect(() => {
-    let mounted = true;
-    (async () => {
-      if (!token) return;
-      setPending(true);
-      setError(null);
-      try {
-        const res = await me(token);
-        if (!mounted) return;
-        startTransition(() => {
-          setUser({ id: res.id, username: res.username, email: res.email });
-        });
-      } catch (err) {
-        if (!mounted) return;
-        startTransition(() => setError(err instanceof Error ? err.message : 'Erro ao carregar perfil.'));
-      } finally {
-        if (mounted) setPending(false);
-      }
-    })();
-    return () => {
-      mounted = false;
-    };
-  }, [token]);
+  const { roles } = useAuth();
+  const { data: user, isPending, isError, error, refetch } = useMeQuery();
 
   return (
-    <div>
-      <h1>Minha conta</h1>
-      <p style={{ color: 'var(--muted)' }}>Informações do usuário autenticado.</p>
+    <ApiQueryBoundary
+      fallback="perfil"
+      isPending={isPending}
+      isError={isError}
+      error={error}
+      resource="perfil"
+      onRetry={() => void refetch()}
+    >
+      <section>
+        <h1>Minha conta</h1>
+        <p style={{ color: 'var(--muted)' }}>Informações do usuário autenticado.</p>
 
-      {error ? (
-        <Alert variant="destructive" title="Erro">
-          {error}
-        </Alert>
-      ) : null}
-      {pending ? <FormFieldsSkeleton fields={5} /> : null}
+        {isPending ? <FormFieldsSkeleton fields={5} /> : null}
 
-      {user ? (
-        <div
-          style={{
-            border: '1px solid var(--border)',
-            borderRadius: 'var(--radius)',
-            padding: 14,
-            background: 'var(--card-bg)'
-          }}
-        >
-          <div>
-            <strong>ID:</strong> {user.id}
-          </div>
-          <div>
-            <strong>Usuário:</strong> {user.username}
-          </div>
-          <div>
-            <strong>E-mail:</strong> {user.email}
-          </div>
-          <div>
-            <strong>Roles:</strong> {roles.length ? roles.join(', ') : '—'}
-          </div>
-        </div>
-      ) : null}
-    </div>
+        {user ? (
+          <article
+            style={{
+              border: '1px solid var(--border)',
+              borderRadius: 'var(--radius)',
+              padding: 14,
+              background: 'var(--card-bg)'
+            }}
+          >
+            <p>
+              <strong>ID:</strong> {user.id}
+            </p>
+            <p>
+              <strong>Usuário:</strong> {user.username}
+            </p>
+            <p>
+              <strong>E-mail:</strong> {user.email}
+            </p>
+            <p>
+              <strong>Roles:</strong> {roles.length ? roles.join(', ') : '—'}
+            </p>
+          </article>
+        ) : null}
+      </section>
+    </ApiQueryBoundary>
   );
 }

@@ -1,3 +1,5 @@
+import { parseApiError } from '@/utils';
+import { isAxiosError } from 'axios';
 import { toast } from 'sonner';
 import { z } from 'zod';
 
@@ -25,6 +27,12 @@ export function notifyApiError(err: unknown, context?: string): void {
   if (err instanceof z.ZodError) {
     toast.error('Dados inválidos ou incompletos', {
       description: `A resposta do servidor não pôde ser validada${suffix}. Se o problema persistir, contacte o suporte.`
+    });
+    return;
+  }
+  if (isAxiosError(err)) {
+    toast.error('Não foi possível concluir a ação', {
+      description: parseApiError(err, context).message
     });
     return;
   }
