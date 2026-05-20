@@ -1,10 +1,10 @@
 'use client';
 
-import { startTransition, useEffect, useState } from 'react';
-import Link from 'next/link';
 import { ListRowsSkeleton } from '@/components/common';
 import { Alert, Button } from '@/components/ui';
 import { listJobs } from '@/services';
+import Link from 'next/link';
+import { startTransition, useEffect, useState } from 'react';
 
 export function JobsPage() {
   const [pending, setPending] = useState(true);
@@ -17,7 +17,7 @@ export function JobsPage() {
       setPending(true);
       setError(null);
       try {
-        const res = await listJobs({ page: 1, size: 50, isActive: true });
+        const res = await listJobs({ page: 1, size: 100, isActive: true });
         if (!mounted) return;
         startTransition(() => {
           setData(res.data.map((j) => ({ id: j.id, title: j.title, location: j.location })));

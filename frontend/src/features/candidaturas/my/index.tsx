@@ -1,10 +1,10 @@
 'use client';
 
-import { startTransition, useEffect, useState } from 'react';
 import { ListRowsSkeleton } from '@/components/common';
 import { Alert } from '@/components/ui';
-import { listMine } from '@/services';
 import { useAuth } from '@/features/auth';
+import { listMine } from '@/services';
+import { startTransition, useEffect, useState } from 'react';
 
 export function MyApplicationsPage() {
   const { token } = useAuth();
@@ -19,7 +19,7 @@ export function MyApplicationsPage() {
       setPending(true);
       setError(null);
       try {
-        const res = await listMine(token, { page: 1, size: 50 });
+        const res = await listMine(token, { page: 1, size: 100 });
         if (!mounted) return;
         startTransition(() => {
           setItems(res.data.map((x) => ({ id: x.id, status: x.status, jobId: x.jobId })));
