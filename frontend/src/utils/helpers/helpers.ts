@@ -1,15 +1,15 @@
 export { cn } from '../lib';
 
 export function getFieldErrorMessage(path: string, errors: unknown): string | undefined {
-  const v = getObjectPropertyValue(path, errors);
-  if (v && typeof v === 'object' && v !== null && 'message' in v) {
-    const m = (v as { message?: unknown }).message;
+  const val = _getObjectPropertyValue(path, errors);
+  if (val && typeof val === 'object' && val !== null && 'message' in val) {
+    const m = (val as { message?: unknown }).message;
     return typeof m === 'string' ? m : undefined;
   }
   return undefined;
 }
 
-export function getObjectPropertyValue(path: string, obj: unknown): unknown {
+function _getObjectPropertyValue(path: string, obj: unknown): unknown {
   if (obj == null || typeof obj !== 'object') return undefined;
   const parts = path.split('.').filter(Boolean);
   let current: unknown = obj;
@@ -21,7 +21,6 @@ export function getObjectPropertyValue(path: string, obj: unknown): unknown {
 }
 
 export const truncateText = (text: string, maxLength = 50) =>  text?.length > maxLength ? `${text.substring(0, maxLength)}...` : text;
-
 
 export function extractAndConvertFiles(data: any) {
   const allFiles: File[] = [];

@@ -1,12 +1,6 @@
 import { z } from 'zod';
+import { listDataPaginationSchema } from '../shared';
 import { userSchema } from '../users/users-schema';
 
-export const candidatesListResponseSchema = z.object({
-  data: z.array(userSchema),
-  page: z.number().optional(),
-  size: z.number().optional(),
-  total: z.number().optional(),
-  totalPages: z.number().optional()
-});
-
+export const candidatesListResponseSchema = listDataPaginationSchema(userSchema);
 export type CandidatesListResponseDto = z.infer<typeof candidatesListResponseSchema>;

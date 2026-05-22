@@ -1,6 +1,6 @@
 import { axiosApi, createAxiosConfig } from '../axios';
 import type { CompaniesListQueryParams } from '../shared';
-import { companiesListResponseSchema, companySchema, type CompaniesListResponseDto } from './companies-schema';
+import { companiesListResponseSchema, CompanyDto, companySchema, type CompaniesListResponseDto } from './companies-schema';
 
 export async function listCompanies(
   token: string,
@@ -10,7 +10,7 @@ export async function listCompanies(
   return companiesListResponseSchema.parse(res.data);
 }
 
-export async function getCompany(token: string, id: number) {
+export async function getCompany(token: string, id: number): Promise<CompanyDto> {
   const res = await axiosApi.get<unknown>(`/api/companies/${id}`, createAxiosConfig(token));
   return companySchema.parse(res.data);
 }

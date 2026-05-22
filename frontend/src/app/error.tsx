@@ -1,7 +1,7 @@
 'use client';
 
 import { ErrorFallback } from '@/components';
-import { formatAppErrorUserMessage, type AppRouteError } from '@/utils/lib';
+import { formatAppErrorUserMessage, type AppRouteError } from '@/utils';
 
 type SegmentErrorProps = Readonly<{
   error: AppRouteError;

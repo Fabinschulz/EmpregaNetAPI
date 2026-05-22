@@ -1,8 +1,8 @@
 'use client';
 
+import { Button } from '@/components';
 import type { LucideIcon } from 'lucide-react';
 import { RefreshCw } from 'lucide-react';
-import { Button } from '@/components/ui';
 import styles from './error-fallback.module.scss';
 
 export type ErrorFallbackProps = {

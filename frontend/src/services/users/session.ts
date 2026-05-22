@@ -1,6 +1,10 @@
-import { jwtDecode } from 'jwt-decode';
-import { AUTH_COOKIE, REFRESH_COOKIE } from '@/services';
+
 import { deleteClientCookie, parseCookieHeader, setClientCookie } from '@/utils/lib';
+import { jwtDecode } from 'jwt-decode';
+
+
+export const AUTH_COOKIE = 'empreganet_access_token';
+export const REFRESH_COOKIE = 'empreganet_refresh_token';
 
 type JwtPayload = {
   exp?: number;

@@ -1,9 +1,9 @@
 'use client';
 
-import { Label } from '@/components/ui';
+import { Label } from '@/components';
 import { useFormContext } from '@/context';
 import type React from 'react';
-import { cn, getFieldErrorMessage } from 'src/utils/helpers/helpers';
+import { cn, getFieldErrorMessage } from 'src/utils';
 import styles from './input.module.scss';
 
 export type InputFieldProps = Omit<React.ComponentProps<'input'>, 'className'> & {

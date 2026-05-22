@@ -1,8 +1,8 @@
 'use client';
 
-import * as React from 'react';
-import { Button, type ButtonProps } from '@/components/ui';
+import { Button, type ButtonProps } from '@/components';
 import { useFormContext } from '@/context';
+import * as React from 'react';
 
 export type FormSubmitButtonProps = Omit<ButtonProps, 'type'>;
 

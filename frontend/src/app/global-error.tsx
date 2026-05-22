@@ -1,8 +1,8 @@
 'use client';
 
-import './globals.scss';
 import { ErrorFallback } from '@/components';
-import { formatAppErrorUserMessage, type AppRouteError } from '@/utils/lib';
+import { formatAppErrorUserMessage, type AppRouteError } from '@/utils';
+import './globals.scss';
 
 type GlobalErrorProps = Readonly<{
   error: AppRouteError;

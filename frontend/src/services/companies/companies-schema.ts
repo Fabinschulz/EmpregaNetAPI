@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { listDataPaginationSchema } from '../shared';
 
 export const companySchema = z.object({
   id: z.number().int(),
@@ -8,15 +9,8 @@ export const companySchema = z.object({
   phone: z.string().nullable().optional()
 });
 
-export const companiesListResponseSchema = z.object({
-  data: z.array(companySchema),
-  page: z.number().optional(),
-  size: z.number().optional(),
-  total: z.number().optional(),
-  totalPages: z.number().optional()
-});
-
 export type CompanyDto = z.infer<typeof companySchema>;
+export const companiesListResponseSchema = listDataPaginationSchema(companySchema);
 export type CompaniesListResponseDto = z.infer<typeof companiesListResponseSchema>;
 
 export const companyFormSchema = z.object({

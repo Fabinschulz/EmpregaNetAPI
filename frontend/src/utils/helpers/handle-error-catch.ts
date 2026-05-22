@@ -1,16 +1,9 @@
 import { isAxiosError } from 'axios';
-import { Dispatch, SetStateAction } from 'react';
 import { ApiStatusCode } from '../enums';
 
 export type ApiErrorResult = {
   message: string;
   statusCode?: number;
-};
-
-type ExProps = {
-  err: unknown;
-  setStatusCode: Dispatch<SetStateAction<number | undefined>>;
-  resource?: string;
 };
 
 const UNKNOWN_ERROR_MESSAGE =
@@ -21,9 +14,7 @@ const UNKNOWN_ERROR_MESSAGE =
  * Função pura — preferir esta em React Query (derivar de `error` no render).
  */
 export function parseApiError(err: unknown, resource?: string): ApiErrorResult {
-  if (!isAxiosError(err)) {
-    return { message: UNKNOWN_ERROR_MESSAGE };
-  }
+  if (!isAxiosError(err)) return { message: UNKNOWN_ERROR_MESSAGE };
 
   const { response } = err;
   const status = response?.status;
@@ -65,17 +56,3 @@ export function parseApiError(err: unknown, resource?: string): ApiErrorResult {
       };
   }
 }
-
-/**
- * Variante imperativa com `setStatusCode` (legado).
- * Preferir `parseApiError` + `useQueryApiError` (queries) ou `getApiErrorMessage` (mutations/toast).
- *
- * @deprecated Evitar em código novo; mantido para compatibilidade pontual.
- */
-export const handleAxiosError = ({ err, setStatusCode, resource }: ExProps): string => {
-  const { message, statusCode } = parseApiError(err, resource);
-  if (statusCode !== undefined) {
-    setStatusCode(statusCode);
-  }
-  return message;
-};

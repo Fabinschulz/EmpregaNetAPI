@@ -1,4 +1,4 @@
-export { FormSubmitButton, type FormSubmitButtonProps } from './FormSubmitButton';
+export * from './common';
+export { FormSubmitButton, type FormSubmitButtonProps } from './common/form-submit-btn';
 export * from './form-fields';
 export * from './ui';
-export * from './common';

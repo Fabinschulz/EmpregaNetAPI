@@ -1,7 +1,7 @@
 'use client';
 
 import { ErrorFallback } from '@/components';
-import { startRouterTransition } from '@/utils/lib';
+import { startRouterTransition } from '@/utils';
 import { ArrowLeft } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 

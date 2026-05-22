@@ -1,4 +1,4 @@
-import { Skeleton } from '@/components/ui';
+import { Skeleton } from '@/components';
 import styles from './detail-page-skeleton.module.scss';
 
 type DetailPageSkeletonProps = {

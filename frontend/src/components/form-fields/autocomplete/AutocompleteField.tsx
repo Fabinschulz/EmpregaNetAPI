@@ -1,19 +1,19 @@
 'use client';
 
 import {
-  Command,
-  CommandEmpty,
-  CommandInput,
-  CommandItem,
-  CommandList,
-  Popover,
-  PopoverContent,
-  PopoverTrigger
+    Command,
+    CommandEmpty,
+    CommandInput,
+    CommandItem,
+    CommandList,
+    Popover,
+    PopoverContent,
+    PopoverTrigger
 } from '@/components/ui';
 import { useFormContext } from '@/context';
-import { cn, getFieldErrorMessage } from 'src/utils/helpers/helpers';
 import { Check, ChevronDown } from 'lucide-react';
 import * as React from 'react';
+import { cn, getFieldErrorMessage } from 'src/utils';
 import styles from './autocomplete.module.scss';
 
 export interface AutocompleteOption {

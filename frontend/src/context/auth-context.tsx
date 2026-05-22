@@ -8,7 +8,7 @@ import {
   normalizeBearer,
   readSessionFromBrowser,
   saveSessionClient
-} from '@/features/auth/session';
+} from 'src/services/users/session';
 
 type AuthState = {
   token: string | null;

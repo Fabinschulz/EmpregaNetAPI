@@ -1,6 +1,6 @@
+import { getPublicEnv } from '@/utils';
 import axios, { type AxiosInstance, type AxiosRequestConfig } from 'axios';
 import * as Qs from 'qs';
-import { getPublicEnv } from '@/utils/lib';
 
 let instance: AxiosInstance | null = null;
 

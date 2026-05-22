@@ -1,4 +1,4 @@
-import { Skeleton } from '@/components/ui';
+import { Skeleton } from '@/components';
 import styles from './list-rows-skeleton.module.scss';
 
 type ListRowsSkeletonProps = {

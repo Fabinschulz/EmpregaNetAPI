@@ -1,20 +1,20 @@
 'use client';
 
 import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger
-} from '@/components/ui';
+    Select,
+    SelectContent,
+    SelectGroup,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger
+} from '@/components';
 import { useFormContext } from '@/context';
-import { cn, getFieldErrorMessage, truncateText } from 'src/utils/helpers/helpers';
 import type React from 'react';
+import { cn, getFieldErrorMessage, truncateText } from 'src/utils';
 import styles from './select.module.scss';
 
 export interface SelectOption {

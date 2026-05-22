@@ -1,8 +1,8 @@
 'use client';
 
+import { Button, Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components';
 import { AlertTriangle, RefreshCw } from 'lucide-react';
 import React, { type ErrorInfo, type ReactNode } from 'react';
-import { Button, Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui';
 import styles from './error-boundary.module.scss';
 
 export interface GracefullyDegradingErrorBoundaryProps {

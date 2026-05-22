@@ -6,13 +6,3 @@ export type { ApiErrorResult };
 export function getApiErrorMessage(err: unknown, resource?: string): string {
   return parseApiError(err, resource).message;
 }
-
-/** Status HTTP do erro Axios, quando aplicável. */
-export function getApiErrorStatusCode(err: unknown, resource?: string): number | undefined {
-  return parseApiError(err, resource).statusCode;
-}
-
-/** Mensagem + status HTTP num único objeto. */
-export function getApiError(err: unknown, resource?: string): ApiErrorResult {
-  return parseApiError(err, resource);
-}

@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { listDataPaginationSchema } from '../shared';
 
 export const jobSchema = z.object({
   id: z.number().int(),
@@ -9,15 +10,8 @@ export const jobSchema = z.object({
   isActive: z.boolean().optional()
 });
 
-export const jobsListResponseSchema = z.object({
-  data: z.array(jobSchema),
-  page: z.number().optional(),
-  size: z.number().optional(),
-  total: z.number().optional(),
-  totalPages: z.number().optional()
-});
-
 export type JobDto = z.infer<typeof jobSchema>;
+export const jobsListResponseSchema = listDataPaginationSchema(jobSchema);
 export type JobsListResponseDto = z.infer<typeof jobsListResponseSchema>;
 
 export const jobFormSchema = z.object({

@@ -7,13 +7,14 @@ export const paginationSchema = z.object({
   totalPages: z.number().int().nonnegative().optional()
 });
 
-export const listDataPaginationSchema = z.object({
-  data: z.array(z.unknown()),
-  page: z.number().int().positive().optional(),
-  size: z.number().int().positive().optional(),
-  total: z.number().int().nonnegative().optional(),
-  totalPages: z.number().int().nonnegative().optional()
-});
+export const listDataPaginationSchema = <T extends z.ZodTypeAny>(t: T) =>
+  z.object({
+    data: z.array(t),
+    page: z.number().int().positive().optional(),
+    size: z.number().int().positive().optional(),
+    total: z.number().int().nonnegative().optional(),
+    totalPages: z.number().int().nonnegative().optional()
+  });
 
 export const domainErrorSchema = z.object({
   statusCode: z.number().int().optional(),
