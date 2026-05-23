@@ -11,7 +11,7 @@ const LOGIN_FIELDS_GRID_STYLE: CSSProperties = {
 };
 
 export function LoginFormFields() {
-    const { submitting } = useFormContext();
+  const { submitting } = useFormContext();
 
   return (
     <div style={LOGIN_FIELDS_GRID_STYLE}>

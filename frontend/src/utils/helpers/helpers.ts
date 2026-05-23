@@ -20,7 +20,8 @@ function _getObjectPropertyValue(path: string, obj: unknown): unknown {
   return current;
 }
 
-export const truncateText = (text: string, maxLength = 50) =>  text?.length > maxLength ? `${text.substring(0, maxLength)}...` : text;
+export const truncateText = (text: string, maxLength = 50) =>
+  text?.length > maxLength ? `${text.substring(0, maxLength)}...` : text;
 
 export function extractAndConvertFiles(data: any) {
   const allFiles: File[] = [];

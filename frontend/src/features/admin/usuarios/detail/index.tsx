@@ -3,12 +3,12 @@
 import { Alert, ApiQueryBoundary, FormFieldsSkeleton } from '@/components';
 import { FormProvider } from '@/context';
 import {
-    adminUserFormValuesFromDto,
-    adminUserUpdateFormSchema,
-    defaultAdminUserUpdateForm,
-    useAdminUserQuery,
-    useUpdateAdminUserMutation,
-    type AdminUserUpdateFormValues
+  adminUserFormValuesFromDto,
+  adminUserUpdateFormSchema,
+  defaultAdminUserUpdateForm,
+  useAdminUserQuery,
+  useUpdateAdminUserMutation,
+  type AdminUserUpdateFormValues
 } from '@/services';
 import { useParams } from 'next/navigation';
 import { useMemo } from 'react';
@@ -18,7 +18,13 @@ export function AdminUserDetailPage() {
   const params = useParams<{ id: string }>();
   const id = useMemo(() => Number(params.id), [params.id]);
   const { data: user, isPending, isError, error, refetch } = useAdminUserQuery(id);
-  const { apiError, mutateAsync: updateAsync, isError: isUpdateError, isPending: isUpdating, error: updateError } = useUpdateAdminUserMutation(id);
+  const {
+    apiError,
+    mutateAsync: updateAsync,
+    isError: isUpdateError,
+    isPending: isUpdating,
+    error: updateError
+  } = useUpdateAdminUserMutation(id);
 
   const initial = useMemo<AdminUserUpdateFormValues>(() => {
     if (!user) return defaultAdminUserUpdateForm;

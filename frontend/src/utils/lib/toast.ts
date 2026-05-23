@@ -22,7 +22,7 @@ export function toastInfo(title: string, description?: string): void {
  * Feedback uniforme para falhas de API ou validação na UI (Zod).
  * `resource` aparece na descrição quando útil (ex.: nome da área).
  */
-export function notifyApiError(err: unknown,   resource: string, actionLabel: string): void {
+export function notifyApiError(err: unknown, resource: string, actionLabel: string): void {
   const suffix = resource ? ` (${resource})` : '';
 
   if (err instanceof z.ZodError) {
@@ -34,7 +34,7 @@ export function notifyApiError(err: unknown,   resource: string, actionLabel: st
 
   if (isAxiosError(err)) {
     const parsed = parseApiError(err, resource);
-      toast.error(`Erro ao ${actionLabel}`, { description: parsed.message, duration: 7000 });
+    toast.error(`Erro ao ${actionLabel}`, { description: parsed.message, duration: 7000 });
     return;
   }
 

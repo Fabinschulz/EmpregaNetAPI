@@ -40,4 +40,3 @@ export function companyFormValuesFromDto(company: CompanyDto): CompanyFormValues
     documentNo: company.documentNo ?? ''
   };
 }
-

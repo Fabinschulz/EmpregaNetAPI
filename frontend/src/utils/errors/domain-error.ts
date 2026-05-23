@@ -1,7 +1,6 @@
 import { domainErrorSchema, type DomainErrorDto } from '@/services';
 
-const UNKNOWN_ERROR_MESSAGE =
-  'Erro desconhecido. Por favor, entre em contato com o suporte técnico.';
+const UNKNOWN_ERROR_MESSAGE = 'Erro desconhecido. Por favor, entre em contato com o suporte técnico.';
 
 /**
  * Valida o corpo JSON de erro devolvido pela API (`DomainError`).

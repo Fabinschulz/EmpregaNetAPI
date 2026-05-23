@@ -12,7 +12,7 @@ import { loginDefaultValues, loginSchema } from './login-schema';
 const LOGIN_SECTION_STYLE: CSSProperties = {
   maxWidth: 520,
   margin: '0 auto'
-}
+};
 
 export function Login() {
   const { apiError, mutateAsync } = useLoginMutation();

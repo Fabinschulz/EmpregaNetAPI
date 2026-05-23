@@ -18,7 +18,7 @@ type JobFormFieldsProps = {
 };
 
 export function JobFormFields({ submitLabel, onClose, closeDisabled }: JobFormFieldsProps) {
-   const { submitting } = useFormContext();
+  const { submitting } = useFormContext();
 
   return (
     <div style={JOB_FORM_GRID_STYLE}>

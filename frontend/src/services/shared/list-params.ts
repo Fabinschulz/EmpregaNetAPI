@@ -30,7 +30,6 @@ export type JobApplicationsAdminListQueryParams = ListQueryParams & SoftDeleteFi
 export const DEFAULT_LIST_PAGE = 1;
 export const DEFAULT_LIST_SIZE = 100;
 
-
 export function withDefaultListParams<T extends ListQueryParams>(params?: T): T {
   return { page: DEFAULT_LIST_PAGE, size: DEFAULT_LIST_SIZE, ...params } as T;
 }

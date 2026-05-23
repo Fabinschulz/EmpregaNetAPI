@@ -28,11 +28,7 @@ export function AuthFloatingThemeToggle() {
         }
         onClick={toggleLightDark}
       >
-        {themeMounted && resolvedTheme === 'dark' ? (
-          <Sun className={styles.icon} />
-        ) : (
-          <Moon className={styles.icon} />
-        )}
+        {themeMounted && resolvedTheme === 'dark' ? <Sun className={styles.icon} /> : <Moon className={styles.icon} />}
       </Button>
     </div>
   );

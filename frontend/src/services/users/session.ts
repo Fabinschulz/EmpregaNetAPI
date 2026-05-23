@@ -1,7 +1,5 @@
-
 import { deleteClientCookie, parseCookieHeader, setClientCookie } from '@/utils/lib';
 import { jwtDecode } from 'jwt-decode';
-
 
 export const AUTH_COOKIE = 'empreganet_access_token';
 export const REFRESH_COOKIE = 'empreganet_refresh_token';
@@ -51,10 +49,7 @@ export function decodeExp(token: string): number | undefined {
   }
 }
 
-const EMAIL_CLAIM_URIS = [
-  'email',
-  'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress'
-] as const;
+const EMAIL_CLAIM_URIS = ['email', 'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress'] as const;
 
 const USERNAME_CLAIM_KEYS = [
   'userName',

@@ -2,12 +2,7 @@
 
 import { Alert } from '@/components';
 import { FormProvider } from '@/context';
-import {
-  defaultFormJob,
-  jobFormSchema,
-  useCreateJobMutation,
-  type JobFormValues
-} from '@/services';
+import { defaultFormJob, jobFormSchema, useCreateJobMutation, type JobFormValues } from '@/services';
 import { JobFormFields } from '../job-form';
 
 export function RecruitmentNewJobPage() {

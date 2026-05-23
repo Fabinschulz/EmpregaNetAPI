@@ -16,7 +16,6 @@ export const listDataPaginationSchema = <T extends z.ZodTypeAny>(t: T) =>
     totalPages: z.number().int().nonnegative().optional()
   });
 
-  
 export const domainErrorSchema = z.object({
   statusCode: z.number().int().optional(),
   code: z

@@ -7,18 +7,18 @@ import { isAdmin, isRecruitmentStaff, startRouterTransition, toastSuccess } from
 import clsx from 'clsx';
 import type { LucideIcon } from 'lucide-react';
 import {
-    Briefcase,
-    Building2,
-    FileText,
-    LayoutDashboard,
-    Menu,
-    Moon,
-    PanelLeft,
-    PanelLeftClose,
-    Sun,
-    UserCircle,
-    Users,
-    X
+  Briefcase,
+  Building2,
+  FileText,
+  LayoutDashboard,
+  Menu,
+  Moon,
+  PanelLeft,
+  PanelLeftClose,
+  Sun,
+  UserCircle,
+  Users,
+  X
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
@@ -104,7 +104,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             aria-label={railCollapsed ? 'Expandir menu lateral' : 'Compactar menu lateral'}
             onClick={() => setRailCollapsed((v) => !v)}
           >
-            {railCollapsed ? <PanelLeft className={styles.headerIcon} /> : <PanelLeftClose className={styles.headerIcon} />}
+            {railCollapsed ? (
+              <PanelLeft className={styles.headerIcon} />
+            ) : (
+              <PanelLeftClose className={styles.headerIcon} />
+            )}
           </Button>
           <Button
             type="button"
@@ -119,11 +123,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         </div>
       </div>
 
-      <nav
-        className={styles.sidebarScroll}
-        aria-label="Navegação principal"
-        suppressHydrationWarning
-      >
+      <nav className={styles.sidebarScroll} aria-label="Navegação principal" suppressHydrationWarning>
         {navGroups.map((group) => {
           const visibleItems = group.items.filter((i) => i.visible);
           if (visibleItems.length === 0) return null;
@@ -139,7 +139,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                       key={item.href}
                       asChild
                       variant="ghost"
-                      className={clsx(styles.navButton, styles.link, active && styles.active, railCollapsed && styles.linkIconOnly)}
+                      className={clsx(
+                        styles.navButton,
+                        styles.link,
+                        active && styles.active,
+                        railCollapsed && styles.linkIconOnly
+                      )}
                     >
                       <Link href={item.href} onClick={closeMobile} title={railCollapsed ? item.label : undefined}>
                         <Icon className={styles.navIcon} aria-hidden />
@@ -183,7 +188,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
       <aside
         id="app-sidebar"
-        className={clsx(styles.sidebar, railCollapsed && styles.sidebarCollapsed, mobileOpen && styles.sidebarMobileOpen)}
+        className={clsx(
+          styles.sidebar,
+          railCollapsed && styles.sidebarCollapsed,
+          mobileOpen && styles.sidebarMobileOpen
+        )}
         suppressHydrationWarning
       >
         {sidebarInner}

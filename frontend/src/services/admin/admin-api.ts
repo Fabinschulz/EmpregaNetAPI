@@ -11,7 +11,7 @@ export async function listAdminUsers(
   return adminUsersListResponseSchema.parse(res.data);
 }
 
-export async function getAdminUser(token: string, id: number) : Promise<UserDto> {
+export async function getAdminUser(token: string, id: number): Promise<UserDto> {
   const res = await axiosApi.get<unknown>(`/api/admin/${id}`, createAxiosConfig(token));
   return userSchema.parse(res.data);
 }

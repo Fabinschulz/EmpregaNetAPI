@@ -10,8 +10,7 @@ export type ApiErrorResult = {
   correlationId?: string;
 };
 
-const UNKNOWN_ERROR_MESSAGE =
-  'Erro desconhecido. Por favor, entre em contato com o suporte técnico.';
+const UNKNOWN_ERROR_MESSAGE = 'Erro desconhecido. Por favor, entre em contato com o suporte técnico.';
 
 function defaultHttpStatusMessage(status: number | undefined, resource?: string): string {
   const target = resource ?? 'o recurso';

@@ -1,6 +1,11 @@
 import { axiosApi, createAxiosConfig } from '../axios';
 import type { CompaniesListQueryParams } from '../shared';
-import { companiesListResponseSchema, CompanyDto, companySchema, type CompaniesListResponseDto } from './companies-schema';
+import {
+  companiesListResponseSchema,
+  CompanyDto,
+  companySchema,
+  type CompaniesListResponseDto
+} from './companies-schema';
 
 export async function listCompanies(
   token: string,

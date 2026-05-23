@@ -1,11 +1,6 @@
 .root {
   border-radius: 10px;
-  background: linear-gradient(
-    90deg,
-    var(--skeleton-base) 0%,
-    var(--skeleton-highlight) 42%,
-    var(--skeleton-base) 84%
-  );
+  background: linear-gradient(90deg, var(--skeleton-base) 0%, var(--skeleton-highlight) 42%, var(--skeleton-base) 84%);
   background-size: 200% 100%;
   animation: skeleton-shimmer 1.35s ease-in-out infinite;
 }

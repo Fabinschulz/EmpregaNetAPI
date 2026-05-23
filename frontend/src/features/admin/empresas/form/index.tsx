@@ -17,7 +17,7 @@ type CompanyFormFieldsProps = {
 
 export function CompanyFormFields({ submitLabel }: CompanyFormFieldsProps) {
   const { submitting } = useFormContext();
-  
+
   return (
     <div style={COMPANY_FORM_GRID_STYLE}>
       <InputField name="name" label="Nome" required />

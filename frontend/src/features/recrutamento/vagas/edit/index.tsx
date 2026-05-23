@@ -3,13 +3,13 @@
 import { Alert, ApiQueryBoundary, FormFieldsSkeleton } from '@/components';
 import { FormProvider } from '@/context';
 import {
-    defaultFormJob,
-    jobFormSchema,
-    jobFormValuesFromDto,
-    useCloseJobMutation,
-    useJobQuery,
-    useUpdateJobMutation,
-    type JobFormValues
+  defaultFormJob,
+  jobFormSchema,
+  jobFormValuesFromDto,
+  useCloseJobMutation,
+  useJobQuery,
+  useUpdateJobMutation,
+  type JobFormValues
 } from '@/services';
 import { useParams } from 'next/navigation';
 import { useMemo } from 'react';
@@ -20,7 +20,13 @@ export function RecruitmentEditJobPage() {
   const jobId = useMemo(() => Number(params.id), [params.id]);
   const { data: job, isPending, isError, error, refetch } = useJobQuery(jobId);
   const { apiError: updateApiError, mutateAsync: updateAsync, isPending: isUpdating } = useUpdateJobMutation(jobId);
-  const { apiError: closeApiError, mutateAsync: closeAsync, isPending: isClosing, error: closeError, isError: isCloseError } = useCloseJobMutation(jobId);
+  const {
+    apiError: closeApiError,
+    mutateAsync: closeAsync,
+    isPending: isClosing,
+    error: closeError,
+    isError: isCloseError
+  } = useCloseJobMutation(jobId);
   const apiError = updateApiError ?? closeApiError;
 
   const initial = useMemo<JobFormValues>(() => {
@@ -56,11 +62,7 @@ export function RecruitmentEditJobPage() {
             defaultValues={initial}
             onSubmit={handleSubmit}
           >
-            <JobFormFields
-              submitLabel="Salvar"
-              onClose={onClose}
-              closeDisabled={isUpdating || isClosing}
-            />
+            <JobFormFields submitLabel="Salvar" onClose={onClose} closeDisabled={isUpdating || isClosing} />
           </FormProvider>
         )}
       </section>
