@@ -13,7 +13,7 @@ export const registerFormSchema = registerSchema.refine((data) => data.password 
 });
 
 export const loginSchema = z.object({
-  email: z.string().email({ message: 'E-mail inválido.' }),
+  login: z.email({ message: 'E-mail inválido.' }),
   password: z.string().min(1, { message: 'A senha é obrigatória.' })
 });
 
@@ -22,7 +22,7 @@ export const refreshTokenSchema = z.object({
 });
 
 export const forgotPasswordSchema = z.object({
-  email: z.string().email({ message: 'E-mail inválido.' })
+  email: z.email({ message: 'E-mail inválido.' })
 });
 
 export const resetPasswordSchema = z.object({
@@ -46,7 +46,7 @@ export const userClaimSchema = z.object({
 export const userTokenSchema = z.object({
   id: z.number().int(),
   username: z.string(),
-  email: z.string().email({ message: 'E-mail inválido.' }),
+  email: z.email({ message: 'E-mail inválido.' }),
   roles: z.array(z.string()).default([]),
   claims: z.array(userClaimSchema)
 });

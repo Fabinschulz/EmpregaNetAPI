@@ -1,13 +1,15 @@
 'use client';
 
 import { useAuth } from '@/context';
+import { reportMutationApiError, toastSuccess } from '@/utils';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useState } from 'react';
 import { queryKeys } from '../query-keys';
-import type { AuthMutationVars } from '../shared';
 import {
-    requireAuthToken, withDefaultListParams,
-    type JobApplicationsAdminListQueryParams,
-    type JobApplicationsListQueryParams
+  requireAuthToken,
+  withDefaultListParams,
+  type JobApplicationsAdminListQueryParams,
+  type JobApplicationsListQueryParams
 } from '../shared';
 import { applyToJob, listAll, listMine } from './job-applications-api';
 
@@ -33,14 +35,22 @@ export function useAllJobApplicationsQuery(params?: JobApplicationsAdminListQuer
   });
 }
 
-export function useApplyToJobMutation() {
+export function useApplyToJobMutation(jobId: number) {
   const { token } = useAuth();
   const queryClient = useQueryClient();
+  const [apiError, setApiError] = useState<string | null>(null);
 
-  return useMutation({
-    mutationFn: ({ dto }: AuthMutationVars) => applyToJob(requireAuthToken(token), dto),
-    onSuccess: async () => {
+  const ctx = useMutation({
+    mutationFn: () => applyToJob(requireAuthToken(token), { jobId }),
+    onSuccess: async (res) => {
       await queryClient.invalidateQueries({ queryKey: queryKeys.jobApplications.all });
+      const message = typeof res === 'string' ? res : 'Candidatura enviada.';
+      toastSuccess('Candidatura enviada', message);
+    },
+    onError: (err) => {
+      reportMutationApiError({ err, actionLabel: 'candidatar-se', resource: 'candidatura', setApiError });
     }
   });
+
+  return { ...ctx, apiError };
 }

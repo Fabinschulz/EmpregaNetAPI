@@ -1,11 +1,14 @@
 'use client';
 
 import { useAuth } from '@/context';
+import { reportMutationApiError, startRouterTransition } from '@/utils';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 import { queryKeys } from '../query-keys';
-import type { AuthIdMutationVars, AuthIdVars } from '../shared';
 import { requireAuthToken, withDefaultListParams, type AdminUsersListQueryParams } from '../shared';
 import { deleteAdminUser, getAdminUser, listAdminUsers, updateAdminUser } from './admin-api';
+import type { AdminUserUpdateFormValues } from './admin-schema';
 
 export function useAdminUsersListQuery(params?: AdminUsersListQueryParams) {
   const { token } = useAuth();
@@ -28,27 +31,46 @@ export function useAdminUserQuery(id: number) {
   });
 }
 
-export function useUpdateAdminUserMutation() {
+export function useUpdateAdminUserMutation(userId: number) {
   const { token } = useAuth();
   const queryClient = useQueryClient();
+  const [apiError, setApiError] = useState<string | null>(null);
+  const router = useRouter();
 
-  return useMutation({
-    mutationFn: ({ id, dto }: AuthIdMutationVars) => updateAdminUser(requireAuthToken(token), id, dto),
-    onSuccess: async (_data, { id }) => {
-      await queryClient.invalidateQueries({ queryKey: queryKeys.adminUsers.detail(id) });
+  const ctx = useMutation({
+    mutationFn: (formValue: AdminUserUpdateFormValues) =>
+      updateAdminUser(requireAuthToken(token), userId, {
+        userType: formValue.userType.trim() || null
+      }),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: queryKeys.adminUsers.detail(userId) });
       await queryClient.invalidateQueries({ queryKey: queryKeys.adminUsers.lists() });
+      startRouterTransition(() => router.push('/admin/usuarios'));
+    },
+    onError: (err) => {
+      reportMutationApiError({ err, actionLabel: 'atualizar usuário', resource: 'usuário', setApiError });
     }
   });
+
+  return { ...ctx, apiError };
 }
 
-export function useDeleteAdminUserMutation() {
+export function useDeleteAdminUserMutation(userId: number) {
   const { token } = useAuth();
   const queryClient = useQueryClient();
+  const [apiError, setApiError] = useState<string | null>(null);
+  const router = useRouter();
 
-  return useMutation({
-    mutationFn: ({ id }: AuthIdVars) => deleteAdminUser(requireAuthToken(token), id),
+  const ctx = useMutation({
+    mutationFn: () => deleteAdminUser(requireAuthToken(token), userId),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: queryKeys.adminUsers.all });
+      startRouterTransition(() => router.push('/admin/usuarios'));
+    },
+    onError: (err) => {
+      reportMutationApiError({ err, actionLabel: 'excluir usuário', resource: 'usuário', setApiError });
     }
   });
+
+  return { ...ctx, apiError };
 }

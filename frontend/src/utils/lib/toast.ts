@@ -20,27 +20,30 @@ export function toastInfo(title: string, description?: string): void {
 
 /**
  * Feedback uniforme para falhas de API ou validação na UI (Zod).
- * `context` aparece na descrição quando útil (ex.: nome da área).
+ * `resource` aparece na descrição quando útil (ex.: nome da área).
  */
-export function notifyApiError(err: unknown, context?: string): void {
-  const suffix = context ? ` (${context})` : '';
+export function notifyApiError(err: unknown,   resource: string, actionLabel: string): void {
+  const suffix = resource ? ` (${resource})` : '';
+
   if (err instanceof z.ZodError) {
     toast.error('Dados inválidos ou incompletos', {
-      description: `A resposta do servidor não pôde ser validada${suffix}. Se o problema persistir, contacte o suporte.`
+      description: `A resposta do servidor não pôde ser validada. Se o problema persistir, contacte o suporte.`
     });
     return;
   }
+
   if (isAxiosError(err)) {
-    toast.error('Não foi possível concluir a ação', {
-      description: parseApiError(err, context).message
-    });
+    const parsed = parseApiError(err, resource);
+      toast.error(`Erro ao ${actionLabel}`, { description: parsed.message, duration: 7000 });
     return;
   }
+
   if (err instanceof Error && err.message.trim().length > 0) {
     toast.error('Não foi possível concluir a ação', {
       description: `${err.message.trim()}${suffix}`
     });
     return;
   }
+
   toast.error('Ocorreu um erro inesperado', { description: `${GENERIC}${suffix}` });
 }

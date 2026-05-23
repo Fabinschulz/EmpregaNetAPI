@@ -1,21 +1,21 @@
 import { axiosApi, createAxiosConfig } from '../axios';
 import {
-  confirmEmailSchema,
-  forgotPasswordSchema,
-  loginSchema,
-  refreshTokenSchema,
-  registerSchema,
-  resetPasswordSchema,
-  userLoggedSchema,
-  userSchema,
-  type ConfirmEmailDto,
-  type ForgotPasswordDto,
-  type LoginDto,
-  type RefreshTokenDto,
-  type RegisterDto,
-  type ResetPasswordDto,
-  type UserDto,
-  type UserLoggedDto
+    confirmEmailSchema,
+    forgotPasswordSchema,
+    loginSchema,
+    refreshTokenSchema,
+    registerSchema,
+    resetPasswordSchema,
+    userLoggedSchema,
+    userSchema,
+    type ConfirmEmailDto,
+    type ForgotPasswordDto,
+    type LoginDto,
+    type RefreshTokenDto,
+    type RegisterDto,
+    type ResetPasswordDto,
+    type UserDto,
+    type UserLoggedDto
 } from './users-schema';
 
 export async function register(dto: RegisterDto): Promise<string> {

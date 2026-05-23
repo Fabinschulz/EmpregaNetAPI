@@ -24,3 +24,20 @@ export const companyFormSchema = z.object({
 });
 
 export type CompanyFormValues = z.infer<typeof companyFormSchema>;
+
+export const defaultFormCompany: CompanyFormValues = {
+  name: '',
+  email: '',
+  phone: '',
+  documentNo: ''
+};
+
+export function companyFormValuesFromDto(company: CompanyDto): CompanyFormValues {
+  return {
+    name: company.name,
+    email: company.email ?? '',
+    phone: company.phone ?? '',
+    documentNo: company.documentNo ?? ''
+  };
+}
+

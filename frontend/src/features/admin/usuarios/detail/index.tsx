@@ -1,68 +1,38 @@
 'use client';
 
-import { useMemo, useState } from 'react';
-import { useParams, useRouter } from 'next/navigation';
-import { Alert, ApiQueryBoundary, Button, FormFieldsSkeleton, FormSubmitButton, InputField } from '@/components';
-import { FormProvider, useFormContext } from '@/context';
+import { Alert, ApiQueryBoundary, FormFieldsSkeleton } from '@/components';
+import { FormProvider } from '@/context';
 import {
-  adminUserUpdateFormSchema,
-  useAdminUserQuery,
-  useDeleteAdminUserMutation,
-  useUpdateAdminUserMutation,
-  type AdminUserUpdateFormValues
+    adminUserFormValuesFromDto,
+    adminUserUpdateFormSchema,
+    defaultAdminUserUpdateForm,
+    useAdminUserQuery,
+    useUpdateAdminUserMutation,
+    type AdminUserUpdateFormValues
 } from '@/services';
-import { getApiErrorMessage } from '@/utils/helpers';
-import { startRouterTransition } from '@/utils/lib';
-
-function SaveUserButton() {
-  const { submitting } = useFormContext();
-  return <FormSubmitButton variant="primary">{submitting ? 'Salvando...' : 'Salvar'}</FormSubmitButton>;
-}
+import { useParams } from 'next/navigation';
+import { useMemo } from 'react';
+import { AdminUserFormFields } from './admin-user-form';
 
 export function AdminUserDetailPage() {
-  const router = useRouter();
   const params = useParams<{ id: string }>();
   const id = useMemo(() => Number(params.id), [params.id]);
   const { data: user, isPending, isError, error, refetch } = useAdminUserQuery(id);
-  const updateMutation = useUpdateAdminUserMutation();
-  const deleteMutation = useDeleteAdminUserMutation();
-  const [apiError, setApiError] = useState<string | null>(null);
+  const { apiError, mutateAsync: updateAsync, isError: isUpdateError, isPending: isUpdating, error: updateError } = useUpdateAdminUserMutation(id);
 
-  const initial = useMemo<AdminUserUpdateFormValues | null>(() => {
-    if (!user) return null;
-    return { userType: (user.userType ?? '') as string };
+  const initial = useMemo<AdminUserUpdateFormValues>(() => {
+    if (!user) return defaultAdminUserUpdateForm;
+    return adminUserFormValuesFromDto(user);
   }, [user]);
 
-  async function handleSubmit(data: AdminUserUpdateFormValues) {
-    setApiError(null);
-    updateMutation.mutate(
-      { id, dto: { userType: data.userType.trim() || null } },
-      {
-        onSuccess: () => startRouterTransition(() => router.push('/admin/usuarios')),
-        onError: (err) => setApiError(getApiErrorMessage(err, 'usuário'))
-      }
-    );
-  }
-
-  function onDelete() {
-    setApiError(null);
-    deleteMutation.mutate(
-      { id },
-      {
-        onSuccess: () => startRouterTransition(() => router.push('/admin/usuarios')),
-        onError: (err) => setApiError(getApiErrorMessage(err, 'usuário'))
-      }
-    );
-  }
-
-  const isMutating = updateMutation.isPending || deleteMutation.isPending;
+  const handleSubmit = async (formValue: AdminUserUpdateFormValues) => await updateAsync(formValue);
 
   return (
     <ApiQueryBoundary
       fallback="usuário"
-      isPending={isPending}
-      isError={isError}
-      error={error}
+      isPending={isPending || isUpdating}
+      isError={isError || isUpdateError}
+      error={error || updateError}
       resource="usuário"
       onRetry={() => void refetch()}
     >
@@ -95,28 +65,14 @@ export function AdminUserDetailPage() {
               </p>
             </article>
 
-            {initial ? (
-              <FormProvider
-                key={`admin-user-${id}`}
-                validationSchema={adminUserUpdateFormSchema}
-                defaultValues={initial}
-                onSubmit={handleSubmit}
-              >
-                <div style={{ display: 'grid', gap: 12, maxWidth: 520, marginTop: 12 }}>
-                  <InputField
-                    name="userType"
-                    label="UserType (ex.: Admin, Recruiter, Manager, Candidate)"
-                    hint="O backend valida/normaliza; aqui enviamos o valor diretamente."
-                  />
-                  <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-                    <SaveUserButton />
-                    <Button variant="destructive" type="button" onClick={onDelete} disabled={isMutating}>
-                      Excluir (lógico)
-                    </Button>
-                  </div>
-                </div>
-              </FormProvider>
-            ) : null}
+            <FormProvider
+              key={`admin-user-${id}`}
+              validationSchema={adminUserUpdateFormSchema}
+              defaultValues={initial}
+              onSubmit={handleSubmit}
+            >
+              <AdminUserFormFields />
+            </FormProvider>
           </>
         ) : null}
       </section>

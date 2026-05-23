@@ -1,58 +1,60 @@
+import { type DomainErrorDto } from '@/services/shared/common-schema';
 import { isAxiosError } from 'axios';
 import { ApiStatusCode } from '../enums';
+import { formatDomainErrorMessage, tryParseDomainError } from '../errors/domain-error';
 
 export type ApiErrorResult = {
   message: string;
   statusCode?: number;
+  domainError: DomainErrorDto | null;
+  correlationId?: string;
 };
 
 const UNKNOWN_ERROR_MESSAGE =
   'Erro desconhecido. Por favor, entre em contato com o suporte técnico.';
 
-/**
- * Interpreta erros Axios (e desconhecidos) e devolve mensagem + status HTTP quando existir.
- * Função pura — preferir esta em React Query (derivar de `error` no render).
- */
-export function parseApiError(err: unknown, resource?: string): ApiErrorResult {
-  if (!isAxiosError(err)) return { message: UNKNOWN_ERROR_MESSAGE };
-
-  const { response } = err;
-  const status = response?.status;
-  const error = {
-    code: `${status ?? ''} ${response?.statusText ?? ''}`.trim(),
-    message: (response?.data as { message?: string } | undefined)?.message
-  };
+function defaultHttpStatusMessage(status: number | undefined, resource?: string): string {
+  const target = resource ?? 'o recurso';
 
   switch (status) {
-    case ApiStatusCode.BadRequest:
-      return {
-        message: `${error.code} - Ops! Algo deu errado. Por favor, tente novamente.`,
-        statusCode: status
-      };
     case ApiStatusCode.Unauthorized:
-      return {
-        message: `${error.code} - Acesso não autorizado. Por favor, realize a autenticação novamente.`,
-        statusCode: status
-      };
+      return 'Acesso não autorizado. Por favor, inicie sessão novamente.';
     case ApiStatusCode.Forbidden:
-      return {
-        message: `${error.code} - Usuário não tem permissão para acessar este recurso`,
-        statusCode: status
-      };
+      return 'Não tem permissão para acessar a este recurso.';
     case ApiStatusCode.NotFound:
-      return {
-        message: `${error.code} - Recurso não encontrado`,
-        statusCode: status
-      };
+      return 'Recurso não encontrado.';
+    case ApiStatusCode.BadRequest:
+      return `Pedido inválido ao acessar ${target}.`;
     case ApiStatusCode.InternalServerError:
-      return {
-        message: `${error.code} - Erro interno do servidor`,
-        statusCode: status
-      };
+      return 'Erro interno do servidor. Tente novamente mais tarde.';
     default:
-      return {
-        message: `${ApiStatusCode.InternalServerError} - Ops! Ocorreu um erro interno do servidor ao acessar ${resource ?? 'o recurso'}!`,
-        statusCode: status ?? ApiStatusCode.InternalServerError
-      };
+      return `Não foi possível comunicar com o servidor ao acessar ${target}.`;
   }
+}
+
+/**
+ * Interpreta erros Axios (corpo `DomainError` quando existir) e desconhecidos.
+ */
+export function parseApiError(err: unknown, resource?: string): ApiErrorResult {
+  if (!isAxiosError(err)) {
+    return { message: UNKNOWN_ERROR_MESSAGE, domainError: null };
+  }
+
+  const status = err.response?.status;
+  const domainError = tryParseDomainError(err.response?.data);
+
+  if (domainError) {
+    return {
+      message: formatDomainErrorMessage(domainError, resource),
+      statusCode: domainError.statusCode ?? status,
+      domainError,
+      correlationId: domainError.correlationId
+    };
+  }
+
+  return {
+    message: defaultHttpStatusMessage(status, resource),
+    statusCode: status,
+    domainError: null
+  };
 }

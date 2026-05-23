@@ -16,9 +16,13 @@ export const listDataPaginationSchema = <T extends z.ZodTypeAny>(t: T) =>
     totalPages: z.number().int().nonnegative().optional()
   });
 
+  
 export const domainErrorSchema = z.object({
   statusCode: z.number().int().optional(),
-  code: z.string().optional(),
+  code: z
+    .union([z.string(), z.number().int()])
+    .optional()
+    .transform((value) => (value === undefined ? undefined : String(value))),
   message: z.string().optional(),
   correlationId: z.string().optional(),
   details: z.unknown().optional()

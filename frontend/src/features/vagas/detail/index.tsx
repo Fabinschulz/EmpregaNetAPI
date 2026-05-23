@@ -1,11 +1,10 @@
 'use client';
 
-import { useMemo, useState } from 'react';
-import { useParams } from 'next/navigation';
 import { Alert, ApiQueryBoundary, Button, DetailPageSkeleton } from '@/components';
 import { useAuth } from '@/features/auth';
 import { useApplyToJobMutation, useJobQuery } from '@/services';
-import { getApiErrorMessage } from '@/utils';
+import { useParams } from 'next/navigation';
+import { useMemo } from 'react';
 
 export function JobDetailPage() {
   const params = useParams<{ id: string }>();
@@ -13,26 +12,11 @@ export function JobDetailPage() {
   const { token } = useAuth();
 
   const { data: job, isPending, isError, error, refetch } = useJobQuery(jobId);
-  const applyMutation = useApplyToJobMutation();
-  const [appMsg, setAppMsg] = useState<string | null>(null);
+  const { apiError, mutateAsync, isPending: isApplying } = useApplyToJobMutation(jobId);
 
   function onApply() {
-    if (!token) {
-      setAppMsg('Você precisa estar logado para se candidatar.');
-      return;
-    }
-    setAppMsg(null);
-    applyMutation.mutate(
-      { dto: { jobId } },
-      {
-        onSuccess: (res) => {
-          setAppMsg(typeof res === 'string' ? res : 'Candidatura enviada.');
-        },
-        onError: (err) => {
-          setAppMsg(getApiErrorMessage(err, 'candidatura'));
-        }
-      }
-    );
+    if (!token) return;
+    void mutateAsync();
   }
 
   return (
@@ -52,13 +36,15 @@ export function JobDetailPage() {
             <p style={{ color: 'var(--muted)' }}>{job.description ?? 'Sem descrição.'}</p>
 
             <p style={{ marginTop: 14, display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-              <Button variant="primary" onClick={onApply} disabled={applyMutation.isPending}>
-                {applyMutation.isPending ? 'Enviando...' : 'Candidatar-me'}
+              <Button variant="primary" onClick={onApply} disabled={!token || isApplying}>
+                {!token ? 'Faça login para se candidatar' : isApplying ? 'Enviando...' : 'Candidatar-me'}
               </Button>
             </p>
-            {appMsg ? (
+            {apiError ? (
               <p style={{ marginTop: 12 }}>
-                <Alert title="Status">{appMsg}</Alert>
+                <Alert variant="destructive" title="Erro">
+                  {apiError}
+                </Alert>
               </p>
             ) : null}
           </>

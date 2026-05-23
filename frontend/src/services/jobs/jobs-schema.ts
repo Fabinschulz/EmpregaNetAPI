@@ -21,3 +21,17 @@ export const jobFormSchema = z.object({
 });
 
 export type JobFormValues = z.infer<typeof jobFormSchema>;
+
+export const defaultFormJob: JobFormValues = {
+  title: '',
+  description: '',
+  location: ''
+};
+
+export function jobFormValuesFromDto(job: JobDto): JobFormValues {
+  return {
+    title: job.title,
+    description: job.description ?? '',
+    location: job.location ?? ''
+  };
+}
