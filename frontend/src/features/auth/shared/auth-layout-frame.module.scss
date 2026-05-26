@@ -1,0 +1,14 @@
+.shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(20px, 4vw, 40px) clamp(16px, 3vw, 24px);
+  background: var(--bg);
+}
+
+.center {
+  width: 100%;
+  max-width: 440px;
+}

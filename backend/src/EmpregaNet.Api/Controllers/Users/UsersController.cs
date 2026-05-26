@@ -73,7 +73,7 @@ public class UsersController : ControllerBase
         return Ok(result);
     }
 
-    /// <summary>Solicita e-mail com link para redefinir senha (resposta genérica por segurança).</summary>
+    /// <summary>Solicita e-mail com link para redefinir senha.</summary>
     [AllowAnonymous]
     [HttpPost("forgot-password")]
     [ProducesResponseType(typeof(ForgotPasswordResult), StatusCodes.Status200OK)]
@@ -95,7 +95,7 @@ public class UsersController : ControllerBase
         return Ok(new { message = "E-mail confirmado com sucesso. Já pode iniciar sessão." });
     }
 
-    /// <summary>Reenvia o link de confirmação de e-mail (resposta genérica por segurança).</summary>
+    /// <summary>Reenvia o link de confirmação de e-mail.</summary>
     [AllowAnonymous]
     [HttpPost("resend-email-confirmation")]
     [ProducesResponseType(typeof(ResendEmailConfirmationResponse), StatusCodes.Status200OK)]

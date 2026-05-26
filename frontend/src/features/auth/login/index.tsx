@@ -1,41 +1,53 @@
 'use client';
 
-import { Alert } from '@/components';
 import { FormProvider } from '@/context';
-import { useLoginMutation } from '@/services';
-import Link from 'next/link';
-import { CSSProperties } from 'react';
+import { useLoginMutation, useLoginWithGoogleMutation } from '@/services';
+import {
+    AuthDivider,
+    AuthFormActions,
+    AuthLinkRow,
+    AuthNavLink,
+    AuthPage,
+    GoogleSignInButton
+} from '../shared';
 import { LoginFormFields } from './login-form';
 import type { LoginDto } from './login-schema';
 import { loginDefaultValues, loginSchema } from './login-schema';
 
-const LOGIN_SECTION_STYLE: CSSProperties = {
-  maxWidth: 520,
-  margin: '0 auto'
-};
-
 export function Login() {
-  const { apiError, mutateAsync } = useLoginMutation();
+  const { apiError, mutateAsync, isPending } = useLoginMutation();
+  const googleMutation = useLoginWithGoogleMutation();
+
   const handleSubmit = async (formValue: LoginDto) => await mutateAsync(formValue);
+  const handleGoogleCredential = (idToken: string) => {
+    void googleMutation.mutateAsync({ idToken });
+  };
+
+  const displayError = apiError ?? googleMutation.apiError;
+  const isBusy = isPending || googleMutation.isPending;
 
   return (
-    <section style={LOGIN_SECTION_STYLE}>
-      <h1>Entrar</h1>
-      <p style={{ color: 'var(--muted)' }}>Use seu e-mail e senha para iniciar sessão.</p>
-
-      {apiError ? (
-        <Alert variant="destructive" title="Erro">
-          {apiError}
-        </Alert>
-      ) : null}
-
+    <AuthPage
+      title="Entrar"
+      description="Acesse com o seu e-mail ou conta Google."
+      apiError={displayError}
+    >
       <FormProvider validationSchema={loginSchema} defaultValues={loginDefaultValues} onSubmit={handleSubmit}>
         <LoginFormFields />
+        <AuthLinkRow>
+          <AuthNavLink href="/forgot-password">Esqueceu a senha?</AuthNavLink>
+          <AuthNavLink href="/resend-confirmation">Reenviar confirmação de e-mail</AuthNavLink>
+        </AuthLinkRow>
       </FormProvider>
 
-      <p style={{ marginTop: 14, color: 'var(--muted)' }}>
-        Não tem conta? <Link href="/register">Criar conta</Link>
-      </p>
-    </section>
+      <AuthDivider />
+      <AuthFormActions>
+        <GoogleSignInButton onCredential={handleGoogleCredential} disabled={isBusy} />
+      </AuthFormActions>
+
+      <footer style={{ marginTop: '1rem', textAlign: 'center', fontSize: '0.9rem', color: 'var(--muted)' }}>
+        Não tem conta? <AuthNavLink href="/register">Criar conta</AuthNavLink>
+      </footer>
+    </AuthPage>
   );
 }

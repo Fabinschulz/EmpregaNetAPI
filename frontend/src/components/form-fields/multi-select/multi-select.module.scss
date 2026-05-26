@@ -10,8 +10,8 @@
 
 .label {
   font-size: 14px;
-  font-weight: 600;
-  color: var(--muted);
+  font-weight: 500;
+  color: var(--field-label, var(--text));
 }
 
 .trigger {
@@ -23,7 +23,7 @@
   padding: 8px 12px;
   border-radius: 12px;
   border: 1px solid var(--border);
-  background: rgba(255, 255, 255, 0.06);
+  background: var(--input-bg);
   color: var(--text);
   font-size: 14px;
   cursor: pointer;
@@ -54,7 +54,7 @@
   font-size: 12px;
   font-weight: 500;
   border: 1px solid var(--border);
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--surface-hover);
   color: var(--muted);
 }
 

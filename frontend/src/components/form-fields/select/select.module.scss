@@ -6,8 +6,8 @@
 
 .label {
   font-size: 14px;
-  font-weight: 600;
-  color: var(--muted);
+  font-weight: 500;
+  color: var(--field-label, var(--text));
 }
 
 .error {

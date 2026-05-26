@@ -11,11 +11,8 @@ import {
   Building2,
   FileText,
   LayoutDashboard,
-  Menu,
-  Moon,
   PanelLeft,
   PanelLeftClose,
-  Sun,
   UserCircle,
   Users,
   X
@@ -24,6 +21,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useHasMounted } from '@/hooks/use-has-mounted';
+import { MainHeader } from './main-header';
 import styles from './AppShell.module.scss';
 
 type NavItem = { href: string; label: string; icon: LucideIcon; visible: boolean };
@@ -42,9 +40,20 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   };
   const [mobileOpen, setMobileOpen] = useState(false);
   const [railCollapsed, setRailCollapsed] = useState(false);
+  const [railTransitioning, setRailTransitioning] = useState(false);
 
   const displayName = username?.trim() || email?.trim() || 'Usuário';
-  const displaySub = username?.trim() && email?.trim() && username !== email ? email : null;
+
+  const toggleRailCollapsed = useCallback(() => {
+    setRailTransitioning(true);
+    setRailCollapsed((v) => !v);
+  }, []);
+
+  useEffect(() => {
+    if (!railTransitioning) return;
+    const timer = window.setTimeout(() => setRailTransitioning(false), 260);
+    return () => window.clearTimeout(timer);
+  }, [railCollapsed, railTransitioning]);
 
   const navGroups: NavGroup[] = useMemo(() => {
     const principal: NavItem[] = [
@@ -93,23 +102,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     <>
       <div className={styles.sidebarHeader}>
         <Link href="/dashboard" className={styles.brand} onClick={closeMobile}>
-          EmpregaNet
+          EmpregaUAI
         </Link>
         <div className={styles.sidebarHeaderActions}>
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon"
-            className={styles.desktopRailToggle}
-            aria-label={railCollapsed ? 'Expandir menu lateral' : 'Compactar menu lateral'}
-            onClick={() => setRailCollapsed((v) => !v)}
-          >
-            {railCollapsed ? (
-              <PanelLeft className={styles.headerIcon} />
-            ) : (
-              <PanelLeftClose className={styles.headerIcon} />
-            )}
-          </Button>
           <Button
             type="button"
             variant="ghost"
@@ -123,7 +118,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         </div>
       </div>
 
-      <nav className={styles.sidebarScroll} aria-label="Navegação principal" suppressHydrationWarning>
+      <nav
+        id="app-sidebar-nav"
+        className={clsx(styles.sidebarScroll, railTransitioning && styles.sidebarScrollTransitioning)}
+        aria-label="Navegação principal"
+        suppressHydrationWarning
+      >
         {navGroups.map((group) => {
           const visibleItems = group.items.filter((i) => i.visible);
           if (visibleItems.length === 0) return null;
@@ -160,16 +160,21 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       </nav>
 
       <div className={styles.sidebarFooter}>
-        <div className={styles.userBlock} title={displaySub ?? undefined}>
-          <div className={styles.userAvatar} aria-hidden>
-            {(displayName.slice(0, 1) || '?').toUpperCase()}
-          </div>
-          {!railCollapsed ? (
-            <div className={styles.userText}>
-              <div className={styles.userName}>{displayName}</div>
-              {displaySub ? <div className={styles.userEmail}>{displaySub}</div> : null}
-            </div>
-          ) : null}
+        <div className={styles.footerRailSlot}>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            className={styles.desktopRailToggle}
+            aria-label={railCollapsed ? 'Expandir menu lateral' : 'Compactar menu lateral'}
+            onClick={toggleRailCollapsed}
+          >
+            {railCollapsed ? (
+              <PanelLeft className={styles.headerIcon} />
+            ) : (
+              <PanelLeftClose className={styles.headerIcon} />
+            )}
+          </Button>
         </div>
         <Button variant="outline" size="sm" className={styles.logoutBtn} onClick={handleLogout}>
           Sair
@@ -199,47 +204,15 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       </aside>
 
       <section className={styles.content}>
-        <header className={styles.topbar}>
-          <div className={styles.topbarLeft}>
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              className={styles.menuToggle}
-              aria-label="Abrir menu de navegação"
-              aria-expanded={mobileOpen}
-              aria-controls="app-sidebar"
-              onClick={() => setMobileOpen(true)}
-            >
-              <Menu className={styles.headerIcon} />
-            </Button>
-            <div className={styles.topbarContext}>
-              <span className={styles.topbarEyebrow}>Área autenticada</span>
-              <span className={styles.topbarHint}>Utilize o menu para aceder às áreas do portal.</span>
-            </div>
-          </div>
-          <div className={styles.topbarRight}>
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              aria-label={
-                !themeMounted
-                  ? 'Alternar tema'
-                  : resolvedTheme === 'dark'
-                    ? 'Alternar para tema claro'
-                    : 'Alternar para tema escuro'
-              }
-              onClick={toggleLightDark}
-            >
-              {themeMounted && resolvedTheme === 'dark' ? (
-                <Sun className={styles.headerIcon} />
-              ) : (
-                <Moon className={styles.headerIcon} />
-              )}
-            </Button>
-          </div>
-        </header>
+        <MainHeader
+          displayName={displayName}
+          email={email}
+          themeMounted={themeMounted}
+          resolvedTheme={resolvedTheme}
+          onToggleTheme={toggleLightDark}
+          onOpenMobileMenu={() => setMobileOpen(true)}
+          mobileMenuOpen={mobileOpen}
+        />
 
         <div className={styles.main}>{children}</div>
       </section>

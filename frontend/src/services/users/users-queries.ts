@@ -7,8 +7,50 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { queryKeys } from '../query-keys';
 import { requireAuthToken } from '../shared';
-import { login, me, register } from './users-public-api';
-import type { LoginDto, RegisterDto } from './users-schema';
+import {
+  confirmEmail,
+  forgotPassword,
+  login,
+  loginWithGoogle,
+  me,
+  register,
+  resendEmailConfirmation,
+  resetPassword
+} from './users-public-api';
+import type {
+  ConfirmEmailDto,
+  ForgotPasswordDto,
+  LoginDto,
+  LoginWithGoogleDto,
+  RegisterDto,
+  ResendEmailConfirmationDto,
+  ResetPasswordFormValues
+} from './users-schema';
+
+function useAuthSessionMutation(actionLabel: string, resource: string) {
+  const { setLoggedUser } = useAuth();
+  const [apiError, setApiError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const router = useRouter();
+
+  return {
+    setLoggedUser,
+    apiError,
+    setApiError,
+    successMessage,
+    setSuccessMessage,
+    router,
+    onAuthSuccess: (res: Parameters<typeof setLoggedUser>[0]) => {
+      setLoggedUser(res);
+      toastSuccess('Sessão iniciada com sucesso', 'Bem-vindo à EmpregaUAI.');
+      startRouterTransition(() => router.push('/dashboard'));
+    },
+    onAuthError: (err: unknown) => {
+      setSuccessMessage(null);
+      reportMutationApiError({ err, actionLabel, resource, setApiError });
+    }
+  };
+}
 
 export function useMeQuery() {
   const { token } = useAuth();
@@ -21,39 +63,131 @@ export function useMeQuery() {
 }
 
 export function useLoginMutation() {
-  const { setLoggedUser } = useAuth();
-  const [apiError, setApiError] = useState<string | null>(null);
-  const router = useRouter();
+  const auth = useAuthSessionMutation('iniciar sessão', 'sessão');
 
   const ctx = useMutation({
     mutationFn: (formValue: LoginDto) => login(formValue),
-    onSuccess: (res) => {
-      setLoggedUser(res);
-      toastSuccess('Sessão iniciada com sucesso', 'Bem-vindo de volta. Estamos a preparar o seu painel.');
-      startRouterTransition(() => router.push('/dashboard'));
-    },
-    onError: (err) => {
-      reportMutationApiError({ err, actionLabel: 'iniciar sessão', resource: 'sessão', setApiError });
-    }
+    onSuccess: auth.onAuthSuccess,
+    onError: auth.onAuthError
   });
 
-  return { ...ctx, apiError };
+  return { ...ctx, apiError: auth.apiError, successMessage: auth.successMessage };
+}
+
+export function useLoginWithGoogleMutation() {
+  const auth = useAuthSessionMutation('iniciar sessão com Google', 'sessão');
+
+  const ctx = useMutation({
+    mutationFn: (formValue: LoginWithGoogleDto) => loginWithGoogle(formValue),
+    onSuccess: auth.onAuthSuccess,
+    onError: auth.onAuthError
+  });
+
+  return { ...ctx, apiError: auth.apiError };
 }
 
 export function useRegisterMutation() {
   const [apiError, setApiError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   const ctx = useMutation({
     mutationFn: (formValue: RegisterDto) => register(formValue),
     onSuccess: (res) => {
+      setApiError(null);
       const message =
-        typeof res === 'string' ? res : 'Conta criada. Confirme o endereço de e-mail antes de iniciar sessão.';
+        typeof res === 'string' ? res : 'Conta criada. Confirme o e-mail antes de iniciar sessão.';
+      setSuccessMessage(message);
       toastSuccess('Registo concluído', message);
     },
     onError: (err) => {
+      setSuccessMessage(null);
       reportMutationApiError({ err, actionLabel: 'criar conta', resource: 'conta', setApiError });
     }
   });
 
-  return { ...ctx, apiError };
+  return { ...ctx, apiError, successMessage };
+}
+
+export function useForgotPasswordMutation() {
+  const [apiError, setApiError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
+  const ctx = useMutation({
+    mutationFn: (formValue: ForgotPasswordDto) => forgotPassword(formValue),
+    onSuccess: (message) => {
+      setApiError(null);
+      setSuccessMessage(message);
+      toastSuccess('Pedido enviado', message);
+    },
+    onError: (err) => {
+      setSuccessMessage(null);
+      reportMutationApiError({ err, actionLabel: 'recuperar senha', resource: 'senha', setApiError });
+    }
+  });
+
+  return { ...ctx, apiError, successMessage };
+}
+
+export function useResetPasswordMutation() {
+  const [apiError, setApiError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const router = useRouter();
+
+  const ctx = useMutation({
+    mutationFn: (formValue: ResetPasswordFormValues) => resetPassword(formValue),
+    onSuccess: (message) => {
+      setApiError(null);
+      setSuccessMessage(message);
+      toastSuccess('Senha atualizada', message);
+      startRouterTransition(() => router.push('/login'));
+    },
+    onError: (err) => {
+      setSuccessMessage(null);
+      reportMutationApiError({ err, actionLabel: 'redefinir senha', resource: 'senha', setApiError });
+    }
+  });
+
+  return { ...ctx, apiError, successMessage };
+}
+
+export function useConfirmEmailMutation() {
+  const [apiError, setApiError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const router = useRouter();
+
+  const ctx = useMutation({
+    mutationFn: (formValue: ConfirmEmailDto) => confirmEmail(formValue),
+    onSuccess: (message) => {
+      setApiError(null);
+      setSuccessMessage(message);
+      toastSuccess('E-mail confirmado', message);
+      startRouterTransition(() => router.push('/login'));
+    },
+    onError: (err) => {
+      setSuccessMessage(null);
+      reportMutationApiError({ err, actionLabel: 'confirmar e-mail', resource: 'e-mail', setApiError });
+    }
+  });
+
+  return { ...ctx, apiError, successMessage };
+}
+
+export function useResendEmailConfirmationMutation() {
+  const [apiError, setApiError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
+  const ctx = useMutation({
+    mutationFn: (formValue: ResendEmailConfirmationDto) => resendEmailConfirmation(formValue),
+    onSuccess: (message) => {
+      setApiError(null);
+      setSuccessMessage(message);
+      toastSuccess('E-mail reenviado', message);
+    },
+    onError: (err) => {
+      setSuccessMessage(null);
+      reportMutationApiError({ err, actionLabel: 'reenviar confirmação', resource: 'e-mail', setApiError });
+    }
+  });
+
+  return { ...ctx, apiError, successMessage };
 }

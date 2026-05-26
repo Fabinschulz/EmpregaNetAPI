@@ -17,18 +17,27 @@ public sealed class DescribeEnumMembers : ISchemaFilter
         _xmlComments = xmlComments;
     }
 
+    /// <summary>
+    /// Aplica o filtro ao schema do Swagger, adicionando à descrição do enum os valores possíveis e suas descrições.
+    /// </summary>
+    /// <param name="schema">Schema OpenAPI a ser modificado.</param>
+    /// <param name="context">Contexto do filtro, contendo informações do tipo.</param>
     public void Apply(IOpenApiSchema schema, SchemaFilterContext context)
     {
-        if (!context.Type.IsEnum)
+         var EnumType = context.Type;
+
+        if (schema is not OpenApiSchema argSchema)
             return;
 
-        var sb = new StringBuilder(schema.Description);
+        if (!EnumType.IsEnum) return;
+
+        var sb = new StringBuilder(argSchema.Description);
 
         sb.AppendLine("<p>Valores possíveis:</p><ul>");
 
-        foreach (var name in Enum.GetNames(context.Type))
+        foreach (var name in Enum.GetNames(EnumType))
         {
-            var memberName = $"F:{context.Type.FullName}.{name}";
+            var memberName = $"F:{EnumType.FullName}.{name}";
             var description = _xmlComments.XPathEvaluate(
                 $"normalize-space(//member[@name='{memberName}']/summary/text())"
             ) as string;

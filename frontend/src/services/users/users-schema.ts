@@ -28,17 +28,41 @@ export const forgotPasswordSchema = z.object({
   email: z.email({ message: 'E-mail inválido.' })
 });
 
-export const resetPasswordSchema = z.object({
-  userId: z.string().min(1, { message: 'O ID do usuário precisa ser um identificador positivo.' }).optional(),
-  token: z.string().min(1, { message: 'O token é obrigatório.' }),
-  password: z.string().min(8, { message: 'A senha deve ter pelo menos 8 caracteres.' }),
-  passwordConfirmation: z.string().min(8, { message: 'A confirmação da senha deve ter pelo menos 8 caracteres.' }),
-  email: z.string().email({ message: 'E-mail inválido.' }).optional()
-});
+export const resetPasswordFormSchema = z
+  .object({
+    userId: z.coerce.number().int().positive({ message: 'Link de redefinição inválido.' }),
+    token: z.string().min(1, { message: 'Token inválido.' }),
+    newPassword: z.string().min(8, { message: 'A senha deve ter pelo menos 8 caracteres.' }),
+    newPasswordConfirmation: z.string().min(8, { message: 'Confirme a nova senha.' })
+  })
+  .refine((data) => data.newPassword === data.newPasswordConfirmation, {
+    message: 'As senhas não conferem.',
+    path: ['newPasswordConfirmation']
+  });
 
 export const confirmEmailSchema = z.object({
-  userId: z.string().min(1, { message: 'O ID do usuário precisa ser um identificador positivo.' }),
-  token: z.string().min(1, { message: 'O token é obrigatório.' })
+  userId: z.coerce.number().int().positive({ message: 'Link de confirmação inválido.' }),
+  token: z.string().min(1, { message: 'Token inválido.' })
+});
+
+export const loginWithGoogleSchema = z.object({
+  idToken: z.string().min(1, { message: 'Token do Google inválido.' })
+});
+
+export const resendEmailConfirmationSchema = z.object({
+  email: z.email({ message: 'E-mail inválido.' })
+});
+
+export const forgotPasswordResponseSchema = z.object({
+  message: z.string()
+});
+
+export const confirmEmailResponseSchema = z.object({
+  message: z.string()
+});
+
+export const resetPasswordResponseSchema = z.object({
+  message: z.string()
 });
 
 export const userClaimSchema = z.object({
@@ -79,8 +103,10 @@ export const userSchema = z.object({
 export type RegisterDto = z.infer<typeof registerSchema>;
 export type LoginDto = z.infer<typeof loginSchema>;
 export type ForgotPasswordDto = z.infer<typeof forgotPasswordSchema>;
-export type ResetPasswordDto = z.infer<typeof resetPasswordSchema>;
+export type ResetPasswordFormValues = z.infer<typeof resetPasswordFormSchema>;
 export type ConfirmEmailDto = z.infer<typeof confirmEmailSchema>;
+export type LoginWithGoogleDto = z.infer<typeof loginWithGoogleSchema>;
+export type ResendEmailConfirmationDto = z.infer<typeof resendEmailConfirmationSchema>;
 export type RefreshTokenDto = z.infer<typeof refreshTokenSchema>;
 export type UserLoggedDto = z.infer<typeof userLoggedSchema>;
 export type UserDto = z.infer<typeof userSchema>;
