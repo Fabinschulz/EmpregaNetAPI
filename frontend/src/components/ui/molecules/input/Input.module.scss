@@ -1,23 +1,18 @@
+@use '../../../form-fields/field-base' as field;
+
 .field {
-  display: grid;
-  gap: 8px;
+  @include field.field-shell;
 }
 
 .input {
-  width: 100%;
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 10px 12px;
-  background: var(--input-bg);
-  color: var(--text);
+  @include field.control-surface;
+  @include field.control-interaction;
 }
 
 .hint {
-  font-size: 12px;
-  color: var(--muted);
+  @include field.field-hint;
 }
 
 .error {
-  font-size: 12px;
-  color: var(--danger);
+  @include field.field-error;
 }

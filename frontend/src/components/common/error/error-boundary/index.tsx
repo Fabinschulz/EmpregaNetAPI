@@ -1,8 +1,7 @@
 'use client';
 
-import { Button, Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components';
-import { AlertTriangle, RefreshCw } from 'lucide-react';
 import React, { type ErrorInfo, type ReactNode } from 'react';
+import { ErrorFallback } from '../error-fallback';
 import styles from './error-boundary.module.scss';
 
 export interface GracefullyDegradingErrorBoundaryProps {
@@ -24,12 +23,9 @@ export class GracefullyDegradingErrorBoundary extends React.Component<
   GracefullyDegradingErrorBoundaryProps,
   ErrorBoundaryState
 > {
-  private contentRef: React.RefObject<HTMLDivElement | null>;
-
   constructor(props: GracefullyDegradingErrorBoundaryProps) {
     super(props);
     this.state = { hasError: false };
-    this.contentRef = React.createRef();
   }
 
   static getDerivedStateFromError(): ErrorBoundaryState {
@@ -47,50 +43,16 @@ export class GracefullyDegradingErrorBoundary extends React.Component<
 
     if (hasError || status === 'error') {
       return (
-        <div
-          className={styles.wrapper}
-          dangerouslySetInnerHTML={{
-            __html: this.contentRef.current?.innerHTML ?? ''
-          }}
-          ref={this.contentRef}
-          suppressHydrationWarning
-        >
-          <Card className={styles.card}>
-            <CardHeader className={styles.cardHeader}>
-              <div className={styles.iconBadge} aria-hidden>
-                <AlertTriangle className={styles.alertIcon} />
-              </div>
-              <h4 className={styles.bannerTitle}>
-                O serviço <span className={styles.bannerStrong}>{fallback ?? ''}</span> encontra-se temporariamente
-                indisponível no momento.
-              </h4>
-              <CardTitle>Algo deu errado</CardTitle>
-              <CardDescription>
-                Ocorreu um erro ao tentar carregar as informações. Por favor, tente novamente mais tarde.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className={styles.content}>
-              {statusCode ? (
-                <p className={styles.statusLine}>
-                  Status code: <span className={styles.statusCode}>{statusCode}</span>
-                </p>
-              ) : null}
-
-              {error ? (
-                <details className={styles.details}>
-                  <summary className={styles.summary}>Detalhes do erro</summary>
-                  <p className={styles.errorMessage}>{error.message}</p>
-                  {errorInfo ? <pre className={styles.stack}>{errorInfo.componentStack}</pre> : null}
-                </details>
-              ) : null}
-
-              <div className={styles.action}>
-                <Button type="button" variant="primary" onClick={handleOnButton} startIcon={RefreshCw}>
-                  Recarregar página
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+        <div className={styles.wrapper} suppressHydrationWarning>
+          <ErrorFallback
+            variant="service"
+            serviceName={fallback}
+            statusCode={statusCode}
+            description="Por favor, contate o suporte ou tente novamente mais tarde."
+            details={error?.message}
+            diagnostic={errorInfo?.componentStack ?? undefined}
+            onButtonClick={handleOnButton}
+          />
         </div>
       );
     }

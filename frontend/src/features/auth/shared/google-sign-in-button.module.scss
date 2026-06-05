@@ -1,0 +1,89 @@
+.root {
+  position: relative;
+  width: 100%;
+  min-height: 48px;
+  border-radius: var(--radius-pill);
+  overflow: hidden;
+  background: var(--auth-outline-btn-bg, transparent);
+  border: 1px solid var(--border-strong, var(--border));
+  transition:
+    background 140ms ease,
+    border-color 140ms ease,
+    opacity 140ms ease;
+}
+
+.root:hover:not(.disabled) {
+  background: var(--surface-hover);
+  border-color: var(--control-border-hover, var(--border-strong));
+}
+
+.face {
+  position: relative;
+  z-index: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 48px;
+  padding: 0 24px;
+  pointer-events: none;
+  user-select: none;
+}
+
+.icon {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+}
+
+.label {
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--text);
+  line-height: 1;
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: flex;
+  align-items: stretch;
+  justify-content: stretch;
+  opacity: 0;
+  cursor: pointer;
+
+  :global(iframe) {
+    flex: 1 1 auto;
+    width: 100% !important;
+    min-height: 48px !important;
+    margin: 0 !important;
+    opacity: 0;
+  }
+
+  :global(div) {
+    width: 100% !important;
+    height: 100% !important;
+    opacity: 0;
+  }
+}
+
+.disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.disabled .overlay {
+  pointer-events: none;
+  cursor: not-allowed;
+}
+
+.unavailable {
+  margin: 0;
+  text-align: center;
+  font-size: 0.9rem;
+  color: var(--muted);
+  line-height: 1.5;
+}

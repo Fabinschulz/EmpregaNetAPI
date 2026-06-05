@@ -1,4 +1,5 @@
 using EmpregaNet.Api.Middleware;
+using EmpregaNet.AI;
 using EmpregaNet.Infra;
 using EmpregaNet.Infra.Extensions;
 using EmpregaNet.Infra.Persistence.Database;
@@ -13,6 +14,7 @@ builderServices.AddExceptionHandler<GlobalExceptionHandler>();
 // Register dependencies
 builderServices.RegisterApiDependencies();
 builderServices.RegisterApplicationDependencies();
+builderServices.RegisterAIDependencies(builder.Configuration);
 builder.RegisterCoreDependencies();
 
 var app = builder.Build();

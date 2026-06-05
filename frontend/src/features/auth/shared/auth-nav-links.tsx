@@ -4,11 +4,12 @@ import styles from './auth-page.module.scss';
 type AuthNavLinkProps = {
   href: string;
   children: React.ReactNode;
+  muted?: boolean;
 };
 
-export function AuthNavLink({ href, children }: AuthNavLinkProps) {
+export function AuthNavLink({ href, children, muted }: AuthNavLinkProps) {
   return (
-    <Link href={href} className={styles.link}>
+    <Link href={href} className={muted ? styles.linkMuted : styles.link}>
       {children}
     </Link>
   );

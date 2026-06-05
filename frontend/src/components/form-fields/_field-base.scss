@@ -1,0 +1,87 @@
+@mixin field-shell {
+  display: flex;
+  flex-direction: column;
+  gap: var(--field-gap, 8px);
+}
+
+@mixin field-label {
+  margin: 0;
+  font-size: var(--field-label-size, 0.875rem);
+  font-weight: var(--field-label-weight, 500);
+  line-height: 1.35;
+  color: var(--field-label, var(--text));
+}
+
+@mixin field-hint {
+  font-size: var(--field-hint-size, 0.75rem);
+  line-height: 1.4;
+  color: var(--muted);
+}
+
+@mixin field-error {
+  font-size: var(--field-hint-size, 0.75rem);
+  font-style: italic;
+  line-height: 1.4;
+  color: var(--danger);
+}
+
+@mixin control-surface {
+  width: 100%;
+  min-height: var(--control-min-height, 44px);
+  border: 1px solid var(--control-border, var(--border));
+  border-radius: var(--control-radius, var(--radius-md));
+  padding: var(--control-padding-block, 11px) var(--control-padding-inline, 14px);
+  background: var(--control-bg, var(--input-bg));
+  color: var(--text);
+  font-size: var(--control-font-size, 0.9375rem);
+  font-family: inherit;
+  line-height: 1.25;
+  box-shadow: var(--control-shadow, none);
+  transition:
+    border-color 140ms ease,
+    box-shadow 140ms ease,
+    background 140ms ease;
+}
+
+@mixin control-interaction {
+  &:hover:not(:disabled) {
+    border-color: var(--control-border-hover, var(--border-strong));
+    background: var(--control-bg-hover, var(--control-bg));
+  }
+
+  &:focus-visible {
+    outline: none;
+    border-color: var(--control-border-focus, var(--brand));
+    box-shadow: var(--control-focus-shadow, var(--focus-ring));
+  }
+
+  &:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+
+  &[aria-invalid='true'] {
+    border-color: var(--control-invalid-border, rgba(239, 68, 68, 0.55));
+  }
+}
+
+@mixin control-trigger {
+  @include control-surface;
+  @include control-interaction;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  cursor: pointer;
+  text-align: left;
+}
+
+@mixin control-textarea {
+  @include control-surface;
+  @include control-interaction;
+
+  min-height: 96px;
+  resize: vertical;
+  line-height: 1.45;
+}

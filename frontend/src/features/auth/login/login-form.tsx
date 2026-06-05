@@ -12,7 +12,9 @@ export function LoginFormFields() {
       <InputField name="login" label="E-mail" type="email" autoComplete="email" required />
       <InputField name="password" label="Senha" type="password" autoComplete="current-password" required />
       <AuthFormActions>
-        <FormSubmitButton variant="primary">{submitting ? 'Entrando...' : 'Entrar'}</FormSubmitButton>
+        <FormSubmitButton variant="primary" size="lg">
+          {submitting ? 'Entrando...' : 'Entrar'}
+        </FormSubmitButton>
       </AuthFormActions>
     </AuthFormGrid>
   );

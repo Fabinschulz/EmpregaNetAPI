@@ -64,6 +64,7 @@ export const AutocompleteField: React.FC<AutocompleteFieldProps> = ({
             className={styles.trigger}
             aria-expanded={open}
             aria-haspopup="listbox"
+            aria-invalid={!!error}
           >
             <span className={cn(!selectedOption && styles.triggerMuted)}>{selectedOption?.label ?? placeholder}</span>
             <ChevronDown className={styles.chevron} size={16} aria-hidden />

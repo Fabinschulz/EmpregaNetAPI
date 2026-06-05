@@ -14,7 +14,7 @@ export function Register() {
   return (
     <AuthPage
       title="Criar conta"
-      description="Registe-se na EmpregaUAI. Enviaremos um e-mail para confirmar o endereço antes do primeiro acesso."
+      description="Enviaremos um e-mail para confirmar o endereço antes do primeiro acesso."
       apiError={apiError}
       successMessage={successMessage}
       footer={

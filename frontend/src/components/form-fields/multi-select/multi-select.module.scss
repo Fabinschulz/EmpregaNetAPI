@@ -1,39 +1,19 @@
+@use '../field-base' as field;
+
 .popoverContent {
   padding: 0;
 }
 
 .field {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
+  @include field.field-shell;
 }
 
 .label {
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--field-label, var(--text));
+  @include field.field-label;
 }
 
 .trigger {
-  display: flex;
-  width: 100%;
-  align-items: center;
-  justify-content: space-between;
-  min-height: 40px;
-  padding: 8px 12px;
-  border-radius: 12px;
-  border: 1px solid var(--border);
-  background: var(--input-bg);
-  color: var(--text);
-  font-size: 14px;
-  cursor: pointer;
-  text-align: left;
-  font-family: inherit;
-}
-
-.trigger:disabled {
-  opacity: 0.55;
-  cursor: not-allowed;
+  @include field.control-trigger;
 }
 
 .badges {
@@ -86,9 +66,7 @@
 }
 
 .error {
-  font-size: 12px;
-  font-style: italic;
-  color: var(--danger);
+  @include field.field-error;
 }
 
 .checkCell {
@@ -103,7 +81,7 @@
 }
 
 .checkCellOn {
-  background: rgba(96, 165, 250, 0.35);
+  background: var(--brand-soft);
 }
 
 .checkDot {

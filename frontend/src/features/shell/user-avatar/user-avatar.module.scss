@@ -7,8 +7,8 @@
   justify-content: center;
   font-weight: 700;
   font-size: 15px;
-  background: var(--brand-soft);
-  border: 1px solid color-mix(in srgb, var(--brand) 35%, transparent);
+  background: var(--surface-hover);
+  border: 1px solid var(--border);
   color: var(--text);
   flex-shrink: 0;
 }

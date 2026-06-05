@@ -4,30 +4,32 @@
   justify-content: center;
   gap: 0.5rem;
   white-space: nowrap;
-  border-radius: var(--radius);
+  border-radius: var(--control-radius, var(--radius));
   font-size: 14px;
   font-weight: 500;
   line-height: 1.25;
-  border: 1px solid transparent;
-  background: var(--surface-raised);
+  border: 1px solid var(--control-border, var(--border));
+  background: var(--control-bg, var(--surface-raised));
   color: var(--text);
   cursor: pointer;
+  box-shadow: var(--control-shadow, none);
   transition:
     background 140ms ease,
     border-color 140ms ease,
     color 140ms ease,
+    box-shadow 140ms ease,
     transform 120ms ease;
-  box-shadow: none;
 }
 
 .root:hover {
-  background: var(--surface-hover);
-  border-color: var(--border);
+  background: var(--control-bg-hover, var(--surface-hover));
+  border-color: var(--control-border-hover, var(--border-strong));
 }
 
 .root:focus-visible {
-  outline: 2px solid var(--focus);
-  outline-offset: 2px;
+  outline: none;
+  border-color: var(--control-border-focus, var(--brand));
+  box-shadow: var(--control-focus-shadow, var(--focus-ring));
 }
 
 .root:disabled {
@@ -42,6 +44,7 @@
   border-color: transparent;
   color: var(--brand-on);
   font-weight: 600;
+  box-shadow: none;
 }
 
 .variantPrimary:hover {
@@ -50,22 +53,33 @@
   color: var(--brand-on);
 }
 
+.variantPrimary:focus-visible {
+  border-color: transparent;
+  box-shadow: var(--control-focus-shadow, var(--brand-glow, var(--focus-ring)));
+}
+
 .variantDestructive {
   background: rgba(255, 69, 58, 0.18);
   border-color: rgba(255, 69, 58, 0.35);
   color: #fff;
+  box-shadow: none;
 }
 
 .variantOutline {
   background: transparent;
-  border-color: var(--border-strong);
+  border-color: var(--control-border, var(--border-strong));
   box-shadow: none;
+}
+
+.variantOutline:hover {
+  background: var(--control-bg-hover, var(--surface-hover));
+  border-color: var(--control-border-hover, var(--border-strong));
 }
 
 .variantSecondary {
   background: var(--surface);
-  border-color: var(--border);
-  box-shadow: none;
+  border-color: var(--control-border, var(--border));
+  box-shadow: var(--control-shadow, none);
 }
 
 .variantGhost {
@@ -75,8 +89,9 @@
 }
 
 .variantGhost:hover {
-  background: var(--surface-hover);
+  background: var(--control-bg-hover, var(--surface-hover));
   border-color: transparent;
+  box-shadow: none;
 }
 
 .variantLink {
@@ -106,7 +121,7 @@
 .sizeLg {
   padding: 12px 18px;
   font-size: 15px;
-  border-radius: var(--radius);
+  border-radius: var(--control-radius, var(--radius));
 }
 
 .sizeIcon {
@@ -131,41 +146,7 @@
 }
 
 :global(html[data-theme='light']) {
-  .root {
-    background: #ffffff;
-    border-color: var(--border);
-    box-shadow: 0 1px 2px rgba(26, 46, 34, 0.06);
-  }
-
-  .root:hover {
-    background: var(--surface-hover);
-    border-color: var(--border-strong);
-  }
-
-  .variantPrimary {
-    color: #fff;
-  }
-
-  .variantPrimary:hover {
-    color: #fff;
-  }
-
   .variantDestructive {
     color: rgba(90, 18, 18, 0.98);
-  }
-
-  .variantGhost,
-  .variantGhost:hover {
-    background: transparent;
-    border-color: transparent;
-    box-shadow: none;
-  }
-
-  .variantGhost:hover {
-    background: var(--surface-hover);
-  }
-
-  .variantSecondary {
-    background: var(--surface);
   }
 }

@@ -39,7 +39,7 @@ export function parseApiError(err: unknown, resource?: string): ApiErrorResult {
     return { message: UNKNOWN_ERROR_MESSAGE, domainError: null };
   }
 
-  const status = err.response?.status;
+  const status = err.response?.status ?? 500;
   const domainError = tryParseDomainError(err.response?.data);
 
   if (domainError) {

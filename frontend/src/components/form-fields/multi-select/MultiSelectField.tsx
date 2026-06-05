@@ -99,6 +99,7 @@ export const MultiSelectField: React.FC<MultiSelectFieldProps> = ({
               className={styles.trigger}
               aria-expanded={open}
               aria-haspopup="listbox"
+              aria-invalid={!!errorsMessage}
             >
               {selectedValues.length > 0 ? (
                 <div className={styles.badges}>

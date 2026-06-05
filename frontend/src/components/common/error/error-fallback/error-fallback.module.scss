@@ -1,67 +1,157 @@
+/* ErrorFallback — consome tokens --error-* definidos em globals.scss */
+
 .root {
-  max-width: 64rem;
-  margin-inline: auto;
-  padding: 1rem;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  background: rgba(255, 255, 255, 0.05);
-  box-shadow: var(--shadow);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.inner {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 1rem;
-
-  @media (min-width: 640px) {
-    flex-direction: row;
-  }
-}
-
-.code {
-  font-weight: 700;
-  line-height: 1;
-  text-align: center;
-  font-size: clamp(2.5rem, 10vw, 3rem);
-
-  @media (min-width: 640px) {
-    text-align: left;
-    font-size: clamp(3.75rem, 12vw, 12.5rem);
-  }
-
-  @media (min-width: 1024px) {
-    font-size: 12.5rem;
-  }
-}
-
-.copy {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  text-align: left;
-  max-width: 22.5rem;
   width: 100%;
-  gap: 0.5rem;
+  max-width: var(--error-card-max-width);
+  margin-inline: auto;
+  border-radius: var(--error-card-radius);
+  border-width: 1px;
+  border-style: solid;
+  background: var(--error-card-bg);
+  box-shadow: var(--error-card-shadow);
+}
 
-  @media (min-width: 640px) {
-    align-items: center;
-    text-align: center;
-  }
+.root[data-variant='error'],
+.root[data-variant='service'] {
+  border-color: var(--error-danger-border);
+}
+
+.root[data-variant='not-found'] {
+  border-color: var(--error-neutral-border);
+}
+
+.header {
+  text-align: center;
+  gap: var(--error-section-gap);
+  padding: var(--error-card-padding) var(--error-card-padding) 0 !important;
+}
+
+.iconBadge {
+  margin-inline: auto;
+  margin-bottom: 0.25rem;
+  display: flex;
+  height: var(--error-icon-badge-size);
+  width: var(--error-icon-badge-size);
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-pill);
+}
+
+.root[data-variant='error'] .iconBadge,
+.root[data-variant='service'] .iconBadge {
+  background: var(--error-danger-icon-bg);
+}
+
+.root[data-variant='not-found'] .iconBadge {
+  background: var(--error-neutral-icon-bg);
+}
+
+.icon {
+  width: 1.5rem;
+  height: 1.5rem;
+  flex-shrink: 0;
+}
+
+.root[data-variant='error'] .icon,
+.root[data-variant='service'] .icon {
+  color: var(--error-danger-icon-fg);
+}
+
+.root[data-variant='not-found'] .icon {
+  color: var(--error-neutral-icon-fg);
+}
+
+.banner {
+  font-size: var(--error-banner-size);
+  font-weight: 600;
+  line-height: 1.4;
+  margin: 0;
+  color: var(--text);
+}
+
+.bannerStrong {
+  font-weight: 650;
 }
 
 .title {
-  font-size: 1.5rem;
-  font-weight: 600;
-  margin: 0;
+  text-align: center;
+  font-size: var(--error-title-size) !important;
+  font-weight: 650 !important;
+  line-height: 1.25 !important;
+  letter-spacing: -0.02em;
 }
 
-.message {
-  color: var(--muted);
-  font-size: 0.875rem;
+.description {
+  text-align: center;
+  font-size: var(--error-description-size) !important;
+  line-height: 1.5 !important;
+  max-width: 22rem;
+  margin-inline: auto;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--error-section-gap);
+  text-align: center;
+  padding: var(--error-section-gap) var(--error-card-padding) var(--error-card-padding) !important;
+}
+
+.statusLine {
   margin: 0;
+  font-size: var(--error-status-size);
+  color: var(--muted);
+  line-height: 1.4;
+}
+
+.statusCode {
+  font-weight: 650;
+  color: var(--text);
+}
+
+.details {
+  width: 100%;
+  font-size: var(--error-status-size);
+  text-align: left;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  background: var(--control-bg);
+  padding: 0.5rem 0.75rem;
+}
+
+.summary {
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--text);
+  list-style-position: inside;
+
+  &:focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+    border-radius: var(--radius);
+  }
+}
+
+.detailBody {
+  margin: 0.5rem 0 0;
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  color: var(--muted);
+  word-break: break-word;
+}
+
+.stack {
+  margin: 0.5rem 0 0;
+  white-space: pre-wrap;
+  font-size: 0.75rem;
+  line-height: 1.4;
+  color: var(--muted);
+}
+
+.action {
+  margin-top: var(--error-action-gap);
+  width: 100%;
+  display: flex;
+  justify-content: center;
 }

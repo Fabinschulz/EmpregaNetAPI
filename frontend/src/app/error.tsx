@@ -10,11 +10,15 @@ type SegmentErrorProps = Readonly<{
 
 export default function Error({ error, reset }: SegmentErrorProps) {
   return (
-    <ErrorFallback
-      statusCode={500}
-      title="Ops! Algo deu errado."
-      message={formatAppErrorUserMessage(error)}
-      onButtonClick={reset}
-    />
+    <div className="error-page">
+      <ErrorFallback
+        variant="error"
+        statusCode={500}
+        title="Ops! Algo deu errado."
+        description="Ocorreu um erro inesperado. Tente novamente ou volte mais tarde."
+        details={formatAppErrorUserMessage(error)}
+        onButtonClick={reset}
+      />
+    </div>
   );
 }

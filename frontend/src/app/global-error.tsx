@@ -14,9 +14,11 @@ export default function GlobalError({ error, reset }: GlobalErrorProps) {
     <html lang="pt-BR" suppressHydrationWarning>
       <body className="global-error-body">
         <ErrorFallback
+          variant="error"
           statusCode={500}
           title="Ops! Algo deu errado."
-          message={formatAppErrorUserMessage(error)}
+          description="Ocorreu um erro inesperado. Tente novamente ou volte mais tarde."
+          details={formatAppErrorUserMessage(error)}
           onButtonClick={reset}
         />
       </body>

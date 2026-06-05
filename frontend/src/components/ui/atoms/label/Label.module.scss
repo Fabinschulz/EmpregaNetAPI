@@ -1,7 +1,8 @@
 .root {
-  font-size: 14px;
-  font-weight: 500;
-  line-height: 1.25;
+  margin: 0;
+  font-size: var(--field-label-size, 0.875rem);
+  font-weight: var(--field-label-weight, 500);
+  line-height: 1.35;
   color: var(--field-label, var(--text));
 }
 

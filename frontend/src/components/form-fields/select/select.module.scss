@@ -1,17 +1,13 @@
+@use '../field-base' as field;
+
 .field {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
+  @include field.field-shell;
 }
 
 .label {
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--field-label, var(--text));
+  @include field.field-label;
 }
 
 .error {
-  font-size: 12px;
-  font-style: italic;
-  color: var(--danger);
+  @include field.field-error;
 }
