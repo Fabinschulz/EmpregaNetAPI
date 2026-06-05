@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 
 namespace EmpregaNet.Infra.Extensions
@@ -101,9 +102,27 @@ namespace EmpregaNet.Infra.Extensions
                                     {
                                         options.Events = new JwtBearerEvents
                                         {
+                                            OnMessageReceived = context =>
+                                            {
+                                                if (string.IsNullOrEmpty(context.Token)
+                                                    && context.Request.Cookies.TryGetValue(Constants.AuthCookies.AccessToken, out var cookieToken)
+                                                    && !string.IsNullOrWhiteSpace(cookieToken))
+                                                {
+                                                    context.Token = cookieToken.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase)
+                                                        ? cookieToken[7..]
+                                                        : cookieToken;
+                                                }
+
+                                                return Task.CompletedTask;
+                                            },
+
                                             OnAuthenticationFailed = context =>
                                             {
-                                                Console.WriteLine("TOKEN FALHOU: " + context.Exception.Message);
+                                                if (builder.Environment.IsDevelopment())
+                                                {
+                                                    Console.WriteLine("TOKEN FALHOU: " + context.Exception.Message);
+                                                }
+
                                                 return Task.CompletedTask;
                                             },
 

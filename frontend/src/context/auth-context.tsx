@@ -1,13 +1,16 @@
 'use client';
 
-import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import type { UserLoggedDto } from '@/services';
+import { refreshToken } from '@/services';
+import { registerAxiosAuthHandlers } from '@/services/axios/axios-auth';
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import {
-  clearSessionClient,
-  decodeRolesFromJwt,
-  normalizeBearer,
-  readSessionFromBrowser,
-  saveSessionClient
+    clearSessionClient,
+    decodeRolesFromJwt,
+    normalizeBearer,
+    readRefreshTokenFromBrowser,
+    readSessionFromBrowser,
+    saveSessionClient
 } from 'src/services/users/session';
 
 type AuthState = {
@@ -15,6 +18,7 @@ type AuthState = {
   roles: string[];
   username: string | null;
   email: string | null;
+  hydrated: boolean;
 };
 
 type AuthContextValue = AuthState & {
@@ -29,18 +33,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [roles, setRoles] = useState<string[]>([]);
   const [username, setUsername] = useState<string | null>(null);
   const [email, setEmail] = useState<string | null>(null);
+  const [hydrated, setHydrated] = useState(false);
 
-  useEffect(() => {
-    const session = readSessionFromBrowser();
-    if (!session) return;
-    const normalized = normalizeBearer(session.token);
-    setToken(normalized);
-    setRoles(session.roles.length ? session.roles : decodeRolesFromJwt(normalized));
-    setUsername(session.username);
-    setEmail(session.email);
-  }, []);
-
-  const setLoggedUser = useCallback((logged: UserLoggedDto) => {
+  const applyLoggedUser = useCallback((logged: UserLoggedDto) => {
     const normalized = normalizeBearer(logged.accessToken);
     saveSessionClient({ token: normalized, refreshToken: logged.refreshToken });
     setToken(normalized);
@@ -57,16 +52,66 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setEmail(null);
   }, []);
 
+  useEffect(() => {
+    registerAxiosAuthHandlers({
+      onSessionRefreshed: applyLoggedUser,
+      onLogout: logout
+    });
+  }, [applyLoggedUser, logout]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const hydrate = async () => {
+      const session = readSessionFromBrowser();
+      if (session?.token) {
+        if (!cancelled) {
+          setToken(session.token);
+          setRoles(session.roles);
+          setUsername(session.username);
+          setEmail(session.email);
+        }
+        setHydrated(true);
+        return;
+      }
+
+      const refresh = readRefreshTokenFromBrowser();
+      if (refresh) {
+        try {
+          const logged = await refreshToken({ refreshToken: refresh });
+          if (!cancelled) applyLoggedUser(logged);
+        } catch {
+          if (!cancelled) logout();
+        }
+      }
+
+      if (!cancelled) setHydrated(true);
+    };
+
+    void hydrate();
+    return () => {
+      cancelled = true;
+    };
+  }, [applyLoggedUser, logout]);
+
+  const setLoggedUser = useCallback(
+    (logged: UserLoggedDto) => {
+      applyLoggedUser(logged);
+    },
+    [applyLoggedUser]
+  );
+
   const value = useMemo<AuthContextValue>(
     () => ({
       token,
       roles,
       username,
       email,
+      hydrated,
       setLoggedUser,
       logout
     }),
-    [token, roles, username, email, setLoggedUser, logout]
+    [token, roles, username, email, hydrated, setLoggedUser, logout]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

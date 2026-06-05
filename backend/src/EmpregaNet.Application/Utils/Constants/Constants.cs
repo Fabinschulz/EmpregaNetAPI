@@ -27,6 +27,12 @@ public static partial class Constants
         public const string GoogleProvider = "Google";
     }
 
+    public static class AuthCookies
+    {
+        public const string AccessToken = "access_token";
+        public const string RefreshToken = "refresh_token";
+    }
+
     public static class Regex
     {
         public const string email = @"^(?!\.)(""([^""\r\\]|\\[""\r\\])*""|([-A-Za-z0-9!#$%&'*+/=?^_`{|}~]|(?<!\.)\.)*)(?<!\.)@[A-Za-z0-9][\w\.-]*[A-Za-z0-9]\.[A-Za-z][A-Za-z\.]*[A-Za-z]$";

@@ -12,15 +12,17 @@ builderServices.AddMediator();
 builderServices.AddExceptionHandler<GlobalExceptionHandler>();
 
 // Register dependencies
-builderServices.RegisterApiDependencies();
+builderServices.RegisterApiDependencies(builder.Configuration);
 builderServices.RegisterApplicationDependencies();
 builderServices.RegisterAIDependencies(builder.Configuration);
 builder.RegisterCoreDependencies();
 
 var app = builder.Build();
 
-// Aplica migrações pendentes em qualquer ambiente - DEV/HML/PROD
-app.ApplyPendingMigrations();
+if (app.Environment.IsDevelopment() || app.Environment.IsStaging())
+{
+    app.ApplyPendingMigrations();
+}
 
 await IdentityDataSeeder.SeedAsync(app);
 

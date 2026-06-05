@@ -1,3 +1,4 @@
+using EmpregaNet.Api.Configuration;
 using EmpregaNet.Application.Auth.ViewModel;
 using EmpregaNet.Application.Common.Cache;
 using EmpregaNet.Application.Users.Commands;
@@ -21,10 +22,12 @@ public class UsersController : ControllerBase
     private IMediator _iMediator = null!;
     private IMediator Mediator => _iMediator ?? HttpContext.RequestServices.GetRequiredService<IMediator>();
     private readonly IMemoryService _cacheService;
+    private readonly AuthCookieService _authCookies;
 
-    public UsersController(IMemoryService cacheService)
+    public UsersController(IMemoryService cacheService, AuthCookieService authCookies)
     {
         _cacheService = cacheService;
+        _authCookies = authCookies;
     }
 
     /// <summary>Registra um novo usuário com nome de usuário, e-mail e senha.</summary>
@@ -48,6 +51,7 @@ public class UsersController : ControllerBase
     public async Task<IActionResult> Login([FromBody] LoginUserCommand command)
     {
         var result = await Mediator.Send(command);
+        _authCookies.AppendLoginCookies(Response, result);
         return Ok(result);
     }
 
@@ -56,9 +60,13 @@ public class UsersController : ControllerBase
     [HttpPost("refresh-token")]
     [ProducesResponseType(typeof(UserLoggedViewModel), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(DomainError))]
-    public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenCommand command)
+    public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenCommand? command)
     {
-        var result = await Mediator.Send(command);
+        var refresh = command?.RefreshToken
+            ?? Request.Cookies[Constants.AuthCookies.RefreshToken]
+            ?? string.Empty;
+        var result = await Mediator.Send(new RefreshTokenCommand(refresh));
+        _authCookies.AppendLoginCookies(Response, result);
         return Ok(result);
     }
 
@@ -70,6 +78,7 @@ public class UsersController : ControllerBase
     public async Task<IActionResult> LoginWithGoogle([FromBody] LoginWithGoogleCommand command)
     {
         var result = await Mediator.Send(command);
+        _authCookies.AppendLoginCookies(Response, result);
         return Ok(result);
     }
 

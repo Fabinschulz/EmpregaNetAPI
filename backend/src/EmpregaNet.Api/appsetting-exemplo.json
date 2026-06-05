@@ -8,7 +8,7 @@
   },
   "AllowedHosts": "*",
   "ConnectionStrings": {
-    "PostgreSQLConnection": "Host=localhost;Port=5432;Database=empreganet;Username=postgres;Password=postgres;"
+    "PostgreSQLConnection": "Host=localhost;Port=5432;Database=nome_do_banco;Username=nome_do_usuario;Password=senha_do_usuario;"
   },
   "Redis": "localhost:6379",
   "JwtSettings": {
@@ -20,8 +20,12 @@
   },
   "AppUrls": {
     "PublicAppBaseUrl": "https://localhost:3000",
-    "PasswordResetPath": "/auth/reset-password",
-    "EmailConfirmationPath": "/auth/confirm-email"
+    "PasswordResetPath": "/reset-password",
+    "EmailConfirmationPath": "/confirm-email",
+    "CorsAllowedOrigins": [
+      "http://localhost:3000",
+      "https://localhost:3000"
+    ]
   },
   "GoogleAuth": {
     "ClientIds": []
@@ -37,9 +41,9 @@
     "FromName": "EmpregaNet"
   },
   "Seed": {
-    "AdminEmail": "admin@empreganet.com",
-    "AdminUserName": "admin",
-    "AdminPassword": "Mudar@123"
+    "AdminEmail": "",
+    "AdminUserName": "",
+    "AdminPassword": ""
   },
   "RateLimiting": {
     "PermitLimit": 100,

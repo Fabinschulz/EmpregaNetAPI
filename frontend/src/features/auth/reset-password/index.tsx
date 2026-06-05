@@ -27,7 +27,10 @@ export function ResetPassword() {
   );
 
   const { apiError, mutateAsync, successMessage } = useResetPasswordMutation();
-  const handleSubmit = async (formValue: ResetPasswordFormValues) => await mutateAsync(formValue);
+  const handleSubmit = async (formValue: ResetPasswordFormValues) => {
+    await mutateAsync(formValue);
+    window.history.replaceState(null, '', '/reset-password');
+  };
 
   return (
     <AuthPage

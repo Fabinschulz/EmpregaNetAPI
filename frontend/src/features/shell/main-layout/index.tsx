@@ -1,6 +1,7 @@
 'use client';
 
 import type { ReactNode } from 'react';
+import { RouteAccessGuard } from '../route-access-guard';
 import { MainAppFrame } from './main-app-frame';
 import { MainSessionBoundary } from './main-session-boundary';
 
@@ -15,7 +16,9 @@ type MainLayoutProps = {
 export function MainLayout({ children }: MainLayoutProps) {
   return (
     <MainSessionBoundary>
-      <MainAppFrame>{children}</MainAppFrame>
+      <RouteAccessGuard>
+        <MainAppFrame>{children}</MainAppFrame>
+      </RouteAccessGuard>
     </MainSessionBoundary>
   );
 }

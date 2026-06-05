@@ -1,6 +1,6 @@
-using EmpregaNet.Application.Auth;
 using EmpregaNet.Application.Common.Base;
 using EmpregaNet.Application.Common.Exceptions;
+using EmpregaNet.Application.Interfaces;
 using EmpregaNet.Application.JobApplications.ViewModel;
 using EmpregaNet.Domain.Enums;
 using EmpregaNet.Domain.Interfaces;
@@ -18,20 +18,22 @@ public sealed record ChangeJobApplicationStatusCommand(
 public sealed class ChangeJobApplicationStatusCommandHandler :
     IRequestHandler<UpdateCommand<ChangeJobApplicationStatusCommand, JobApplicationViewModel>, JobApplicationViewModel>
 {
-    private static readonly string[] AllowedRoles = RecruitmentRoleNames.Staff;
     private readonly IJobApplicationRepository _jobApplicationRepository;
-    private readonly IHttpCurrentUser _httpCurrentUser;
+    private readonly IJobRepository _jobRepository;
+    private readonly IJobEmployerAccess _jobEmployerAccess;
     private readonly IValidator<UpdateCommand<ChangeJobApplicationStatusCommand, JobApplicationViewModel>> _validator;
     private readonly ILogger<ChangeJobApplicationStatusCommandHandler> _logger;
 
     public ChangeJobApplicationStatusCommandHandler(
         IJobApplicationRepository jobApplicationRepository,
-        IHttpCurrentUser httpCurrentUser,
+        IJobRepository jobRepository,
+        IJobEmployerAccess jobEmployerAccess,
         IValidator<UpdateCommand<ChangeJobApplicationStatusCommand, JobApplicationViewModel>> validator,
         ILogger<ChangeJobApplicationStatusCommandHandler> logger)
     {
         _jobApplicationRepository = jobApplicationRepository;
-        _httpCurrentUser = httpCurrentUser;
+        _jobRepository = jobRepository;
+        _jobEmployerAccess = jobEmployerAccess;
         _validator = validator;
         _logger = logger;
     }
@@ -42,8 +44,6 @@ public sealed class ChangeJobApplicationStatusCommandHandler :
     {
         _logger.LogInformation("Atualizando status da candidatura {ApplicationId}", request.Id);
 
-        EnsureCanManageApplications();
-
         var application = await _jobApplicationRepository.GetByIdAsync(request.Id, cancellationToken);
         if (application is null || application.IsDeleted)
         {
@@ -52,6 +52,17 @@ public sealed class ChangeJobApplicationStatusCommandHandler :
                 $"Candidatura com ID '{request.Id}' não encontrada.",
                 DomainErrorEnum.RESOURCE_ID_NOT_FOUND);
         }
+
+        var job = await _jobRepository.GetByIdAsync(application.JobId, cancellationToken);
+        if (job is null || job.IsDeleted)
+        {
+            throw new ValidationAppException(
+                nameof(application.JobId),
+                "Vaga associada à candidatura não encontrada.",
+                DomainErrorEnum.RESOURCE_ID_NOT_FOUND);
+        }
+
+        await _jobEmployerAccess.EnsureCanManageCompanyAsync(job.CompanyId, cancellationToken);
 
         if (!Enum.TryParse<ApplicationStatusEnum>(request.entity.Status, true, out var newStatus) ||
             newStatus == ApplicationStatusEnum.NaoSelecionado)
@@ -66,27 +77,5 @@ public sealed class ChangeJobApplicationStatusCommandHandler :
         await _jobApplicationRepository.UpdateAsync(application, cancellationToken);
 
         return application.ToViewModel();
-    }
-
-    private void EnsureCanManageApplications()
-    {
-        var user = _httpCurrentUser.GetContextUser();
-        if (user is null)
-        {
-            throw new ValidationAppException(
-                nameof(_httpCurrentUser.UserId),
-                "Usuário autenticado não encontrado no contexto da requisição.",
-                DomainErrorEnum.MISSING_RESOURCE_PERMISSION);
-        }
-
-        var userRoles = user.UserToken.GetRoleNames();
-
-        if (!userRoles.Any(r => AllowedRoles.Contains(r, StringComparer.OrdinalIgnoreCase)))
-        {
-            throw new ValidationAppException(
-                nameof(_httpCurrentUser.UserId),
-                "Apenas usuários com perfil de recrutamento podem alterar o status da candidatura.",
-                DomainErrorEnum.MISSING_RESOURCE_PERMISSION);
-        }
     }
 }

@@ -3,6 +3,7 @@ import type { CompaniesListQueryParams } from '../shared';
 import {
   companiesListResponseSchema,
   CompanyDto,
+  companyFormSchema,
   companySchema,
   type CompaniesListResponseDto
 } from './companies-schema';
@@ -21,12 +22,14 @@ export async function getCompany(token: string, id: number): Promise<CompanyDto>
 }
 
 export async function createCompany(token: string, dto: unknown): Promise<string> {
-  const res = await axiosApi.post<string>('/api/companies', dto, createAxiosConfig(token));
+  const body = companyFormSchema.parse(dto);
+  const res = await axiosApi.post<string>('/api/companies', body, createAxiosConfig(token));
   return res.data;
 }
 
 export async function updateCompany(token: string, id: number, dto: unknown) {
-  const res = await axiosApi.put<unknown>(`/api/companies/${id}`, dto, createAxiosConfig(token));
+  const body = companyFormSchema.parse(dto);
+  const res = await axiosApi.put<unknown>(`/api/companies/${id}`, body, createAxiosConfig(token));
   return res.data;
 }
 

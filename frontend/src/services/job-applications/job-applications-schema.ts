@@ -12,3 +12,11 @@ export const jobApplicationSchema = z.object({
 export type JobApplicationDto = z.infer<typeof jobApplicationSchema>;
 export const jobApplicationsListResponseSchema = listDataPaginationSchema(jobApplicationSchema);
 export type JobApplicationsListResponseDto = z.infer<typeof jobApplicationsListResponseSchema>;
+
+export const applyToJobSchema = z.object({
+  jobId: z.number().int().positive()
+});
+
+export const changeApplicationStatusSchema = z.object({
+  status: z.string().min(1)
+});

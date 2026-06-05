@@ -1,7 +1,6 @@
 using EmpregaNet.Application.Auth;
 using Microsoft.Extensions.Logging;
 using EmpregaNet.Application.Jobs.ViewModel;
-using EmpregaNet.Application.Admin.Company.ViewModel;
 using EmpregaNet.Application.Common.Base;
 using EmpregaNet.Domain.Interfaces;
 using EmpregaNet.Application.Common.Exceptions;
@@ -40,6 +39,15 @@ public sealed class GetJobByIdHandler : IRequestHandler<GetByIdQuery<JobViewMode
                             nameof(request.Id),
                             $"Vaga de emprego com ID '{request.Id}' não encontrada.",
                             DomainErrorEnum.RECORD_NOT_EXISTS_OR_MISSING_PERMISSION);
+            }
+
+            var staff = RecruitmentRoleNames.IsRecruitmentStaff(_httpContextAccessor.HttpContext?.User);
+            if (!staff && (entity.IsDeleted || !entity.IsActive))
+            {
+                throw new ValidationAppException(
+                    nameof(request.Id),
+                    $"Vaga de emprego com ID '{request.Id}' não encontrada.",
+                    DomainErrorEnum.RECORD_NOT_EXISTS_OR_MISSING_PERMISSION);
             }
 
             var viewModel = entity.ToViewModel();

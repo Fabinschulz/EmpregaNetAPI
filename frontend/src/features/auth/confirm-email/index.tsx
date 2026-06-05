@@ -25,6 +25,7 @@ export function ConfirmEmail() {
     if (!payload || submittedRef.current) return;
     submittedRef.current = true;
     void mutateAsync(payload);
+    window.history.replaceState(null, '', '/confirm-email');
   }, [mutateAsync, payload]);
 
   return (

@@ -29,7 +29,7 @@ export function Login() {
 
   return (
     <AuthPage
-      title="Olá de novo"
+      title="Acesse sua conta"
       apiError={displayError}
       footer={
         <AuthFooterPrompt prompt="Não tem uma conta?">

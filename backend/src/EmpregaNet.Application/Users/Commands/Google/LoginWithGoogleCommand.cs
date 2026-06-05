@@ -67,7 +67,7 @@ public sealed class LoginWithGoogleHandler : IRequestHandler<LoginWithGoogleComm
                     DomainErrorEnum.INVALID_ACTION_FOR_STATUS);
             }
 
-            return await _jwtBuilder.BuildUserTokenAsync(user);
+            return await BuildTokenWithRefreshAsync(user, cancellationToken);
         }
 
         user = await _userManager.FindByEmailAsync(payload.Email);

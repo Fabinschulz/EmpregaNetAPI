@@ -139,12 +139,16 @@ namespace EmpregaNet.Api.Configuration
 
         public static IApplicationBuilder UseSwaggerSetup(this IApplicationBuilder app)
         {
+            var env = app.ApplicationServices.GetRequiredService<IHostEnvironment>();
+            if (!env.IsDevelopment() && !env.IsStaging())
+            {
+                return app;
+            }
 
             app.UseSwagger();
             app.UseSwaggerUI(c =>
             {
                 c.SwaggerEndpoint($"/swagger/{Constants.OpenApi.V1}/swagger.json", "EmpregaNet API");
-                // c.SwaggerEndpoint($"/swagger/{Constants.OpenApi.Admin}/swagger.json", "Administração"); - documento separado para endpoints administrativos, se necessário.
                 c.DocExpansion(Swashbuckle.AspNetCore.SwaggerUI.DocExpansion.None);
                 c.DefaultModelsExpandDepth(-1);
             });

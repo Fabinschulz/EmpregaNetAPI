@@ -1,12 +1,18 @@
-import { deleteClientCookie, parseCookieHeader, setClientCookie } from '@/utils/lib';
+import { deleteClientCookie, parseCookieHeader, setClientCookie } from '@/utils';
 import { jwtDecode } from 'jwt-decode';
 
 export const AUTH_COOKIE = 'empreganet_access_token';
 export const REFRESH_COOKIE = 'empreganet_refresh_token';
+const SESSION_STORAGE_KEY = 'empreganet_session';
 
 type JwtPayload = {
   exp?: number;
   roles?: string[];
+};
+
+type StoredSession = {
+  token: string;
+  refreshToken?: string | null;
 };
 
 export type Session = {
@@ -81,13 +87,51 @@ export function decodeUserDisplayFromJwt(token: string): { username: string | nu
   }
 }
 
+function readStoredSession(): StoredSession | null {
+  if (typeof window === 'undefined') return null;
+  try {
+    const raw = sessionStorage.getItem(SESSION_STORAGE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as StoredSession;
+    if (!parsed?.token) return null;
+    return parsed;
+  } catch {
+    return null;
+  }
+}
+
+function writeStoredSession(session: StoredSession) {
+  if (typeof window === 'undefined') return;
+  sessionStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(session));
+}
+
+function clearStoredSession() {
+  if (typeof window === 'undefined') return;
+  sessionStorage.removeItem(SESSION_STORAGE_KEY);
+}
+
+function buildSession(token: string, refreshToken?: string | null): Session {
+  const normalized = normalizeBearer(token);
+  const { username, email } = decodeUserDisplayFromJwt(normalized);
+  return {
+    token: normalized,
+    refreshToken,
+    roles: decodeRolesFromJwt(normalized),
+    exp: decodeExp(normalized),
+    username,
+    email
+  };
+}
+
 export function saveSessionClient(params: { token: string; refreshToken?: string | null }) {
   const token = normalizeBearer(params.token);
+  writeStoredSession({ token, refreshToken: params.refreshToken ?? null });
   setClientCookie(AUTH_COOKIE, token);
-  if (params.refreshToken) setClientCookie(REFRESH_COOKIE, params.refreshToken);
+  if (params.refreshToken) setClientCookie(REFRESH_COOKIE, params.refreshToken, { maxAgeSeconds: 60 * 60 * 24 * 14 });
 }
 
 export function clearSessionClient() {
+  clearStoredSession();
   deleteClientCookie(AUTH_COOKIE);
   deleteClientCookie(REFRESH_COOKIE);
 }
@@ -97,19 +141,17 @@ export function readSessionFromCookieHeader(cookieHeader: string | null | undefi
   const token = cookies[AUTH_COOKIE];
   if (!token) return null;
   const refreshToken = cookies[REFRESH_COOKIE];
-  const { username, email } = decodeUserDisplayFromJwt(token);
-  return {
-    token,
-    refreshToken,
-    roles: decodeRolesFromJwt(token),
-    exp: decodeExp(token),
-    username,
-    email
-  };
+  return buildSession(token, refreshToken);
 }
 
-/** Sessão a partir de `document.cookie` (apenas browser). */
 export function readSessionFromBrowser(): Session | null {
   if (typeof document === 'undefined') return null;
+  const stored = readStoredSession();
+  if (stored?.token) return buildSession(stored.token, stored.refreshToken);
   return readSessionFromCookieHeader(document.cookie);
+}
+
+export function readRefreshTokenFromBrowser(): string | null {
+  const session = readSessionFromBrowser();
+  return session?.refreshToken ?? null;
 }

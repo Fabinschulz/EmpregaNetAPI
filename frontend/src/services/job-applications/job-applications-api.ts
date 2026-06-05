@@ -1,9 +1,15 @@
 import { axiosApi, createAxiosConfig } from '../axios';
 import type { JobApplicationsAdminListQueryParams, JobApplicationsListQueryParams } from '../shared';
-import { jobApplicationsListResponseSchema, type JobApplicationsListResponseDto } from './job-applications-schema';
+import {
+  applyToJobSchema,
+  changeApplicationStatusSchema,
+  jobApplicationsListResponseSchema,
+  type JobApplicationsListResponseDto
+} from './job-applications-schema';
 
 export async function applyToJob(token: string, dto: unknown): Promise<string> {
-  const res = await axiosApi.post<string>('/api/jobapplications', dto, createAxiosConfig(token));
+  const body = applyToJobSchema.parse(dto);
+  const res = await axiosApi.post<string>('/api/jobapplications', body, createAxiosConfig(token));
   return res.data;
 }
 
@@ -33,7 +39,8 @@ export async function listByJob(
 }
 
 export async function changeStatus(token: string, id: number, dto: unknown): Promise<unknown> {
-  const res = await axiosApi.put<unknown>(`/api/jobapplications/${id}`, dto, createAxiosConfig(token));
+  const body = changeApplicationStatusSchema.parse(dto);
+  const res = await axiosApi.put<unknown>(`/api/jobapplications/${id}`, body, createAxiosConfig(token));
   return res.data;
 }
 

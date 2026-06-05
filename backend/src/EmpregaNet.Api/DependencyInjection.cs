@@ -10,7 +10,7 @@ public static class DependencyInjection
     public static void SetupApiServices(this WebApplication app)
     {
         app.UseHttpsRedirection()
-           .UseCors("AllowAll")
+           .UseCors(CorsPolicyConfig.DefaultPolicyName)
            .UseAuthentication()
            .UseAuthorization()
            .UseSwaggerSetup()
@@ -29,7 +29,7 @@ public static class DependencyInjection
 
     }
 
-    public static IServiceCollection RegisterApiDependencies(this IServiceCollection services)
+    public static IServiceCollection RegisterApiDependencies(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddControllers()
         .ConfigureApiBehaviorOptions(options =>
@@ -48,7 +48,8 @@ public static class DependencyInjection
         });
 
         services.SetupSwaggerDocumentation();
-        services.ConfigureCorsPolicy();
+        services.ConfigureCorsPolicy(configuration);
+        services.AddSingleton<AuthCookieService>();
         services.AddScoped<HttpUserContext>();
         services.AddScoped<IHttpCurrentUser, HttpCurrentUser>();
 

@@ -3,6 +3,7 @@
 import { Alert } from '@/components';
 import type { ReactNode } from 'react';
 import styles from './auth-page.module.scss';
+import { EmpregaUaiLogo } from './empregauai-logo';
 
 type AuthPageProps = {
   title: string;
@@ -17,9 +18,7 @@ export function AuthPage({ title, description, children, footer, apiError, succe
   return (
     <section className={styles.page} aria-labelledby="auth-page-title" suppressHydrationWarning>
       <header className={styles.header}>
-        <div className={styles.logo} aria-hidden>
-          EU
-        </div>
+        <EmpregaUaiLogo />
         <p className={styles.brand}>EmpregaUAI</p>
         <h1 id="auth-page-title" className={styles.title}>
           {title}

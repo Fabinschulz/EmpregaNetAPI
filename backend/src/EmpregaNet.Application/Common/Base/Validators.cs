@@ -45,7 +45,7 @@ public abstract class BasePaginatedQueryValidator<TQuery> : AbstractValidator<TQ
 
         RuleFor(x => x.Size)
             .NotEmpty().WithMessage("Size é obrigatório")
-            .GreaterThanOrEqualTo(100).WithMessage("Size precisa ser maior ou igual a 100");
+            .InclusiveBetween(1, 500).WithMessage("Size precisa ser maior ou igual a 100");
 
         RuleFor(x => x.OrderBy)
             .MaximumLength(50).WithMessage("Ordenação deve ter no máximo 50 caracteres.");

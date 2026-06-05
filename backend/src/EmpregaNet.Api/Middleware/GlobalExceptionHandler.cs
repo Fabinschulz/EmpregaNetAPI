@@ -76,6 +76,8 @@ namespace EmpregaNet.Api.Middleware
                 exception = exception.InnerException;
             }
 
+            var isDevelopment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development";
+
             switch (exception)
             {
                 case BadRequestException badRequestException:
@@ -89,35 +91,35 @@ namespace EmpregaNet.Api.Middleware
                     statusCode = (int)HttpStatusCode.NotFound;
                     code = DomainErrorEnum.RESOURCE_ID_NOT_FOUND;
                     message = "Recurso não encontrado.";
-                    errors = new[] { notFoundException.Message };
+                    errors = ClientErrorDetails(isDevelopment, notFoundException.Message);
                     break;
 
                 case InvalidOperationException invalidOperationException:
                     statusCode = (int)HttpStatusCode.Conflict;
                     code = DomainErrorEnum.INVALID_ACTION_FOR_RECORD;
                     message = "Operação inválida.";
-                    errors = new[] { invalidOperationException.Message };
+                    errors = ClientErrorDetails(isDevelopment, invalidOperationException.Message);
                     break;
 
                 case KeyNotFoundException keyNotFoundException:
                     statusCode = (int)HttpStatusCode.NotFound;
                     code = DomainErrorEnum.RESOURCE_ID_NOT_FOUND;
                     message = "Chave não encontrada.";
-                    errors = new[] { keyNotFoundException.Message };
+                    errors = ClientErrorDetails(isDevelopment, keyNotFoundException.Message);
                     break;
 
                 case UnauthorizedAccessException unauthorizedAccessException:
                     statusCode = (int)HttpStatusCode.Unauthorized;
                     code = DomainErrorEnum.MISSING_RESOURCE_PERMISSION;
                     message = "Acesso não autorizado.";
-                    errors = new[] { unauthorizedAccessException.Message };
+                    errors = ClientErrorDetails(isDevelopment, unauthorizedAccessException.Message);
                     break;
 
                 case DatabaseNotFoundException databaseNotFoundException:
                     statusCode = (int)HttpStatusCode.ServiceUnavailable;
                     code = DomainErrorEnum.UNEXPECTED_EXCEPTION;
                     message = "Banco de dados não encontrado.";
-                    errors = new[] { databaseNotFoundException.Message };
+                    errors = ClientErrorDetails(isDevelopment, databaseNotFoundException.Message);
                     break;
 
                 case ValidationAppException validationException:
@@ -131,26 +133,25 @@ namespace EmpregaNet.Api.Middleware
                     statusCode = (int)HttpStatusCode.Forbidden;
                     code = DomainErrorEnum.MISSING_RESOURCE_PERMISSION;
                     message = "Acesso negado. Você não possui o nível de permissão necessário para acessar este recurso.";
-                    errors = new[] { forbiddenAccessException.Message };
+                    errors = ClientErrorDetails(isDevelopment, forbiddenAccessException.Message);
                     break;
 
                 case NotSupportedException notSupportedException:
                     statusCode = (int)HttpStatusCode.NotImplemented;
                     code = DomainErrorEnum.UNSUPPORTED_OPERATION;
                     message = notSupportedException.Message ?? "Operação não suportada.";
-                    errors = new[] { notSupportedException.Message ?? "Mensagem não fornecida." };
+                    errors = ClientErrorDetails(isDevelopment, notSupportedException.Message ?? "Mensagem não fornecida.");
                     break;
 
                 default:
                     statusCode = (int)HttpStatusCode.InternalServerError;
                     code = DomainErrorEnum.UNEXPECTED_EXCEPTION;
                     message = "Erro interno no servidor.";
-                    errors = new[] { exception.Message };
+                    errors = ClientErrorDetails(isDevelopment, exception.Message);
                     break;
             }
 
             details = new Dictionary<string, object>();
-            var isDevelopment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development";
 
             if (errors.Any())
             {
@@ -172,5 +173,10 @@ namespace EmpregaNet.Api.Middleware
 
             return (domainError, statusCode);
         }
+
+        private static string[] ClientErrorDetails(bool isDevelopment, string? detail) =>
+            isDevelopment && !string.IsNullOrWhiteSpace(detail)
+                ? [detail]
+                : Array.Empty<string>();
     }
 }

@@ -1,3 +1,7 @@
+function isProduction(): boolean {
+  return process.env.NODE_ENV === 'production';
+}
+
 export function parseCookieHeader(cookieHeader: string | null | undefined): Record<string, string> {
   if (!cookieHeader) return {};
   return cookieHeader
@@ -16,9 +20,11 @@ export function parseCookieHeader(cookieHeader: string | null | undefined): Reco
 
 export function setClientCookie(name: string, value: string, opts?: { maxAgeSeconds?: number }) {
   const maxAge = opts?.maxAgeSeconds ?? 60 * 60 * 8; // 8h
-  document.cookie = `${encodeURIComponent(name)}=${encodeURIComponent(value)}; Path=/; Max-Age=${maxAge}; SameSite=Lax`;
+  const secure = isProduction() ? '; Secure' : '';
+  document.cookie = `${encodeURIComponent(name)}=${encodeURIComponent(value)}; Path=/; Max-Age=${maxAge}; SameSite=Lax${secure}`;
 }
 
 export function deleteClientCookie(name: string) {
-  document.cookie = `${encodeURIComponent(name)}=; Path=/; Max-Age=0; SameSite=Lax`;
+  const secure = isProduction() ? '; Secure' : '';
+  document.cookie = `${encodeURIComponent(name)}=; Path=/; Max-Age=0; SameSite=Lax${secure}`;
 }

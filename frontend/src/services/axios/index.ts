@@ -1,6 +1,7 @@
 import { getPublicEnv } from '@/utils';
 import axios, { type AxiosInstance, type AxiosRequestConfig } from 'axios';
 import * as Qs from 'qs';
+import { attachAxiosAuthInterceptor } from './axios-auth';
 
 let instance: AxiosInstance | null = null;
 
@@ -10,10 +11,13 @@ const createAxiosInstance = async () => {
   const axiosParams: AxiosRequestConfig = {
     baseURL: NEXT_PUBLIC_API_BASE_URL,
     responseType: 'json' as const,
+    withCredentials: true,
     paramsSerializer: (params: unknown) => Qs.stringify(params as Record<string, unknown>, { arrayFormat: 'repeat' })
   };
 
-  return axios.create(axiosParams);
+  const created = axios.create(axiosParams);
+  attachAxiosAuthInterceptor(created);
+  return created;
 };
 
 const getAxiosInstance = async () => {
@@ -26,19 +30,19 @@ const getAxiosInstance = async () => {
 
 export const axiosApi = {
   get: <T>(url: string, config?: AxiosRequestConfig) => {
-    return getAxiosInstance().then((instance) => instance.get<T>(url, config));
+    return getAxiosInstance().then((inst) => inst.get<T>(url, config));
   },
   post: <T>(url: string, body: unknown, config?: AxiosRequestConfig) => {
-    return getAxiosInstance().then((instance) => instance.post<T>(url, body, config));
+    return getAxiosInstance().then((inst) => inst.post<T>(url, body, config));
   },
   patch: <T>(url: string, body: unknown, config?: AxiosRequestConfig) => {
-    return getAxiosInstance().then((instance) => instance.patch<T>(url, body, config));
+    return getAxiosInstance().then((inst) => inst.patch<T>(url, body, config));
   },
   put: <T>(url: string, body: unknown, config?: AxiosRequestConfig) => {
-    return getAxiosInstance().then((instance) => instance.put<T>(url, body, config));
+    return getAxiosInstance().then((inst) => inst.put<T>(url, body, config));
   },
   delete: <T>(url: string, config?: AxiosRequestConfig) => {
-    return getAxiosInstance().then((instance) => instance.delete<T>(url, config));
+    return getAxiosInstance().then((inst) => inst.delete<T>(url, config));
   }
 };
 
@@ -51,6 +55,7 @@ export function createAxiosConfig<T>(token: string, params?: T) {
     headers: {
       Authorization: normalizeAuthorizationHeader(token)
     },
-    params
+    params,
+    withCredentials: true
   } satisfies AxiosRequestConfig;
 }

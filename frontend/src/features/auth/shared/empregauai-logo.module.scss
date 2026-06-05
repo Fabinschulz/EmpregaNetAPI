@@ -1,0 +1,14 @@
+.root {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin: 0 auto 1.25rem;
+  border-radius: 50%;
+  background: var(--brand);
+  color: var(--brand-on);
+}
+
+.icon {
+  display: block;
+}

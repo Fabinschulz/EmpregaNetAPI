@@ -2,6 +2,7 @@ using EmpregaNet.Application.Auth;
 using EmpregaNet.Application.Common.Base;
 using EmpregaNet.Application.Common.Cache;
 using EmpregaNet.Application.Common.Exceptions;
+using EmpregaNet.Application.Interfaces;
 using EmpregaNet.Application.Users.ViewModel;
 using EmpregaNet.Domain.Entities;
 using EmpregaNet.Domain.Enums;
@@ -15,17 +16,20 @@ public sealed class DeleteUserHandler : IRequestHandler<DeleteCommand<UserViewMo
 {
     private readonly UserManager<User> _userManager;
     private readonly IHttpCurrentUser _httpCurrentUser;
+    private readonly IRefreshTokenService _refreshTokens;
     private readonly IMemoryService _memoryService;
     private readonly ILogger<DeleteUserHandler> _logger;
 
     public DeleteUserHandler(
         UserManager<User> userManager,
         IHttpCurrentUser httpCurrentUser,
+        IRefreshTokenService refreshTokens,
         IMemoryService memoryService,
         ILogger<DeleteUserHandler> logger)
     {
         _userManager = userManager;
         _httpCurrentUser = httpCurrentUser;
+        _refreshTokens = refreshTokens;
         _memoryService = memoryService;
         _logger = logger;
     }
@@ -68,6 +72,8 @@ public sealed class DeleteUserHandler : IRequestHandler<DeleteCommand<UserViewMo
             var msg = result.Errors.FirstOrDefault()?.Description ?? "Falha ao excluir o usuário.";
             throw new ValidationAppException(nameof(request.Id), msg, DomainErrorEnum.RESOURCE_ERROR);
         }
+
+        await _refreshTokens.RevokeAllForUserAsync(user.Id, cancellationToken);
 
         _logger.LogInformation("Usuário {UserId} marcado como excluído (soft delete).", request.Id);
 

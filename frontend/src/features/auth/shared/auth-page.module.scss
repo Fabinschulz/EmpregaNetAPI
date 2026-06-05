@@ -9,22 +9,6 @@
   margin-bottom: clamp(1.75rem, 5vw, 2.25rem);
 }
 
-.logo {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 40px;
-  height: 40px;
-  margin: 0 auto 1.25rem;
-  border-radius: 50%;
-  background: var(--brand);
-  color: var(--brand-on);
-  font-size: 0.72rem;
-  font-weight: 800;
-  letter-spacing: -0.04em;
-  line-height: 1;
-}
-
 .brand {
   display: none;
 }

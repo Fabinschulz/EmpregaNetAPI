@@ -1,6 +1,6 @@
-using EmpregaNet.Application.Auth;
 using EmpregaNet.Application.Common.Base;
 using EmpregaNet.Application.Common.Exceptions;
+using EmpregaNet.Application.Interfaces;
 using EmpregaNet.Application.JobApplications.ViewModel;
 using EmpregaNet.Domain.Common;
 using EmpregaNet.Domain.Enums;
@@ -16,23 +16,22 @@ public sealed record GetJobApplicationsByJobIdQuery(long JobId, int Page, int Si
 public sealed class GetJobApplicationsByJobIdHandler :
     IRequestHandler<GetJobApplicationsByJobIdQuery, ListDataPagination<JobApplicationViewModel>>
 {
-    private static readonly string[] AllowedRoles = RecruitmentRoleNames.Staff;
     private readonly IJobRepository _jobRepository;
     private readonly IJobApplicationRepository _jobApplicationRepository;
-    private readonly IHttpCurrentUser _httpCurrentUser;
+    private readonly IJobEmployerAccess _jobEmployerAccess;
     private readonly IValidator<GetJobApplicationsByJobIdQuery> _validator;
     private readonly ILogger<GetJobApplicationsByJobIdHandler> _logger;
 
     public GetJobApplicationsByJobIdHandler(
         IJobRepository jobRepository,
         IJobApplicationRepository jobApplicationRepository,
-        IHttpCurrentUser httpCurrentUser,
+        IJobEmployerAccess jobEmployerAccess,
         IValidator<GetJobApplicationsByJobIdQuery> validator,
         ILogger<GetJobApplicationsByJobIdHandler> logger)
     {
         _jobRepository = jobRepository;
         _jobApplicationRepository = jobApplicationRepository;
-        _httpCurrentUser = httpCurrentUser;
+        _jobEmployerAccess = jobEmployerAccess;
         _validator = validator;
         _logger = logger;
     }
@@ -41,8 +40,6 @@ public sealed class GetJobApplicationsByJobIdHandler :
         GetJobApplicationsByJobIdQuery request,
         CancellationToken cancellationToken)
     {
-        EnsureCanManageApplications();
-
         var job = await _jobRepository.GetByIdAsync(request.JobId, cancellationToken);
         if (job is null || job.IsDeleted)
         {
@@ -51,6 +48,8 @@ public sealed class GetJobApplicationsByJobIdHandler :
                 $"Vaga com ID '{request.JobId}' não encontrada.",
                 DomainErrorEnum.RESOURCE_ID_NOT_FOUND);
         }
+
+        await _jobEmployerAccess.EnsureCanManageCompanyAsync(job.CompanyId, cancellationToken);
 
         _logger.LogInformation("Listando candidaturas da vaga {JobId}", request.JobId);
         var status = ParseStatus(request.Status);
@@ -64,28 +63,6 @@ public sealed class GetJobApplicationsByJobIdHandler :
 
         var data = result.Data.Select(a => a.ToViewModel()).ToList();
         return new ListDataPagination<JobApplicationViewModel>(data, result.TotalItems, request.Page, request.Size);
-    }
-
-    private void EnsureCanManageApplications()
-    {
-        var user = _httpCurrentUser.GetContextUser();
-        if (user is null)
-        {
-            throw new ValidationAppException(
-                nameof(_httpCurrentUser.UserId),
-                "Usuário autenticado não encontrado no contexto da requisição.",
-                DomainErrorEnum.MISSING_RESOURCE_PERMISSION);
-        }
-
-        var userRoles = user.UserToken.GetRoleNames();
-
-        if (!userRoles.Any(r => AllowedRoles.Contains(r, StringComparer.OrdinalIgnoreCase)))
-        {
-            throw new ValidationAppException(
-                nameof(_httpCurrentUser.UserId),
-                "Apenas usuários com perfil de recrutamento podem visualizar candidaturas por vaga.",
-                DomainErrorEnum.MISSING_RESOURCE_PERMISSION);
-        }
     }
 
     private static ApplicationStatusEnum? ParseStatus(string? status)

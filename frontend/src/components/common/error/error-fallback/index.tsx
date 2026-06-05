@@ -55,8 +55,10 @@ export function ErrorFallback({
   const ActionIcon = Icon ?? defaults.Icon;
   const StatusIcon = STATUS_ICON[variant];
   const showServiceBanner = variant === 'service' && serviceName != null && serviceName.length > 0;
-  const hasDetails = Boolean(details?.trim());
-  const hasDiagnostic = Boolean(diagnostic?.trim());
+  
+  const showDiagnostics = process.env.NODE_ENV === 'development';
+  const hasDetails = showDiagnostics && Boolean(details?.trim());
+  const hasDiagnostic = showDiagnostics && Boolean(diagnostic?.trim());
   const isDestructiveVariant = variant === 'error' || variant === 'service';
 
   return (
