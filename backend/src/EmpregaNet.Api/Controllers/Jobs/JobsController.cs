@@ -4,8 +4,10 @@ using EmpregaNet.Domain.Common;
 using EmpregaNet.Application.Jobs.Commands;
 using EmpregaNet.Application.Jobs.ViewModel;
 using EmpregaNet.Domain.Interfaces;
+using EmpregaNet.Api.Configuration;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OutputCaching;
 
 namespace EmpregaNet.Api.Controllers.Jobs;
 
@@ -15,13 +17,14 @@ namespace EmpregaNet.Api.Controllers.Jobs;
 [Route("api/[controller]")]
 public class JobsController : MainController<CreateJobCommand, UpdateJobCommand, JobViewModel>
 {
-    public JobsController(IMemoryService cacheService) : base(cacheService)
+    public JobsController(IOutputCacheManager cacheService) : base(cacheService)
     {
     }
 
     /// <summary>Retorna uma lista paginada de vagas ativas, com filtros opcionais por título, empresa, localização, etc.</summary>
     [AllowAnonymous]
     [HttpGet]
+    [OutputCache(PolicyName = OutputCachePolicies.PublicCatalog)]
     public override Task<IActionResult> GetAll(
         [FromQuery] int page = 1,
         [FromQuery] int size = 100,
@@ -33,6 +36,7 @@ public class JobsController : MainController<CreateJobCommand, UpdateJobCommand,
     /// <summary>Retorna os detalhes de uma vaga específica por ID, incluindo título, descrição, empresa, localização, requisitos, etc.</summary>
     [AllowAnonymous]
     [HttpGet("{id:long}")]
+    [OutputCache(PolicyName = OutputCachePolicies.PublicCatalog)]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(JobViewModel))]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(DomainError))]
     [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(DomainError))]

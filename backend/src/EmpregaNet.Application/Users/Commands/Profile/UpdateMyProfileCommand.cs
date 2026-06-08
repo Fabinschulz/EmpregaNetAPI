@@ -1,4 +1,3 @@
-using EmpregaNet.Application.Common.Cache;
 using EmpregaNet.Application.Common.Exceptions;
 using EmpregaNet.Application.Users.ViewModel;
 using EmpregaNet.Domain.Entities;
@@ -20,18 +19,18 @@ public sealed class UpdateMyProfileHandler : IRequestHandler<UpdateMyProfileComm
 {
     private readonly UserManager<User> _userManager;
     private readonly IHttpCurrentUser _httpCurrentUser;
-    private readonly IMemoryService _memoryService;
+    private readonly IOutputCacheManager _cache;
     private readonly ILogger<UpdateMyProfileHandler> _logger;
 
     public UpdateMyProfileHandler(
         UserManager<User> userManager,
         IHttpCurrentUser httpCurrentUser,
-        IMemoryService memoryService,
+        IOutputCacheManager cacheService,
         ILogger<UpdateMyProfileHandler> logger)
     {
         _userManager = userManager;
         _httpCurrentUser = httpCurrentUser;
-        _memoryService = memoryService;
+        _cache = cacheService;
         _logger = logger;
     }
 
@@ -67,9 +66,7 @@ public sealed class UpdateMyProfileHandler : IRequestHandler<UpdateMyProfileComm
 
         _logger.LogInformation("Usuário {UserId} atualizou o próprio perfil.", user.Id);
 
-        _memoryService.Remove(ApplicationCacheKeys.Users.Me(user.Id));
-        await _memoryService.RemoveByPatternAsync(ApplicationCacheKeys.Users.AdminPrefix);
-        _memoryService.Remove(ApplicationCacheKeys.Candidates.GetById(user.Id));
+        await _cache.InvalidateAdminUsersAsync(user.Id, cancellationToken);
 
         return user.ToViewModel();
     }

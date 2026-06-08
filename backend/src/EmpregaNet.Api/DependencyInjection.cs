@@ -1,6 +1,8 @@
 using System.Text.Json.Serialization;
+using EmpregaNet.Api.Controllers.HealthChecks;
 using EmpregaNet.Api.Configuration;
 using EmpregaNet.Application.Auth;
+using EmpregaNet.Infra.Cache;
 using EmpregaNet.Infra.Extensions;
 using Newtonsoft.Json;
 
@@ -13,6 +15,7 @@ public static class DependencyInjection
            .UseCors(CorsPolicyConfig.DefaultPolicyName)
            .UseAuthentication()
            .UseAuthorization()
+           .UseOutputCache()
            .UseSwaggerSetup()
            .Use(async (context, next) =>
                 {
@@ -49,13 +52,16 @@ public static class DependencyInjection
 
         services.SetupSwaggerDocumentation();
         services.ConfigureCorsPolicy(configuration);
+        services.SetupOutputCache(configuration);
         services.AddSingleton<AuthCookieService>();
         services.AddScoped<HttpUserContext>();
         services.AddScoped<IHttpCurrentUser, HttpCurrentUser>();
 
-        services.AddHealthChecks()
-                       .AddCheck<DatabaseCheck>("Database")
-                       .AddCheck<MemoryServiceCheck>("Cache");
+        var healthChecks = services.AddHealthChecks()
+            .AddCheck<DatabaseCheck>("Database");
+
+        if (RedisOptions.Resolve(configuration).IsActive)
+            healthChecks.AddCheck<RedisHealthCheck>("Redis");
 
         return services;
     }

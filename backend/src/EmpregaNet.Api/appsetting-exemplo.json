@@ -10,7 +10,6 @@
   "ConnectionStrings": {
     "PostgreSQLConnection": "Host=localhost;Port=5432;Database=nome_do_banco;Username=nome_do_usuario;Password=senha_do_usuario;"
   },
-  "Redis": "localhost:6379",
   "JwtSettings": {
     "SecretKey": "TroqueEstaChavePorUmSegredoLongoDePeloMenos32Caracteres!",
     "ExpirationHours": 8,
@@ -22,10 +21,7 @@
     "PublicAppBaseUrl": "https://localhost:3000",
     "PasswordResetPath": "/reset-password",
     "EmailConfirmationPath": "/confirm-email",
-    "CorsAllowedOrigins": [
-      "http://localhost:3000",
-      "https://localhost:3000"
-    ]
+    "CorsAllowedOrigins": ["http://localhost:3000", "https://localhost:3000"]
   },
   "GoogleAuth": {
     "ClientIds": []
@@ -52,5 +48,15 @@
   },
   "Sentry": {
     "Dsn": ""
+  },
+  "Redis": {
+    "Enabled": false,
+    "ConnectionString": "localhost:6379",
+    "InstanceName": "EmpregaNet:"
+  },
+  "OutputCache": {
+    "DefaultExpirationMinutes": 90,
+    "SizeLimitMegabytes": 100,
+    "MaximumBodySizeMegabytes": 100
   }
 }

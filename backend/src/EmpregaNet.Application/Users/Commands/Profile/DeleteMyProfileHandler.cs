@@ -1,4 +1,3 @@
-using EmpregaNet.Application.Common.Cache;
 using EmpregaNet.Application.Common.Exceptions;
 using EmpregaNet.Domain.Entities;
 using EmpregaNet.Domain.Enums;
@@ -14,18 +13,18 @@ public sealed class DeleteMyProfileHandler : IRequestHandler<DeleteMyProfileComm
 {
     private readonly UserManager<User> _userManager;
     private readonly IHttpCurrentUser _httpCurrentUser;
-    private readonly IMemoryService _memoryService;
+    private readonly IOutputCacheManager _cache;
     private readonly ILogger<DeleteMyProfileHandler> _logger;
 
     public DeleteMyProfileHandler(
         UserManager<User> userManager,
         IHttpCurrentUser httpCurrentUser,
-        IMemoryService memoryService,
+        IOutputCacheManager cacheService,
         ILogger<DeleteMyProfileHandler> logger)
     {
         _userManager = userManager;
         _httpCurrentUser = httpCurrentUser;
-        _memoryService = memoryService;
+        _cache = cacheService;
         _logger = logger;
     }
 
@@ -60,9 +59,7 @@ public sealed class DeleteMyProfileHandler : IRequestHandler<DeleteMyProfileComm
 
         _logger.LogInformation("Usuário {UserId} solicitou exclusão da própria conta (delete).", user.Id);
 
-        _memoryService.Remove(ApplicationCacheKeys.Users.Me(user.Id));
-        await _memoryService.RemoveByPatternAsync(ApplicationCacheKeys.Users.AdminPrefix);
-        _memoryService.Remove(ApplicationCacheKeys.Candidates.GetById(user.Id));
+        await _cache.InvalidateAdminUsersAsync(user.Id, cancellationToken);
 
         return true;
     }

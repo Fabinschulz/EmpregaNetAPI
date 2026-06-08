@@ -7,8 +7,10 @@ using EmpregaNet.Application.JobApplications.Queries;
 using EmpregaNet.Application.JobApplications.ViewModel;
 using EmpregaNet.Domain.Common;
 using EmpregaNet.Domain.Interfaces;
+using EmpregaNet.Api.Configuration;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OutputCaching;
 
 namespace EmpregaNet.Api.Controllers.JobApplications;
 
@@ -19,7 +21,7 @@ namespace EmpregaNet.Api.Controllers.JobApplications;
 [Authorize]
 public class JobApplicationsController : MainController<ApplyToJobCommand, ChangeJobApplicationStatusCommand, JobApplicationViewModel>
 {
-    public JobApplicationsController(IMemoryService cacheService)
+    public JobApplicationsController(IOutputCacheManager cacheService)
         : base(cacheService)
     {
     }
@@ -40,6 +42,7 @@ public class JobApplicationsController : MainController<ApplyToJobCommand, Chang
 
     /// <summary>Lista todas as candidaturas (paginação; apenas recrutamento).</summary>
     [HttpGet]
+    [OutputCache(PolicyName = OutputCachePolicies.EntityRead)]
     [Authorize(Policy = Constants.AuthPolicies.Recrutamento)]
     public override Task<IActionResult> GetAll(
         [FromQuery] int page = 1,
@@ -51,6 +54,7 @@ public class JobApplicationsController : MainController<ApplyToJobCommand, Chang
 
     /// <summary>Lista as candidaturas do utilizador autenticado.</summary>
     [HttpGet("mine")]
+    [OutputCache(PolicyName = OutputCachePolicies.AuthenticatedRead, Tags = [ApplicationCacheTags.JobApplicationsMine])]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ListDataPagination<JobApplicationViewModel>))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(DomainError))]
     [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(DomainError))]
@@ -60,17 +64,13 @@ public class JobApplicationsController : MainController<ApplyToJobCommand, Chang
         [FromQuery] string? status = null,
         [FromQuery] string? orderBy = null)
     {
-        var cacheKey = ApplicationCacheKeys.JobApplications.Mine(page, size, status, orderBy);
-        var cachedData = await _cacheService.GetValueAsync<ListDataPagination<JobApplicationViewModel>>(cacheKey);
-        if (cachedData is not null) return Ok(cachedData);
-
         var result = await _mediator.Send(new GetMyJobApplicationsQuery(page, size, status, orderBy));
-        await _cacheService.SetValueAsync(cacheKey, result, TimeSpan.FromMinutes(5));
         return Ok(result);
     }
 
     /// <summary>Lista candidaturas associadas a uma vaga (apenas recrutamento).</summary>
     [HttpGet("job/{jobId:long}")]
+    [OutputCache(PolicyName = OutputCachePolicies.AuthenticatedRead, Tags = [ApplicationCacheTags.JobApplicationsByJob])]
     [Authorize(Policy = Constants.AuthPolicies.Recrutamento)]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ListDataPagination<JobApplicationViewModel>))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(DomainError))]
@@ -83,12 +83,7 @@ public class JobApplicationsController : MainController<ApplyToJobCommand, Chang
         [FromQuery] string? status = null,
         [FromQuery] string? orderBy = null)
     {
-        var cacheKey = ApplicationCacheKeys.JobApplications.ByJob(jobId, page, size, status, orderBy);
-        var cachedData = await _cacheService.GetValueAsync<ListDataPagination<JobApplicationViewModel>>(cacheKey);
-        if (cachedData is not null) return Ok(cachedData);
-
         var result = await _mediator.Send(new GetJobApplicationsByJobIdQuery(jobId, page, size, status, orderBy));
-        await _cacheService.SetValueAsync(cacheKey, result, TimeSpan.FromMinutes(5));
         return Ok(result);
     }
 
@@ -112,7 +107,6 @@ public class JobApplicationsController : MainController<ApplyToJobCommand, Chang
     protected override async Task InvalidateCacheForEntity(long id = default)
     {
         await base.InvalidateCacheForEntity(id);
-        await _cacheService.RemoveByPatternAsync(ApplicationCacheKeys.JobApplications.MinePrefix);
-        await _cacheService.RemoveByPatternAsync(ApplicationCacheKeys.JobApplications.ByJobPrefix);
+        await _outputCache.InvalidateJobApplicationsAsync();
     }
 }

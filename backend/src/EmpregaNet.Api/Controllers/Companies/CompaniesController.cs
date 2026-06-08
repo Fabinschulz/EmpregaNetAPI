@@ -13,7 +13,7 @@ namespace EmpregaNet.Api.Controllers.Companies
     public class CompaniesController : MainController<CreateCompanyCommand, UpdateCompanyCommand, CompanyViewModel>
     {
 
-        public CompaniesController(IMemoryService cacheService) : base(cacheService)
+        public CompaniesController(IOutputCacheManager cacheService) : base(cacheService)
         {
         }
 

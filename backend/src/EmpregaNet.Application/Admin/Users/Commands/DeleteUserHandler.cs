@@ -1,6 +1,5 @@
 using EmpregaNet.Application.Auth;
 using EmpregaNet.Application.Common.Base;
-using EmpregaNet.Application.Common.Cache;
 using EmpregaNet.Application.Common.Exceptions;
 using EmpregaNet.Application.Interfaces;
 using EmpregaNet.Application.Users.ViewModel;
@@ -17,20 +16,20 @@ public sealed class DeleteUserHandler : IRequestHandler<DeleteCommand<UserViewMo
     private readonly UserManager<User> _userManager;
     private readonly IHttpCurrentUser _httpCurrentUser;
     private readonly IRefreshTokenService _refreshTokens;
-    private readonly IMemoryService _memoryService;
+    private readonly IOutputCacheManager _cache;
     private readonly ILogger<DeleteUserHandler> _logger;
 
     public DeleteUserHandler(
         UserManager<User> userManager,
         IHttpCurrentUser httpCurrentUser,
         IRefreshTokenService refreshTokens,
-        IMemoryService memoryService,
+        IOutputCacheManager cacheService,
         ILogger<DeleteUserHandler> logger)
     {
         _userManager = userManager;
         _httpCurrentUser = httpCurrentUser;
         _refreshTokens = refreshTokens;
-        _memoryService = memoryService;
+        _cache = cacheService;
         _logger = logger;
     }
 
@@ -77,9 +76,7 @@ public sealed class DeleteUserHandler : IRequestHandler<DeleteCommand<UserViewMo
 
         _logger.LogInformation("Usuário {UserId} marcado como excluído (soft delete).", request.Id);
 
-        _memoryService.Remove(ApplicationCacheKeys.Users.Me(user.Id));
-        await _memoryService.RemoveByPatternAsync(ApplicationCacheKeys.Users.AdminPrefix);
-        _memoryService.Remove(ApplicationCacheKeys.Candidates.GetById(user.Id));
+        await _cache.InvalidateAdminUsersAsync(user.Id, cancellationToken);
 
         return true;
     }

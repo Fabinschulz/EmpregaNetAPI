@@ -1,6 +1,5 @@
 using EmpregaNet.Application.Auth;
 using EmpregaNet.Application.Common.Base;
-using EmpregaNet.Application.Common.Cache;
 using EmpregaNet.Application.Common.Exceptions;
 using EmpregaNet.Application.Interfaces;
 using EmpregaNet.Application.Users.Identity;
@@ -25,7 +24,7 @@ public sealed class UpdateAdminUserHandler : IRequestHandler<UpdateCommand<Updat
     private readonly RoleManager<Role> _roleManager;
     private readonly IHttpCurrentUser _httpCurrentUser;
     private readonly IRefreshTokenService _refreshTokens;
-    private readonly IMemoryService _memoryService;
+    private readonly IOutputCacheManager _cache;
     private readonly ILogger<UpdateAdminUserHandler> _logger;
 
     public UpdateAdminUserHandler(
@@ -33,14 +32,14 @@ public sealed class UpdateAdminUserHandler : IRequestHandler<UpdateCommand<Updat
         RoleManager<Role> roleManager,
         IHttpCurrentUser httpCurrentUser,
         IRefreshTokenService refreshTokens,
-        IMemoryService memoryService,
+        IOutputCacheManager cacheService,
         ILogger<UpdateAdminUserHandler> logger)
     {
         _userManager = userManager;
         _roleManager = roleManager;
         _httpCurrentUser = httpCurrentUser;
         _refreshTokens = refreshTokens;
-        _memoryService = memoryService;
+        _cache = cacheService;
         _logger = logger;
     }
 
@@ -95,9 +94,7 @@ public sealed class UpdateAdminUserHandler : IRequestHandler<UpdateCommand<Updat
 
         _logger.LogInformation("Usuário {UserId} atualizado por administrador.", user.Id);
 
-        _memoryService.Remove(ApplicationCacheKeys.Users.Me(user.Id));
-        await _memoryService.RemoveByPatternAsync(ApplicationCacheKeys.Users.AdminPrefix);
-        _memoryService.Remove(ApplicationCacheKeys.Candidates.GetById(user.Id));
+        await _cache.InvalidateAdminUsersAsync(user.Id, cancellationToken);
 
         return user.ToViewModel();
     }

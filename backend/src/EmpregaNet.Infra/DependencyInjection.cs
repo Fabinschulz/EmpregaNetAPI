@@ -25,7 +25,6 @@ public static class DependencyInjection
         builder.SetupDatabaseConnection();
         builder.SetupInfrastructureServices();
         builder.RegisterAuthFlowServices();
-        // builder.AddElasticsearch();
     }
 
     private static void RegisterAuthFlowServices(this WebApplicationBuilder builder)
@@ -68,7 +67,6 @@ public static class DependencyInjection
     private static void SetupInfrastructureServices(this WebApplicationBuilder builder)
     {
         builder.UseRedisCache();
-        builder.UseMemoryService(opt => opt.KeyPrefix = "EmpregaNet_Cache_");
         builder.Services.AddHttpContextAccessor();
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddProblemDetails();

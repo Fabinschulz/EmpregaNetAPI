@@ -21,7 +21,7 @@ public sealed class InMemoryIdentityFixture : IDisposable
 {
     public ServiceProvider Services { get; }
     public Mock<IAccountEmailService> AccountEmail { get; } = new();
-    public Mock<IMemoryService> Memory { get; } = new();
+    public Mock<IOutputCacheManager> CacheManager { get; } = new();
     public Mock<IHttpCurrentUser> HttpUser { get; } = new();
     public Mock<IGoogleIdTokenValidator> Google { get; } = new();
 
@@ -63,9 +63,12 @@ public sealed class InMemoryIdentityFixture : IDisposable
             .Returns(Task.CompletedTask);
         services.AddSingleton(AccountEmail.Object);
 
-        Memory.Setup(x => x.Remove(It.IsAny<string>()));
-        Memory.Setup(x => x.RemoveByPatternAsync(It.IsAny<string>())).Returns(Task.CompletedTask);
-        services.AddSingleton(Memory.Object);
+        CacheManager.Setup(x => x.InvalidateUserMeAsync(It.IsAny<long>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
+        CacheManager.Setup(x => x.InvalidateAdminUsersAsync(It.IsAny<long>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
+        CacheManager.Setup(x => x.InvalidateCandidatesAsync(It.IsAny<long>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
+        CacheManager.Setup(x => x.InvalidateJobApplicationsAsync(It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
+        CacheManager.Setup(x => x.InvalidateEntityAsync(It.IsAny<string>(), It.IsAny<long>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
+        services.AddSingleton(CacheManager.Object);
         services.AddSingleton(HttpUser.Object);
         services.AddSingleton(Google.Object);
 
@@ -112,7 +115,7 @@ public sealed class InMemoryIdentityFixture : IDisposable
     public void ResetMocks()
     {
         AccountEmail.Invocations.Clear();
-        Memory.Invocations.Clear();
+        CacheManager.Invocations.Clear();
         Google.Reset();
     }
 

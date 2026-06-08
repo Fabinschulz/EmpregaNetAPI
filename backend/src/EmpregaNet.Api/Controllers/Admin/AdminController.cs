@@ -1,15 +1,15 @@
 using EmpregaNet.Api.Controllers.Core;
-using EmpregaNet.Application.Common.Base;
-using EmpregaNet.Application.Common.Cache;
 using EmpregaNet.Application.Admin.Users.Commands;
 using EmpregaNet.Application.Admin.Users.Queries;
+using EmpregaNet.Application.Common.Cache;
 using EmpregaNet.Application.Users.Queries;
 using EmpregaNet.Application.Users.ViewModel;
 using EmpregaNet.Application.Utils;
-using EmpregaNet.Domain.Common;
 using EmpregaNet.Domain.Interfaces;
+using EmpregaNet.Api.Configuration;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OutputCaching;
 
 namespace EmpregaNet.Api.Controllers.Admin;
 
@@ -26,11 +26,13 @@ public sealed record AdminUsersCreateNotSupportedCommand;
 [Authorize(Policy = Constants.AuthPolicies.Administrador)]
 public class AdminController : MainController<AdminUsersCreateNotSupportedCommand, UpdateAdminUserCommand, UserViewModel>
 {
-    public AdminController(IMemoryService cacheService) : base(cacheService)
+    public AdminController(IOutputCacheManager cacheService) : base(cacheService)
     {
     }
 
     /// <summary>Lista usuários. isDeleted omitido = todos; false = ativos; true = somente excluídos.</summary>
+    [HttpGet]
+    [OutputCache(PolicyName = OutputCachePolicies.AuthenticatedRead, Tags = [ApplicationCacheTags.AdminUsers])]
     public override async Task<IActionResult> GetAll(
         [FromQuery] int page = 1,
         [FromQuery] int size = 100,
@@ -39,25 +41,16 @@ public class AdminController : MainController<AdminUsersCreateNotSupportedComman
         [FromQuery] bool? isActive = null)
     {
         _ = isActive;
-
-        var cacheKey = ApplicationCacheKeys.Users.AdminList(page, size, orderBy, isDeleted);
-        var cached = await _cacheService.GetValueAsync<ListDataPagination<UserViewModel>>(cacheKey);
-        if (cached is not null) return Ok(cached);
-
         var result = await _mediator.Send(new GetAllUsersQuery(page, size, orderBy, isDeleted));
-        await _cacheService.SetValueAsync(cacheKey, result, TimeSpan.FromMinutes(5));
         return Ok(result);
     }
 
     /// <summary>Obtém o detalhe de um utilizador pelo identificador (visão administrativa).</summary>
+    [HttpGet("{id:long}")]
+    [OutputCache(PolicyName = OutputCachePolicies.AuthenticatedRead, Tags = [ApplicationCacheTags.AdminUsers])]
     public override async Task<IActionResult> GetById([FromRoute] long id)
     {
-        var cacheKey = ApplicationCacheKeys.Users.AdminById(id);
-        var cached = await _cacheService.GetValueAsync<UserViewModel>(cacheKey);
-        if (cached is not null) return Ok(cached);
-
         var result = await _mediator.Send(new GetUserByIdForAdminQuery(id));
-        await _cacheService.SetValueAsync(cacheKey, result, TimeSpan.FromMinutes(5));
         return Ok(result);
     }
 
@@ -67,13 +60,6 @@ public class AdminController : MainController<AdminUsersCreateNotSupportedComman
     public override Task<IActionResult> Create([FromBody] AdminUsersCreateNotSupportedCommand entity)
         => Task.FromResult<IActionResult>(StatusCode(StatusCodes.Status405MethodNotAllowed));
 
-    protected override async Task InvalidateCacheForEntity(long id = default)
-    {
-        await base.InvalidateCacheForEntity(id);
-        await _cacheService.RemoveByPatternAsync(ApplicationCacheKeys.Users.AdminPrefix);
-        if (id == default) return;
-
-        _cacheService.Remove(ApplicationCacheKeys.Users.Me(id));
-        _cacheService.Remove(ApplicationCacheKeys.Candidates.GetById(id));
-    }
+    protected override Task InvalidateCacheForEntity(long id = default)
+        => _outputCache.InvalidateAdminUsersAsync(id);
 }

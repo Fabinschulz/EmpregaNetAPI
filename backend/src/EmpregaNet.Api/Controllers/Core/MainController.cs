@@ -1,19 +1,17 @@
 using EmpregaNet.Domain.Common;
 using Microsoft.AspNetCore.Mvc;
 using EmpregaNet.Application.Common.Base;
-using EmpregaNet.Application.Common.Cache;
 using EmpregaNet.Domain.Interfaces;
+using EmpregaNet.Api.Configuration;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.OutputCaching;
 
 namespace EmpregaNet.Api.Controllers.Core
 {
     /// <summary>
-    /// Classe base para controladores com operações CRUD genéricas: leitura com cache, criação, atualização e exclusão com invalidação de cache.
+    /// Classe base para controladores com operações CRUD genéricas: leitura com Output Cache e invalidação coordenada em mutações.
     /// </summary>
-    /// <typeparam name="TCreateCommand"></typeparam>
-    /// <typeparam name="TUpdateCommand"></typeparam>
-    /// <typeparam name="TViewModel"></typeparam>
     [ApiController]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public abstract class MainController<TCreateCommand, TUpdateCommand, TViewModel> : ControllerBase
@@ -23,21 +21,20 @@ namespace EmpregaNet.Api.Controllers.Core
     {
         private IMediator _IMediator = null!;
         protected IMediator _mediator => _IMediator ?? HttpContext.RequestServices.GetRequiredService<IMediator>();
-        protected readonly IMemoryService _cacheService;
+        protected readonly IOutputCacheManager _outputCache;
         private readonly string _entityName;
 
-        protected MainController(IMemoryService cacheService)
+        protected MainController(IOutputCacheManager cacheService)
         {
-            _cacheService = cacheService;
+            _outputCache = cacheService;
             _entityName = typeof(TViewModel).Name;
-
         }
 
         /// <summary>
         /// Endpoint para obter todos os recursos de uma entidade com paginação e ordenação.
-        /// Utiliza cache para otimização de leitura.
         /// </summary>
         [HttpGet]
+        [OutputCache(PolicyName = OutputCachePolicies.EntityRead)]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ListDataPagination<object>))]
         [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(DomainError))]
         [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(DomainError))]
@@ -49,23 +46,15 @@ namespace EmpregaNet.Api.Controllers.Core
             [FromQuery] bool? isDeleted = null,
             [FromQuery] bool? isActive = null)
         {
-            var cacheKey = ApplicationCacheKeys.Entity.GetAll(_entityName, page, size, orderBy, isDeleted, isActive);
-            var cachedData = await _cacheService.GetValueAsync<ListDataPagination<TViewModel>>(cacheKey);
-
-            if (cachedData is not null) return Ok(cachedData);
-
             var result = await _mediator.Send(new GetAllQuery<TViewModel>(page, size, orderBy, isDeleted, isActive));
-            await _cacheService.SetValueAsync(cacheKey, result, TimeSpan.FromMinutes(5));
-
             return Ok(result);
         }
 
         /// <summary>
         /// Endpoint para obter um recurso específico pelo ID.
-        /// Utiliza cache para otimização de leitura.
         /// </summary>
-        /// <param name="id">O ID do recurso a ser obtido.</param>
         [HttpGet("{id:long}")]
+        [OutputCache(PolicyName = OutputCachePolicies.EntityRead)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(DomainError))]
         [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(DomainError))]
@@ -73,23 +62,13 @@ namespace EmpregaNet.Api.Controllers.Core
         [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(DomainError))]
         public virtual async Task<IActionResult> GetById([FromRoute] long id)
         {
-            var cacheKey = ApplicationCacheKeys.Entity.GetById(_entityName, id);
-            var cachedData = await _cacheService.GetValueAsync<TViewModel>(cacheKey);
-
-            if (cachedData is not null) return Ok(cachedData);
-
             var result = await _mediator.Send(new GetByIdQuery<TViewModel>(id));
-            await _cacheService.SetValueAsync(cacheKey, result, TimeSpan.FromMinutes(5));
-
             return Ok(result);
         }
 
         /// <summary>
         /// Endpoint para criar um novo recurso.
-        /// Invalida o cache após a criação.
         /// </summary>
-        /// <param name="entity">O objeto Command/ViewModel para criação.</param>
-        /// <returns>Retorna o ID do recurso criado.</returns>
         [HttpPost]
         [ProducesResponseType(typeof(string), StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(DomainError))]
@@ -108,10 +87,7 @@ namespace EmpregaNet.Api.Controllers.Core
 
         /// <summary>
         /// Endpoint para atualizar um recurso existente.
-        /// Invalida o cache após a atualização.
         /// </summary>
-        /// <param name="id">O ID do recurso a ser atualizado.</param>
-        /// <param name="entity">O objeto com os dados para atualização.</param>
         [HttpPut("{id:long}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(DomainError))]
@@ -127,9 +103,7 @@ namespace EmpregaNet.Api.Controllers.Core
 
         /// <summary>
         /// Endpoint para excluir um recurso.
-        /// Invalida o cache após a exclusão.
         /// </summary>
-        /// <param name="id">O ID do recurso a ser excluído.</param>
         [HttpDelete("{id:long}")]
         [ProducesResponseType(typeof(string), StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(DomainError))]
@@ -144,26 +118,9 @@ namespace EmpregaNet.Api.Controllers.Core
         }
 
         /// <summary>
-        /// Invalida as entradas de cache relacionadas à entidade.
-        /// Remove a entrada específica pelo ID e todas as entradas "GetAll".
+        /// Invalida Output Cache e entradas legadas relacionadas à entidade.
         /// </summary>
-        /// <param name="id">O ID opcional do recurso que teve seu cache invalidado.</param>
-        /// <returns>Um Task que indica a conclusão da operação.</returns>
-        protected virtual async Task InvalidateCacheForEntity(long id = default)
-        {
-            if (id != default)
-                await _cacheService.RemoveByPatternAsync(ApplicationCacheKeys.Entity.GetByIdPrefix(_entityName, id));
-
-            await InvalidateGetAllCache();
-        }
-
-        /// <summary>
-        /// Invalida todas as entradas de cache do GetAll para a entidade atual.
-        /// </summary>
-        /// <returns>Um Task que indica a conclusão da operação.</returns>
-        protected virtual Task InvalidateGetAllCache()
-        {
-            return _cacheService.RemoveByPatternAsync(ApplicationCacheKeys.Entity.GetAllPrefix(_entityName));
-        }
+        protected virtual Task InvalidateCacheForEntity(long id = default)
+            => _outputCache.InvalidateEntityAsync(_entityName, id);
     }
 }

@@ -23,7 +23,8 @@ Controllers na API devem espelhar o recurso e delegar ao MediatR.
 
 ## Cache HTTP (leituras)
 
-- Chaves e prefixos de invalidação ficam em `Common/Cache/ApplicationCacheKeys.cs` para a **Application** e a **API** usarem os mesmos literais (evita divergência entre `Users_List_` vs `Users_Admin_` e falha ao invalidar).
-- O `MainController` usa `ApplicationCacheKeys.Entity.*` para `GetAll` (inclui `isDeleted` / `isActive` na chave quando aplicável).
-- Recursos específicos: `Users` (me, admin), `Candidates`, `JobApplications` (listas por job / minhas).
-- Após mutação de usuário, invalida-se também o cache de **candidato** (`Candidates_GetById_{id}`) quando os dados exibidos nessa API podem mudar.
+- Respostas GET opt-in via `[OutputCache(PolicyName = ...)]`; política base `NoCache()` desabilita cache no restante da API.
+- Políticas nomeadas em `EmpregaNet.Api/Configuration/OutputCacheConfig.cs` e implementações em `Configuration/OutputCache/`.
+- Tags de invalidação em `Common/Cache/ApplicationCacheTags.cs`; mutações invalidam via `IOutputCacheManager`.
+- Leituras autenticadas genéricas usam `AuthenticatedRead` + `Tags` no atributo; entidades do `MainController` usam `EntityRead` (tags dinâmicas por ViewModel).
+- Redis opcional (`Redis:Enabled=true`) ativa store distribuído do Output Cache para scale-out.
