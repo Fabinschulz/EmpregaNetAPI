@@ -43,7 +43,7 @@ public sealed class CreateCompanyCommandValidatorTests
         var result = _sut.Validate(cmd);
 
         result.IsValid.Should().BeFalse();
-        result.Errors.Should().Contain(e => e.PropertyName == nameof(CreateCompanyCommand.Cnpj));
+        result.Errors.Should().Contain(e => e.PropertyName == CompanyTestData.EntityField(nameof(CreateCompanyCommand.Cnpj)));
     }
 
     [Fact]
@@ -55,7 +55,7 @@ public sealed class CreateCompanyCommandValidatorTests
         var result = _sut.Validate(cmd);
 
         result.IsValid.Should().BeFalse();
-        result.Errors.Should().Contain(e => e.PropertyName == nameof(CreateCompanyCommand.TypeOfActivity));
+        result.Errors.Should().Contain(e => e.PropertyName == CompanyTestData.EntityField(nameof(CreateCompanyCommand.TypeOfActivity)));
     }
 
     [Fact]
@@ -67,6 +67,6 @@ public sealed class CreateCompanyCommandValidatorTests
         var result = _sut.Validate(cmd);
 
         result.IsValid.Should().BeFalse();
-        result.Errors.Should().Contain(e => e.PropertyName == nameof(CreateCompanyCommand.Phone));
+        result.Errors.Should().Contain(e => e.PropertyName == CompanyTestData.EntityField(nameof(CreateCompanyCommand.Phone)));
     }
 }

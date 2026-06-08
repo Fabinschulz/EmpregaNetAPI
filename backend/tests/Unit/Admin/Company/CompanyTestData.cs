@@ -6,6 +6,9 @@ namespace EmpregaNet.Tests.Unit.Application.Admin.CompanyHandlers;
 
 internal static class CompanyTestData
 {
+    internal const string EntityPrefix = "entity";
+
+    internal static string EntityField(string propertyName) => $"{EntityPrefix}.{propertyName}";
     internal static Address ValidAddress() =>
         new()
         {

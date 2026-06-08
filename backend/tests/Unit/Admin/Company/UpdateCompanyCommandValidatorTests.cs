@@ -52,6 +52,6 @@ public sealed class UpdateCompanyCommandValidatorTests
         var result = _sut.Validate(cmd);
 
         result.IsValid.Should().BeFalse();
-        result.Errors.Should().Contain(e => e.PropertyName == nameof(UpdateCompanyCommand.CompanyName));
+        result.Errors.Should().Contain(e => e.PropertyName == CompanyTestData.EntityField(nameof(UpdateCompanyCommand.CompanyName)));
     }
 }
