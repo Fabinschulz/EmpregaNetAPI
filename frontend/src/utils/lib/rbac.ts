@@ -7,6 +7,7 @@ const PUBLIC_PATH_PREFIXES = [
   '/confirm-email',
   '/reset-password',
   '/resend-confirmation',
+  '/nao-autorizado',
   '/vagas'
 ] as const;
 
@@ -26,6 +27,7 @@ export function isAdmin(userRoles: readonly string[] | null | undefined): boolea
 export function isRecruitmentStaff(userRoles: readonly string[] | null | undefined): boolean {
   return hasRole(userRoles, 'Admin') || hasRole(userRoles, 'Recruiter') || hasRole(userRoles, 'Manager');
 }
+
 
 export function canAccessPath(pathname: string, roles: readonly string[] | null | undefined): boolean {
   if (isPublicPath(pathname)) return true;

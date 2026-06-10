@@ -26,11 +26,8 @@ export function ResetPassword() {
     [linkValid, token, userId]
   );
 
-  const { apiError, mutateAsync, successMessage } = useResetPasswordMutation();
-  const handleSubmit = async (formValue: ResetPasswordFormValues) => {
-    await mutateAsync(formValue);
-    window.history.replaceState(null, '', '/reset-password');
-  };
+  const { apiError, mutateAsync, successMessage, isPending } = useResetPasswordMutation();
+  const handleSubmit = async (formValue: ResetPasswordFormValues) => await mutateAsync(formValue);
 
   return (
     <AuthPage
@@ -44,12 +41,12 @@ export function ResetPassword() {
         </>
       }
     >
-      {!linkValid ? (
+      {!linkValid && !successMessage && !isPending ? (
         <Alert variant="destructive" title="Link inválido">
           O link de redefinição está incompleto ou expirou. Solicite um novo em{' '}
           <AuthNavLink href="/forgot-password">recuperar senha</AuthNavLink>.
         </Alert>
-      ) : defaultValues ? (
+      ) : linkValid && defaultValues && !successMessage ? (
         <FormProvider
           key={`${userId}-${token}`}
           validationSchema={resetPasswordFormSchema}

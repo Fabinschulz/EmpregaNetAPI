@@ -2,6 +2,7 @@
 
 import { FormProvider } from '@/context';
 import { useLoginMutation, useLoginWithGoogleMutation } from '@/services';
+import { useEffect, useRef } from 'react';
 import {
   AuthDivider,
   AuthFooterPrompt,
@@ -16,8 +17,16 @@ import type { LoginDto } from './login-schema';
 import { loginDefaultValues, loginSchema } from './login-schema';
 
 export function Login() {
-  const { apiError, mutateAsync, isPending } = useLoginMutation();
+  const { apiError, mutateAsync, isPending, resetFeedback } = useLoginMutation();
   const googleMutation = useLoginWithGoogleMutation();
+
+  const clearedStaleFeedbackRef = useRef(false);
+  useEffect(() => {
+    if (clearedStaleFeedbackRef.current) return;
+    clearedStaleFeedbackRef.current = true;
+    resetFeedback();
+    googleMutation.resetFeedback();
+  }, [resetFeedback, googleMutation.resetFeedback]);
 
   const handleSubmit = async (formValue: LoginDto) => await mutateAsync(formValue);
   const handleGoogleCredential = (idToken: string) => {

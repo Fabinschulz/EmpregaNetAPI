@@ -34,7 +34,7 @@ public class UsersController : ControllerBase
     public async Task<IActionResult> Register([FromBody] RegisterUserCommand command)
     {
         var id = await Mediator.Send(command);
-        return Created($"api/users/{id}", $"Usuário criado com sucesso. ID: {id}. Confirme o e-mail para poder iniciar sessão.");
+        return Created($"api/users/{id}", "Enviámos um e-mail de confirmação para o endereço indicado. Confirme o seu e-mail para ativar a conta.");
     }
 
     /// <summary>Autentica um usuário e retorna um token JWT para acesso aos recursos protegidos.</summary>

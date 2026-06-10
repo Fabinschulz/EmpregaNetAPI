@@ -1,10 +1,10 @@
 'use client';
 
 import { useAuth } from '@/context';
-import { reportMutationApiError, startRouterTransition, toastSuccess } from '@/utils';
+import { reportMutationApiError, resolvePostLoginPath, startRouterTransition, toastSuccess } from '@/utils';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { queryKeys } from '../query-keys';
 import { requireAuthToken } from '../shared';
 import {
@@ -33,17 +33,31 @@ function useAuthSessionMutation(actionLabel: string, resource: string) {
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const router = useRouter();
 
+  const resetFeedback = useCallback(() => {
+    setApiError(null);
+    setSuccessMessage(null);
+  }, []);
+
   return {
     setLoggedUser,
     apiError,
     setApiError,
     successMessage,
     setSuccessMessage,
+    resetFeedback,
     router,
+    onMutate: () => {
+      setApiError(null);
+      setSuccessMessage(null);
+    },
     onAuthSuccess: (res: Parameters<typeof setLoggedUser>[0]) => {
+      setApiError(null);
+      setSuccessMessage(null);
       setLoggedUser(res);
       toastSuccess('Sessão iniciada com sucesso', 'Bem-vindo à EmpregaUAI.');
-      startRouterTransition(() => router.push('/dashboard'));
+
+      const params = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
+      startRouterTransition(() => router.replace(resolvePostLoginPath(params)));
     },
     onAuthError: (err: unknown) => {
       setSuccessMessage(null);
@@ -67,11 +81,12 @@ export function useLoginMutation() {
 
   const ctx = useMutation({
     mutationFn: (formValue: LoginDto) => login(formValue),
+    onMutate: auth.onMutate,
     onSuccess: auth.onAuthSuccess,
     onError: auth.onAuthError
   });
 
-  return { ...ctx, apiError: auth.apiError, successMessage: auth.successMessage };
+  return { ...ctx, apiError: auth.apiError, successMessage: auth.successMessage, resetFeedback: auth.resetFeedback };
 }
 
 export function useLoginWithGoogleMutation() {
@@ -79,11 +94,12 @@ export function useLoginWithGoogleMutation() {
 
   const ctx = useMutation({
     mutationFn: (formValue: LoginWithGoogleDto) => loginWithGoogle(formValue),
+    onMutate: auth.onMutate,
     onSuccess: auth.onAuthSuccess,
     onError: auth.onAuthError
   });
 
-  return { ...ctx, apiError: auth.apiError };
+  return { ...ctx, apiError: auth.apiError, resetFeedback: auth.resetFeedback };
 }
 
 export function useRegisterMutation() {

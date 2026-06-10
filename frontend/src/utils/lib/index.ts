@@ -3,6 +3,7 @@ export * from './env';
 export * from './format-app-error';
 export * from './query-client';
 export * from './rbac';
+export * from './route-access-policy';
 export * from './router-transition';
 export * from './toast';
 export * from './utils';

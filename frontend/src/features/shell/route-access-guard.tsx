@@ -1,7 +1,12 @@
 'use client';
 
 import { useAuth } from '@/context';
-import { canAccessPath } from '@/utils/lib/rbac';
+import { AuthSessionChecking } from '@/features/auth/shared';
+import {
+    buildForbiddenRedirectPath,
+    buildLoginRedirectPath,
+    evaluateRouteAccess
+} from '@/utils';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, type ReactNode } from 'react';
 
@@ -10,42 +15,29 @@ type RouteAccessGuardProps = {
 };
 
 export function RouteAccessGuard({ children }: RouteAccessGuardProps) {
-  const { token, roles, hydrated, logout } = useAuth();
+  const { token, roles, hydrated } = useAuth();
   const pathname = usePathname();
   const router = useRouter();
+
+  const session = { token, roles };
+  const decision = evaluateRouteAccess(pathname, session);
 
   useEffect(() => {
     if (!hydrated) return;
 
-    if (!token) {
-      router.replace(`/login?next=${encodeURIComponent(pathname)}`);
+    if (decision === 'login') {
+      router.replace(buildLoginRedirectPath(pathname));
       return;
     }
 
-    if (!canAccessPath(pathname, roles)) {
-      router.replace('/dashboard');
+    if (decision === 'forbidden') {
+      router.replace(buildForbiddenRedirectPath(pathname));
     }
-  }, [hydrated, token, roles, pathname, router, logout]);
+  }, [hydrated, decision, pathname, router]);
 
-  if (!hydrated) {
-    return (
-      <div
-        style={{
-          minHeight: '40vh',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          color: 'var(--muted)'
-        }}
-      >
-        A verificar sessão…
-      </div>
-    );
-  }
-
-  if (!token || !canAccessPath(pathname, roles)) {
-    return null;
-  }
+  if (!hydrated) return <AuthSessionChecking />;
+  if (decision !== 'allow')return null;
+  
 
   return <>{children}</>;
 }

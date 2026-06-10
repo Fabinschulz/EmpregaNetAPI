@@ -126,7 +126,7 @@ function buildSession(token: string, refreshToken?: string | null): Session {
 export function saveSessionClient(params: { token: string; refreshToken?: string | null }) {
   const token = normalizeBearer(params.token);
   writeStoredSession({ token, refreshToken: params.refreshToken ?? null });
-  setClientCookie(AUTH_COOKIE, token);
+  setClientCookie(AUTH_COOKIE, stripBearer(token));
   if (params.refreshToken) setClientCookie(REFRESH_COOKIE, params.refreshToken, { maxAgeSeconds: 60 * 60 * 24 * 14 });
 }
 

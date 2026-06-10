@@ -42,12 +42,12 @@ export function ConfirmEmail() {
         </>
       }
     >
-      {!payload ? (
+      {!payload && !successMessage && !isPending ? (
         <Alert variant="destructive" title="Link inválido">
           O link de confirmação está incompleto. Peça um novo em{' '}
           <AuthNavLink href="/resend-confirmation">reenviar confirmação</AuthNavLink>.
         </Alert>
-      ) : isPending && !successMessage && !apiError ? (
+      ) : payload && isPending && !successMessage && !apiError ? (
         <p role="status" style={{ margin: 0, color: 'var(--muted)', textAlign: 'center' }}>
           A confirmar o seu e-mail…
         </p>

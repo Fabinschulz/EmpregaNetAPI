@@ -1,7 +1,12 @@
 // https://nextjs.org/docs/app/api-reference/file-conventions/proxy
 
 import { readSessionFromCookieHeader } from '@/services';
-import { canAccessPath, isPublicPath } from '@/utils';
+import {
+  buildForbiddenRedirectPath,
+  evaluateRouteAccess,
+  LOGIN_PATH,
+  type RouteAccessDecision
+} from '@/utils';
 import { NextResponse, type NextRequest } from 'next/server';
 
 const defaultOrigins = ['http://localhost:3000', 'https://localhost:3000', 'http://localhost:8081', 'http://localhost:5225'];
@@ -18,6 +23,21 @@ const corsOptions = {
   'Access-Control-Allow-Credentials': 'true'
 };
 
+function routeAccessRedirect(req: NextRequest, pathname: string, decision: RouteAccessDecision): NextResponse | null {
+  if (decision === 'allow') return null;
+
+  const url = req.nextUrl.clone();
+  url.search = '';
+
+  if (decision === 'login') {
+    url.pathname = LOGIN_PATH;
+    url.searchParams.set('redirect', pathname);
+    return NextResponse.redirect(url);
+  }
+
+  return NextResponse.redirect(new URL(buildForbiddenRedirectPath(pathname), req.url));
+}
+
 export function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;
   const allowedOrigins = getAllowedOrigins();
@@ -33,21 +53,13 @@ export function proxy(req: NextRequest) {
     return NextResponse.json({}, { headers: preflightHeaders });
   }
 
-  if (!isPublicPath(pathname)) {
-    const session = readSessionFromCookieHeader(req.headers.get('cookie'));
-    if (!session?.token) {
-      const url = req.nextUrl.clone();
-      url.pathname = '/login';
-      url.searchParams.set('next', pathname);
-      return NextResponse.redirect(url);
-    }
-
-    if (!canAccessPath(pathname, session.roles)) {
-      const url = req.nextUrl.clone();
-      url.pathname = '/dashboard';
-      return NextResponse.redirect(url);
-    }
-  }
+  const session = readSessionFromCookieHeader(req.headers.get('cookie'));
+  const accessDecision = evaluateRouteAccess(pathname, {
+    token: session?.token ?? null,
+    roles: session?.roles ?? []
+  });
+  const redirect = routeAccessRedirect(req, pathname, accessDecision);
+  if (redirect) return redirect;
 
   const response = NextResponse.next();
   if (isAllowedOrigin) {
