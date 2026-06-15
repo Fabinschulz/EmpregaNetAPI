@@ -80,7 +80,10 @@ export function GoogleSignInButton({ onCredential, disabled }: GoogleSignInButto
   const googleButtonTheme = themeMounted && resolvedTheme === 'light' ? 'outline' : 'filled_black';
 
   const onCredentialRef = useRef(onCredential);
-  onCredentialRef.current = onCredential;
+
+  useEffect(() => {
+    onCredentialRef.current = onCredential;
+  }, [onCredential]);
 
   useEffect(() => {
     const root = rootRef.current;

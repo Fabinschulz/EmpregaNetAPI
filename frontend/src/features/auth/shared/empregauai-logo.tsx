@@ -40,19 +40,9 @@ export function EmpregaUaiLogo({ className, size = 40 }: EmpregaUaiLogoProps) {
           strokeLinecap="round"
           strokeLinejoin="round"
         />
-        <path
-          d="M5 12h14"
-          stroke="currentColor"
-          strokeWidth="1.75"
-          strokeLinecap="round"
-        />
+        <path d="M5 12h14" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" />
         <circle cx="17.5" cy="6.5" r="2.25" fill="currentColor" />
-        <path
-          d="M17.5 4.8v3.4M15.8 6.5h3.4"
-          stroke="var(--brand)"
-          strokeWidth="0.9"
-          strokeLinecap="round"
-        />
+        <path d="M17.5 4.8v3.4M15.8 6.5h3.4" stroke="var(--brand)" strokeWidth="0.9" strokeLinecap="round" />
       </svg>
     </span>
   );

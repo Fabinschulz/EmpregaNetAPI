@@ -3,7 +3,7 @@
 import { Label } from '@/components';
 import { useFormContext } from '@/context';
 import type React from 'react';
-import { cn, getFieldErrorMessage } from 'src/utils';
+import { cn, getFieldErrorMessage } from '@/utils';
 import styles from './textarea.module.scss';
 
 export type TextareaFieldProps = Omit<React.ComponentProps<'textarea'>, 'className'> & {

@@ -55,19 +55,14 @@ export function ErrorFallback({
   const ActionIcon = Icon ?? defaults.Icon;
   const StatusIcon = STATUS_ICON[variant];
   const showServiceBanner = variant === 'service' && serviceName != null && serviceName.length > 0;
-  
+
   const showDiagnostics = process.env.NODE_ENV === 'development';
   const hasDetails = showDiagnostics && Boolean(details?.trim());
   const hasDiagnostic = showDiagnostics && Boolean(diagnostic?.trim());
   const isDestructiveVariant = variant === 'error' || variant === 'service';
 
   return (
-    <Card
-      className={styles.root}
-      data-variant={variant}
-      role={defaults.role}
-      aria-labelledby="error-fallback-title"
-    >
+    <Card className={styles.root} data-variant={variant} role={defaults.role} aria-labelledby="error-fallback-title">
       <CardHeader className={styles.header}>
         <div className={styles.iconBadge} aria-hidden>
           <StatusIcon className={styles.icon} />
@@ -80,16 +75,12 @@ export function ErrorFallback({
           </p>
         ) : null}
 
-       {title && (
-         <CardTitle id="error-fallback-title" className={styles.title}>
-           {title}
-         </CardTitle>
-       )}
-       {description && (
-         <CardDescription className={styles.description}>
-           {description}
-         </CardDescription>
-       )}
+        {title && (
+          <CardTitle id="error-fallback-title" className={styles.title}>
+            {title}
+          </CardTitle>
+        )}
+        {description && <CardDescription className={styles.description}>{description}</CardDescription>}
       </CardHeader>
 
       <CardContent className={styles.content}>

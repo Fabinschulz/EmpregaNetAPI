@@ -110,8 +110,7 @@ export function useRegisterMutation() {
     mutationFn: (formValue: RegisterDto) => register(formValue),
     onSuccess: (res) => {
       setApiError(null);
-      const message =
-        typeof res === 'string' ? res : 'Conta criada. Confirme o e-mail antes de iniciar sessão.';
+      const message = typeof res === 'string' ? res : 'Conta criada. Confirme o e-mail antes de iniciar sessão.';
       setSuccessMessage(message);
       toastSuccess('Registo concluído', message);
     },

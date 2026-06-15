@@ -1,4 +1,4 @@
-export * from '../utils';
+export * from '../shared/utils';
 export * from './admin';
 export * from './axios';
 export * from './candidates';

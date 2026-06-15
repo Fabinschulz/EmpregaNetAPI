@@ -2,11 +2,7 @@
 
 import { useAuth } from '@/context';
 import { AuthSessionChecking } from '@/features/auth/shared';
-import {
-    buildForbiddenRedirectPath,
-    buildLoginRedirectPath,
-    evaluateRouteAccess
-} from '@/utils';
+import { buildForbiddenRedirectPath, buildLoginRedirectPath, evaluateRouteAccess } from '@/utils';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, type ReactNode } from 'react';
 
@@ -36,8 +32,7 @@ export function RouteAccessGuard({ children }: RouteAccessGuardProps) {
   }, [hydrated, decision, pathname, router]);
 
   if (!hydrated) return <AuthSessionChecking />;
-  if (decision !== 'allow')return null;
-  
+  if (decision !== 'allow') return null;
 
   return <>{children}</>;
 }

@@ -2,12 +2,7 @@
 
 import { Alert, Button } from '@/components';
 import { useAuth } from '@/context';
-import {
-    AuthFooterPrompt,
-    AuthFormActions,
-    AuthNavLink,
-    AuthPage
-} from '@/features/auth/shared';
+import { AuthFooterPrompt, AuthFormActions, AuthNavLink, AuthPage } from '@/features/auth/shared';
 import { DEFAULT_POST_LOGIN_PATH, isSafeInternalPath, startRouterTransition } from '@/utils';
 import { LayoutDashboard } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';

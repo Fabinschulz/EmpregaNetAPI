@@ -3,7 +3,7 @@
 import { Label } from '@/components';
 import { useFormContext } from '@/context';
 import type React from 'react';
-import { cn, getFieldErrorMessage } from 'src/utils';
+import { cn, getFieldErrorMessage } from '@/utils';
 import styles from './input.module.scss';
 
 export type InputFieldProps = Omit<React.ComponentProps<'input'>, 'className'> & {

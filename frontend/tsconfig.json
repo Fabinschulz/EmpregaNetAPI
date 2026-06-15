@@ -20,6 +20,16 @@
     ],
     "paths": {
       "*": ["./*"],
+      "@/components": ["./src/shared/components"],
+      "@/components/*": ["./src/shared/components/*"],
+      "@/context": ["./src/shared/context"],
+      "@/context/*": ["./src/shared/context/*"],
+      "@/hooks": ["./src/shared/hooks"],
+      "@/hooks/*": ["./src/shared/hooks/*"],
+      "@/utils": ["./src/shared/utils"],
+      "@/utils/*": ["./src/shared/utils/*"],
+      "@/shared": ["./src/shared"],
+      "@/shared/*": ["./src/shared/*"],
       "@/*": ["./src/*"]
     }
   },

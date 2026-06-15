@@ -37,17 +37,8 @@ export function Sidebar({
       suppressHydrationWarning
     >
       <SidebarHeader onNavigate={onNavigate} onCloseMobile={onCloseMobile} />
-      <SidebarNav
-        groups={groups}
-        collapsed={collapsed}
-        transitioning={railTransitioning}
-        onNavigate={onNavigate}
-      />
-      <SidebarFooter
-        collapsed={collapsed}
-        onToggleCollapsed={onToggleCollapsed}
-        onLogout={onLogout}
-      />
+      <SidebarNav groups={groups} collapsed={collapsed} transitioning={railTransitioning} onNavigate={onNavigate} />
+      <SidebarFooter collapsed={collapsed} onToggleCollapsed={onToggleCollapsed} onLogout={onLogout} />
     </aside>
   );
 }

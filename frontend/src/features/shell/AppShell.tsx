@@ -20,8 +20,16 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const themeMounted = useHasMounted();
 
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [prevPathname, setPrevPathname] = useState(pathname);
   const [railCollapsed, setRailCollapsed] = useState(false);
   const [railTransitioning, setRailTransitioning] = useState(false);
+
+  if (pathname !== prevPathname) {
+    setPrevPathname(pathname);
+    if (mobileOpen) {
+      setMobileOpen(false);
+    }
+  }
 
   const displayName = username?.trim() || email?.trim() || 'Usuário';
   const navGroups = useAppShellNavigation(roles);
@@ -37,10 +45,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     setRailTransitioning(true);
     setRailCollapsed((value) => !value);
   }, []);
-
-  useEffect(() => {
-    closeMobile();
-  }, [pathname, closeMobile]);
 
   useEffect(() => {
     if (!railTransitioning) return;

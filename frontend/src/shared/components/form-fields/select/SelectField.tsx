@@ -14,7 +14,7 @@ import {
 } from '@/components';
 import { useFormContext } from '@/context';
 import type React from 'react';
-import { cn, getFieldErrorMessage, truncateText } from 'src/utils';
+import { cn, getFieldErrorMessage, truncateText } from '@/utils';
 import styles from './select.module.scss';
 
 export interface SelectOption {

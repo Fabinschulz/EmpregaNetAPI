@@ -18,7 +18,7 @@ import {
 import { useFormContext } from '@/context';
 import { ChevronDown, X } from 'lucide-react';
 import * as React from 'react';
-import { cn, getFieldErrorMessage, truncateText } from 'src/utils';
+import { cn, getFieldErrorMessage, truncateText } from '@/utils';
 import styles from './multi-select.module.scss';
 
 export interface MultiSelectOption {
@@ -86,7 +86,7 @@ export const MultiSelectField: React.FC<MultiSelectFieldProps> = ({
   );
 
   return (
-    <div className={cn(styles.field, className)}>
+    <div className={cn(styles.field, className)} aria-invalid={!!errorsMessage}>
       {labelText ? <span className={styles.label}>{labelText}</span> : null}
 
       <TooltipProvider delayDuration={200}>
@@ -99,7 +99,6 @@ export const MultiSelectField: React.FC<MultiSelectFieldProps> = ({
               className={styles.trigger}
               aria-expanded={open}
               aria-haspopup="listbox"
-              aria-invalid={!!errorsMessage}
             >
               {selectedValues.length > 0 ? (
                 <div className={styles.badges}>

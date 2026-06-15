@@ -40,10 +40,10 @@
 
 :global(html[data-theme='light']) {
   .greeting {
-     color: var(--text);
+    color: var(--text);
   }
   .accent {
-     color: var(--muted);
+    color: var(--muted);
   }
 }
 

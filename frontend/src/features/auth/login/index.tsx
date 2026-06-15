@@ -19,14 +19,15 @@ import { loginDefaultValues, loginSchema } from './login-schema';
 export function Login() {
   const { apiError, mutateAsync, isPending, resetFeedback } = useLoginMutation();
   const googleMutation = useLoginWithGoogleMutation();
+  const { resetFeedback: resetGoogleFeedback } = googleMutation;
 
   const clearedStaleFeedbackRef = useRef(false);
   useEffect(() => {
     if (clearedStaleFeedbackRef.current) return;
     clearedStaleFeedbackRef.current = true;
     resetFeedback();
-    googleMutation.resetFeedback();
-  }, [resetFeedback, googleMutation.resetFeedback]);
+    resetGoogleFeedback();
+  }, [resetFeedback, resetGoogleFeedback]);
 
   const handleSubmit = async (formValue: LoginDto) => await mutateAsync(formValue);
   const handleGoogleCredential = (idToken: string) => {

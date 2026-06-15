@@ -13,8 +13,8 @@ type MainLayoutProps = {
  */
 export function MainLayout({ children }: MainLayoutProps) {
   return (
-      <RouteAccessGuard>
-        <AppShell>{children}</AppShell>
-      </RouteAccessGuard>
+    <RouteAccessGuard>
+      <AppShell>{children}</AppShell>
+    </RouteAccessGuard>
   );
 }

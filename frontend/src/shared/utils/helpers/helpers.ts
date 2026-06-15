@@ -23,12 +23,15 @@ function _getObjectPropertyValue(path: string, obj: unknown): unknown {
 export const truncateText = (text: string, maxLength = 50) =>
   text?.length > maxLength ? `${text.substring(0, maxLength)}...` : text;
 
-export function extractAndConvertFiles(data: any) {
+type DocumentWithFile = {
+  file: File;
+};
+
+export function extractAndConvertFiles(data: { documents?: DocumentWithFile[] } | null | undefined) {
   const allFiles: File[] = [];
 
-  data?.documents!?.forEach((item: any) => {
-    const file = item.file as File;
-    allFiles.push(file);
+  data?.documents?.forEach((item) => {
+    allFiles.push(item.file);
   });
 
   const convertBase64 = (file: File) => {

@@ -13,7 +13,7 @@ import {
 import { useFormContext } from '@/context';
 import { Check, ChevronDown } from 'lucide-react';
 import * as React from 'react';
-import { cn, getFieldErrorMessage } from 'src/utils';
+import { cn, getFieldErrorMessage } from '@/utils';
 import styles from './autocomplete.module.scss';
 
 export interface AutocompleteOption {
@@ -53,7 +53,7 @@ export const AutocompleteField: React.FC<AutocompleteFieldProps> = ({
   };
 
   return (
-    <div className={cn(styles.field, className)}>
+    <div className={cn(styles.field, className)} aria-invalid={!!error}>
       {labelText ? <span className={styles.label}>{labelText}</span> : null}
 
       <Popover open={open} onOpenChange={setOpen}>
@@ -64,7 +64,6 @@ export const AutocompleteField: React.FC<AutocompleteFieldProps> = ({
             className={styles.trigger}
             aria-expanded={open}
             aria-haspopup="listbox"
-            aria-invalid={!!error}
           >
             <span className={cn(!selectedOption && styles.triggerMuted)}>{selectedOption?.label ?? placeholder}</span>
             <ChevronDown className={styles.chevron} size={16} aria-hidden />

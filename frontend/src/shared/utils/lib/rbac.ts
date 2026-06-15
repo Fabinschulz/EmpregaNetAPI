@@ -28,7 +28,6 @@ export function isRecruitmentStaff(userRoles: readonly string[] | null | undefin
   return hasRole(userRoles, 'Admin') || hasRole(userRoles, 'Recruiter') || hasRole(userRoles, 'Manager');
 }
 
-
 export function canAccessPath(pathname: string, roles: readonly string[] | null | undefined): boolean {
   if (isPublicPath(pathname)) return true;
   if (pathname.startsWith('/recrutamento')) return isRecruitmentStaff(roles);

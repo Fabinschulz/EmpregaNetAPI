@@ -1,20 +1,23 @@
 // https://nextjs.org/docs/app/api-reference/file-conventions/proxy
 
 import { readSessionFromCookieHeader } from '@/services';
-import {
-  buildForbiddenRedirectPath,
-  evaluateRouteAccess,
-  LOGIN_PATH,
-  type RouteAccessDecision
-} from '@/utils';
+import { buildForbiddenRedirectPath, evaluateRouteAccess, LOGIN_PATH, type RouteAccessDecision } from '@/utils';
 import { NextResponse, type NextRequest } from 'next/server';
 
-const defaultOrigins = ['http://localhost:3000', 'https://localhost:3000', 'http://localhost:8081', 'http://localhost:5225'];
+const defaultOrigins = [
+  'http://localhost:3000',
+  'https://localhost:3000',
+  'http://localhost:8081',
+  'http://localhost:5225'
+];
 
 function getAllowedOrigins(): string[] {
   const fromEnv = process.env.NEXT_PUBLIC_ALLOWED_ORIGINS;
   if (!fromEnv?.trim()) return defaultOrigins;
-  return fromEnv.split(',').map((o) => o.trim()).filter(Boolean);
+  return fromEnv
+    .split(',')
+    .map((o) => o.trim())
+    .filter(Boolean);
 }
 
 const corsOptions = {

@@ -5,12 +5,12 @@ import { refreshToken } from '@/services';
 import { registerAxiosAuthHandlers } from '@/services/axios/axios-auth';
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import {
-    clearSessionClient,
-    decodeRolesFromJwt,
-    normalizeBearer,
-    readRefreshTokenFromBrowser,
-    readSessionFromBrowser,
-    saveSessionClient
+  clearSessionClient,
+  decodeRolesFromJwt,
+  normalizeBearer,
+  readRefreshTokenFromBrowser,
+  readSessionFromBrowser,
+  saveSessionClient
 } from 'src/services/users/session';
 
 type AuthState = {
