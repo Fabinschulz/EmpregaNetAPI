@@ -21,6 +21,7 @@ namespace EmpregaNet.Api.Middleware
             CancellationToken cancellationToken)
         {
             var correlationId = httpContext.Items["Correlation-ID"]?.ToString() ?? Guid.NewGuid().ToString();
+            exception = ResolveHandleableException(exception);
             var (domainError, httpStatusCode) = MapExceptionToDomainError(exception, correlationId);
 
             _logger.LogError(exception, "Erro ao processar a requisição: {Message}. CorrelationId: {CorrelationId}", exception.Message, correlationId);
@@ -55,6 +56,31 @@ namespace EmpregaNet.Api.Middleware
 
             return true;
         }
+    
+        private Exception ResolveHandleableException(Exception exception)
+        {
+            var current = exception;
+
+            while (current is not null)
+            {
+                if (current is BadRequestException
+                    or NotFoundException
+                    or InvalidOperationException
+                    or KeyNotFoundException
+                    or UnauthorizedAccessException
+                    or DatabaseNotFoundException
+                    or ValidationAppException
+                    or ForbiddenAccessException
+                    or NotSupportedException)
+                {
+                    return current;
+                }
+
+                current = current.InnerException;
+            }
+
+            return exception;
+        }
 
 
         /// <summary>
@@ -70,11 +96,6 @@ namespace EmpregaNet.Api.Middleware
             object details = new { };
             string[] errors = Array.Empty<string>();
             var statusCode = (int)HttpStatusCode.InternalServerError;
-
-            if (exception.InnerException != null)
-            {
-                exception = exception.InnerException;
-            }
 
             var isDevelopment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development";
 
