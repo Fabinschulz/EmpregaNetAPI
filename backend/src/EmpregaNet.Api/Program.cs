@@ -8,7 +8,7 @@ using EmpregaNet.Infra.Persistence.Seeds;
 var builder = WebApplication.CreateBuilder(args);
 
 var builderServices = builder.Services;
-builderServices.AddMediator();
+builderServices.AddMediator("EmpregaNet");
 builderServices.AddExceptionHandler<GlobalExceptionHandler>();
 
 // Register dependencies

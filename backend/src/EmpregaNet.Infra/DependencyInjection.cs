@@ -77,8 +77,8 @@ public static class DependencyInjection
 
     private static void SetupDependencyInjection(this IServiceCollection services)
     {
-        // Adiciona o comportamento de validação antes da execução de qualquer Handler.
-        // Ele intercepta a requisição, executa as validações necessárias e, se falhar, evita que o Handler seja executado.
+        // Behaviors executam na ordem de registro: o primeiro registrado é o mais externo (executa antes dos demais).
+        // Ordem atual: Validation → Transaction → Handler
         services.AddScoped(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
         services.AddScoped(typeof(IPipelineBehavior<,>), typeof(TransactionBehavior<,>));
         // services.AddScoped(typeof(IPipelineBehavior<,>), typeof(PerformanceBehaviour<,>));
