@@ -59,8 +59,9 @@ public static class RateLimiterExtensions
 
     /// <summary>
     /// Chave de partição do rate limiter = IP do cliente.
-    /// Nota: atrás de proxy reverso, configure ForwardedHeaders com KnownProxies para obter o IP real
-    /// sem permitir spoofing via X-Forwarded-For.
+    /// Nota: atrás de proxy reverso, preencha a seção "ForwardedHeaders" do appsettings
+    /// (KnownProxies/KnownNetworks) para o middleware restaurar o IP real sem permitir
+    /// spoofing via X-Forwarded-For —> ver ForwardedHeadersConfig na API.
     /// </summary>
     private static string GetClientPartitionKey(HttpContext httpContext) =>
         httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";

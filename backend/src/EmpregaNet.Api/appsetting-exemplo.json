@@ -6,7 +6,6 @@
       "Microsoft.EntityFrameworkCore": "Warning"
     }
   },
-  "AllowedHosts": "*",
   "ConnectionStrings": {
     "PostgreSQLConnection": "Host=localhost;Port=5432;Database=nome_do_banco;Username=nome_do_usuario;Password=senha_do_usuario;"
   },
@@ -42,21 +41,27 @@
     "AdminPassword": ""
   },
   "RateLimiting": {
-    "PermitLimit": 100,
+    "PermitLimit": 5,
     "WindowInSeconds": 10,
     "QueueLimit": 0
+  },
+  "EmailThrottle": {
+    "MaxPerDay": 5
+  },
+  "ForwardedHeaders": {
+    "KnownProxies": [],
+    "KnownNetworks": []
   },
   "Sentry": {
     "Dsn": ""
   },
   "Redis": {
-    "Enabled": false,
+    "Enabled": true,
     "ConnectionString": "localhost:6379",
     "InstanceName": "EmpregaNet:"
   },
   "OutputCache": {
-    "DefaultExpirationMinutes": 90,
-    "SizeLimitMegabytes": 100,
-    "MaximumBodySizeMegabytes": 100
+    "DefaultExpirationMinutes": 5,
+    "SizeLimitMegabytes": 64
   }
 }

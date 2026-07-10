@@ -11,6 +11,9 @@ public static class DependencyInjection
 
     public static void SetupApiServices(this WebApplication app)
     {
+        // Configura o uso de headers de proxy reverso (X-Forwarded-For, X-Forwarded-Proto) caso esteja atrás de um proxy reverso.
+        app.UseForwardedHeadersIfConfigured();
+
         // HSTS apenas fora de Development (evita fixar HSTS em http://localhost).
         if (!app.Environment.IsDevelopment())
         {
