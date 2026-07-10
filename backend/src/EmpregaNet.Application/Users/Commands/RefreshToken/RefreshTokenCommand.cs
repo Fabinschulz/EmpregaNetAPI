@@ -1,6 +1,6 @@
 using EmpregaNet.Application.Auth.ViewModel;
 using EmpregaNet.Application.Common.Exceptions;
-using EmpregaNet.Application.Interfaces;
+using EmpregaNet.Application.Abstraction;
 using EmpregaNet.Domain.Enums;
 
 namespace EmpregaNet.Application.Users.Commands;

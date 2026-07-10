@@ -12,23 +12,23 @@ export async function getJob(id: number): Promise<JobDto> {
   return jobSchema.parse(res.data);
 }
 
-export async function createJob(token: string, dto: unknown): Promise<string> {
+export async function createJob(dto: unknown): Promise<string> {
   const body = jobFormSchema.parse(dto);
-  const res = await axiosApi.post<string>('/api/jobs', body, createAxiosConfig(token));
+  const res = await axiosApi.post<string>('/api/jobs', body, createAxiosConfig());
   return res.data;
 }
 
-export async function updateJob(token: string, id: number, dto: unknown): Promise<unknown> {
+export async function updateJob(id: number, dto: unknown): Promise<unknown> {
   const body = jobFormSchema.parse(dto);
-  const res = await axiosApi.put<unknown>(`/api/jobs/${id}`, body, createAxiosConfig(token));
+  const res = await axiosApi.put<unknown>(`/api/jobs/${id}`, body, createAxiosConfig());
   return res.data;
 }
 
-export async function closeJob(token: string, id: number): Promise<string> {
-  const res = await axiosApi.put<string>(`/api/jobs/${id}/close`, undefined, createAxiosConfig(token));
+export async function closeJob(id: number): Promise<string> {
+  const res = await axiosApi.put<string>(`/api/jobs/${id}/close`, undefined, createAxiosConfig());
   return res.data;
 }
 
-export async function deleteJob(token: string, id: number): Promise<void> {
-  await axiosApi.delete(`/api/jobs/${id}`, createAxiosConfig(token));
+export async function deleteJob(id: number): Promise<void> {
+  await axiosApi.delete(`/api/jobs/${id}`, createAxiosConfig());
 }

@@ -1,6 +1,6 @@
 using EmpregaNet.Application.Auth;
 using EmpregaNet.Application.Auth.ViewModel;
-using EmpregaNet.Application.Interfaces;
+using EmpregaNet.Application.Abstraction;
 using EmpregaNet.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;

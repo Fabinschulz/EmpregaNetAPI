@@ -97,6 +97,7 @@ export const userSchema = z.object({
   email: z.string().email({ message: 'E-mail inválido.' }),
   phoneNumber: z.string().nullable().optional(),
   userType: z.string().nullable().optional(),
+  roles: z.array(z.string()).default([]),
   isDeleted: z.boolean().optional()
 });
 

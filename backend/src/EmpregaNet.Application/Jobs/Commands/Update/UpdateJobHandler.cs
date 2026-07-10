@@ -1,5 +1,5 @@
 using EmpregaNet.Application.Auth;
-using EmpregaNet.Application.Interfaces;
+using EmpregaNet.Application.Abstraction;
 using EmpregaNet.Domain.Entities;
 using FluentValidation;
 using Microsoft.Extensions.Logging;

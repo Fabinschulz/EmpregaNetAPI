@@ -52,8 +52,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     return () => window.clearTimeout(timer);
   }, [railCollapsed, railTransitioning]);
 
-  const handleLogout = useCallback(() => {
-    logout();
+  const handleLogout = useCallback(async () => {
+    await logout();
     toastSuccess('Sessão terminada', 'Terminou sessão com segurança. Até breve.');
     startRouterTransition(() => router.push('/login'));
   }, [logout, router]);

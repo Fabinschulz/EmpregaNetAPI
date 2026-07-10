@@ -1,4 +1,4 @@
-namespace EmpregaNet.Application.Interfaces;
+namespace EmpregaNet.Application.Abstraction;
 
 /// <summary>
 /// Valida um <c>id_token</c> JWT do Google e expõe claims mínimas para login na API.

@@ -11,11 +11,11 @@ type RouteAccessGuardProps = {
 };
 
 export function RouteAccessGuard({ children }: RouteAccessGuardProps) {
-  const { token, roles, hydrated } = useAuth();
+  const { isAuthenticated, roles, hydrated } = useAuth();
   const pathname = usePathname();
   const router = useRouter();
 
-  const session = { token, roles };
+  const session = { isAuthenticated, roles };
   const decision = evaluateRouteAccess(pathname, session);
 
   useEffect(() => {

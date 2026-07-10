@@ -1,6 +1,6 @@
 using System.Security.Cryptography;
 using System.Text;
-using EmpregaNet.Application.Interfaces;
+using EmpregaNet.Application.Abstraction;
 using EmpregaNet.Domain.Entities;
 using EmpregaNet.Infra.Persistence.Database;
 using Microsoft.EntityFrameworkCore;
@@ -62,6 +62,22 @@ public sealed class RefreshTokenService : IRefreshTokenService
 
         await _db.SaveChangesAsync(cancellationToken);
         return (row.User, newPlain);
+    }
+
+    public async Task RevokeAsync(string plainRefreshToken, CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(plainRefreshToken))
+            return;
+
+        var hash = HashToken(plainRefreshToken.Trim());
+        var row = await _db.UserRefreshTokens
+            .FirstOrDefaultAsync(x => x.TokenHash == hash, cancellationToken);
+
+        if (row is null || row.RevokedAt is not null)
+            return;
+
+        row.RevokedAt = DateTimeOffset.UtcNow;
+        await _db.SaveChangesAsync(cancellationToken);
     }
 
     public async Task RevokeAllForUserAsync(long userId, CancellationToken cancellationToken = default)

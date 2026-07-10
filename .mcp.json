@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "shadcn": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["shadcn@latest", "mcp"]
+    },
+    "mermaid-mcp": {
+      "type": "http",
+      "url": "https://mcp.mermaid.ai/mcp"
+    }
+  }
+}

@@ -1,7 +1,7 @@
 using EmpregaNet.Application.Auth.ViewModel;
 using EmpregaNet.Domain.Entities;
 
-namespace EmpregaNet.Application.Interfaces;
+namespace EmpregaNet.Application.Abstraction;
 
 public interface IJwtBuilder
 {

@@ -1,5 +1,5 @@
 using EmpregaNet.Application.Auth.Configuration;
-using EmpregaNet.Application.Interfaces;
+using EmpregaNet.Application.Abstraction;
 using EmpregaNet.Domain.Interfaces;
 using EmpregaNet.Infra.Behaviors;
 using EmpregaNet.Infra.Cache;
@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using StackExchange.Redis;
 
 namespace EmpregaNet.Infra;
 
@@ -45,6 +46,14 @@ public static class DependencyInjection
         builder.Services.AddScoped<IGoogleIdTokenValidator, GoogleIdTokenValidator>();
         builder.Services.AddScoped<IAccountEmailService, AccountEmailService>();
         builder.Services.AddScoped<IRefreshTokenService, RefreshTokenService>();
+
+        // Teto diário de e-mails por destinatário (anti-abuso de forgot-password/resend-confirmation).
+        // Usa Redis quando ativo (multi-instância/persistente); senão, contador em memória.
+        var maxEmailsPerDay = builder.Configuration.GetValue("EmailThrottle:MaxPerDay", 5);
+        builder.Services.AddSingleton<IEmailThrottleService>(sp =>
+            sp.GetService<IConnectionMultiplexer>() is { } redis
+                ? new RedisEmailThrottleService(redis, maxEmailsPerDay)
+                : (IEmailThrottleService)new InMemoryEmailThrottleService(maxEmailsPerDay));
     }
 
     private static void EnsureSmtpConfiguredForProduction(IHostEnvironment env, SmtpEmailOptions smtp)

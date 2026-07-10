@@ -1,5 +1,5 @@
 using EmpregaNet.Application.Auth.Configuration;
-using EmpregaNet.Application.Interfaces;
+using EmpregaNet.Application.Abstraction;
 using EmpregaNet.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
@@ -19,17 +19,20 @@ public sealed class ForgotPasswordHandler : IRequestHandler<ForgotPasswordComman
 
     private readonly UserManager<User> _userManager;
     private readonly IAccountEmailService _accountEmail;
+    private readonly IEmailThrottleService _emailThrottle;
     private readonly AppUrlsOptions _urls;
     private readonly ILogger<ForgotPasswordHandler> _logger;
 
     public ForgotPasswordHandler(
         UserManager<User> userManager,
         IAccountEmailService accountEmail,
+        IEmailThrottleService emailThrottle,
         IOptions<AppUrlsOptions> urlsOptions,
         ILogger<ForgotPasswordHandler> logger)
     {
         _userManager = userManager;
         _accountEmail = accountEmail;
+        _emailThrottle = emailThrottle;
         _urls = urlsOptions.Value;
         _logger = logger;
     }
@@ -40,6 +43,14 @@ public sealed class ForgotPasswordHandler : IRequestHandler<ForgotPasswordComman
         if (user is null || user.IsDeleted || string.IsNullOrEmpty(user.Email))
         {
             _logger.LogDebug("Pedido de reset para e-mail sem conta ativa (omitido por segurança).");
+            return new ForgotPasswordResult(PublicMessage);
+        }
+
+        // Teto diário por destinatário: quando excedido, omite o envio mantendo a resposta
+        // uniforme (o chamador não descobre que foi limitado — anti-abuso e anti-enumeração).
+        if (!await _emailThrottle.TryAcquireAsync(user.Email, cancellationToken))
+        {
+            _logger.LogWarning("Limite diário de e-mails atingido para o usuário {UserId}; reset omitido.", user.Id);
             return new ForgotPasswordResult(PublicMessage);
         }
 

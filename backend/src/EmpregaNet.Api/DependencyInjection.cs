@@ -11,6 +11,30 @@ public static class DependencyInjection
 
     public static void SetupApiServices(this WebApplication app)
     {
+        // HSTS apenas fora de Development (evita fixar HSTS em http://localhost).
+        if (!app.Environment.IsDevelopment())
+        {
+            app.UseHsts();
+        }
+
+        // Headers de segurança em todas as respostas.
+        app.Use(async (context, next) =>
+        {
+            var headers = context.Response.Headers;
+            headers["X-Content-Type-Options"] = "nosniff";
+            headers["X-Frame-Options"] = "DENY";
+            headers["Referrer-Policy"] = "no-referrer";
+            headers["X-Permitted-Cross-Domain-Policies"] = "none";
+
+            // A API responde JSON; bloqueia scripts/embedding. O Swagger UI precisa de CSP própria.
+            if (!context.Request.Path.StartsWithSegments("/swagger"))
+            {
+                headers["Content-Security-Policy"] = "default-src 'none'; frame-ancestors 'none'; base-uri 'none'";
+            }
+
+            await next.Invoke();
+        });
+
         app.UseHttpsRedirection()
            .UseCors(CorsPolicyConfig.DefaultPolicyName)
            .UseAuthentication()

@@ -56,9 +56,11 @@ export function proxy(req: NextRequest) {
     return NextResponse.json({}, { headers: preflightHeaders });
   }
 
+  // Lê o cookie httpOnly `access_token` (server-side) para o gating de rotas.
   const session = readSessionFromCookieHeader(req.headers.get('cookie'));
+  const isSessionValid = !!session?.token && (session.exp === undefined || session.exp * 1000 > Date.now());
   const accessDecision = evaluateRouteAccess(pathname, {
-    token: session?.token ?? null,
+    isAuthenticated: isSessionValid,
     roles: session?.roles ?? []
   });
   const redirect = routeAccessRedirect(req, pathname, accessDecision);

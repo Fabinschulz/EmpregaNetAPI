@@ -1,5 +1,5 @@
 using EmpregaNet.Application.Auth.Configuration;
-using EmpregaNet.Application.Interfaces;
+using EmpregaNet.Application.Abstraction;
 using Google.Apis.Auth;
 using Microsoft.Extensions.Options;
 

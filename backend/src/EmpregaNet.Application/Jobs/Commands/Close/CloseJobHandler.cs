@@ -1,6 +1,6 @@
 using EmpregaNet.Application.Auth;
 using EmpregaNet.Application.Common.Exceptions;
-using EmpregaNet.Application.Interfaces;
+using EmpregaNet.Application.Abstraction;
 using EmpregaNet.Domain.Enums;
 using EmpregaNet.Domain.Interfaces;
 using FluentValidation;

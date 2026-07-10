@@ -46,15 +46,12 @@ export const axiosApi = {
   }
 };
 
-function normalizeAuthorizationHeader(token: string) {
-  return token.startsWith('Bearer ') ? token : `Bearer ${token}`;
-}
-
-export function createAxiosConfig<T>(token: string, params?: T) {
+/**
+ * Config para chamadas autenticadas. A autenticação é feita pelo cookie httpOnly
+ * (enviado automaticamente por `withCredentials`) -> não há header Bearer nem token em JS.
+ */
+export function createAxiosConfig<T>(params?: T) {
   return {
-    headers: {
-      Authorization: normalizeAuthorizationHeader(token)
-    },
     params,
     withCredentials: true
   } satisfies AxiosRequestConfig;

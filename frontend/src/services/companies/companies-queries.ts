@@ -6,39 +6,38 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { queryKeys } from '../query-keys';
-import { requireAuthToken, withDefaultListParams, type CompaniesListQueryParams } from '../shared';
+import { withDefaultListParams, type CompaniesListQueryParams } from '../shared';
 import { createCompany, deleteCompany, getCompany, listCompanies, updateCompany } from './companies-api';
 import type { CompanyFormValues } from './companies-schema';
 
 export function useCompaniesListQuery(params?: CompaniesListQueryParams) {
-  const { token } = useAuth();
+  const { isAuthenticated } = useAuth();
   const listParams = withDefaultListParams(params);
 
   return useQuery({
     queryKey: queryKeys.companies.list(listParams),
-    queryFn: () => listCompanies(requireAuthToken(token), listParams),
-    enabled: !!token
+    queryFn: () => listCompanies(listParams),
+    enabled: isAuthenticated
   });
 }
 
 export function useCompanyQuery(id: number) {
-  const { token } = useAuth();
+  const { isAuthenticated } = useAuth();
 
   return useQuery({
     queryKey: queryKeys.companies.detail(id),
-    queryFn: () => getCompany(requireAuthToken(token), id),
-    enabled: !!token && Number.isFinite(id) && id > 0
+    queryFn: () => getCompany(id),
+    enabled: isAuthenticated && Number.isFinite(id) && id > 0
   });
 }
 
 export function useCreateCompanyMutation() {
-  const { token } = useAuth();
   const queryClient = useQueryClient();
   const [apiError, setApiError] = useState<string | null>(null);
   const router = useRouter();
 
   const ctx = useMutation({
-    mutationFn: (formValue: CompanyFormValues) => createCompany(requireAuthToken(token), formValue),
+    mutationFn: (formValue: CompanyFormValues) => createCompany(formValue),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: queryKeys.companies.lists() });
       startRouterTransition(() => router.push('/admin/empresas'));
@@ -52,13 +51,12 @@ export function useCreateCompanyMutation() {
 }
 
 export function useUpdateCompanyMutation(companyId: number) {
-  const { token } = useAuth();
   const queryClient = useQueryClient();
   const [apiError, setApiError] = useState<string | null>(null);
   const router = useRouter();
 
   const ctx = useMutation({
-    mutationFn: (formValue: CompanyFormValues) => updateCompany(requireAuthToken(token), companyId, formValue),
+    mutationFn: (formValue: CompanyFormValues) => updateCompany(companyId, formValue),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: queryKeys.companies.detail(companyId) });
       await queryClient.invalidateQueries({ queryKey: queryKeys.companies.lists() });
@@ -73,13 +71,12 @@ export function useUpdateCompanyMutation(companyId: number) {
 }
 
 export function useDeleteCompanyMutation(companyId: number) {
-  const { token } = useAuth();
   const queryClient = useQueryClient();
   const [apiError, setApiError] = useState<string | null>(null);
   const router = useRouter();
 
   const ctx = useMutation({
-    mutationFn: () => deleteCompany(requireAuthToken(token), companyId),
+    mutationFn: () => deleteCompany(companyId),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: queryKeys.companies.all });
       startRouterTransition(() => router.push('/admin/empresas'));

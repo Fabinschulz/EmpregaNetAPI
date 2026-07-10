@@ -7,7 +7,7 @@ export const DEFAULT_POST_LOGIN_PATH = '/dashboard';
 export type RouteAccessDecision = 'allow' | 'login' | 'forbidden';
 
 export type RouteSession = {
-  token: string | null | undefined;
+  isAuthenticated: boolean;
   roles: readonly string[] | null | undefined;
 };
 
@@ -19,7 +19,7 @@ export function isSafeInternalPath(path: string | null | undefined): path is str
 /** Política única de acesso a rotas (edge proxy + guards cliente). */
 export function evaluateRouteAccess(pathname: string, session: RouteSession): RouteAccessDecision {
   if (isPublicPath(pathname)) return 'allow';
-  if (!session.token) return 'login';
+  if (!session.isAuthenticated) return 'login';
   if (!canAccessPath(pathname, session.roles)) return 'forbidden';
   return 'allow';
 }

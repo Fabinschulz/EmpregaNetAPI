@@ -7,43 +7,40 @@ import {
   type JobApplicationsListResponseDto
 } from './job-applications-schema';
 
-export async function applyToJob(token: string, dto: unknown): Promise<string> {
+export async function applyToJob(dto: unknown): Promise<string> {
   const body = applyToJobSchema.parse(dto);
-  const res = await axiosApi.post<string>('/api/jobapplications', body, createAxiosConfig(token));
+  const res = await axiosApi.post<string>('/api/jobapplications', body, createAxiosConfig());
   return res.data;
 }
 
 export async function listMine(
-  token: string,
   params?: JobApplicationsListQueryParams
 ): Promise<JobApplicationsListResponseDto> {
-  const res = await axiosApi.get<unknown>('/api/jobapplications/mine', createAxiosConfig(token, params));
+  const res = await axiosApi.get<unknown>('/api/jobapplications/mine', createAxiosConfig(params));
   return jobApplicationsListResponseSchema.parse(res.data);
 }
 
 export async function listAll(
-  token: string,
   params?: JobApplicationsAdminListQueryParams
 ): Promise<JobApplicationsListResponseDto> {
-  const res = await axiosApi.get<unknown>('/api/jobapplications', createAxiosConfig(token, params));
+  const res = await axiosApi.get<unknown>('/api/jobapplications', createAxiosConfig(params));
   return jobApplicationsListResponseSchema.parse(res.data);
 }
 
 export async function listByJob(
-  token: string,
   jobId: number,
   params?: JobApplicationsListQueryParams
 ): Promise<JobApplicationsListResponseDto> {
-  const res = await axiosApi.get<unknown>(`/api/jobapplications/job/${jobId}`, createAxiosConfig(token, params));
+  const res = await axiosApi.get<unknown>(`/api/jobapplications/job/${jobId}`, createAxiosConfig(params));
   return jobApplicationsListResponseSchema.parse(res.data);
 }
 
-export async function changeStatus(token: string, id: number, dto: unknown): Promise<unknown> {
+export async function changeStatus(id: number, dto: unknown): Promise<unknown> {
   const body = changeApplicationStatusSchema.parse(dto);
-  const res = await axiosApi.put<unknown>(`/api/jobapplications/${id}`, body, createAxiosConfig(token));
+  const res = await axiosApi.put<unknown>(`/api/jobapplications/${id}`, body, createAxiosConfig());
   return res.data;
 }
 
-export async function deleteApplication(token: string, id: number): Promise<void> {
-  await axiosApi.delete(`/api/jobapplications/${id}`, createAxiosConfig(token));
+export async function deleteApplication(id: number): Promise<void> {
+  await axiosApi.delete(`/api/jobapplications/${id}`, createAxiosConfig());
 }

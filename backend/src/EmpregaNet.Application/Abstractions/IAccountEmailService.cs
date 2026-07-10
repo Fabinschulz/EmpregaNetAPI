@@ -1,4 +1,4 @@
-namespace EmpregaNet.Application.Interfaces;
+namespace EmpregaNet.Application.Abstraction;
 
 /// <summary>
 /// Envio de e-mails transacionais da aplicação (reset de senha, etc.).

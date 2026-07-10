@@ -1,12 +1,11 @@
 'use client';
 
-import { useAuth } from '@/context';
 import { reportMutationApiError, startRouterTransition } from '@/utils';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { queryKeys } from '../query-keys';
-import { requireAuthToken, withDefaultListParams, type JobsListQueryParams } from '../shared';
+import { withDefaultListParams, type JobsListQueryParams } from '../shared';
 import { closeJob, createJob, deleteJob, getJob, listJobs, updateJob } from './jobs-api';
 import type { JobFormValues } from './jobs-schema';
 
@@ -28,13 +27,12 @@ export function useJobQuery(id: number) {
 }
 
 export function useCreateJobMutation() {
-  const { token } = useAuth();
   const queryClient = useQueryClient();
   const [apiError, setApiError] = useState<string | null>(null);
   const router = useRouter();
 
   const ctx = useMutation({
-    mutationFn: (formValue: JobFormValues) => createJob(requireAuthToken(token), formValue),
+    mutationFn: (formValue: JobFormValues) => createJob(formValue),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: queryKeys.jobs.lists() });
       startRouterTransition(() => router.push('/recrutamento/vagas'));
@@ -48,13 +46,12 @@ export function useCreateJobMutation() {
 }
 
 export function useUpdateJobMutation(jobId: number) {
-  const { token } = useAuth();
   const queryClient = useQueryClient();
   const [apiError, setApiError] = useState<string | null>(null);
   const router = useRouter();
 
   const ctx = useMutation({
-    mutationFn: (formValue: JobFormValues) => updateJob(requireAuthToken(token), jobId, formValue),
+    mutationFn: (formValue: JobFormValues) => updateJob(jobId, formValue),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: queryKeys.jobs.detail(jobId) });
       await queryClient.invalidateQueries({ queryKey: queryKeys.jobs.lists() });
@@ -69,13 +66,12 @@ export function useUpdateJobMutation(jobId: number) {
 }
 
 export function useCloseJobMutation(jobId: number) {
-  const { token } = useAuth();
   const queryClient = useQueryClient();
   const [apiError, setApiError] = useState<string | null>(null);
   const router = useRouter();
 
   const ctx = useMutation({
-    mutationFn: () => closeJob(requireAuthToken(token), jobId),
+    mutationFn: () => closeJob(jobId),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: queryKeys.jobs.detail(jobId) });
       await queryClient.invalidateQueries({ queryKey: queryKeys.jobs.lists() });
@@ -90,13 +86,12 @@ export function useCloseJobMutation(jobId: number) {
 }
 
 export function useDeleteJobMutation(jobId: number) {
-  const { token } = useAuth();
   const queryClient = useQueryClient();
   const [apiError, setApiError] = useState<string | null>(null);
   const router = useRouter();
 
   const ctx = useMutation({
-    mutationFn: () => deleteJob(requireAuthToken(token), jobId),
+    mutationFn: () => deleteJob(jobId),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: queryKeys.jobs.all });
       startRouterTransition(() => router.push('/recrutamento/vagas'));

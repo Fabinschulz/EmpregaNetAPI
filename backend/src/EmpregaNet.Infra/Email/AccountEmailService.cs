@@ -1,4 +1,4 @@
-using EmpregaNet.Application.Interfaces;
+using EmpregaNet.Application.Abstraction;
 using Microsoft.AspNetCore.Identity.UI.Services;
 
 namespace EmpregaNet.Infra.Email;

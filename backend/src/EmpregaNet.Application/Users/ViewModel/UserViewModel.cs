@@ -11,6 +11,7 @@ public sealed class UserViewModel
     public string Email { get; set; } = string.Empty;
     public string? PhoneNumber { get; set; }
     public required string UserType { get; set; }
+    public IReadOnlyList<string> Roles { get; set; } = [];
     public DateTimeOffset CreatedAt { get; set; }
     public DateTimeOffset? UpdatedAt { get; set; }
     public DateTimeOffset? DeletedAt { get; set; }

@@ -9,13 +9,13 @@ import { useMemo } from 'react';
 export function JobDetailPage() {
   const params = useParams<{ id: string }>();
   const jobId = useMemo(() => Number(params.id), [params.id]);
-  const { token } = useAuth();
+  const { isAuthenticated } = useAuth();
 
   const { data: job, isPending, isError, error, refetch } = useJobQuery(jobId);
   const { apiError, mutateAsync, isPending: isApplying } = useApplyToJobMutation(jobId);
 
   function onApply() {
-    if (!token) return;
+    if (!isAuthenticated) return;
     void mutateAsync();
   }
 
@@ -36,8 +36,8 @@ export function JobDetailPage() {
             <p style={{ color: 'var(--muted)' }}>{job.description ?? 'Sem descrição.'}</p>
 
             <p style={{ marginTop: 14, display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-              <Button variant="primary" onClick={onApply} disabled={!token || isApplying}>
-                {!token ? 'Faça login para se candidatar' : isApplying ? 'Enviando...' : 'Candidatar-me'}
+              <Button variant="primary" onClick={onApply} disabled={!isAuthenticated || isApplying}>
+                {!isAuthenticated ? 'Faça login para se candidatar' : isApplying ? 'Enviando...' : 'Candidatar-me'}
               </Button>
             </p>
             {apiError ? (

@@ -31,6 +31,8 @@ public sealed class GetCurrentUserHandler : IRequestHandler<GetCurrentUserQuery,
                 DomainErrorEnum.USER_NOT_FOUND);
         }
 
-        return user.ToViewModel();
+        var vm = user.ToViewModel();
+        vm.Roles = [.. await _userManager.GetRolesAsync(user)];
+        return vm;
     }
 }

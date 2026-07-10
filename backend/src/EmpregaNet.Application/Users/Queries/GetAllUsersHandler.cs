@@ -1,6 +1,5 @@
 using EmpregaNet.Application.Auth;
 using EmpregaNet.Application.Common.Base;
-using EmpregaNet.Application.Interfaces;
 using EmpregaNet.Application.Users.ViewModel;
 using EmpregaNet.Domain.Common;
 using EmpregaNet.Domain.Entities;

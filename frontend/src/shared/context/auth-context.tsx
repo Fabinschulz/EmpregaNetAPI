@@ -1,20 +1,18 @@
 'use client';
 
 import type { UserLoggedDto } from '@/services';
-import { refreshToken } from '@/services';
+import { logout as apiLogout } from '@/services';
 import { registerAxiosAuthHandlers } from '@/services/axios/axios-auth';
-import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useSyncExternalStore } from 'react';
 import {
-  clearSessionClient,
-  decodeRolesFromJwt,
-  normalizeBearer,
-  readRefreshTokenFromBrowser,
-  readSessionFromBrowser,
-  saveSessionClient
+    clearSessionMetadata,
+    getSessionMetadataSnapshot,
+    saveSessionMetadata,
+    subscribeSessionMetadata
 } from 'src/services/users/session';
 
 type AuthState = {
-  token: string | null;
+  isAuthenticated: boolean;
   roles: string[];
   username: string | null;
   email: string | null;
@@ -23,95 +21,67 @@ type AuthState = {
 
 type AuthContextValue = AuthState & {
   setLoggedUser: (logged: UserLoggedDto) => void;
-  logout: () => void;
+  logout: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
+const EMPTY_ROLES: string[] = [];
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [token, setToken] = useState<string | null>(null);
-  const [roles, setRoles] = useState<string[]>([]);
-  const [username, setUsername] = useState<string | null>(null);
-  const [email, setEmail] = useState<string | null>(null);
-  const [hydrated, setHydrated] = useState(false);
+  const meta = useSyncExternalStore(subscribeSessionMetadata, getSessionMetadataSnapshot, () => null);
 
-  const applyLoggedUser = useCallback((logged: UserLoggedDto) => {
-    const normalized = normalizeBearer(logged.accessToken);
-    saveSessionClient({ token: normalized, refreshToken: logged.refreshToken });
-    setToken(normalized);
-    setRoles(logged.userToken.roles?.length ? logged.userToken.roles : decodeRolesFromJwt(normalized));
-    setUsername(logged.userToken.username ?? null);
-    setEmail(logged.userToken.email ?? null);
+  // OBS: No SSR/primeira pintura o snapshot do servidor é null; após a hidratação o
+  // snapshot real do cliente é aplicado.
+  const hydrated = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false
+  );
+
+  const setLoggedUser = useCallback((logged: UserLoggedDto) => {
+    saveSessionMetadata({
+      roles: logged.userToken.roles ?? [],
+      username: logged.userToken.username ?? null,
+      email: logged.userToken.email ?? null
+    });
   }, []);
 
-  const logout = useCallback(() => {
-    clearSessionClient();
-    setToken(null);
-    setRoles([]);
-    setUsername(null);
-    setEmail(null);
+  /** Limpa apenas o estado local da sessão (sem chamar o servidor). */
+  const clearLocalSession = useCallback(() => {
+    clearSessionMetadata();
   }, []);
+
+  /** Logout iniciado pelo usuário: revoga o refresh token e limpa os cookies no servidor + estado local. */
+  const logout = useCallback(async () => {
+    try {
+      await apiLogout();
+    } catch (err) {
+      // Ignora falhas de rede/servidor: a sessão local é sempre limpa a seguir.
+      console.error('Falha ao chamar /logout', err);
+    }
+    clearLocalSession();
+  }, [clearLocalSession]);
 
   useEffect(() => {
     registerAxiosAuthHandlers({
-      onSessionRefreshed: applyLoggedUser,
-      onLogout: logout
+      onSessionRefreshed: setLoggedUser,
+      // Sessão já inválida (refresh falhou): basta limpar o estado local, sem novo request.
+      onLogout: clearLocalSession
     });
-  }, [applyLoggedUser, logout]);
-
-  useEffect(() => {
-    let cancelled = false;
-
-    const hydrate = async () => {
-      const session = readSessionFromBrowser();
-      if (session?.token) {
-        if (!cancelled) {
-          setToken(session.token);
-          setRoles(session.roles);
-          setUsername(session.username);
-          setEmail(session.email);
-        }
-        setHydrated(true);
-        return;
-      }
-
-      const refresh = readRefreshTokenFromBrowser();
-      if (refresh) {
-        try {
-          const logged = await refreshToken({ refreshToken: refresh });
-          if (!cancelled) applyLoggedUser(logged);
-        } catch {
-          if (!cancelled) logout();
-        }
-      }
-
-      if (!cancelled) setHydrated(true);
-    };
-
-    void hydrate();
-    return () => {
-      cancelled = true;
-    };
-  }, [applyLoggedUser, logout]);
-
-  const setLoggedUser = useCallback(
-    (logged: UserLoggedDto) => {
-      applyLoggedUser(logged);
-    },
-    [applyLoggedUser]
-  );
+  }, [setLoggedUser, clearLocalSession]);
 
   const value = useMemo<AuthContextValue>(
     () => ({
-      token,
-      roles,
-      username,
-      email,
+      isAuthenticated: meta !== null,
+      roles: meta?.roles ?? EMPTY_ROLES,
+      username: meta?.username ?? null,
+      email: meta?.email ?? null,
       hydrated,
       setLoggedUser,
       logout
     }),
-    [token, roles, username, email, hydrated, setLoggedUser, logout]
+    [meta, hydrated, setLoggedUser, logout]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

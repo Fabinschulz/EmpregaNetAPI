@@ -6,40 +6,39 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { queryKeys } from '../query-keys';
-import { requireAuthToken, withDefaultListParams, type AdminUsersListQueryParams } from '../shared';
+import { withDefaultListParams, type AdminUsersListQueryParams } from '../shared';
 import { deleteAdminUser, getAdminUser, listAdminUsers, updateAdminUser } from './admin-api';
 import type { AdminUserUpdateFormValues } from './admin-schema';
 
 export function useAdminUsersListQuery(params?: AdminUsersListQueryParams) {
-  const { token } = useAuth();
+  const { isAuthenticated } = useAuth();
   const listParams = withDefaultListParams(params);
 
   return useQuery({
     queryKey: queryKeys.adminUsers.list(listParams),
-    queryFn: () => listAdminUsers(requireAuthToken(token), listParams),
-    enabled: !!token
+    queryFn: () => listAdminUsers(listParams),
+    enabled: isAuthenticated
   });
 }
 
 export function useAdminUserQuery(id: number) {
-  const { token } = useAuth();
+  const { isAuthenticated } = useAuth();
 
   return useQuery({
     queryKey: queryKeys.adminUsers.detail(id),
-    queryFn: () => getAdminUser(requireAuthToken(token), id),
-    enabled: !!token && Number.isFinite(id) && id > 0
+    queryFn: () => getAdminUser(id),
+    enabled: isAuthenticated && Number.isFinite(id) && id > 0
   });
 }
 
 export function useUpdateAdminUserMutation(userId: number) {
-  const { token } = useAuth();
   const queryClient = useQueryClient();
   const [apiError, setApiError] = useState<string | null>(null);
   const router = useRouter();
 
   const ctx = useMutation({
     mutationFn: (formValue: AdminUserUpdateFormValues) =>
-      updateAdminUser(requireAuthToken(token), userId, {
+      updateAdminUser(userId, {
         userType: formValue.userType.trim() || null
       }),
     onSuccess: async () => {
@@ -56,13 +55,12 @@ export function useUpdateAdminUserMutation(userId: number) {
 }
 
 export function useDeleteAdminUserMutation(userId: number) {
-  const { token } = useAuth();
   const queryClient = useQueryClient();
   const [apiError, setApiError] = useState<string | null>(null);
   const router = useRouter();
 
   const ctx = useMutation({
-    mutationFn: () => deleteAdminUser(requireAuthToken(token), userId),
+    mutationFn: () => deleteAdminUser(userId),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: queryKeys.adminUsers.all });
       startRouterTransition(() => router.push('/admin/usuarios'));

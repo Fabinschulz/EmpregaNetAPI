@@ -55,6 +55,7 @@ public class UsersController : ControllerBase
     [HttpPost("refresh-token")]
     [ProducesResponseType(typeof(UserLoggedViewModel), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(DomainError))]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(DomainError))]
     public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenCommand? command)
     {
         var refresh = command?.RefreshToken
@@ -63,6 +64,25 @@ public class UsersController : ControllerBase
         var result = await Mediator.Send(new RefreshTokenCommand(refresh));
         _authCookies.AppendLoginCookies(Response, result);
         return Ok(result);
+    }
+
+    /// <summary>Encerra a sessão: revoga o refresh token atual e limpa os cookies de autenticação.</summary>
+    /// <remarks>
+    /// Anónimo por design para funcionar mesmo com o access token expirado; a credencial revogada é o refresh
+    /// token (lido do cookie httpOnly ou do corpo). Idempotente — devolve 200 mesmo sem token a revogar.
+    /// </remarks>
+    [AllowAnonymous]
+    [HttpPost("logout")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<IActionResult> Logout([FromBody] LogoutCommand? command)
+    {
+        var refresh = command?.RefreshToken
+            ?? Request.Cookies[Constants.AuthCookies.RefreshToken]
+            ?? string.Empty;
+            
+        await Mediator.Send(new LogoutCommand(refresh));
+        _authCookies.ClearLoginCookies(Response);
+        return Ok(new { message = "Sessão encerrada com sucesso." });
     }
 
     /// <summary>Autentica com Google: envie o <c>id_token</c> obtido no cliente (Sign-In SDK). Requer <c>GoogleAuth:ClientIds</c> configurado.</summary>

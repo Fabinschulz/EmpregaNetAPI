@@ -1,4 +1,4 @@
-namespace EmpregaNet.Application.Interfaces;
+namespace EmpregaNet.Application.Abstraction;
 
 /// <summary>
 /// Garante que o usuário atual pode gerenciar recursos (vagas) de uma empresa (admin global ou vínculo <c>User.EmployerCompanyId</c>).

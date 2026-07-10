@@ -1,5 +1,5 @@
 using EmpregaNet.Application.Auth.Configuration;
-using EmpregaNet.Application.Interfaces;
+using EmpregaNet.Application.Abstraction;
 using EmpregaNet.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
@@ -18,17 +18,20 @@ public sealed class ResendEmailConfirmationHandler : IRequestHandler<ResendEmail
 
     private readonly UserManager<User> _userManager;
     private readonly IAccountEmailService _accountEmail;
+    private readonly IEmailThrottleService _emailThrottle;
     private readonly AppUrlsOptions _urls;
     private readonly ILogger<ResendEmailConfirmationHandler> _logger;
 
     public ResendEmailConfirmationHandler(
         UserManager<User> userManager,
         IAccountEmailService accountEmail,
+        IEmailThrottleService emailThrottle,
         IOptions<AppUrlsOptions> urlsOptions,
         ILogger<ResendEmailConfirmationHandler> logger)
     {
         _userManager = userManager;
         _accountEmail = accountEmail;
+        _emailThrottle = emailThrottle;
         _urls = urlsOptions.Value;
         _logger = logger;
     }
@@ -39,6 +42,13 @@ public sealed class ResendEmailConfirmationHandler : IRequestHandler<ResendEmail
         if (user is null || user.IsDeleted || string.IsNullOrEmpty(user.Email) || user.EmailConfirmed)
         {
             _logger.LogDebug("Reenvio de confirmação omitido (sem conta pendente ou já confirmado).");
+            return new ResendEmailConfirmationResponse(PublicMessage);
+        }
+
+        // Teto diário por destinatário: quando excedido, omite o envio mantendo a resposta uniforme.
+        if (!await _emailThrottle.TryAcquireAsync(user.Email, cancellationToken))
+        {
+            _logger.LogWarning("Limite diário de e-mails atingido para o usuário {UserId}; reenvio omitido.", user.Id);
             return new ResendEmailConfirmationResponse(PublicMessage);
         }
 

@@ -1,5 +1,5 @@
 import type { UserLoggedDto } from '@/services';
-import { clearSessionClient, readRefreshTokenFromBrowser, refreshToken, saveSessionClient } from '@/services';
+import { refreshToken } from '@/services';
 import type { AxiosError, AxiosInstance, InternalAxiosRequestConfig } from 'axios';
 
 type AuthHandlers = {
@@ -12,15 +12,11 @@ let refreshPromise: Promise<UserLoggedDto | null> | null = null;
 
 export const registerAxiosAuthHandlers = (next: AuthHandlers) => (handlers = next);
 
-/** Tenta atualizar a sessão usando o token de refresh. */
+/** Tenta atualizar a sessão usando o refresh token do cookie httpOnly (enviado por `withCredentials`). */
 async function tryRefreshSession(): Promise<UserLoggedDto | null> {
-  const refresh = readRefreshTokenFromBrowser();
-  if (!refresh) return null;
-
   if (!refreshPromise) {
-    refreshPromise = refreshToken({ refreshToken: refresh })
+    refreshPromise = refreshToken()
       .then((logged) => {
-        saveSessionClient({ token: logged.accessToken, refreshToken: logged.refreshToken });
         handlers?.onSessionRefreshed(logged);
         return logged;
       })
@@ -31,6 +27,12 @@ async function tryRefreshSession(): Promise<UserLoggedDto | null> {
   }
 
   return refreshPromise;
+}
+
+/** Endpoints de auth não devem disparar o fluxo de refresh (evita recursão em 401). */
+function isAuthEndpoint(url: string | undefined): boolean {
+  if (!url) return false;
+  return url.includes('/users/refresh-token') || url.includes('/users/logout');
 }
 
 /** Configura o interceptor de autenticação do Axios,
@@ -44,22 +46,18 @@ export function attachAxiosAuthInterceptor(instance: AxiosInstance) {
     (response) => response,
     async (error: AxiosError) => {
       const config = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
-      if (!config || error.response?.status !== 401 || config._retry) {
+      if (!config || error.response?.status !== 401 || config._retry || isAuthEndpoint(config.url)) {
         return Promise.reject(error);
       }
 
       config._retry = true;
       const refreshed = await tryRefreshSession();
       if (!refreshed) {
-        clearSessionClient();
         handlers?.onLogout();
         return Promise.reject(error);
       }
 
-      config.headers.Authorization = refreshed.accessToken.startsWith('Bearer ')
-        ? refreshed.accessToken
-        : `Bearer ${refreshed.accessToken}`;
-
+      // A requisição repetida reautentica pelo cookie httpOnly já renovado (withCredentials).
       return instance.request(config);
     }
   );

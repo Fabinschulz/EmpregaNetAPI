@@ -1,23 +1,20 @@
-import { deleteClientCookie, parseCookieHeader, setClientCookie } from '@/utils';
+import { parseCookieHeader } from '@/utils';
 import { jwtDecode } from 'jwt-decode';
 
-export const AUTH_COOKIE = 'empreganet_access_token';
-export const REFRESH_COOKIE = 'empreganet_refresh_token';
-const SESSION_STORAGE_KEY = 'empreganet_session';
+/**
+ * Nome do cookie httpOnly de access token emitido pelo backend.
+ * No host `localhost` o cookie é compartilhado entre portas, então o middleware/proxy (server-side)
+ * consegue lê-lo para o gating de rotas. Nunca é legível por JS no cliente (httpOnly).
+ */
+export const ACCESS_TOKEN_COOKIE = 'access_token';
 
 type JwtPayload = {
   exp?: number;
   roles?: string[];
 };
 
-type StoredSession = {
-  token: string;
-  refreshToken?: string | null;
-};
-
 export type Session = {
   token: string;
-  refreshToken?: string | null;
   roles: string[];
   exp?: number;
   username: string | null;
@@ -87,35 +84,11 @@ export function decodeUserDisplayFromJwt(token: string): { username: string | nu
   }
 }
 
-function readStoredSession(): StoredSession | null {
-  if (typeof window === 'undefined') return null;
-  try {
-    const raw = sessionStorage.getItem(SESSION_STORAGE_KEY);
-    if (!raw) return null;
-    const parsed = JSON.parse(raw) as StoredSession;
-    if (!parsed?.token) return null;
-    return parsed;
-  } catch {
-    return null;
-  }
-}
-
-function writeStoredSession(session: StoredSession) {
-  if (typeof window === 'undefined') return;
-  sessionStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(session));
-}
-
-function clearStoredSession() {
-  if (typeof window === 'undefined') return;
-  sessionStorage.removeItem(SESSION_STORAGE_KEY);
-}
-
-function buildSession(token: string, refreshToken?: string | null): Session {
+function buildSession(token: string): Session {
   const normalized = normalizeBearer(token);
   const { username, email } = decodeUserDisplayFromJwt(normalized);
   return {
     token: normalized,
-    refreshToken,
     roles: decodeRolesFromJwt(normalized),
     exp: decodeExp(normalized),
     username,
@@ -123,35 +96,85 @@ function buildSession(token: string, refreshToken?: string | null): Session {
   };
 }
 
-export function saveSessionClient(params: { token: string; refreshToken?: string | null }) {
-  const token = normalizeBearer(params.token);
-  writeStoredSession({ token, refreshToken: params.refreshToken ?? null });
-  setClientCookie(AUTH_COOKIE, stripBearer(token));
-  if (params.refreshToken) setClientCookie(REFRESH_COOKIE, params.refreshToken, { maxAgeSeconds: 60 * 60 * 24 * 14 });
-}
-
-export function clearSessionClient() {
-  clearStoredSession();
-  deleteClientCookie(AUTH_COOKIE);
-  deleteClientCookie(REFRESH_COOKIE);
-}
-
+/**
+ * Constrói a sessão a partir do cookie httpOnly `access_token` presente no header `Cookie`.
+ * Uso exclusivamente server-side (middleware/proxy) para gating de rotas.
+ */
 export function readSessionFromCookieHeader(cookieHeader: string | null | undefined): Session | null {
   const cookies = parseCookieHeader(cookieHeader);
-  const token = cookies[AUTH_COOKIE];
+  const token = cookies[ACCESS_TOKEN_COOKIE];
   if (!token) return null;
-  const refreshToken = cookies[REFRESH_COOKIE];
-  return buildSession(token, refreshToken);
+  return buildSession(token);
 }
 
-export function readSessionFromBrowser(): Session | null {
-  if (typeof document === 'undefined') return null;
-  const stored = readStoredSession();
-  if (stored?.token) return buildSession(stored.token, stored.refreshToken);
-  return readSessionFromCookieHeader(document.cookie);
+// ---------------------------------------------------------------------------
+// Metadados de sessão no cliente (hidratação sem requisição).
+//
+// Guarda APENAS dados de exibição/gating de UI (roles, nome, e-mail), nunca o token.
+// A credencial vive exclusivamente nos cookies httpOnly: um XSS que leia estes
+// metadados não obtém nada utilizável, pois a autorização real é decidida no
+// servidor pelo cookie. Se os metadados ficarem obsoletos (logout noutra aba,
+// cookies expirados), a primeira chamada à API devolve 401 e o interceptor corrige.
+// ---------------------------------------------------------------------------
+
+const SESSION_METADATA_KEY = 'empreganet_session_meta';
+const SESSION_METADATA_EVENT = 'empreganet:session-meta';
+
+export type SessionMetadata = {
+  roles: string[];
+  username: string | null;
+  email: string | null;
+};
+
+function parseMetadata(raw: string): SessionMetadata | null {
+  try {
+    const parsed = JSON.parse(raw) as SessionMetadata;
+    if (!Array.isArray(parsed.roles)) return null;
+    return parsed;
+  } catch {
+    return null;
+  }
 }
 
-export function readRefreshTokenFromBrowser(): string | null {
-  const session = readSessionFromBrowser();
-  return session?.refreshToken ?? null;
+// Cache referencial para o snapshot do useSyncExternalStore (mesmo raw -> mesmo objeto).
+let metadataCacheRaw: string | null = null;
+let metadataCacheParsed: SessionMetadata | null = null;
+
+/** Snapshot dos metadados de sessão (estável referencialmente para useSyncExternalStore). */
+export function getSessionMetadataSnapshot(): SessionMetadata | null {
+  const raw = localStorage.getItem(SESSION_METADATA_KEY);
+  if (raw !== metadataCacheRaw) {
+    metadataCacheRaw = raw;
+    metadataCacheParsed = raw ? parseMetadata(raw) : null;
+  }
+  return metadataCacheParsed;
+}
+
+/**
+ * Subscreve mudanças dos metadados: evento custom (mesma aba) + `storage` (outras abas),
+ * o que sincroniza login/logout entre abas automaticamente.
+ */
+export function subscribeSessionMetadata(callback: () => void): () => void {
+  window.addEventListener(SESSION_METADATA_EVENT, callback);
+  window.addEventListener('storage', callback);
+  return () => {
+    window.removeEventListener(SESSION_METADATA_EVENT, callback);
+    window.removeEventListener('storage', callback);
+  };
+}
+
+function notifySessionMetadataChanged() {
+  window.dispatchEvent(new Event(SESSION_METADATA_EVENT));
+}
+
+export function saveSessionMetadata(meta: SessionMetadata) {
+  if (typeof window === 'undefined') return;
+  localStorage.setItem(SESSION_METADATA_KEY, JSON.stringify(meta));
+  notifySessionMetadataChanged();
+}
+
+export function clearSessionMetadata() {
+  if (typeof window === 'undefined') return;
+  localStorage.removeItem(SESSION_METADATA_KEY);
+  notifySessionMetadataChanged();
 }

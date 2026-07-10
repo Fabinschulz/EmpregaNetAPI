@@ -12,20 +12,20 @@ type AuthSessionBoundaryProps = {
 
 /** Redireciona utilizadores já autenticados para fora das páginas de auth. */
 export function AuthSessionBoundary({ children }: AuthSessionBoundaryProps) {
-  const { token, hydrated } = useAuth();
+  const { isAuthenticated, hydrated } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
 
   useEffect(() => {
-    if (!hydrated || !token) return;
+    if (!hydrated || !isAuthenticated) return;
     router.replace(resolvePostLoginPath(searchParams));
-  }, [hydrated, token, router, searchParams]);
+  }, [hydrated, isAuthenticated, router, searchParams]);
 
   if (!hydrated) {
     return <AuthSessionChecking />;
   }
 
-  if (token) return null;
+  if (isAuthenticated) return null;
 
   return <>{children}</>;
 }

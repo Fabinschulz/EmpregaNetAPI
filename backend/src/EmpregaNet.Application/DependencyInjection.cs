@@ -1,7 +1,7 @@
 using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 using FluentValidation;
-using EmpregaNet.Application.Interfaces;
+using EmpregaNet.Application.Abstraction;
 using EmpregaNet.Application.Jobs.UseCase;
 
 public static class DependencyInjection

@@ -1,6 +1,6 @@
 using EmpregaNet.Application.Common.Base;
 using EmpregaNet.Application.Common.Exceptions;
-using EmpregaNet.Application.Interfaces;
+using EmpregaNet.Application.Abstraction;
 using EmpregaNet.Application.JobApplications.ViewModel;
 using EmpregaNet.Domain.Common;
 using EmpregaNet.Domain.Enums;

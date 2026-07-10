@@ -43,10 +43,19 @@ export async function loginWithGoogle(dto: LoginWithGoogleDto): Promise<UserLogg
   return userLoggedSchema.parse(res.data);
 }
 
-export async function refreshToken(dto: RefreshTokenDto): Promise<UserLoggedDto> {
-  const body = refreshTokenSchema.parse(dto);
+/**
+ * Renova a sessão. Sem argumento, o refresh token é lido do cookie httpOnly
+ * (enviado automaticamente por `withCredentials`); `dto` só é usado em casos legados/testes.
+ */
+export async function refreshToken(dto?: RefreshTokenDto): Promise<UserLoggedDto> {
+  const body = dto ? refreshTokenSchema.parse(dto) : undefined;
   const res = await axiosApi.post<unknown>('/api/users/refresh-token', body);
   return userLoggedSchema.parse(res.data);
+}
+
+/** Encerra a sessão no servidor (revoga o refresh token do cookie httpOnly e limpa os cookies de auth). */
+export async function logout(): Promise<void> {
+  await axiosApi.post<unknown>('/api/users/logout', undefined);
 }
 
 export async function forgotPassword(dto: ForgotPasswordDto): Promise<string> {
@@ -81,7 +90,7 @@ export async function resendEmailConfirmation(dto: ResendEmailConfirmationDto): 
   return 'Se o e-mail existir e ainda não estiver confirmado, reenviámos o link.';
 }
 
-export async function me(token: string): Promise<UserDto> {
-  const res = await axiosApi.get<unknown>('/api/users/me', createAxiosConfig(token));
+export async function me(): Promise<UserDto> {
+  const res = await axiosApi.get<unknown>('/api/users/me', createAxiosConfig());
   return userSchema.parse(res.data);
 }

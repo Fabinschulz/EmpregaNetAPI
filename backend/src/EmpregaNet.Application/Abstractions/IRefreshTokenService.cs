@@ -1,6 +1,6 @@
 using EmpregaNet.Domain.Entities;
 
-namespace EmpregaNet.Application.Interfaces;
+namespace EmpregaNet.Application.Abstraction;
 
 /// <summary>
 /// Emissão, rotação e revogação de refresh tokens opacos (persistidos por hash).
@@ -18,4 +18,10 @@ public interface IRefreshTokenService
 
     /// <summary>Revoga todos os refresh tokens ativos do utilizador (ex.: após mudança de senha).</summary>
     Task RevokeAllForUserAsync(long userId, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Revoga um único refresh token (logout do dispositivo atual).
+    /// Silencioso quando o token não existe ou já está revogado. O logout é idempotente.
+    /// </summary>
+    Task RevokeAsync(string plainRefreshToken, CancellationToken cancellationToken = default);
 }

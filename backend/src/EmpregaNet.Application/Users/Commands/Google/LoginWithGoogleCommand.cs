@@ -1,5 +1,5 @@
 using EmpregaNet.Application.Common.Exceptions;
-using EmpregaNet.Application.Interfaces;
+using EmpregaNet.Application.Abstraction;
 using EmpregaNet.Application.Auth.ViewModel;
 using EmpregaNet.Application.Users.Identity;
 using EmpregaNet.Application.Utils;

@@ -1,5 +1,5 @@
 using EmpregaNet.Application.Auth.Configuration;
-using EmpregaNet.Application.Interfaces;
+using EmpregaNet.Application.Abstraction;
 using EmpregaNet.Application.Users.Commands;
 using EmpregaNet.Domain.Entities;
 using EmpregaNet.Domain.Interfaces;
@@ -11,6 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
+using EmpregaNet.Infra.Email;
 
 namespace EmpregaNet.Tests.Support;
 
@@ -74,6 +75,8 @@ public sealed class InMemoryIdentityFixture : IDisposable
 
         services.AddScoped<IJwtBuilder, JwtBuilder>();
         services.AddScoped<IRefreshTokenService, RefreshTokenService>();
+        // Limite alto para não interferir nos cenários dos testes (os e-mails são únicos por teste).
+        services.AddSingleton<IEmailThrottleService>(new InMemoryEmailThrottleService(maxPerDay: 1000));
 
         services.AddSingleton<IValidator<RegisterUserCommand>, RegisterUserCommandValidator>();
         services.AddSingleton<IValidator<LoginUserCommand>, LoginUserCommandValidator>();

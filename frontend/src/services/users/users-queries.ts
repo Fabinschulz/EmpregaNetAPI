@@ -6,7 +6,6 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { useCallback, useState } from 'react';
 import { queryKeys } from '../query-keys';
-import { requireAuthToken } from '../shared';
 import {
   confirmEmail,
   forgotPassword,
@@ -67,12 +66,12 @@ function useAuthSessionMutation(actionLabel: string, resource: string) {
 }
 
 export function useMeQuery() {
-  const { token } = useAuth();
+  const { isAuthenticated } = useAuth();
 
   return useQuery({
     queryKey: queryKeys.users.me(),
-    queryFn: () => me(requireAuthToken(token)),
-    enabled: !!token
+    queryFn: () => me(),
+    enabled: isAuthenticated
   });
 }
 

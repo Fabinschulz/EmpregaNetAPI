@@ -1,5 +1,5 @@
 using EmpregaNet.Application.Common.Exceptions;
-using EmpregaNet.Application.Interfaces;
+using EmpregaNet.Application.Abstraction;
 using EmpregaNet.Application.Users.Commands;
 using EmpregaNet.Domain.Enums;
 using EmpregaNet.Tests.Support;
