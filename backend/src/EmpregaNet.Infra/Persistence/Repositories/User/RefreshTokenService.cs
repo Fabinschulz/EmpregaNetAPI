@@ -4,17 +4,20 @@ using EmpregaNet.Application.Abstraction;
 using EmpregaNet.Domain.Entities;
 using EmpregaNet.Infra.Persistence.Database;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 public sealed class RefreshTokenService : IRefreshTokenService
 {
     private readonly PostgreSqlContext _db;
     private readonly JwtSettings _jwt;
+    private readonly ILogger<RefreshTokenService> _logger;
 
-    public RefreshTokenService(PostgreSqlContext db, IOptions<JwtSettings> jwtOptions)
+    public RefreshTokenService(PostgreSqlContext db, IOptions<JwtSettings> jwtOptions, ILogger<RefreshTokenService> logger)
     {
         _db = db;
         _jwt = jwtOptions.Value;
+        _logger = logger;
     }
 
     public async Task<string> IssueAsync(long userId, CancellationToken cancellationToken = default)
@@ -43,8 +46,19 @@ public sealed class RefreshTokenService : IRefreshTokenService
             .Include(x => x.User)
             .FirstOrDefaultAsync(x => x.TokenHash == hash, cancellationToken);
 
-        if (row is null || row.RevokedAt is not null || row.ExpiresAt < DateTimeOffset.UtcNow)
+        if (row is null || row.ExpiresAt < DateTimeOffset.UtcNow)
             return null;
+
+        if (row.RevokedAt is not null)
+        {
+            // Se um refresh token revogado for reutilizado, revoga-se todos os tokens ativos do usuário para evitar possíveis ataques 
+            // de reuso de refresh token. Isso é uma medida de segurança para proteger a conta do usuário.
+            _logger.LogWarning(
+                "Reuso de refresh token revogado detectado para o usuário {UserId}; todos os tokens ativos foram revogados.",
+                row.UserId);
+            await RevokeAllForUserAsync(row.UserId, cancellationToken);
+            return null;
+        }
 
         if (row.User.IsDeleted)
             return null;
