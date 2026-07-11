@@ -1,6 +1,6 @@
 'use client';
 
-import { Alert, ApiQueryBoundary, Button, ListRowsSkeleton } from '@/components';
+import { Alert, ApiQueryBoundary, Button, ListRowsSkeleton, PageHeader } from '@/components';
 import { useCandidatesListQuery } from '@/services';
 import Link from 'next/link';
 
@@ -18,8 +18,7 @@ export function RecruitmentCandidatesPage() {
       onRetry={() => void refetch()}
     >
       <section>
-        <h1>Recrutamento: Candidatos</h1>
-        <p style={{ color: 'var(--muted)' }}>Listagem de candidatos.</p>
+        <PageHeader title="Recrutamento: Candidatos" description="Listagem de candidatos." />
 
         {isPending ? <ListRowsSkeleton rows={6} /> : null}
 

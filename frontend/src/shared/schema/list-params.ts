@@ -1,3 +1,5 @@
+import { DEFAULT_PAGE } from './pagination-schema';
+
 /** Paginação e ordenação comuns a endpoints de listagem. */
 export type ListQueryParams = {
   page?: number;
@@ -15,7 +17,12 @@ export type StatusFilterParams = {
   status?: string;
 };
 
-export type JobsListQueryParams = ListQueryParams & Pick<SoftDeleteFilterParams, 'isActive'>;
+/** Busca textual livre (interpretação por entidade no backend; ex.: título/descrição em vagas). */
+export type SearchFilterParams = {
+  search?: string;
+};
+
+export type JobsListQueryParams = ListQueryParams & Pick<SoftDeleteFilterParams, 'isActive'> & SearchFilterParams;
 
 export type CompaniesListQueryParams = ListQueryParams & SoftDeleteFilterParams;
 
@@ -27,9 +34,13 @@ export type JobApplicationsListQueryParams = ListQueryParams & StatusFilterParam
 
 export type JobApplicationsAdminListQueryParams = ListQueryParams & SoftDeleteFilterParams;
 
-export const DEFAULT_LIST_PAGE = 1;
-export const DEFAULT_LIST_SIZE = 100;
+/**
+ * Tamanho usado pelas telas ainda NÃO migradas para tabela paginada ("traga tudo").
+ * Transitório: quando uma tela adota `usePersistedTablePagination`, ela passa `page`/`size`
+ * explícitos e deixa de depender deste default. Remover quando todas migrarem.
+ */
+export const FULL_LIST_SIZE = 100;
 
 export function withDefaultListParams<T extends ListQueryParams>(params?: T): T {
-  return { page: DEFAULT_LIST_PAGE, size: DEFAULT_LIST_SIZE, ...params } as T;
+  return { page: DEFAULT_PAGE, size: FULL_LIST_SIZE, ...params } as T;
 }

@@ -1,5 +1,5 @@
+import type { JobsListQueryParams } from '@/shared';
 import { axiosApi, createAxiosConfig } from '../axios';
-import type { JobsListQueryParams } from '../shared';
 import { jobFormSchema, jobSchema, jobsListResponseSchema, type JobDto, type JobsListResponseDto } from './jobs-schema';
 
 export async function listJobs(params?: JobsListQueryParams): Promise<JobsListResponseDto> {

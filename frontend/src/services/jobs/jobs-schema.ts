@@ -1,5 +1,5 @@
+import { createPaginatedResponseSchema, type JobsListQueryParams } from '@/shared';
 import { z } from 'zod';
-import { listDataPaginationSchema } from '../shared';
 
 export const jobSchema = z.object({
   id: z.number().int(),
@@ -11,7 +11,7 @@ export const jobSchema = z.object({
 });
 
 export type JobDto = z.infer<typeof jobSchema>;
-export const jobsListResponseSchema = listDataPaginationSchema(jobSchema);
+export const jobsListResponseSchema = createPaginatedResponseSchema(jobSchema);
 export type JobsListResponseDto = z.infer<typeof jobsListResponseSchema>;
 
 export const jobFormSchema = z.object({
@@ -33,5 +33,25 @@ export function jobFormValuesFromDto(job: JobDto): JobFormValues {
     title: job.title,
     description: job.description ?? '',
     location: job.location ?? ''
+  };
+}
+
+// --- Filtros da tabela de vagas ---
+export const jobsFilterFormSchema = z.object({
+  search: z.string().trim().max(120, { message: 'A busca não pode exceder 120 caracteres.' }),
+  status: z.enum(['all', 'active', 'closed'])
+});
+
+export type JobsFilterFormValues = z.infer<typeof jobsFilterFormSchema>;
+export const defaultJobsFilter: JobsFilterFormValues = {
+  search: '',
+  status: 'all'
+};
+
+/** Converte os valores do formulário de filtro nos parâmetros aceitos pela API de vagas. */
+export function jobsFilterToParams(values: JobsFilterFormValues): Pick<JobsListQueryParams, 'search' | 'isActive'> {
+  return {
+    search: values.search.trim() || undefined,
+    isActive: values.status === 'all' ? undefined : values.status === 'active'
   };
 }

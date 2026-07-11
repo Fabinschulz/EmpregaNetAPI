@@ -1,6 +1,6 @@
 'use client';
 
-import { Alert, ApiQueryBoundary, Button, ListRowsSkeleton } from '@/components';
+import { Alert, ApiQueryBoundary, Button, ListRowsSkeleton, PageHeader } from '@/components';
 import { useJobsListQuery } from '@/services';
 import Link from 'next/link';
 
@@ -18,8 +18,7 @@ export function JobsPage() {
       onRetry={() => void refetch()}
     >
       <div>
-        <h1>Vagas</h1>
-        <p style={{ color: 'var(--muted)' }}>Lista de vagas ativas (leitura pública).</p>
+        <PageHeader title="Vagas" description="Lista de vagas ativas (leitura pública)." />
 
         {isPending ? (
           <ListRowsSkeleton rows={6} />

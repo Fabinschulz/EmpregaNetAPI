@@ -21,7 +21,7 @@ public class JobsController : MainController<CreateJobCommand, UpdateJobCommand,
     {
     }
 
-    /// <summary>Retorna uma lista paginada de vagas ativas, com filtros opcionais por título, empresa, localização, etc.</summary>
+    /// <summary>Retorna uma lista paginada de vagas ativas, com filtros opcionais (situação e busca por título/descrição).</summary>
     [AllowAnonymous]
     [HttpGet]
     [OutputCache(PolicyName = OutputCachePolicies.PublicCatalog)]
@@ -30,8 +30,9 @@ public class JobsController : MainController<CreateJobCommand, UpdateJobCommand,
         [FromQuery] int size = 100,
         [FromQuery] string? orderBy = null,
         [FromQuery] bool? isDeleted = null,
-        [FromQuery] bool? isActive = null)
-        => base.GetAll(page, size, orderBy, isDeleted, isActive);
+        [FromQuery] bool? isActive = null,
+        [FromQuery] string? search = null)
+        => base.GetAll(page, size, orderBy, isDeleted, isActive, search);
 
     /// <summary>Retorna os detalhes de uma vaga específica por ID, incluindo título, descrição, empresa, localização, requisitos, etc.</summary>
     [AllowAnonymous]

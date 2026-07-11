@@ -1,5 +1,5 @@
+import { createPaginatedResponseSchema } from '@/shared';
 import { z } from 'zod';
-import { listDataPaginationSchema } from '../shared';
 
 export const companySchema = z.object({
   id: z.number().int(),
@@ -10,7 +10,7 @@ export const companySchema = z.object({
 });
 
 export type CompanyDto = z.infer<typeof companySchema>;
-export const companiesListResponseSchema = listDataPaginationSchema(companySchema);
+export const companiesListResponseSchema = createPaginatedResponseSchema(companySchema);
 export type CompaniesListResponseDto = z.infer<typeof companiesListResponseSchema>;
 
 export const companyFormSchema = z.object({

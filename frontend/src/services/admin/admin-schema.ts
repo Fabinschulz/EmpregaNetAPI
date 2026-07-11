@@ -1,8 +1,8 @@
+import { createPaginatedResponseSchema } from '@/shared';
 import { z } from 'zod';
-import { listDataPaginationSchema } from '../shared';
 import { userSchema, type UserDto } from '../users/users-schema';
 
-export const adminUsersListResponseSchema = listDataPaginationSchema(userSchema);
+export const adminUsersListResponseSchema = createPaginatedResponseSchema(userSchema);
 export type AdminUsersListResponseDto = z.infer<typeof adminUsersListResponseSchema>;
 
 export const adminUserUpdateFormSchema = z.object({

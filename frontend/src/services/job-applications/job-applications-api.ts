@@ -1,10 +1,10 @@
+import type { JobApplicationsAdminListQueryParams, JobApplicationsListQueryParams } from '@/shared';
 import { axiosApi, createAxiosConfig } from '../axios';
-import type { JobApplicationsAdminListQueryParams, JobApplicationsListQueryParams } from '../shared';
 import {
-  applyToJobSchema,
-  changeApplicationStatusSchema,
-  jobApplicationsListResponseSchema,
-  type JobApplicationsListResponseDto
+    applyToJobSchema,
+    changeApplicationStatusSchema,
+    jobApplicationsListResponseSchema,
+    type JobApplicationsListResponseDto
 } from './job-applications-schema';
 
 export async function applyToJob(dto: unknown): Promise<string> {

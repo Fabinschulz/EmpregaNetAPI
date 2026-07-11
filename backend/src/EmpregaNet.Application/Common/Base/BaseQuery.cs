@@ -18,4 +18,5 @@ public sealed record GetByIdQuery<TResponse>(long Id) : IRequest<TResponse>;
 /// <param name="OrderBy"></param>
 /// <param name="IsDeleted"></param>
 /// <param name="IsActive"></param>
-public sealed record GetAllQuery<TResponse>(int Page, int Size, string? OrderBy, bool? IsDeleted = null, bool? IsActive = null) : IRequest<ListDataPagination<TResponse>>, IPaginatedQuery;
+/// <param name="Search">Busca textual livre (interpretação por entidade; ex.: título/localização em vagas).</param>
+public sealed record GetAllQuery<TResponse>(int Page, int Size, string? OrderBy, bool? IsDeleted = null, bool? IsActive = null, string? Search = null) : IRequest<ListDataPagination<TResponse>>, IPaginatedQuery;

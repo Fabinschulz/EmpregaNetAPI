@@ -1,5 +1,5 @@
 import { axiosApi, createAxiosConfig } from '../axios';
-import type { AdminUsersListQueryParams } from '../shared';
+import type { AdminUsersListQueryParams } from '@/shared/schema';
 import { UserDto, userSchema } from '../users/users-schema';
 import { adminUsersListResponseSchema, type AdminUsersListResponseDto } from './admin-schema';
 

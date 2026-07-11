@@ -23,13 +23,21 @@ public class JobRepository : BaseRepository<Job>, IJobRepository
         int size,
         string? orderBy,
         bool? isDeleted,
-        bool? isActive)
+        bool? isActive,
+        string? search = null)
     {
         var query = _context.Jobs.AsNoTracking();
         if (isDeleted.HasValue)
             query = query.Where(j => j.IsDeleted == isDeleted.Value);
         if (isActive.HasValue)
             query = query.Where(j => j.IsActive == isActive.Value);
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            var term = search.Trim().ToLower();
+            query = query.Where(j =>
+                j.Title.ToLower().Contains(term) ||
+                j.Description.ToLower().Contains(term));
+        }
         query = ApplyJobOrderBy(query, orderBy);
         return await query.ToPaginatedListAsync(page, size, cancellationToken);
     }

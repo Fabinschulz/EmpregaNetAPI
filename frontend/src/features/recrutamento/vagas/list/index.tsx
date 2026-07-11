@@ -1,12 +1,69 @@
 'use client';
 
-import { Alert, ApiQueryBoundary, Button, ListRowsSkeleton } from '@/components';
-import { useJobsListQuery } from '@/services';
+import {
+  ApiQueryBoundary,
+  Badge,
+  Button,
+  PageHeader,
+  TableContainer,
+  TableFilters,
+  type DataTableColumn
+} from '@/components';
+import { FormProvider } from '@/context';
+import { usePersistedTablePagination } from '@/hooks';
+import {
+  defaultJobsFilter,
+  jobsFilterFormSchema,
+  jobsFilterToParams,
+  useJobsListQuery,
+  type JobDto,
+  type JobsFilterFormValues
+} from '@/services';
+import type { JobsListQueryParams } from '@/shared/schema';
 import Link from 'next/link';
+import { useState } from 'react';
+import { JobsFilterFields } from './jobs-filter-fields';
+
+type JobsFilterParams = Pick<JobsListQueryParams, 'search' | 'isActive'>;
+
+const JOBS_COLUMNS: DataTableColumn<JobDto>[] = [
+  { key: 'title', header: 'Título', render: (job) => <strong>{job.title}</strong> },
+  { key: 'location', header: 'Localização', render: (job) => job.location ?? '—' },
+  {
+    key: 'status',
+    header: 'Status',
+    render: (job) => (
+      <Badge variant={job.isActive === false ? 'secondary' : 'default'}>
+        {job.isActive === false ? 'Encerrada' : 'Ativa'}
+      </Badge>
+    )
+  },
+  {
+    key: 'actions',
+    type: 'actions',
+    getActions: (job) => [{ key: 'edit', label: 'Editar', href: `/recrutamento/vagas/${job.id}` }]
+  }
+];
 
 export function RecruitmentJobsPage() {
-  const { data, isPending, isError, error, refetch } = useJobsListQuery();
-  const jobs = data?.data.map((j) => ({ id: j.id, title: j.title })) ?? [];
+  const pagination = usePersistedTablePagination({ storageKey: 'recrutamento-vagas' });
+  const [filters, setFilters] = useState<JobsFilterParams>({});
+
+  const { data, isPending, isError, error, refetch } = useJobsListQuery({
+    page: pagination.page,
+    size: pagination.pageSize,
+    ...filters
+  });
+
+  const handleFilterSubmit = (values: JobsFilterFormValues) => {
+    setFilters(jobsFilterToParams(values));
+    pagination.setPage(1);
+  };
+
+  const handleFilterClear = () => {
+    setFilters({});
+    pagination.setPage(1);
+  };
 
   return (
     <ApiQueryBoundary
@@ -18,44 +75,39 @@ export function RecruitmentJobsPage() {
       onRetry={() => void refetch()}
     >
       <section>
-        <header style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 12 }}>
-          <div>
-            <h1>Recrutamento: Vagas</h1>
-            <p style={{ color: 'var(--muted)' }}>Gestão de vagas (criar/editar/fechar/excluir).</p>
-          </div>
-          <Button variant="primary" asChild>
-            <Link href="/recrutamento/vagas/new">Nova vaga</Link>
-          </Button>
-        </header>
+        <PageHeader
+          title="Recrutamento: Vagas"
+          description="Gestão de vagas (criar/editar/fechar/excluir)."
+          actions={
+            <Button variant="primary" asChild>
+              <Link href="/recrutamento/vagas/new">Nova vaga</Link>
+            </Button>
+          }
+        />
 
-        {isPending ? <ListRowsSkeleton rows={6} /> : null}
-
-        {!isPending && jobs.length === 0 ? (
-          <Alert title="Nenhuma vaga">Ainda não há vagas cadastradas.</Alert>
-        ) : (
-          <ul style={{ display: 'grid', gap: 10, marginTop: 12, listStyle: 'none', padding: 0 }}>
-            {jobs.map((j) => (
-              <li
-                key={j.id}
-                style={{
-                  border: '1px solid var(--border)',
-                  borderRadius: 'var(--radius)',
-                  padding: 14,
-                  background: 'var(--card-bg)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  gap: 12
-                }}
+        <TableContainer
+          columns={JOBS_COLUMNS}
+          items={data?.data ?? []}
+          getRowKey={(job) => job.id}
+          pagination={pagination}
+          totalItems={data?.totalItems}
+          isPending={isPending}
+          emptyTitle="Nenhuma vaga"
+          emptyMessage="Nenhuma vaga encontrada para os filtros informados."
+          filters={
+            <TableFilters title="Buscar vagas" description="Filtre por título/descrição ou pela situação da vaga.">
+              <FormProvider
+                validationSchema={jobsFilterFormSchema}
+                defaultValues={defaultJobsFilter}
+                onSubmit={handleFilterSubmit}
               >
-                <strong>{j.title}</strong>
-                <Button asChild>
-                  <Link href={`/recrutamento/vagas/${j.id}`}>Editar</Link>
-                </Button>
-              </li>
-            ))}
-          </ul>
-        )}
+                <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'flex-end', gap: 12 }}>
+                  <JobsFilterFields onClear={handleFilterClear} />
+                </div>
+              </FormProvider>
+            </TableFilters>
+          }
+        />
       </section>
     </ApiQueryBoundary>
   );

@@ -1,6 +1,6 @@
 'use client';
 
-import { Alert, ApiQueryBoundary, Button, ListRowsSkeleton } from '@/components';
+import { Alert, ApiQueryBoundary, Button, ListRowsSkeleton, PageHeader } from '@/components';
 import { useCompaniesListQuery } from '@/services';
 import Link from 'next/link';
 
@@ -18,15 +18,15 @@ export function AdminCompaniesPage() {
       onRetry={() => void refetch()}
     >
       <div>
-        <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 12 }}>
-          <div>
-            <h1>Admin: Empresas</h1>
-            <p style={{ color: 'var(--muted)' }}>Gestão de empresas (Admin).</p>
-          </div>
-          <Button variant="primary" asChild>
-            <Link href="/admin/empresas/new">Nova empresa</Link>
-          </Button>
-        </div>
+        <PageHeader
+          title="Admin: Empresas"
+          description="Gestão de empresas (Admin)."
+          actions={
+            <Button variant="primary" asChild>
+              <Link href="/admin/empresas/new">Nova empresa</Link>
+            </Button>
+          }
+        />
 
         {isPending ? <ListRowsSkeleton rows={6} /> : null}
 

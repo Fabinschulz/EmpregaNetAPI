@@ -1,0 +1,41 @@
+.root {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 14px;
+  padding: 8px 4px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.pageSize {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.label {
+  white-space: nowrap;
+}
+
+.pageSizeTrigger {
+  min-width: 72px;
+}
+
+.range {
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.pageIndicator {
+  min-width: 52px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}

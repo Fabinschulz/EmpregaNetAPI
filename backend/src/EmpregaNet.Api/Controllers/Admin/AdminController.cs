@@ -38,9 +38,11 @@ public class AdminController : MainController<AdminUsersCreateNotSupportedComman
         [FromQuery] int size = 100,
         [FromQuery] string? orderBy = null,
         [FromQuery] bool? isDeleted = null,
-        [FromQuery] bool? isActive = null)
+        [FromQuery] bool? isActive = null,
+        [FromQuery] string? search = null)
     {
         _ = isActive;
+        _ = search;
         var result = await _mediator.Send(new GetAllUsersQuery(page, size, orderBy, isDeleted));
         return Ok(result);
     }

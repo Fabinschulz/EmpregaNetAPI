@@ -51,7 +51,8 @@ public sealed class GetAllJobHandler : IRequestHandler<GetAllQuery<JobViewModel>
                 request.Size,
                 request.OrderBy,
                 isDeleted,
-                isActive);
+                isActive,
+                request.Search);
             var jobViewModels = result.Data.Select(c => c.ToViewModel()).ToList();
 
             _logger.LogInformation("Total de vagas de emprego encontradas: {Count}", result.TotalItems);

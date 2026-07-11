@@ -6,5 +6,4 @@ export * from './companies';
 export * from './job-applications';
 export * from './jobs';
 export * from './query-keys';
-export * from './shared';
 export * from './users';

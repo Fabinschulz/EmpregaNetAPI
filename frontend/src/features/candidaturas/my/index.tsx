@@ -1,6 +1,6 @@
 'use client';
 
-import { Alert, ApiQueryBoundary, ListRowsSkeleton } from '@/components';
+import { Alert, ApiQueryBoundary, ListRowsSkeleton, PageHeader } from '@/components';
 import { useMyJobApplicationsQuery } from '@/services';
 
 export function MyApplicationsPage() {
@@ -17,8 +17,7 @@ export function MyApplicationsPage() {
       onRetry={() => void refetch()}
     >
       <section>
-        <h1>Minhas candidaturas</h1>
-        <p style={{ color: 'var(--muted)' }}>Acompanhe o status das suas candidaturas.</p>
+        <PageHeader title="Minhas candidaturas" description="Acompanhe o status das suas candidaturas." />
 
         {isPending ? <ListRowsSkeleton rows={5} /> : null}
 

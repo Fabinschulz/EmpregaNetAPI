@@ -1,6 +1,6 @@
 'use client';
 
-import { ApiQueryBoundary, FormFieldsSkeleton } from '@/components';
+import { ApiQueryBoundary, FormFieldsSkeleton, PageHeader } from '@/components';
 import { useAuth } from '@/features/auth';
 import { useMeQuery } from '@/services';
 
@@ -18,8 +18,7 @@ export function ProfilePage() {
       onRetry={() => void refetch()}
     >
       <section>
-        <h1>Minha conta</h1>
-        <p style={{ color: 'var(--muted)' }}>Informações do usuário autenticado.</p>
+        <PageHeader title="Minha conta" description="Informações do usuário autenticado." />
 
         {isPending ? <FormFieldsSkeleton fields={5} /> : null}
 

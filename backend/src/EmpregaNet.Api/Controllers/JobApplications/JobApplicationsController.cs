@@ -49,8 +49,9 @@ public class JobApplicationsController : MainController<ApplyToJobCommand, Chang
         [FromQuery] int size = 100,
         [FromQuery] string? orderBy = null,
         [FromQuery] bool? isDeleted = null,
-        [FromQuery] bool? isActive = null)
-        => base.GetAll(page, size, orderBy, isDeleted, isActive);
+        [FromQuery] bool? isActive = null,
+        [FromQuery] string? search = null)
+        => base.GetAll(page, size, orderBy, isDeleted, isActive, search);
 
     /// <summary>Lista as candidaturas do utilizador autenticado.</summary>
     [HttpGet("mine")]

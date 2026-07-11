@@ -1,6 +1,6 @@
 'use client';
 
-import { Alert, ApiQueryBoundary, Button, ListRowsSkeleton } from '@/components';
+import { Alert, ApiQueryBoundary, Button, ListRowsSkeleton, PageHeader } from '@/components';
 import { useAdminUsersListQuery } from '@/services';
 import Link from 'next/link';
 
@@ -18,8 +18,7 @@ export function AdminUsersPage() {
       onRetry={() => void refetch()}
     >
       <section>
-        <h1>Admin: Usuários</h1>
-        <p style={{ color: 'var(--muted)' }}>Gestão de usuários (Admin).</p>
+        <PageHeader title="Admin: Usuários" description="Gestão de usuários (Admin)." />
 
         {isPending ? <ListRowsSkeleton rows={6} /> : null}
 

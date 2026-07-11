@@ -1,5 +1,5 @@
+import type { DomainErrorDto } from '@/shared';
 import { parseApiError } from '@/utils';
-import type { DomainErrorDto } from '@/services/shared/common-schema';
 
 export type QueryApiErrorState = {
   message: string | null;

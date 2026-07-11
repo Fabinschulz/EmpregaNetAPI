@@ -1,15 +1,15 @@
 'use client';
 
 import { useAuth } from '@/context';
+import {
+    withDefaultListParams,
+    type JobApplicationsAdminListQueryParams,
+    type JobApplicationsListQueryParams
+} from '@/shared';
 import { reportMutationApiError, toastSuccess } from '@/utils';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { queryKeys } from '../query-keys';
-import {
-  withDefaultListParams,
-  type JobApplicationsAdminListQueryParams,
-  type JobApplicationsListQueryParams
-} from '../shared';
 import { applyToJob, listAll, listMine } from './job-applications-api';
 
 export function useMyJobApplicationsQuery(params?: JobApplicationsListQueryParams) {

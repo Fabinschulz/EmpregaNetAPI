@@ -1,12 +1,12 @@
 'use client';
 
 import { useAuth } from '@/context';
+import { withDefaultListParams, type CompaniesListQueryParams } from '@/shared';
 import { reportMutationApiError, startRouterTransition } from '@/utils';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { queryKeys } from '../query-keys';
-import { withDefaultListParams, type CompaniesListQueryParams } from '../shared';
 import { createCompany, deleteCompany, getCompany, listCompanies, updateCompany } from './companies-api';
 import type { CompanyFormValues } from './companies-schema';
 

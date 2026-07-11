@@ -1,9 +1,9 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, PageHeader } from '@/components/ui';
 
 export function DashboardPage() {
   return (
     <div>
-      <h1>Dashboard</h1>
+      <PageHeader title="Dashboard" />
       <Card style={{ marginTop: 16 }}>
         <CardHeader>
           <CardTitle>Bem-vindo</CardTitle>

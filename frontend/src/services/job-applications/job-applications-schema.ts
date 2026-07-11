@@ -1,5 +1,5 @@
+import { createPaginatedResponseSchema } from '@/shared';
 import { z } from 'zod';
-import { listDataPaginationSchema } from '../shared';
 
 export const jobApplicationSchema = z.object({
   id: z.number().int(),
@@ -10,7 +10,7 @@ export const jobApplicationSchema = z.object({
 });
 
 export type JobApplicationDto = z.infer<typeof jobApplicationSchema>;
-export const jobApplicationsListResponseSchema = listDataPaginationSchema(jobApplicationSchema);
+export const jobApplicationsListResponseSchema = createPaginatedResponseSchema(jobApplicationSchema);
 export type JobApplicationsListResponseDto = z.infer<typeof jobApplicationsListResponseSchema>;
 
 export const applyToJobSchema = z.object({

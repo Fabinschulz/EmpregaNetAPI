@@ -14,7 +14,7 @@ public interface IJobRepository : IBaseRepository<Job>
     Task<bool> ExistsByTitleAndCompanyIdAsync(string title, long companyId);
 
     /// <summary>
-    /// Lista vagas com filtros opcionais.
+    /// Lista vagas com filtros opcionais. <paramref name="search"/> busca por título ou localização.
     /// </summary>
     Task<ListDataPagination<Job>> GetAllAsync(
         CancellationToken cancellationToken,
@@ -22,5 +22,6 @@ public interface IJobRepository : IBaseRepository<Job>
         int size,
         string? orderBy,
         bool? isDeleted,
-        bool? isActive);
+        bool? isActive,
+        string? search = null);
 }

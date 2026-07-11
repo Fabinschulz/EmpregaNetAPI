@@ -1,11 +1,11 @@
+import type { CompaniesListQueryParams } from '@/shared';
 import { axiosApi, createAxiosConfig } from '../axios';
-import type { CompaniesListQueryParams } from '../shared';
 import {
-  companiesListResponseSchema,
-  CompanyDto,
-  companyFormSchema,
-  companySchema,
-  type CompaniesListResponseDto
+    companiesListResponseSchema,
+    CompanyDto,
+    companyFormSchema,
+    companySchema,
+    type CompaniesListResponseDto
 } from './companies-schema';
 
 export async function listCompanies(
