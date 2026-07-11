@@ -1,11 +1,60 @@
 'use client';
 
-import { Alert, ApiQueryBoundary, ListRowsSkeleton, PageHeader } from '@/components';
-import { useAllJobApplicationsQuery } from '@/services';
+import { ApiQueryBoundary, PageHeader, TableContainer, type DataTableColumn, type RowAction } from '@/components';
+import { ApplicationStatusBadge } from '@/features/candidaturas/application-status-badge';
+import { usePersistedTablePagination } from '@/hooks';
+import {
+  applicationStatusTransitions,
+  applicationTransitionLabels,
+  parseApplicationStatus,
+  useAllJobApplicationsQuery,
+  useChangeApplicationStatusMutation,
+  type JobApplicationDto
+} from '@/services';
+import { useMemo } from 'react';
 
 export function RecruitmentApplicationsPage() {
-  const { data, isPending, isError, error, refetch } = useAllJobApplicationsQuery();
-  const items = data?.data.map((x) => ({ id: x.id, jobId: x.jobId, status: x.status })) ?? [];
+  const pagination = usePersistedTablePagination({ storageKey: 'recrutamento-candidaturas' });
+  const { data, isPending, isError, error, refetch } = useAllJobApplicationsQuery({
+    page: pagination.page,
+    size: pagination.pageSize
+  });
+  const { mutate: changeApplicationStatus, isPending: isChangingStatus } = useChangeApplicationStatusMutation();
+
+  const columns = useMemo<DataTableColumn<JobApplicationDto>[]>(
+    () => [
+      { key: 'id', header: 'Candidatura', render: (application) => <strong>#{application.id}</strong> },
+      { key: 'jobId', header: 'Vaga', render: (application) => application.jobId ?? '—' },
+      {
+        key: 'status',
+        header: 'Status',
+        render: (application) => <ApplicationStatusBadge status={application.status} />
+      },
+      {
+        key: 'actions',
+        type: 'actions',
+        getActions: (application) => {
+          const status = parseApplicationStatus(application.status);
+          const transitions = status ? applicationStatusTransitions[status] : [];
+
+          const actions: RowAction[] = transitions.map((target) => ({
+            key: target,
+            label: applicationTransitionLabels[target],
+            onSelect: () => changeApplicationStatus({ id: application.id, status: target }),
+            variant: target === 'Rejected' || target === 'Canceled' ? 'destructive' : 'default',
+            disabled: isChangingStatus
+          }));
+
+          if (application.jobId) {
+            actions.push({ key: 'view-job', label: 'Ver vaga', href: `/vagas/${application.jobId}` });
+          }
+
+          return actions;
+        }
+      }
+    ],
+    [changeApplicationStatus, isChangingStatus]
+  );
 
   return (
     <ApiQueryBoundary
@@ -17,32 +66,21 @@ export function RecruitmentApplicationsPage() {
       onRetry={() => void refetch()}
     >
       <section>
-        <PageHeader title="Recrutamento: Candidaturas" description="Listagem de candidaturas (equipe de recrutamento)." />
+        <PageHeader
+          title="Recrutamento: Candidaturas"
+          description="Acompanhe e avance as candidaturas pelo processo seletivo."
+        />
 
-        {isPending ? <ListRowsSkeleton rows={6} /> : null}
-
-        {!isPending && items.length === 0 ? (
-          <Alert title="Nenhuma candidatura">Nenhuma candidatura encontrada.</Alert>
-        ) : (
-          <ul style={{ display: 'grid', gap: 10, marginTop: 12, listStyle: 'none', padding: 0 }}>
-            {items.map((it) => (
-              <li
-                key={it.id}
-                style={{
-                  border: '1px solid var(--border)',
-                  borderRadius: 'var(--radius)',
-                  padding: 14,
-                  background: 'var(--card-bg)'
-                }}
-              >
-                <strong>#{it.id}</strong>
-                <p style={{ color: 'var(--muted)', fontSize: 14, margin: '4px 0 0' }}>
-                  Job: {it.jobId ?? '—'} • Status: {it.status ?? '—'}
-                </p>
-              </li>
-            ))}
-          </ul>
-        )}
+        <TableContainer
+          columns={columns}
+          items={data?.data ?? []}
+          getRowKey={(application) => application.id}
+          pagination={pagination}
+          totalItems={data?.totalItems}
+          isPending={isPending}
+          emptyTitle="Nenhuma candidatura"
+          emptyMessage="Nenhuma candidatura encontrada."
+        />
       </section>
     </ApiQueryBoundary>
   );

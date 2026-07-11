@@ -1,12 +1,25 @@
 'use client';
 
-import { Alert, ApiQueryBoundary, Button, ListRowsSkeleton, PageHeader } from '@/components';
-import { useCandidatesListQuery } from '@/services';
-import Link from 'next/link';
+import { ApiQueryBoundary, PageHeader, TableContainer, type DataTableColumn } from '@/components';
+import { usePersistedTablePagination } from '@/hooks';
+import { useCandidatesListQuery, type UserDto } from '@/services';
+
+const CANDIDATES_COLUMNS: DataTableColumn<UserDto>[] = [
+  { key: 'username', header: 'Candidato', render: (candidate) => <strong>{candidate.username}</strong> },
+  { key: 'email', header: 'E-mail', render: (candidate) => candidate.email },
+  {
+    key: 'actions',
+    type: 'actions',
+    getActions: (candidate) => [{ key: 'detail', label: 'Detalhes', href: `/recrutamento/candidatos/${candidate.id}` }]
+  }
+];
 
 export function RecruitmentCandidatesPage() {
-  const { data, isPending, isError, error, refetch } = useCandidatesListQuery();
-  const items = data?.data.map((c) => ({ id: c.id, username: c.username, email: c.email })) ?? [];
+  const pagination = usePersistedTablePagination({ storageKey: 'recrutamento-candidatos' });
+  const { data, isPending, isError, error, refetch } = useCandidatesListQuery({
+    page: pagination.page,
+    size: pagination.pageSize
+  });
 
   return (
     <ApiQueryBoundary
@@ -20,38 +33,16 @@ export function RecruitmentCandidatesPage() {
       <section>
         <PageHeader title="Recrutamento: Candidatos" description="Listagem de candidatos." />
 
-        {isPending ? <ListRowsSkeleton rows={6} /> : null}
-
-        {!isPending && items.length === 0 ? (
-          <Alert title="Nenhum candidato">Nenhum candidato encontrado.</Alert>
-        ) : (
-          <ul style={{ display: 'grid', gap: 10, marginTop: 12, listStyle: 'none', padding: 0 }}>
-            {items.map((c) => (
-              <li
-                key={c.id}
-                style={{
-                  border: '1px solid var(--border)',
-                  borderRadius: 'var(--radius)',
-                  padding: 14,
-                  background: 'var(--card-bg)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  gap: 12
-                }}
-              >
-                <span>
-                  <strong>{c.username}</strong>
-                  <br />
-                  <span style={{ color: 'var(--muted)', fontSize: 14 }}>{c.email}</span>
-                </span>
-                <Button asChild>
-                  <Link href={`/recrutamento/candidatos/${c.id}`}>Detalhes</Link>
-                </Button>
-              </li>
-            ))}
-          </ul>
-        )}
+        <TableContainer
+          columns={CANDIDATES_COLUMNS}
+          items={data?.data ?? []}
+          getRowKey={(candidate) => candidate.id}
+          pagination={pagination}
+          totalItems={data?.totalItems}
+          isPending={isPending}
+          emptyTitle="Nenhum candidato"
+          emptyMessage="Nenhum candidato encontrado."
+        />
       </section>
     </ApiQueryBoundary>
   );

@@ -1,11 +1,32 @@
 'use client';
 
-import { Alert, ApiQueryBoundary, ListRowsSkeleton, PageHeader } from '@/components';
-import { useMyJobApplicationsQuery } from '@/services';
+import { ApiQueryBoundary, PageHeader, TableContainer, type DataTableColumn } from '@/components';
+import { usePersistedTablePagination } from '@/hooks';
+import { useMyJobApplicationsQuery, type JobApplicationDto } from '@/services';
+import { ApplicationStatusBadge } from '../application-status-badge';
+
+const MY_APPLICATIONS_COLUMNS: DataTableColumn<JobApplicationDto>[] = [
+  { key: 'id', header: 'Candidatura', render: (application) => <strong>#{application.id}</strong> },
+  { key: 'jobId', header: 'Vaga', render: (application) => application.jobId ?? '—' },
+  {
+    key: 'status',
+    header: 'Status',
+    render: (application) => <ApplicationStatusBadge status={application.status} />
+  },
+  {
+    key: 'actions',
+    type: 'actions',
+    getActions: (application) =>
+      application.jobId ? [{ key: 'view-job', label: 'Ver vaga', href: `/vagas/${application.jobId}` }] : []
+  }
+];
 
 export function MyApplicationsPage() {
-  const { data, isPending, isError, error, refetch } = useMyJobApplicationsQuery();
-  const items = data?.data.map((x) => ({ id: x.id, status: x.status, jobId: x.jobId })) ?? [];
+  const pagination = usePersistedTablePagination({ storageKey: 'minhas-candidaturas' });
+  const { data, isPending, isError, error, refetch } = useMyJobApplicationsQuery({
+    page: pagination.page,
+    size: pagination.pageSize
+  });
 
   return (
     <ApiQueryBoundary
@@ -19,30 +40,16 @@ export function MyApplicationsPage() {
       <section>
         <PageHeader title="Minhas candidaturas" description="Acompanhe o status das suas candidaturas." />
 
-        {isPending ? <ListRowsSkeleton rows={5} /> : null}
-
-        {!isPending && items.length === 0 ? (
-          <Alert title="Nenhuma candidatura">Você ainda não se candidatou a nenhuma vaga.</Alert>
-        ) : (
-          <ul style={{ display: 'grid', gap: 10, marginTop: 12, listStyle: 'none', padding: 0 }}>
-            {items.map((it) => (
-              <li
-                key={it.id}
-                style={{
-                  border: '1px solid var(--border)',
-                  borderRadius: 'var(--radius)',
-                  background: 'var(--card-bg)',
-                  padding: 14
-                }}
-              >
-                <strong>Candidatura #{it.id}</strong>
-                <p style={{ color: 'var(--muted)', fontSize: 14, margin: '4px 0 0' }}>
-                  Job: {it.jobId ?? '—'} • Status: {it.status ?? '—'}
-                </p>
-              </li>
-            ))}
-          </ul>
-        )}
+        <TableContainer
+          columns={MY_APPLICATIONS_COLUMNS}
+          items={data?.data ?? []}
+          getRowKey={(application) => application.id}
+          pagination={pagination}
+          totalItems={data?.totalItems}
+          isPending={isPending}
+          emptyTitle="Nenhuma candidatura"
+          emptyMessage="Você ainda não se candidatou a nenhuma vaga."
+        />
       </section>
     </ApiQueryBoundary>
   );

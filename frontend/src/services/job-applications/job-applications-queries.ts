@@ -10,7 +10,8 @@ import { reportMutationApiError, toastSuccess } from '@/utils';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { queryKeys } from '../query-keys';
-import { applyToJob, listAll, listMine } from './job-applications-api';
+import { applyToJob, changeStatus, listAll, listMine } from './job-applications-api';
+import { applicationStatusLabels, type ApplicationStatus } from './job-applications-schema';
 
 export function useMyJobApplicationsQuery(params?: JobApplicationsListQueryParams) {
   const { isAuthenticated } = useAuth();
@@ -47,6 +48,25 @@ export function useApplyToJobMutation(jobId: number) {
     },
     onError: (err) => {
       reportMutationApiError({ err, actionLabel: 'candidatar-se', resource: 'candidatura', setApiError });
+    }
+  });
+
+  return { ...ctx, apiError };
+}
+
+/** Move uma candidatura para outro status do processo seletivo (equipe de recrutamento). */
+export function useChangeApplicationStatusMutation() {
+  const queryClient = useQueryClient();
+  const [apiError, setApiError] = useState<string | null>(null);
+
+  const ctx = useMutation({
+    mutationFn: ({ id, status }: { id: number; status: ApplicationStatus }) => changeStatus(id, { status }),
+    onSuccess: async (_res, { status }) => {
+      await queryClient.invalidateQueries({ queryKey: queryKeys.jobApplications.all });
+      toastSuccess('Status atualizado', `Candidatura movida para "${applicationStatusLabels[status]}".`);
+    },
+    onError: (err) => {
+      reportMutationApiError({ err, actionLabel: 'atualizar o status', resource: 'candidatura', setApiError });
     }
   });
 

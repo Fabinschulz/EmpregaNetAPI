@@ -1,12 +1,28 @@
 'use client';
 
-import { Alert, ApiQueryBoundary, Button, ListRowsSkeleton, PageHeader } from '@/components';
-import { useCompaniesListQuery } from '@/services';
+import { ApiQueryBoundary, Button, PageHeader, TableContainer, type DataTableColumn } from '@/components';
+import { usePersistedTablePagination } from '@/hooks';
+import { useCompaniesListQuery, type CompanyDto } from '@/services';
 import Link from 'next/link';
 
+const COMPANIES_COLUMNS: DataTableColumn<CompanyDto>[] = [
+  { key: 'name', header: 'Nome', render: (company) => <strong>{company.name}</strong> },
+  { key: 'email', header: 'E-mail', render: (company) => company.email ?? '—' },
+  { key: 'phone', header: 'Telefone', render: (company) => company.phone ?? '—' },
+  { key: 'documentNo', header: 'CNPJ', render: (company) => company.documentNo ?? '—' },
+  {
+    key: 'actions',
+    type: 'actions',
+    getActions: (company) => [{ key: 'edit', label: 'Editar', href: `/admin/empresas/${company.id}` }]
+  }
+];
+
 export function AdminCompaniesPage() {
-  const { data, isPending, isError, error, refetch } = useCompaniesListQuery();
-  const items = data?.data.map((c) => ({ id: c.id, name: c.name })) ?? [];
+  const pagination = usePersistedTablePagination({ storageKey: 'admin-empresas' });
+  const { data, isPending, isError, error, refetch } = useCompaniesListQuery({
+    page: pagination.page,
+    size: pagination.pageSize
+  });
 
   return (
     <ApiQueryBoundary
@@ -17,7 +33,7 @@ export function AdminCompaniesPage() {
       resource="empresas"
       onRetry={() => void refetch()}
     >
-      <div>
+      <section>
         <PageHeader
           title="Admin: Empresas"
           description="Gestão de empresas (Admin)."
@@ -28,36 +44,17 @@ export function AdminCompaniesPage() {
           }
         />
 
-        {isPending ? <ListRowsSkeleton rows={6} /> : null}
-
-        {!isPending && items.length === 0 ? (
-          <Alert title="Nenhuma empresa">Nenhuma empresa encontrada.</Alert>
-        ) : (
-          <div style={{ display: 'grid', gap: 10, marginTop: 12 }}>
-            {items.map((c) => (
-              <div key={c.id}>
-                <div
-                  style={{
-                    border: '1px solid var(--border)',
-                    borderRadius: 'var(--radius)',
-                    padding: 14,
-                    background: 'var(--card-bg)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    gap: 12
-                  }}
-                >
-                  <div style={{ fontWeight: 700 }}>{c.name}</div>
-                  <Button asChild>
-                    <Link href={`/admin/empresas/${c.id}`}>Editar</Link>
-                  </Button>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
+        <TableContainer
+          columns={COMPANIES_COLUMNS}
+          items={data?.data ?? []}
+          getRowKey={(company) => company.id}
+          pagination={pagination}
+          totalItems={data?.totalItems}
+          isPending={isPending}
+          emptyTitle="Nenhuma empresa"
+          emptyMessage="Nenhuma empresa encontrada."
+        />
+      </section>
     </ApiQueryBoundary>
   );
 }
