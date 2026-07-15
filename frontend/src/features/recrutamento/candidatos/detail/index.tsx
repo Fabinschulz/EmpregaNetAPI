@@ -1,6 +1,6 @@
 'use client';
 
-import { ApiQueryBoundary, FormFieldsSkeleton } from '@/components';
+import { ApiQueryBoundary, FormFieldsSkeleton, PageHeader } from '@/components';
 import { useCandidateQuery } from '@/services';
 import { useParams } from 'next/navigation';
 import { useMemo } from 'react';
@@ -20,7 +20,7 @@ export function CandidateDetailPage() {
       onRetry={() => void refetch()}
     >
       <section>
-        <h1>Candidato</h1>
+        <PageHeader title="Candidato" description="Ficha do candidato." />
         {isPending ? <FormFieldsSkeleton fields={5} /> : null}
         {user ? (
           <article

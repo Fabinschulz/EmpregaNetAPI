@@ -1,6 +1,6 @@
 'use client';
 
-import { Alert, ApiQueryBoundary, FormFieldsSkeleton } from '@/components';
+import { Alert, ApiQueryBoundary, FormFieldsSkeleton, PageHeader } from '@/components';
 import { FormProvider } from '@/context';
 import {
   defaultFormJob,
@@ -47,7 +47,7 @@ export function RecruitmentEditJobPage() {
       onRetry={() => void refetch()}
     >
       <section>
-        <h1>Editar vaga</h1>
+        <PageHeader title="Editar vaga" description="Atualize os dados ou encerre a vaga." />
         {apiError ? (
           <Alert variant="destructive" title="Erro">
             {apiError}

@@ -2,7 +2,7 @@
 
 import { useMemo } from 'react';
 import { useParams } from 'next/navigation';
-import { Alert, ApiQueryBoundary, FormFieldsSkeleton } from '@/components';
+import { Alert, ApiQueryBoundary, FormFieldsSkeleton, PageHeader } from '@/components';
 import { FormProvider } from '@/context';
 import {
   companyFormSchema,
@@ -37,7 +37,7 @@ export function AdminEditCompanyPage() {
       onRetry={() => void refetch()}
     >
       <section>
-        <h1>Editar empresa</h1>
+        <PageHeader title="Editar empresa" description="Atualize os dados cadastrais da empresa." />
         {apiError ? (
           <Alert variant="destructive" title="Erro">
             {apiError}

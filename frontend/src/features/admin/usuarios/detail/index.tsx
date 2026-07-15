@@ -1,6 +1,6 @@
 'use client';
 
-import { Alert, ApiQueryBoundary, FormFieldsSkeleton } from '@/components';
+import { Alert, ApiQueryBoundary, FormFieldsSkeleton, PageHeader } from '@/components';
 import { FormProvider } from '@/context';
 import {
   adminUserFormValuesFromDto,
@@ -43,7 +43,7 @@ export function AdminUserDetailPage() {
       onRetry={() => void refetch()}
     >
       <section>
-        <h1>Admin: Usuário</h1>
+        <PageHeader title="Admin: Usuário" description="Detalhe e alteração do tipo de usuário." />
         {apiError ? (
           <Alert variant="destructive" title="Erro">
             {apiError}

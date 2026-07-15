@@ -1,12 +1,44 @@
 'use client';
 
-import { Alert, ApiQueryBoundary, Button, ListRowsSkeleton, PageHeader } from '@/components';
-import { useJobsListQuery } from '@/services';
+import {
+  Alert,
+  ApiQueryBoundary,
+  Button,
+  ListRowsSkeleton,
+  PageHeader,
+  TableFilters,
+  TablePagination
+} from '@/components';
+import { FormProvider } from '@/context';
+import { usePersistedTablePagination } from '@/hooks';
+import { defaultJobsSearch, jobsSearchFormSchema, useJobsListQuery, type JobsSearchFormValues } from '@/services';
 import Link from 'next/link';
+import { useState } from 'react';
+import { JobsSearchFields } from './jobs-search-fields';
+import styles from './jobs-list.module.scss';
 
 export function JobsPage() {
-  const { data, isPending, isError, error, refetch } = useJobsListQuery({ isActive: true });
-  const items = data?.data.map((j) => ({ id: j.id, title: j.title, location: j.location })) ?? [];
+  const pagination = usePersistedTablePagination({ storageKey: 'vagas-publicas' });
+  const [search, setSearch] = useState<string | undefined>(undefined);
+
+  const { data, isPending, isError, error, refetch } = useJobsListQuery({
+    isActive: true,
+    search,
+    page: pagination.page,
+    size: pagination.pageSize
+  });
+  const items = data?.data ?? [];
+  const hasItems = !isPending && items.length > 0;
+
+  const handleSearchSubmit = (values: JobsSearchFormValues) => {
+    setSearch(values.search.trim() || undefined);
+    pagination.setPage(1);
+  };
+
+  const handleSearchClear = () => {
+    setSearch(undefined);
+    pagination.setPage(1);
+  };
 
   return (
     <ApiQueryBoundary
@@ -18,39 +50,48 @@ export function JobsPage() {
       onRetry={() => void refetch()}
     >
       <div>
-        <PageHeader title="Vagas" description="Lista de vagas ativas (leitura pública)." />
+        <PageHeader title="Vagas" description="Encontre a sua próxima oportunidade." />
 
-        {isPending ? (
-          <ListRowsSkeleton rows={6} />
-        ) : items.length === 0 ? (
-          <Alert title="Nenhuma vaga" variant="default">
-            Não encontramos vagas ativas no momento.
-          </Alert>
-        ) : (
-          <div style={{ display: 'grid', gap: 10, marginTop: 12 }}>
-            {items.map((j) => (
-              <div
-                key={j.id}
-                style={{
-                  border: '1px solid var(--border)',
-                  borderRadius: 'var(--radius)',
-                  background: 'var(--card-bg)',
-                  padding: 14
-                }}
-              >
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
-                  <div>
-                    <div style={{ fontWeight: 700 }}>{j.title}</div>
-                    <div style={{ color: 'var(--muted)', fontSize: 14 }}>{j.location ?? '—'}</div>
-                  </div>
-                  <Button variant="primary" asChild>
-                    <Link href={`/vagas/${j.id}`}>Ver detalhes</Link>
-                  </Button>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
+        <div className={styles.content}>
+          <TableFilters title="Buscar vagas" description="Busque por cargo ou palavra-chave.">
+            <FormProvider
+              validationSchema={jobsSearchFormSchema}
+              defaultValues={defaultJobsSearch}
+              onSubmit={handleSearchSubmit}
+            >
+              <JobsSearchFields onClear={handleSearchClear} />
+            </FormProvider>
+          </TableFilters>
+
+          {isPending ? <ListRowsSkeleton rows={6} /> : null}
+
+          {!isPending && items.length === 0 ? (
+            <Alert title="Nenhuma vaga" variant="default">
+              {search ? 'Não encontramos vagas para a busca informada.' : 'Não encontramos vagas ativas no momento.'}
+            </Alert>
+          ) : null}
+
+          {hasItems ? (
+            <>
+              <ul className={styles.grid} aria-label="Vagas disponíveis">
+                {items.map((job) => (
+                  <li key={job.id} className={styles.card}>
+                    <div className={styles.cardRow}>
+                      <div>
+                        <div className={styles.cardTitle}>{job.title}</div>
+                        <div className={styles.cardLocation}>{job.location ?? '—'}</div>
+                      </div>
+                      <Button variant="primary" asChild>
+                        <Link href={`/vagas/${job.id}`}>Ver detalhes</Link>
+                      </Button>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+              <TablePagination pagination={pagination} totalItems={data?.totalItems} />
+            </>
+          ) : null}
+        </div>
       </div>
     </ApiQueryBoundary>
   );

@@ -1,6 +1,6 @@
 'use client';
 
-import { Alert } from '@/components';
+import { Alert, PageHeader } from '@/components';
 import { FormProvider } from '@/context';
 import { companyFormSchema, defaultFormCompany, useCreateCompanyMutation, type CompanyFormValues } from '@/services';
 import { CompanyFormFields } from '../form';
@@ -11,7 +11,7 @@ export function AdminNewCompanyPage() {
 
   return (
     <div>
-      <h1>Nova empresa</h1>
+      <PageHeader title="Nova empresa" description="Cadastre uma nova empresa parceira." />
       {apiError ? (
         <Alert variant="destructive" title="Erro">
           {apiError}

@@ -55,3 +55,10 @@ export function jobsFilterToParams(values: JobsFilterFormValues): Pick<JobsListQ
     isActive: values.status === 'all' ? undefined : values.status === 'active'
   };
 }
+
+/** Busca do catálogo público de vagas (visitante só vê vagas ativas; sem filtro de situação). */
+export const jobsSearchFormSchema = jobsFilterFormSchema.pick({ search: true });
+
+export type JobsSearchFormValues = z.infer<typeof jobsSearchFormSchema>;
+
+export const defaultJobsSearch: JobsSearchFormValues = { search: '' };

@@ -1,0 +1,36 @@
+.content {
+  display: grid;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.grid {
+  display: grid;
+  gap: 10px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.card {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--card-bg);
+  padding: 14px;
+}
+
+.cardRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.cardTitle {
+  font-weight: 700;
+}
+
+.cardLocation {
+  color: var(--muted);
+  font-size: 14px;
+}

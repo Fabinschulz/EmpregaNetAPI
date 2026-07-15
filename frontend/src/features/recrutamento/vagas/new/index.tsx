@@ -1,6 +1,6 @@
 'use client';
 
-import { Alert } from '@/components';
+import { Alert, PageHeader } from '@/components';
 import { FormProvider } from '@/context';
 import { defaultFormJob, jobFormSchema, useCreateJobMutation, type JobFormValues } from '@/services';
 import { JobFormFields } from '../job-form';
@@ -11,7 +11,7 @@ export function RecruitmentNewJobPage() {
 
   return (
     <div>
-      <h1>Nova vaga</h1>
+      <PageHeader title="Nova vaga" description="Publique uma nova vaga para a sua empresa." />
       {apiError ? (
         <Alert variant="destructive" title="Erro">
           {apiError}
