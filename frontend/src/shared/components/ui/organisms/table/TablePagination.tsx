@@ -28,7 +28,6 @@ function rangeLabel(page: number, pageSize: number, totalItems: number | undefin
   return `${start}–${end} de ${totalItems}`;
 }
 
-
 export function TablePagination({ pagination, totalItems, className }: TablePaginationProps) {
   const { page, pageSize, pageSizeOptions, setPage, setPageSize } = pagination;
 

@@ -7,6 +7,7 @@ export * from './molecules/command';
 export * from './molecules/input';
 export * from './molecules/popover';
 export * from './molecules/select';
+export * from './molecules/status-badge';
 export * from './molecules/tooltip';
 export * from './organisms/card';
 export * from './organisms/page-header';

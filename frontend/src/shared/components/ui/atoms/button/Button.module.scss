@@ -4,6 +4,13 @@
   justify-content: center;
   gap: 0.5rem;
   white-space: nowrap;
+
+  // Ícones (lucide vêm em 24px por padrão): dimensiona para acompanhar o texto do botão.
+  svg {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+  }
   border-radius: var(--control-radius, var(--radius));
   font-size: 14px;
   font-weight: 500;

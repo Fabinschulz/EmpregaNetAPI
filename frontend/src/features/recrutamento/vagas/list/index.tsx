@@ -2,9 +2,9 @@
 
 import {
   ApiQueryBoundary,
-  Badge,
   Button,
   PageHeader,
+  StatusBadge,
   TableContainer,
   TableFilters,
   type DataTableColumn
@@ -20,6 +20,7 @@ import {
   type JobsFilterFormValues
 } from '@/services';
 import type { JobsListQueryParams } from '@/shared/schema';
+import { Pencil, Plus } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
 import { JobsFilterFields } from './jobs-filter-fields';
@@ -33,15 +34,16 @@ const JOBS_COLUMNS: DataTableColumn<JobDto>[] = [
     key: 'status',
     header: 'Status',
     render: (job) => (
-      <Badge variant={job.isActive === false ? 'secondary' : 'default'}>
-        {job.isActive === false ? 'Encerrada' : 'Ativa'}
-      </Badge>
+      <StatusBadge
+        label={job.isActive === false ? 'Encerrada' : 'Ativa'}
+        tone={job.isActive === false ? 'negative' : 'positive'}
+      />
     )
   },
   {
     key: 'actions',
     type: 'actions',
-    getActions: (job) => [{ key: 'edit', label: 'Editar', href: `/recrutamento/vagas/${job.id}` }]
+    getActions: (job) => [{ key: 'edit', label: 'Editar', icon: Pencil, href: `/recrutamento/vagas/${job.id}` }]
   }
 ];
 
@@ -80,7 +82,10 @@ export function RecruitmentJobsPage() {
           description="Gestão de vagas (criar/editar/fechar/excluir)."
           actions={
             <Button variant="primary" asChild>
-              <Link href="/recrutamento/vagas/new">Nova vaga</Link>
+              <Link href="/recrutamento/vagas/new">
+                <Plus aria-hidden />
+                Nova vaga
+              </Link>
             </Button>
           }
         />

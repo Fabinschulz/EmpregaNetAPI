@@ -5,10 +5,10 @@ import { logout as apiLogout } from '@/services';
 import { registerAxiosAuthHandlers } from '@/services/axios/axios-auth';
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useSyncExternalStore } from 'react';
 import {
-    clearSessionMetadata,
-    getSessionMetadataSnapshot,
-    saveSessionMetadata,
-    subscribeSessionMetadata
+  clearSessionMetadata,
+  getSessionMetadataSnapshot,
+  saveSessionMetadata,
+  subscribeSessionMetadata
 } from 'src/services/users/session';
 
 type AuthState = {

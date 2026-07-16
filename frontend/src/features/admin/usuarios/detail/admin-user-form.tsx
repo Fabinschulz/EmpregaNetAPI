@@ -2,6 +2,7 @@
 
 import { FormSubmitButton, InputField } from '@/components';
 import { useFormContext } from '@/context';
+import { Save } from 'lucide-react';
 
 const ADMIN_USER_FORM_GRID_STYLE = {
   display: 'grid',
@@ -21,7 +22,10 @@ export function AdminUserFormFields() {
         hint="O backend valida/normaliza; aqui enviamos o valor diretamente."
       />
       <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-        <FormSubmitButton variant="primary">{submitting ? 'Salvando...' : 'Salvar'}</FormSubmitButton>
+        <FormSubmitButton variant="primary">
+          <Save aria-hidden />
+          {submitting ? 'Salvando...' : 'Salvar'}
+        </FormSubmitButton>
       </div>
     </div>
   );

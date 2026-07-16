@@ -1,7 +1,7 @@
 'use client';
 
 import { cn } from '@/utils/lib';
-import { MoreVertical } from 'lucide-react';
+import { MoreVertical, type LucideIcon } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
 import { Button } from '../../atoms/button';
@@ -12,6 +12,8 @@ export type RowAction = {
   /** Identificador estável da ação (key de renderização). */
   key: string;
   label: string;
+  /** Ícone (lucide) exibido à esquerda do rótulo. */
+  icon?: LucideIcon;
   /** Navegação (renderiza `Link`). Mutuamente exclusivo com `onSelect`. */
   href?: string;
   /** Ação imperativa (ex.: abrir confirmação de exclusão). */
@@ -45,15 +47,19 @@ export function RowActions({ actions, maxInline = 2, className }: RowActionsProp
 
   return (
     <div className={cn(styles.root, className)}>
-      {inlineActions.map((action) =>
-        action.href ? (
+      {inlineActions.map((action) => {
+        const Icon = action.icon;
+        return action.href ? (
           <Button
             key={action.key}
             asChild
             size="sm"
             variant={action.variant === 'destructive' ? 'destructive' : 'default'}
           >
-            <Link href={action.href}>{action.label}</Link>
+            <Link href={action.href}>
+              {Icon ? <Icon aria-hidden /> : null}
+              {action.label}
+            </Link>
           </Button>
         ) : (
           <Button
@@ -64,10 +70,11 @@ export function RowActions({ actions, maxInline = 2, className }: RowActionsProp
             onClick={action.onSelect}
             disabled={action.disabled}
           >
+            {Icon ? <Icon aria-hidden /> : null}
             {action.label}
           </Button>
-        )
-      )}
+        );
+      })}
 
       {menuActions.length > 0 ? (
         <Popover open={menuOpen} onOpenChange={setMenuOpen}>
@@ -77,14 +84,16 @@ export function RowActions({ actions, maxInline = 2, className }: RowActionsProp
             </Button>
           </PopoverTrigger>
           <PopoverContent align="end" className={styles.menu}>
-            {menuActions.map((action) =>
-              action.href ? (
+            {menuActions.map((action) => {
+              const Icon = action.icon;
+              return action.href ? (
                 <Link
                   key={action.key}
                   href={action.href}
                   className={cn(styles.menuItem, action.variant === 'destructive' && styles.menuItemDestructive)}
                   onClick={() => setMenuOpen(false)}
                 >
+                  {Icon ? <Icon className={styles.menuItemIcon} aria-hidden /> : null}
                   {action.label}
                 </Link>
               ) : (
@@ -98,10 +107,11 @@ export function RowActions({ actions, maxInline = 2, className }: RowActionsProp
                   }}
                   disabled={action.disabled}
                 >
+                  {Icon ? <Icon className={styles.menuItemIcon} aria-hidden /> : null}
                   {action.label}
                 </button>
-              )
-            )}
+              );
+            })}
           </PopoverContent>
         </Popover>
       ) : null}

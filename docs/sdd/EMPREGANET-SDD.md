@@ -2,7 +2,7 @@
 
 Documento vivo: descreve **como** especificação, implementação e validação se alinham no monorepo **EmpregaNet**, com ênfase em contratos claros, gates de qualidade e uso disciplinado de **agentes de IA** como aceleradores—not substitutos de julgamento humano.
 
-**Audiência**: equipa de produto e engenharia, arquitetos, e quem orquestra trabalho com IA (Cursor, reviews automatizados, etc.).
+**Audiência**: equipe de produto e engenharia, arquitetos, e quem orquestra trabalho com IA (Cursor, reviews automatizados, etc.).
 
 ---
 

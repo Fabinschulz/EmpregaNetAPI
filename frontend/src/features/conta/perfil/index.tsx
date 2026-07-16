@@ -1,12 +1,35 @@
 'use client';
 
-import { ApiQueryBoundary, FormFieldsSkeleton, PageHeader } from '@/components';
-import { useAuth } from '@/features/auth';
-import { useMeQuery } from '@/services';
+import {
+  Alert,
+  ApiQueryBoundary,
+  Badge,
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  FormFieldsSkeleton,
+  PageHeader
+} from '@/components';
+import { FormProvider } from '@/context';
+import {
+  profileFormSchema,
+  profileFormValuesFromDto,
+  useMeQuery,
+  useUpdateMyProfileMutation,
+  type ProfileFormValues
+} from '@/services';
+import styles from '../conta.module.scss';
+import { ProfileFormFields } from './profile-form-fields';
 
 export function ProfilePage() {
-  const { roles } = useAuth();
   const { data: user, isPending, isError, error, refetch } = useMeQuery();
+  const profileMutation = useUpdateMyProfileMutation();
+
+  const handleProfileSubmit = async (values: ProfileFormValues) => {
+    await profileMutation.mutateAsync(values);
+  };
 
   return (
     <ApiQueryBoundary
@@ -15,35 +38,50 @@ export function ProfilePage() {
       isError={isError}
       error={error}
       resource="perfil"
-      onRetry={() => void refetch()}
+      onRetry={refetch}
     >
       <section>
-        <PageHeader title="Minha conta" description="Informações do usuário autenticado." />
+        <PageHeader title="Perfil" description="Atualize os seus dados pessoais." />
 
-        {isPending ? <FormFieldsSkeleton fields={5} /> : null}
+        {isPending ? <FormFieldsSkeleton fields={4} /> : null}
 
         {user ? (
-          <article
-            style={{
-              border: '1px solid var(--border)',
-              borderRadius: 'var(--radius)',
-              padding: 14,
-              background: 'var(--card-bg)'
-            }}
-          >
-            <p>
-              <strong>ID:</strong> {user.id}
-            </p>
-            <p>
-              <strong>Usuário:</strong> {user.username}
-            </p>
-            <p>
-              <strong>E-mail:</strong> {user.email}
-            </p>
-            <p>
-              <strong>Roles:</strong> {roles.length ? roles.join(', ') : '—'}
-            </p>
-          </article>
+          <div className={styles.content}>
+            <Card>
+              <CardHeader>
+                <div className={styles.cardHeaderRow}>
+                  <div>
+                    <CardTitle>Dados pessoais</CardTitle>
+                    <CardDescription>Atualize o seu nome de usuário, e-mail e telefone.</CardDescription>
+                  </div>
+                  {user.roles.length ? (
+                    <div className={styles.badgeGroup} aria-label="Perfil de acesso">
+                      {user.roles.map((role) => (
+                        <Badge key={role} variant="secondary">
+                          {role}
+                        </Badge>
+                      ))}
+                    </div>
+                  ) : null}
+                </div>
+              </CardHeader>
+              <CardContent>
+                {profileMutation.apiError ? (
+                  <Alert variant="destructive" title="Erro ao salvar">
+                    {profileMutation.apiError}
+                  </Alert>
+                ) : null}
+                <FormProvider
+                  key={`profile-${user.id}`}
+                  validationSchema={profileFormSchema}
+                  defaultValues={profileFormValuesFromDto(user)}
+                  onSubmit={handleProfileSubmit}
+                >
+                  <ProfileFormFields />
+                </FormProvider>
+              </CardContent>
+            </Card>
+          </div>
         ) : null}
       </section>
     </ApiQueryBoundary>

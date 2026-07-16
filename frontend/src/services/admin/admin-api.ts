@@ -3,9 +3,7 @@ import type { AdminUsersListQueryParams } from '@/shared/schema';
 import { UserDto, userSchema } from '../users/users-schema';
 import { adminUsersListResponseSchema, type AdminUsersListResponseDto } from './admin-schema';
 
-export async function listAdminUsers(
-  params?: AdminUsersListQueryParams
-): Promise<AdminUsersListResponseDto> {
+export async function listAdminUsers(params?: AdminUsersListQueryParams): Promise<AdminUsersListResponseDto> {
   const res = await axiosApi.get<unknown>('/api/admin', createAxiosConfig(params));
   return adminUsersListResponseSchema.parse(res.data);
 }

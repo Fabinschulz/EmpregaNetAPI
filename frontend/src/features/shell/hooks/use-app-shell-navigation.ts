@@ -5,11 +5,19 @@ import type { LucideIcon } from 'lucide-react';
 import { Briefcase, Building2, FileText, LayoutDashboard, UserCircle, Users } from 'lucide-react';
 import { useMemo } from 'react';
 
+export type ShellNavChild = {
+  href: string;
+  label: string;
+  visible: boolean;
+};
+
 export type ShellNavItem = {
   href: string;
   label: string;
   icon: LucideIcon;
   visible: boolean;
+  /** Subitens do menu */
+  children?: ShellNavChild[];
 };
 
 export type ShellNavGroup = {
@@ -24,11 +32,20 @@ export function useAppShellNavigation(roles: string[]) {
       { href: '/dashboard', label: 'Painel', icon: LayoutDashboard, visible: true },
       { href: '/vagas', label: 'Vagas', icon: Briefcase, visible: true },
       { href: '/candidaturas', label: 'Minhas candidaturas', icon: FileText, visible: true },
-      { href: '/conta/perfil', label: 'Conta e perfil', icon: UserCircle, visible: true }
+      {
+        href: '/conta/perfil',
+        label: 'Conta',
+        icon: UserCircle,
+        visible: true,
+        children: [
+          { href: '/conta/perfil', label: 'Perfil', visible: true },
+          { href: '/conta/seguranca', label: 'Segurança', visible: true }
+        ]
+      }
     ];
 
     const recruitment: ShellNavItem[] = [
-      { href: '/recrutamento/vagas', label: 'Vagas (equipa)', icon: Briefcase, visible: isRecruitmentStaff(roles) },
+      { href: '/recrutamento/vagas', label: 'Vagas (equipe)', icon: Briefcase, visible: isRecruitmentStaff(roles) },
       {
         href: '/recrutamento/candidaturas',
         label: 'Candidaturas',

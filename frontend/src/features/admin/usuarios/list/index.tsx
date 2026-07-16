@@ -1,8 +1,9 @@
 'use client';
 
-import { ApiQueryBoundary, Badge, PageHeader, TableContainer, type DataTableColumn } from '@/components';
+import { ApiQueryBoundary, PageHeader, StatusBadge, TableContainer, type DataTableColumn } from '@/components';
 import { usePersistedTablePagination } from '@/hooks';
 import { useAdminUsersListQuery, type UserDto } from '@/services';
+import { Eye } from 'lucide-react';
 
 const USERS_COLUMNS: DataTableColumn<UserDto>[] = [
   { key: 'username', header: 'Usuário', render: (user) => <strong>{user.username}</strong> },
@@ -12,13 +13,13 @@ const USERS_COLUMNS: DataTableColumn<UserDto>[] = [
     key: 'situation',
     header: 'Situação',
     render: (user) => (
-      <Badge variant={user.isDeleted ? 'secondary' : 'default'}>{user.isDeleted ? 'Excluído' : 'Ativo'}</Badge>
+      <StatusBadge label={user.isDeleted ? 'Excluído' : 'Ativo'} tone={user.isDeleted ? 'negative' : 'positive'} />
     )
   },
   {
     key: 'actions',
     type: 'actions',
-    getActions: (user) => [{ key: 'detail', label: 'Detalhes', href: `/admin/usuarios/${user.id}` }]
+    getActions: (user) => [{ key: 'detail', label: 'Detalhes', icon: Eye, href: `/admin/usuarios/${user.id}` }]
   }
 ];
 

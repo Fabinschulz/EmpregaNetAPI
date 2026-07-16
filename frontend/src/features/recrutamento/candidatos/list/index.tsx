@@ -3,6 +3,7 @@
 import { ApiQueryBoundary, PageHeader, TableContainer, type DataTableColumn } from '@/components';
 import { usePersistedTablePagination } from '@/hooks';
 import { useCandidatesListQuery, type UserDto } from '@/services';
+import { Eye } from 'lucide-react';
 
 const CANDIDATES_COLUMNS: DataTableColumn<UserDto>[] = [
   { key: 'username', header: 'Candidato', render: (candidate) => <strong>{candidate.username}</strong> },
@@ -10,7 +11,9 @@ const CANDIDATES_COLUMNS: DataTableColumn<UserDto>[] = [
   {
     key: 'actions',
     type: 'actions',
-    getActions: (candidate) => [{ key: 'detail', label: 'Detalhes', href: `/recrutamento/candidatos/${candidate.id}` }]
+    getActions: (candidate) => [
+      { key: 'detail', label: 'Detalhes', icon: Eye, href: `/recrutamento/candidatos/${candidate.id}` }
+    ]
   }
 ];
 

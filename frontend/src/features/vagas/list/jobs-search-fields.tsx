@@ -3,6 +3,7 @@
 import { Button, FormSubmitButton, InputField } from '@/components';
 import { useFormContext } from '@/context';
 import { defaultJobsSearch, type JobsSearchFormValues } from '@/services';
+import { Search, X } from 'lucide-react';
 import styles from './jobs-search-fields.module.scss';
 
 type JobsSearchFieldsProps = {
@@ -22,8 +23,12 @@ export function JobsSearchFields({ onClear }: JobsSearchFieldsProps) {
     <div className={styles.fields}>
       <InputField name="search" label="Buscar" placeholder="Cargo, palavra-chave..." className={styles.search} />
       <div className={styles.actions}>
-        <FormSubmitButton variant="primary">Buscar</FormSubmitButton>
+        <FormSubmitButton variant="primary">
+          <Search aria-hidden />
+          Buscar
+        </FormSubmitButton>
         <Button type="button" variant="outline" onClick={handleClear}>
+          <X aria-hidden />
           Limpar
         </Button>
       </div>

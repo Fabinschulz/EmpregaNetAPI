@@ -1,6 +1,6 @@
 # Documentação EmpregaNet (`docs/`)
 
-Índice **canónico** para IA e equipa alinharem ao produto neste monorepo. O contexto sempre aplicável no Cursor está em [`.cursor/rules/empreganet-docs-context.mdc`](../.cursor/rules/empreganet-docs-context.mdc).
+Índice **canónico** para IA e equipe alinharem ao produto neste monorepo. O contexto sempre aplicável no Cursor está em [`.cursor/rules/empreganet-docs-context.mdc`](../.cursor/rules/empreganet-docs-context.mdc).
 
 ---
 

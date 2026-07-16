@@ -12,6 +12,7 @@ import {
 import { FormProvider } from '@/context';
 import { usePersistedTablePagination } from '@/hooks';
 import { defaultJobsSearch, jobsSearchFormSchema, useJobsListQuery, type JobsSearchFormValues } from '@/services';
+import { ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
 import { JobsSearchFields } from './jobs-search-fields';
@@ -82,7 +83,10 @@ export function JobsPage() {
                         <div className={styles.cardLocation}>{job.location ?? '—'}</div>
                       </div>
                       <Button variant="primary" asChild>
-                        <Link href={`/vagas/${job.id}`}>Ver detalhes</Link>
+                        <Link href={`/vagas/${job.id}`}>
+                          Ver detalhes
+                          <ArrowRight aria-hidden />
+                        </Link>
                       </Button>
                     </div>
                   </li>

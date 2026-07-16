@@ -1,10 +1,10 @@
 import type { JobApplicationsAdminListQueryParams, JobApplicationsListQueryParams } from '@/shared';
 import { axiosApi, createAxiosConfig } from '../axios';
 import {
-    applyToJobSchema,
-    changeApplicationStatusSchema,
-    jobApplicationsListResponseSchema,
-    type JobApplicationsListResponseDto
+  applyToJobSchema,
+  changeApplicationStatusSchema,
+  jobApplicationsListResponseSchema,
+  type JobApplicationsListResponseDto
 } from './job-applications-schema';
 
 export async function applyToJob(dto: unknown): Promise<string> {
@@ -13,16 +13,12 @@ export async function applyToJob(dto: unknown): Promise<string> {
   return res.data;
 }
 
-export async function listMine(
-  params?: JobApplicationsListQueryParams
-): Promise<JobApplicationsListResponseDto> {
+export async function listMine(params?: JobApplicationsListQueryParams): Promise<JobApplicationsListResponseDto> {
   const res = await axiosApi.get<unknown>('/api/jobapplications/mine', createAxiosConfig(params));
   return jobApplicationsListResponseSchema.parse(res.data);
 }
 
-export async function listAll(
-  params?: JobApplicationsAdminListQueryParams
-): Promise<JobApplicationsListResponseDto> {
+export async function listAll(params?: JobApplicationsAdminListQueryParams): Promise<JobApplicationsListResponseDto> {
   const res = await axiosApi.get<unknown>('/api/jobapplications', createAxiosConfig(params));
   return jobApplicationsListResponseSchema.parse(res.data);
 }

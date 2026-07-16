@@ -2,9 +2,9 @@
 
 import { useAuth } from '@/context';
 import {
-    withDefaultListParams,
-    type JobApplicationsAdminListQueryParams,
-    type JobApplicationsListQueryParams
+  withDefaultListParams,
+  type JobApplicationsAdminListQueryParams,
+  type JobApplicationsListQueryParams
 } from '@/shared';
 import { reportMutationApiError, toastSuccess } from '@/utils';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';

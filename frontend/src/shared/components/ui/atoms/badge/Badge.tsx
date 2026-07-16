@@ -10,7 +10,9 @@ const badgeVariants = cva(styles.root, {
     variant: {
       default: styles.variantDefault,
       secondary: styles.variantSecondary,
-      destructive: styles.variantDestructive
+      destructive: styles.variantDestructive,
+      success: styles.variantSuccess,
+      warning: styles.variantWarning
     }
   },
   defaultVariants: {

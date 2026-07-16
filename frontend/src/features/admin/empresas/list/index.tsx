@@ -3,6 +3,7 @@
 import { ApiQueryBoundary, Button, PageHeader, TableContainer, type DataTableColumn } from '@/components';
 import { usePersistedTablePagination } from '@/hooks';
 import { useCompaniesListQuery, type CompanyDto } from '@/services';
+import { Pencil, Plus } from 'lucide-react';
 import Link from 'next/link';
 
 const COMPANIES_COLUMNS: DataTableColumn<CompanyDto>[] = [
@@ -13,7 +14,7 @@ const COMPANIES_COLUMNS: DataTableColumn<CompanyDto>[] = [
   {
     key: 'actions',
     type: 'actions',
-    getActions: (company) => [{ key: 'edit', label: 'Editar', href: `/admin/empresas/${company.id}` }]
+    getActions: (company) => [{ key: 'edit', label: 'Editar', icon: Pencil, href: `/admin/empresas/${company.id}` }]
   }
 ];
 
@@ -39,7 +40,10 @@ export function AdminCompaniesPage() {
           description="Gestão de empresas (Admin)."
           actions={
             <Button variant="primary" asChild>
-              <Link href="/admin/empresas/new">Nova empresa</Link>
+              <Link href="/admin/empresas/new">
+                <Plus aria-hidden />
+                Nova empresa
+              </Link>
             </Button>
           }
         />

@@ -12,7 +12,7 @@ using Microsoft.AspNetCore.OutputCaching;
 namespace EmpregaNet.Api.Controllers.Candidates;
 
 /// <summary>
-/// Consulta de candidatos (utilizadores com perfil de candidato) para equipa de recrutamento.
+/// Consulta de candidatos (utilizadores com perfil de candidato) para equipe de recrutamento.
 /// </summary>
 [ApiController]
 [Route("api/[controller]")]

@@ -1,7 +1,7 @@
 ---
 name: sdd-orchestrator
 description: >-
-  Especifica features pelo método SDD EmpregaNet: pastas em docs/features/, artefactos prd/design/spec/tasks,
+  Especifica features pelo método SDD EmpregaNet: pastas em docs/features/, artefactos prd/design,
   versionamento em frontmatter, gate anti-código até aprovação. Use ao iniciar uma nova capability, refactor grande
   com spec formal, ou quando o utilizador pede fluxo "orquestrador SDD".
 ---

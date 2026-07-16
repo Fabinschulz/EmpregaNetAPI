@@ -3,6 +3,7 @@
 import { ApiQueryBoundary, PageHeader, TableContainer, type DataTableColumn } from '@/components';
 import { usePersistedTablePagination } from '@/hooks';
 import { useMyJobApplicationsQuery, type JobApplicationDto } from '@/services';
+import { Eye } from 'lucide-react';
 import { ApplicationStatusBadge } from '../application-status-badge';
 
 const MY_APPLICATIONS_COLUMNS: DataTableColumn<JobApplicationDto>[] = [
@@ -17,7 +18,7 @@ const MY_APPLICATIONS_COLUMNS: DataTableColumn<JobApplicationDto>[] = [
     key: 'actions',
     type: 'actions',
     getActions: (application) =>
-      application.jobId ? [{ key: 'view-job', label: 'Ver vaga', href: `/vagas/${application.jobId}` }] : []
+      application.jobId ? [{ key: 'view-job', label: 'Ver vaga', icon: Eye, href: `/vagas/${application.jobId}` }] : []
   }
 ];
 

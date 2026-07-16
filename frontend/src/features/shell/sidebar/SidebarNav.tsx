@@ -4,6 +4,7 @@ import clsx from 'clsx';
 import { usePathname } from 'next/navigation';
 import type { ShellNavGroup } from '../hooks/use-app-shell-navigation';
 import { SidebarNavItem } from './SidebarNavItem';
+import { SidebarNavSubmenu } from './SidebarNavSubmenu';
 import styles from './sidebar.module.scss';
 
 type SidebarNavProps = {
@@ -32,7 +33,17 @@ export function SidebarNav({ groups, collapsed, transitioning, onNavigate }: Sid
             {!collapsed ? <div className={styles.navGroupTitle}>{group.title}</div> : null}
             <div className={styles.navList}>
               {visibleItems.map((item) => {
-                const active = pathname === item.href || pathname?.startsWith(`${item.href}/`);
+                const hasSubmenu = (item.children ?? []).some((child) => child.visible);
+
+                if (hasSubmenu && !collapsed) {
+                  return <SidebarNavSubmenu key={item.href} item={item} pathname={pathname} onNavigate={onNavigate} />;
+                }
+
+                const childActive = (item.children ?? []).some(
+                  (child) => pathname === child.href || pathname?.startsWith(`${child.href}/`)
+                );
+
+                const active = childActive || pathname === item.href || pathname?.startsWith(`${item.href}/`);
 
                 return (
                   <SidebarNavItem

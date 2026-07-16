@@ -101,6 +101,49 @@ export const userSchema = z.object({
   isDeleted: z.boolean().optional()
 });
 
+export const profileFormSchema = registerSchema.pick({ username: true, email: true }).extend({
+  phoneNumber: z.string().optional().nullable()
+});
+
+export type ProfileFormValues = z.infer<typeof profileFormSchema>;
+
+export const defaultProfileForm: ProfileFormValues = {
+  username: '',
+  email: '',
+  phoneNumber: ''
+};
+
+export function profileFormValuesFromDto(user: {
+  username: string;
+  email: string;
+  phoneNumber?: string | null;
+}): ProfileFormValues {
+  return {
+    username: user.username,
+    email: user.email,
+    phoneNumber: user.phoneNumber ?? ''
+  };
+}
+
+export const changeMyPasswordFormSchema = z
+  .object({
+    currentPassword: z.string().min(1, { message: 'Informe a senha atual.' }),
+    newPassword: z.string().min(8, { message: 'A nova senha deve ter pelo menos 8 caracteres.' }),
+    newPasswordConfirmation: z.string().min(8, { message: 'Confirme a nova senha.' })
+  })
+  .refine((data) => data.newPassword === data.newPasswordConfirmation, {
+    message: 'As senhas não conferem.',
+    path: ['newPasswordConfirmation']
+  });
+
+export type ChangeMyPasswordFormValues = z.infer<typeof changeMyPasswordFormSchema>;
+
+export const defaultChangeMyPasswordForm: ChangeMyPasswordFormValues = {
+  currentPassword: '',
+  newPassword: '',
+  newPasswordConfirmation: ''
+};
+
 export type RegisterDto = z.infer<typeof registerSchema>;
 export type LoginDto = z.infer<typeof loginSchema>;
 export type ForgotPasswordDto = z.infer<typeof forgotPasswordSchema>;

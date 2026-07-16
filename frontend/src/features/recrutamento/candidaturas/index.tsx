@@ -9,9 +9,23 @@ import {
   parseApplicationStatus,
   useAllJobApplicationsQuery,
   useChangeApplicationStatusMutation,
+  type ApplicationStatus,
   type JobApplicationDto
 } from '@/services';
+import { Ban, CheckCircle2, Eye, Flag, PlayCircle, RotateCcw, XCircle, type LucideIcon } from 'lucide-react';
 import { useMemo } from 'react';
+
+/** Ícone da ação que leva a candidatura para cada status alvo. */
+const TRANSITION_ICON: Record<ApplicationStatus, LucideIcon> = {
+  Pending: RotateCcw,
+  Processing: PlayCircle,
+  Approved: CheckCircle2,
+  Rejected: XCircle,
+  Canceled: Ban,
+  Finished: Flag,
+  Timeout: Ban,
+  Error: Ban
+};
 
 export function RecruitmentApplicationsPage() {
   const pagination = usePersistedTablePagination({ storageKey: 'recrutamento-candidaturas' });
@@ -40,13 +54,14 @@ export function RecruitmentApplicationsPage() {
           const actions: RowAction[] = transitions.map((target) => ({
             key: target,
             label: applicationTransitionLabels[target],
+            icon: TRANSITION_ICON[target],
             onSelect: () => changeApplicationStatus({ id: application.id, status: target }),
             variant: target === 'Rejected' || target === 'Canceled' ? 'destructive' : 'default',
             disabled: isChangingStatus
           }));
 
           if (application.jobId) {
-            actions.push({ key: 'view-job', label: 'Ver vaga', href: `/vagas/${application.jobId}` });
+            actions.push({ key: 'view-job', label: 'Ver vaga', icon: Eye, href: `/vagas/${application.jobId}` });
           }
 
           return actions;

@@ -81,7 +81,7 @@ Exemplo mínimo de corpo:
 ## 4. Ligação ao backlog do produto
 
 - Lista de alto nível e prioridades: preferir **ticket/issue tracker** do projecto.
-- Opcional: manter um índice textual em `docs/sdd/FEATURES-BACKLOG.md` se a equipa quiser tudo no repo (não substitui issues).
+- Opcional: manter um índice textual em `docs/sdd/FEATURES-BACKLOG.md` se a equipe quiser tudo no repo (não substitui issues).
 
 ---
 

@@ -3,6 +3,12 @@
   align-items: center;
   justify-content: flex-end;
   gap: 6px;
+
+  // Dimensiona os ícones dos botões de ação da linha (lucide vem em 24px por padrão).
+  svg {
+    width: 15px;
+    height: 15px;
+  }
 }
 
 .menu {
@@ -13,7 +19,9 @@
 }
 
 .menuItem {
-  display: block;
+  display: flex;
+  align-items: center;
+  gap: 8px;
   width: 100%;
   padding: 8px 10px;
   border: none;
@@ -34,6 +42,12 @@
     opacity: 0.5;
     cursor: not-allowed;
   }
+}
+
+.menuItemIcon {
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
 }
 
 .menuItemDestructive {

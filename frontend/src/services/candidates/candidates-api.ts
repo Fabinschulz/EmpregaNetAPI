@@ -3,9 +3,7 @@ import { axiosApi, createAxiosConfig } from '../axios';
 import { userSchema } from '../users/users-schema';
 import { candidatesListResponseSchema, type CandidatesListResponseDto } from './candidates-schema';
 
-export async function listCandidates(
-  params?: CandidatesListQueryParams
-): Promise<CandidatesListResponseDto> {
+export async function listCandidates(params?: CandidatesListQueryParams): Promise<CandidatesListResponseDto> {
   const res = await axiosApi.get<unknown>('/api/candidates', createAxiosConfig(params));
   return candidatesListResponseSchema.parse(res.data);
 }

@@ -1,11 +1,13 @@
 import { axiosApi, createAxiosConfig } from '../axios';
 import {
+  changeMyPasswordFormSchema,
   confirmEmailResponseSchema,
   confirmEmailSchema,
   forgotPasswordResponseSchema,
   forgotPasswordSchema,
   loginSchema,
   loginWithGoogleSchema,
+  profileFormSchema,
   refreshTokenSchema,
   registerSchema,
   resendEmailConfirmationSchema,
@@ -13,10 +15,12 @@ import {
   resetPasswordResponseSchema,
   userLoggedSchema,
   userSchema,
+  type ChangeMyPasswordFormValues,
   type ConfirmEmailDto,
   type ForgotPasswordDto,
   type LoginDto,
   type LoginWithGoogleDto,
+  type ProfileFormValues,
   type RefreshTokenDto,
   type RegisterDto,
   type ResendEmailConfirmationDto,
@@ -93,4 +97,30 @@ export async function resendEmailConfirmation(dto: ResendEmailConfirmationDto): 
 export async function me(): Promise<UserDto> {
   const res = await axiosApi.get<unknown>('/api/users/me', createAxiosConfig());
   return userSchema.parse(res.data);
+}
+
+/** Atualiza os dados da própria conta (username, e-mail, telefone). */
+export async function updateMyProfile(dto: ProfileFormValues): Promise<UserDto> {
+  const values = profileFormSchema.parse(dto);
+  const body = {
+    userName: values.username,
+    email: values.email,
+    phoneNumber: values.phoneNumber?.trim() || null
+  };
+  const res = await axiosApi.put<unknown>('/api/users/me', body, createAxiosConfig());
+  return userSchema.parse(res.data);
+}
+
+/** Altera a própria senha (exige a senha atual). Revoga as sessões abertas no servidor. */
+export async function changeMyPassword(dto: ChangeMyPasswordFormValues): Promise<string> {
+  const body = changeMyPasswordFormSchema.parse(dto);
+  const res = await axiosApi.post<unknown>('/api/users/me/change-password', body, createAxiosConfig());
+  const parsed = confirmEmailResponseSchema.safeParse(res.data);
+  if (parsed.success) return parsed.data.message;
+  return 'Senha alterada com sucesso.';
+}
+
+/** Encerra a própria conta (exclusão lógica; o registro permanece para auditoria). */
+export async function deleteMyAccount(): Promise<void> {
+  await axiosApi.delete<unknown>('/api/users/me', createAxiosConfig());
 }

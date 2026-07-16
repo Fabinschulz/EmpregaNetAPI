@@ -4,7 +4,6 @@ import * as React from 'react';
 import { RowActions, type RowAction } from './RowActions';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './Table';
 
-
 export type DataTableDataColumn<TItem> = {
   key: string;
   header: React.ReactNode;

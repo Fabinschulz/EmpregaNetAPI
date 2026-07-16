@@ -2,6 +2,7 @@
 
 import { FormSubmitButton, InputField } from '@/components';
 import { useFormContext } from '@/context';
+import { Save } from 'lucide-react';
 import { CSSProperties } from 'react';
 
 const COMPANY_FORM_GRID_STYLE: CSSProperties = {
@@ -25,7 +26,10 @@ export function CompanyFormFields({ submitLabel }: CompanyFormFieldsProps) {
       <InputField name="phone" label="Telefone" />
       <InputField name="documentNo" label="Documento" />
       <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-        <FormSubmitButton variant="primary">{submitting ? 'Salvando...' : submitLabel}</FormSubmitButton>
+        <FormSubmitButton variant="primary">
+          <Save aria-hidden />
+          {submitting ? 'Salvando...' : submitLabel}
+        </FormSubmitButton>
       </div>
     </div>
   );

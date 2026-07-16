@@ -2,6 +2,7 @@
 
 import { Button, FormSubmitButton, InputField, TextareaField } from '@/components';
 import { useFormContext } from '@/context';
+import { Archive, Save } from 'lucide-react';
 import type { CSSProperties } from 'react';
 
 const JOB_FORM_GRID_STYLE: CSSProperties = {
@@ -26,9 +27,13 @@ export function JobFormFields({ submitLabel, onClose, closeDisabled }: JobFormFi
       <InputField name="location" label="Localização" />
       <TextareaField name="description" label="Descrição" rows={5} />
       <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-        <FormSubmitButton variant="primary">{submitting ? 'Salvando...' : submitLabel}</FormSubmitButton>
+        <FormSubmitButton variant="primary">
+          <Save aria-hidden />
+          {submitting ? 'Salvando...' : submitLabel}
+        </FormSubmitButton>
         {onClose ? (
           <Button type="button" onClick={onClose} disabled={closeDisabled}>
+            <Archive aria-hidden />
             Encerrar vaga
           </Button>
         ) : null}

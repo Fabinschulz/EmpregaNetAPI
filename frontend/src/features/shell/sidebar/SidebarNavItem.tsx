@@ -22,7 +22,12 @@ export function SidebarNavItem({ item, active, collapsed, onNavigate }: SidebarN
       variant="ghost"
       className={clsx(styles.navButton, styles.link, active && styles.active, collapsed && styles.linkIconOnly)}
     >
-      <Link href={item.href} onClick={onNavigate} title={collapsed ? item.label : undefined}>
+      <Link
+        href={item.href}
+        onClick={onNavigate}
+        title={collapsed ? item.label : undefined}
+        aria-current={active ? 'page' : undefined}
+      >
         <Icon className={styles.navIcon} aria-hidden />
         {!collapsed ? <span className={styles.navLabel}>{item.label}</span> : null}
       </Link>
