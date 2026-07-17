@@ -30,7 +30,10 @@ public class AdminController : MainController<AdminUsersCreateNotSupportedComman
     {
     }
 
-    /// <summary>Lista usuários. isDeleted omitido = todos; false = ativos; true = somente excluídos.</summary>
+    /// <summary>
+    /// Lista usuários. isDeleted omitido = todos; false = ativos; true = somente excluídos.
+    /// search filtra por nome de usuário ou e-mail.
+    /// </summary>
     [HttpGet]
     [OutputCache(PolicyName = OutputCachePolicies.AuthenticatedRead, Tags = [ApplicationCacheTags.AdminUsers])]
     public override async Task<IActionResult> GetAll(
@@ -38,12 +41,9 @@ public class AdminController : MainController<AdminUsersCreateNotSupportedComman
         [FromQuery] int size = 100,
         [FromQuery] string? orderBy = null,
         [FromQuery] bool? isDeleted = null,
-        [FromQuery] bool? isActive = null,
         [FromQuery] string? search = null)
     {
-        _ = isActive;
-        _ = search;
-        var result = await _mediator.Send(new GetAllUsersQuery(page, size, orderBy, isDeleted));
+        var result = await _mediator.Send(new GetAllUsersQuery(page, size, orderBy, isDeleted, search));
         return Ok(result);
     }
 

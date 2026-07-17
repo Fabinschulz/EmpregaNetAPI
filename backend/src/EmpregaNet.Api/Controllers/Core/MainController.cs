@@ -44,10 +44,9 @@ namespace EmpregaNet.Api.Controllers.Core
             [FromQuery] int size = 100,
             [FromQuery] string? orderBy = null,
             [FromQuery] bool? isDeleted = null,
-            [FromQuery] bool? isActive = null,
             [FromQuery] string? search = null)
         {
-            var result = await _mediator.Send(new GetAllQuery<TViewModel>(page, size, orderBy, isDeleted, isActive, search));
+            var result = await _mediator.Send(new GetAllQuery<TViewModel>(page, size, orderBy, isDeleted, Search: search));
             return Ok(result);
         }
 

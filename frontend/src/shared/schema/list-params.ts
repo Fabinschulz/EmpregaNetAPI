@@ -7,6 +7,24 @@ export type ListQueryParams = {
   orderBy?: string;
 };
 
+/** Valores de ordenação aceitos pelos endpoints de listagem (data de criação e id). */
+export const LIST_ORDER_BY_VALUES = ['createdAt_DESC', 'createdAt_ASC', 'id_DESC', 'id_ASC'] as const;
+
+export type ListOrderByValue = (typeof LIST_ORDER_BY_VALUES)[number];
+
+export const LIST_ORDER_BY_OPTIONS: ReadonlyArray<{ value: ListOrderByValue; label: string }> = [
+  { value: 'createdAt_DESC', label: 'Mais recentes' },
+  { value: 'createdAt_ASC', label: 'Mais antigas' },
+  // { value: 'id_DESC', label: 'Usuários mais recentes' },
+  // { value: 'id_ASC', label: 'Usuários mais antigos' }
+
+];
+
+export const DATE_ORDER_BY_OPTIONS: ReadonlyArray<{ value: ListOrderByValue; label: string }> = [
+  { value: 'createdAt_DESC', label: 'Mais recentes' },
+  { value: 'createdAt_ASC', label: 'Mais antigas' }
+];
+
 /** Filtros de exclusão lógica / ativo usados em listagens administrativas. */
 export type SoftDeleteFilterParams = {
   isDeleted?: boolean;
@@ -24,11 +42,11 @@ export type SearchFilterParams = {
 
 export type JobsListQueryParams = ListQueryParams & Pick<SoftDeleteFilterParams, 'isActive'> & SearchFilterParams;
 
-export type CompaniesListQueryParams = ListQueryParams & SoftDeleteFilterParams;
+export type CompaniesListQueryParams = ListQueryParams & SoftDeleteFilterParams & SearchFilterParams;
 
-export type AdminUsersListQueryParams = ListQueryParams & Pick<SoftDeleteFilterParams, 'isDeleted'>;
+export type AdminUsersListQueryParams = ListQueryParams & Pick<SoftDeleteFilterParams, 'isDeleted'> & SearchFilterParams;
 
-export type CandidatesListQueryParams = ListQueryParams;
+export type CandidatesListQueryParams = ListQueryParams & SearchFilterParams;
 
 export type JobApplicationsListQueryParams = ListQueryParams & StatusFilterParams;
 

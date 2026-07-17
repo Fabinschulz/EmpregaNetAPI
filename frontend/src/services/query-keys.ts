@@ -32,7 +32,10 @@ export const queryKeys = {
   jobApplications: {
     all: ['job-applications'] as const,
     mine: (params: ListQueryParams) => [...queryKeys.jobApplications.all, 'mine', params] as const,
-    allList: (params: ListQueryParams) => [...queryKeys.jobApplications.all, 'all', params] as const
+    allList: (params: ListQueryParams) => [...queryKeys.jobApplications.all, 'all', params] as const,
+    byJobLists: () => [...queryKeys.jobApplications.all, 'by-job'] as const,
+    byJob: (jobId: number, params: ListQueryParams) =>
+      [...queryKeys.jobApplications.byJobLists(), jobId, params] as const
   },
   users: {
     me: () => ['users', 'me'] as const

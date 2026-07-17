@@ -1,6 +1,6 @@
 'use client';
 
-import { Alert, ApiQueryBoundary, FormFieldsSkeleton, PageHeader } from '@/components';
+import { Alert, ApiQueryBoundary, Card, CardContent, FormFieldsSkeleton, PageHeader } from '@/components';
 import { FormProvider } from '@/context';
 import {
   adminUserFormValuesFromDto,
@@ -13,6 +13,7 @@ import {
 import { useParams } from 'next/navigation';
 import { useMemo } from 'react';
 import { AdminUserFormFields } from './admin-user-form';
+import styles from './admin-user-detail.module.scss';
 
 export function AdminUserDetailPage() {
   const params = useParams<{ id: string }>();
@@ -52,24 +53,21 @@ export function AdminUserDetailPage() {
         {isPending ? <FormFieldsSkeleton fields={6} /> : null}
         {user ? (
           <>
-            <article
-              style={{
-                border: '1px solid var(--border)',
-                borderRadius: 'var(--radius)',
-                padding: 14,
-                background: 'var(--card-bg)'
-              }}
-            >
-              <p>
-                <strong>ID:</strong> {user.id}
-              </p>
-              <p>
-                <strong>Usuário:</strong> {user.username}
-              </p>
-              <p>
-                <strong>E-mail:</strong> {user.email}
-              </p>
-            </article>
+            <Card>
+              <CardContent>
+                <div className={styles.info}>
+                  <p>
+                    <strong>ID:</strong> {user.id}
+                  </p>
+                  <p>
+                    <strong>Usuário:</strong> {user.username}
+                  </p>
+                  <p>
+                    <strong>E-mail:</strong> {user.email}
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
 
             <FormProvider
               key={`admin-user-${id}`}

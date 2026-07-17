@@ -9,7 +9,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace EmpregaNet.Application.Users.Queries;
 
-public sealed record GetAllCandidatesQuery(int Page, int Size, string? OrderBy)
+/// <summary>Lista candidatos. <paramref name="Search"/> filtra por nome de usuário ou e-mail.</summary>
+public sealed record GetAllCandidatesQuery(int Page, int Size, string? OrderBy, string? Search = null)
     : IRequest<ListDataPagination<UserViewModel>>, IPaginatedQuery;
 
 public sealed class GetAllCandidatesHandler : IRequestHandler<GetAllCandidatesQuery, ListDataPagination<UserViewModel>>
@@ -28,6 +29,14 @@ public sealed class GetAllCandidatesHandler : IRequestHandler<GetAllCandidatesQu
         var query = _userManager.Users
             .AsNoTracking()
             .Where(u => !u.IsDeleted && u.UserType == UserTypeEnum.Candidate);
+
+        if (!string.IsNullOrWhiteSpace(request.Search))
+        {
+            var term = request.Search.Trim().ToLower();
+            query = query.Where(u =>
+                (u.UserName != null && u.UserName.ToLower().Contains(term)) ||
+                (u.Email != null && u.Email.ToLower().Contains(term)));
+        }
 
         query = request.OrderBy switch
         {

@@ -9,6 +9,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useHasMounted } from '@/hooks/use-has-mounted';
 import { useAppShellNavigation } from './hooks/use-app-shell-navigation';
 import { MainHeader } from './main-header';
+import { MobileNav } from './MobileNav';
 import { Sidebar } from './sidebar';
 import styles from './AppShell.module.scss';
 
@@ -60,20 +61,27 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className={clsx(styles.shell, railCollapsed && styles.shellCollapsed)}>
-      <div
-        className={clsx(styles.overlay, mobileOpen && styles.overlayVisible)}
-        aria-hidden={!mobileOpen}
-        onClick={closeMobile}
-      />
+      <a href="#conteudo" className={styles.skipLink}>
+        Pular para o conteúdo
+      </a>
 
       <Sidebar
+        className={styles.sidebarDesktop}
         groups={navGroups}
         collapsed={railCollapsed}
-        mobileOpen={mobileOpen}
+        mobileOpen={false}
         railTransitioning={railTransitioning}
         onNavigate={closeMobile}
         onCloseMobile={closeMobile}
         onToggleCollapsed={toggleRailCollapsed}
+        onLogout={handleLogout}
+      />
+
+      <MobileNav
+        open={mobileOpen}
+        onOpenChange={setMobileOpen}
+        groups={navGroups}
+        onNavigate={closeMobile}
         onLogout={handleLogout}
       />
 
@@ -88,7 +96,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           mobileMenuOpen={mobileOpen}
         />
 
-        <div className={styles.main}>{children}</div>
+        <main id="conteudo" className={styles.main}>
+          {children}
+        </main>
       </section>
     </div>
   );

@@ -1,27 +1,23 @@
 'use client';
 
-import { FormSubmitButton, InputField } from '@/components';
+import { FormSubmitButton, SelectField } from '@/components';
 import { useFormContext } from '@/context';
+import { USER_TYPE_OPTIONS } from '@/shared';
 import { Save } from 'lucide-react';
-
-const ADMIN_USER_FORM_GRID_STYLE = {
-  display: 'grid',
-  gap: 12,
-  maxWidth: 520,
-  marginTop: 12
-} as const;
+import styles from './admin-user-detail.module.scss';
 
 export function AdminUserFormFields() {
   const { submitting } = useFormContext();
 
   return (
-    <div style={ADMIN_USER_FORM_GRID_STYLE}>
-      <InputField
+    <div className={styles.form}>
+      <SelectField
         name="userType"
-        label="Tipo de Usuário (ex.: Admin, Recruiter, Manager, Candidate)"
-        hint="O backend valida/normaliza; aqui enviamos o valor diretamente."
+        label="Tipo de Usuário"
+        options={[...USER_TYPE_OPTIONS]}
+        placeholder="Selecione o tipo de usuário"
       />
-      <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+      <div className={styles.actions}>
         <FormSubmitButton variant="primary">
           <Save aria-hidden />
           {submitting ? 'Salvando...' : 'Salvar'}

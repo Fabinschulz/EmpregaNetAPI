@@ -30,6 +30,10 @@ export type TableContainerProps<TItem> = {
   emptyTitle?: string;
   /** Mensagem exibida quando não há itens. */
   emptyMessage?: React.ReactNode;
+  /** Legenda visível da tabela (renderizada como `<caption>`). */
+  caption?: string;
+  /** Nome acessível da tabela quando não há legenda visível. */
+  ariaLabel?: string;
   className?: string;
 };
 
@@ -49,6 +53,8 @@ export function TableContainer<TItem>({
   skeletonRows = 6,
   emptyTitle = 'Nenhum registro',
   emptyMessage = 'Nenhum registro encontrado.',
+  caption,
+  ariaLabel,
   className
 }: TableContainerProps<TItem>) {
   const hasItems = !isPending && items.length > 0;
@@ -61,7 +67,9 @@ export function TableContainer<TItem>({
 
       {!isPending && items.length === 0 ? <Alert title={emptyTitle}>{emptyMessage}</Alert> : null}
 
-      {hasItems ? <DataTable columns={columns} items={items} getRowKey={getRowKey} /> : null}
+      {hasItems ? (
+        <DataTable columns={columns} items={items} getRowKey={getRowKey} caption={caption} ariaLabel={ariaLabel} />
+      ) : null}
 
       {hasItems && pagination ? <TablePagination pagination={pagination} totalItems={totalItems} /> : null}
     </div>

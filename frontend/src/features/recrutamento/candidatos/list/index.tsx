@@ -1,9 +1,21 @@
 'use client';
 
-import { ApiQueryBoundary, PageHeader, TableContainer, type DataTableColumn } from '@/components';
+import { ApiQueryBoundary, PageHeader, TableContainer, TableFilters, type DataTableColumn } from '@/components';
+import { FormProvider } from '@/context';
 import { usePersistedTablePagination } from '@/hooks';
-import { useCandidatesListQuery, type UserDto } from '@/services';
+import {
+  candidatesFilterFormSchema,
+  candidatesFilterToParams,
+  defaultCandidatesFilter,
+  useCandidatesListQuery,
+  type UserDto
+} from '@/services';
+import type { CandidatesListQueryParams } from '@/shared';
 import { Eye } from 'lucide-react';
+import { useCallback, useState } from 'react';
+import { CandidatesFilterFields } from './candidates-filter-fields';
+
+type CandidatesFilterParams = Pick<CandidatesListQueryParams, 'search' | 'orderBy'>;
 
 const CANDIDATES_COLUMNS: DataTableColumn<UserDto>[] = [
   { key: 'username', header: 'Candidato', render: (candidate) => <strong>{candidate.username}</strong> },
@@ -19,10 +31,24 @@ const CANDIDATES_COLUMNS: DataTableColumn<UserDto>[] = [
 
 export function RecruitmentCandidatesPage() {
   const pagination = usePersistedTablePagination({ storageKey: 'recrutamento-candidatos' });
+  const { setPage } = pagination;
+  const [filters, setFilters] = useState<CandidatesFilterParams>(() =>
+    candidatesFilterToParams(defaultCandidatesFilter)
+  );
+
   const { data, isPending, isError, error, refetch } = useCandidatesListQuery({
     page: pagination.page,
-    size: pagination.pageSize
+    size: pagination.pageSize,
+    ...filters
   });
+
+  const handleFiltersChange = useCallback(
+    (next: CandidatesFilterParams) => {
+      setFilters(next);
+      setPage(1);
+    },
+    [setPage]
+  );
 
   return (
     <ApiQueryBoundary
@@ -44,7 +70,20 @@ export function RecruitmentCandidatesPage() {
           totalItems={data?.totalItems}
           isPending={isPending}
           emptyTitle="Nenhum candidato"
-          emptyMessage="Nenhum candidato encontrado."
+          emptyMessage="Nenhum candidato encontrado para os filtros informados."
+          filters={
+            <TableFilters title="Buscar candidatos" description="Filtre por nome/e-mail e ordenação.">
+              <FormProvider
+                validationSchema={candidatesFilterFormSchema}
+                defaultValues={defaultCandidatesFilter}
+                onSubmit={() => undefined}
+              >
+                <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'flex-end', gap: 12 }}>
+                  <CandidatesFilterFields onChange={handleFiltersChange} />
+                </div>
+              </FormProvider>
+            </TableFilters>
+          }
         />
       </section>
     </ApiQueryBoundary>

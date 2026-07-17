@@ -2,9 +2,7 @@ using System.ComponentModel;
 
 namespace EmpregaNet.Domain.Enums
 {
-    /// <summary>
-    /// Enumeração que representa o tipo de usuário (Candidato ou Recrutador).
-    /// </summary>
+    
     public enum UserTypeEnum
     {
         /// <summary>
@@ -40,25 +38,9 @@ namespace EmpregaNet.Domain.Enums
         /// Tipo de usuário Gestor.
         /// </summary>
         /// <remarks>
-        /// Representa um usuário que tem acesso a funcionalidades de gerenciamento, mas não tem acesso total ao sistema.
+        /// Recrutador com visão de gestão da área de recrutamento (métricas/analytics da equipe),
+        /// além das capacidades de recrutamento. Não tem acesso administrativo total ao sistema.
         /// </remarks>
-        [Description("Gestor")] Manager,
-
-        /// <summary>
-        /// Tipo de usuário Entrevistador.
-        /// </summary>
-        /// <remarks>
-        /// Representa um usuário que tem acesso a funcionalidades de entrevista, mas não tem acesso total ao sistema.
-        /// </remarks>
-        [Description("Entrevistador")] Interviewer,
-
-        /// <summary>
-        /// Tipo de usuário Analista.
-        /// </summary>
-        /// <remarks>
-        /// Representa um usuário que tem acesso a funcionalidades de análise, mas não tem acesso total ao sistema.
-        /// </remarks>
-        [Description("Analista")] Analyst
-        
+        [Description("Gestor")] Manager
     }
 }

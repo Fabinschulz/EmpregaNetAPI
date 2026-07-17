@@ -1,0 +1,22 @@
+.info {
+  display: grid;
+  gap: 4px;
+  margin-bottom: 16px;
+
+  p {
+    margin: 0;
+  }
+}
+
+.form {
+  display: grid;
+  gap: 12px;
+  max-width: 520px;
+  margin-top: 12px;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}

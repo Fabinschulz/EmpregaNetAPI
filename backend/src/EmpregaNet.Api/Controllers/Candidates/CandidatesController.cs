@@ -28,9 +28,13 @@ public class CandidatesController : ControllerBase
     [ProducesResponseType(typeof(ListDataPagination<UserViewModel>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(DomainError))]
     [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(DomainError))]
-    public async Task<IActionResult> GetAll([FromQuery] int page = 1, [FromQuery] int size = 100, [FromQuery] string? orderBy = null)
+    public async Task<IActionResult> GetAll(
+        [FromQuery] int page = 1,
+        [FromQuery] int size = 100,
+        [FromQuery] string? orderBy = null,
+        [FromQuery] string? search = null)
     {
-        var result = await Mediator.Send(new GetAllCandidatesQuery(page, size, orderBy));
+        var result = await Mediator.Send(new GetAllCandidatesQuery(page, size, orderBy, search));
         return Ok(result);
     }
 

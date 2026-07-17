@@ -1,10 +1,23 @@
 'use client';
 
-import { Alert, ApiQueryBoundary, Button, DetailPageSkeleton } from '@/components';
+import {
+  Alert,
+  ApiQueryBoundary,
+  Button,
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+  DetailPageSkeleton,
+  StatusBadge
+} from '@/components';
 import { useAuth } from '@/features/auth';
 import { useApplyToJobMutation, useJobQuery } from '@/services';
+import { Building2, MapPin } from 'lucide-react';
 import { useParams } from 'next/navigation';
 import { useMemo } from 'react';
+import styles from './job-detail.module.scss';
 
 export function JobDetailPage() {
   const params = useParams<{ id: string }>();
@@ -19,6 +32,12 @@ export function JobDetailPage() {
     void mutateAsync();
   }
 
+  const applyLabel = !isAuthenticated
+    ? 'Faça login para se candidatar'
+    : isApplying
+      ? 'Enviando...'
+      : 'Candidatar-me';
+
   return (
     <ApiQueryBoundary
       fallback="vaga"
@@ -31,23 +50,48 @@ export function JobDetailPage() {
       <section>
         {isPending ? <DetailPageSkeleton bodyLines={5} /> : null}
         {job ? (
-          <>
-            <h1>{job.title}</h1>
-            <p style={{ color: 'var(--muted)' }}>{job.description ?? 'Sem descrição.'}</p>
+          <Card className={styles.card}>
+            <CardHeader>
+              <div className={styles.headerRow}>
+                <CardTitle>{job.title}</CardTitle>
+                <StatusBadge
+                  label={job.isActive === false ? 'Encerrada' : 'Ativa'}
+                  tone={job.isActive === false ? 'negative' : 'positive'}
+                />
+              </div>
+              <ul className={styles.meta}>
+                {job.companyId != null ? (
+                  <li className={styles.metaItem}>
+                    <Building2 aria-hidden />
+                    <span>Empresa #{job.companyId}</span>
+                  </li>
+                ) : null}
+                <li className={styles.metaItem}>
+                  <MapPin aria-hidden />
+                  <span>{job.location?.trim() ? job.location : 'Local não informado'}</span>
+                </li>
+              </ul>
+            </CardHeader>
 
-            <p style={{ marginTop: 14, display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+            <CardContent>
+              <h2 className={styles.sectionLabel}>Descrição</h2>
+              <p className={styles.description}>{job.description?.trim() ? job.description : 'Sem descrição.'}</p>
+            </CardContent>
+
+            <CardFooter className={styles.footer}>
               <Button variant="primary" onClick={onApply} disabled={!isAuthenticated || isApplying}>
-                {!isAuthenticated ? 'Faça login para se candidatar' : isApplying ? 'Enviando...' : 'Candidatar-me'}
+                {applyLabel}
               </Button>
-            </p>
-            {apiError ? (
-              <p style={{ marginTop: 12 }}>
+              {!isAuthenticated ? (
+                <p className={styles.footerHint}>É necessário entrar na conta para enviar sua candidatura.</p>
+              ) : null}
+              {apiError ? (
                 <Alert variant="destructive" title="Erro">
                   {apiError}
                 </Alert>
-              </p>
-            ) : null}
-          </>
+              ) : null}
+            </CardFooter>
+          </Card>
         ) : null}
       </section>
     </ApiQueryBoundary>

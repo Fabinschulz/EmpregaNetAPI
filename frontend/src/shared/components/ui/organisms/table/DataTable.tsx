@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { RowActions, type RowAction } from './RowActions';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './Table';
+import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from './Table';
 
 export type DataTableDataColumn<TItem> = {
   key: string;
@@ -31,24 +31,29 @@ export type DataTableProps<TItem> = {
   items: readonly TItem[];
   /** Key estável de cada linha (ex.: `(item) => item.id`). */
   getRowKey: (item: TItem) => React.Key;
+  /** Legenda visível da tabela (renderizada como `<caption>`). */
+  caption?: string;
+  /** Nome acessível da tabela quando não há legenda visível. */
+  ariaLabel?: string;
 };
 
 /**
  * Tabela declarativa: o chamador define colunas (dados ou ações) e itens,
  * sem montar `TableHead`/`TableCell` manualmente.
  */
-export function DataTable<TItem>({ columns, items, getRowKey }: DataTableProps<TItem>) {
+export function DataTable<TItem>({ columns, items, getRowKey, caption, ariaLabel }: DataTableProps<TItem>) {
   return (
-    <Table>
+    <Table aria-label={ariaLabel}>
+      {caption ? <TableCaption>{caption}</TableCaption> : null}
       <TableHeader>
         <TableRow>
           {columns.map((column) =>
             isActionsColumn(column) ? (
-              <TableHead key={column.key} aria-label="Ações">
+              <TableHead key={column.key} scope="col" aria-label="Ações">
                 {column.header ?? null}
               </TableHead>
             ) : (
-              <TableHead key={column.key} style={column.align ? { textAlign: column.align } : undefined}>
+              <TableHead key={column.key} scope="col" style={column.align ? { textAlign: column.align } : undefined}>
                 {column.header}
               </TableHead>
             )

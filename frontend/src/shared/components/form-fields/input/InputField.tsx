@@ -2,7 +2,8 @@
 
 import { Label } from '@/components';
 import { useFormContext } from '@/context';
-import type React from 'react';
+import { Eye, EyeOff } from 'lucide-react';
+import * as React from 'react';
 import { cn, getFieldErrorMessage } from '@/utils';
 import styles from './input.module.scss';
 
@@ -13,11 +14,16 @@ export type InputFieldProps = Omit<React.ComponentProps<'input'>, 'className'> &
   startIcon?: React.FC<React.SVGProps<SVGSVGElement>>;
   endIcon?: React.FC<React.SVGProps<SVGSVGElement>>;
   onEndIconClick?: () => void;
+  /** Rótulo acessível do botão de end-icon quando ele dispara uma ação. */
+  endIconLabel?: string;
   error?: string;
-  /** @deprecated use `onFieldChange` */
-  onFielChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
   onFieldChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
   hint?: string | null;
+  /**
+   * Habilita o botão de mostrar/ocultar senha. Automático para `type="password"`;
+   * passe `false` para desabilitar.
+   */
+  showPasswordToggle?: boolean;
 };
 
 export const InputField: React.FC<InputFieldProps> = ({
@@ -30,10 +36,11 @@ export const InputField: React.FC<InputFieldProps> = ({
   startIcon: StartIcon,
   endIcon: EndIcon,
   onEndIconClick,
+  endIconLabel,
   error: errorProp,
-  onFielChange,
   onFieldChange,
   hint,
+  showPasswordToggle,
   ...props
 }) => {
   const { register, validationErrors, readOnly } = useFormContext();
@@ -41,7 +48,15 @@ export const InputField: React.FC<InputFieldProps> = ({
   const errorsMessage = errorProp ?? fromForm;
   const labelText = required && label ? `${label} *` : label;
 
-  const fieldChange = onFieldChange ?? onFielChange;
+  const isPassword = type === 'password';
+  const canTogglePassword = isPassword && (showPasswordToggle ?? true) && !EndIcon;
+  const [passwordVisible, setPasswordVisible] = React.useState(false);
+  const resolvedType = isPassword && passwordVisible ? 'text' : type;
+
+  const errorId = `${name}-error`;
+  const hintId = `${name}-hint`;
+  const describedBy = errorsMessage ? errorId : hint ? hintId : undefined;
+
   const { ref, onChange: regOnChange, ...regRest } = register(name);
   const { onChange: propOnChange, ...restProps } = props;
 
@@ -64,30 +79,56 @@ export const InputField: React.FC<InputFieldProps> = ({
           {...regRest}
           id={name}
           ref={ref}
-          type={type}
+          type={resolvedType}
           placeholder={placeholder}
           disabled={!!readOnly}
           aria-invalid={!!errorsMessage}
+          aria-describedby={describedBy}
           className={styles.input}
           onChange={(e) => {
             void regOnChange(e);
             propOnChange?.(e);
-            fieldChange?.(e);
+            onFieldChange?.(e);
           }}
         />
-        {EndIcon ? (
-          <button type="button" className={styles.iconBtn} onClick={onEndIconClick} tabIndex={-1} aria-label="Ação">
-            <EndIcon width={18} height={18} />
+        {canTogglePassword ? (
+          <button
+            type="button"
+            className={styles.iconBtn}
+            onClick={() => setPasswordVisible((visible) => !visible)}
+            aria-label={passwordVisible ? 'Ocultar senha' : 'Mostrar senha'}
+            aria-pressed={passwordVisible}
+          >
+            {passwordVisible ? (
+              <EyeOff width={18} height={18} aria-hidden />
+            ) : (
+              <Eye width={18} height={18} aria-hidden />
+            )}
           </button>
+        ) : EndIcon && onEndIconClick ? (
+          <button
+            type="button"
+            className={styles.iconBtn}
+            onClick={onEndIconClick}
+            aria-label={endIconLabel ?? 'Ação do campo'}
+          >
+            <EndIcon width={18} height={18} aria-hidden />
+          </button>
+        ) : EndIcon ? (
+          <span className={styles.iconBtn} aria-hidden>
+            <EndIcon width={18} height={18} />
+          </span>
         ) : null}
       </div>
 
       {errorsMessage ? (
-        <span className={styles.error} role="alert">
+        <span id={errorId} className={styles.error} role="alert">
           {errorsMessage}
         </span>
       ) : hint ? (
-        <span className={styles.hint}>{hint}</span>
+        <span id={hintId} className={styles.hint}>
+          {hint}
+        </span>
       ) : null}
     </div>
   );

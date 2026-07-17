@@ -12,8 +12,45 @@
   grid-template-columns: minmax(0, 76px) minmax(0, 1fr);
 }
 
-.overlay {
-  display: none;
+.skipLink {
+  position: absolute;
+  left: 8px;
+  top: 8px;
+  z-index: 100;
+  padding: 10px 16px;
+  border-radius: var(--radius-md);
+  background: var(--surface-raised);
+  color: var(--text);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-card);
+  font-size: 14px;
+  font-weight: 600;
+  opacity: 0;
+  transform: translateY(-150%);
+  pointer-events: none;
+  transition:
+    transform 0.16s ease,
+    opacity 0.16s ease;
+}
+
+.skipLink:focus,
+.skipLink:focus-visible {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+.mobileOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 35;
+  background: rgba(0, 0, 0, 0.55);
+}
+
+:global(html[data-theme='light']) .mobileOverlay {
+  background: rgba(22, 24, 31, 0.28);
 }
 
 .content {
@@ -38,24 +75,8 @@
     grid-template-columns: 1fr;
   }
 
-  .overlay {
-    display: block;
-    position: fixed;
-    inset: 0;
-    z-index: 35;
-    background: rgba(0, 0, 0, 0.55);
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.2s ease;
-  }
-
-  .overlayVisible {
-    opacity: 1;
-    pointer-events: auto;
-  }
-
-  :global(html[data-theme='light']) .overlay {
-    background: rgba(22, 24, 31, 0.28);
+  .sidebarDesktop {
+    display: none;
   }
 }
 

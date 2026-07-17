@@ -1,4 +1,4 @@
-import { createPaginatedResponseSchema } from '@/shared';
+import { LIST_ORDER_BY_VALUES, createPaginatedResponseSchema, type JobApplicationsListQueryParams } from '@/shared';
 import { z } from 'zod';
 
 export const jobApplicationSchema = z.object({
@@ -78,3 +78,34 @@ export function parseApplicationStatus(status: string | null | undefined): Appli
   const parsed = applicationStatusSchema.safeParse(status);
   return parsed.success ? parsed.data : null;
 }
+
+export const myApplicationsFilterFormSchema = z.object({
+  status: z.enum(['all', ...APPLICATION_STATUSES]),
+  orderBy: z.enum(LIST_ORDER_BY_VALUES)
+});
+
+export type MyApplicationsFilterFormValues = z.infer<typeof myApplicationsFilterFormSchema>;
+
+export const defaultMyApplicationsFilter: MyApplicationsFilterFormValues = {
+  status: 'all',
+  orderBy: 'createdAt_DESC'
+};
+
+export function myApplicationsFilterToParams(
+  values: MyApplicationsFilterFormValues
+): Pick<JobApplicationsListQueryParams, 'status' | 'orderBy'> {
+  return {
+    status: values.status === 'all' ? undefined : values.status,
+    orderBy: values.orderBy
+  };
+}
+
+export const recruitmentApplicationsFilterFormSchema = z.object({
+  orderBy: z.enum(LIST_ORDER_BY_VALUES)
+});
+
+export type RecruitmentApplicationsFilterFormValues = z.infer<typeof recruitmentApplicationsFilterFormSchema>;
+
+export const defaultRecruitmentApplicationsFilter: RecruitmentApplicationsFilterFormValues = {
+  orderBy: 'createdAt_DESC'
+};

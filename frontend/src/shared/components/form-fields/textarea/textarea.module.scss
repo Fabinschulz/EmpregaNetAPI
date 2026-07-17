@@ -12,6 +12,10 @@
   @include field.control-textarea;
 }
 
+.hint {
+  @include field.field-hint;
+}
+
 .error {
   @include field.field-error;
 }

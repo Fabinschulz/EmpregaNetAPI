@@ -1,10 +1,22 @@
 'use client';
 
-import { ApiQueryBoundary, PageHeader, TableContainer, type DataTableColumn } from '@/components';
+import { ApiQueryBoundary, PageHeader, TableContainer, TableFilters, type DataTableColumn } from '@/components';
+import { FormProvider } from '@/context';
 import { usePersistedTablePagination } from '@/hooks';
-import { useMyJobApplicationsQuery, type JobApplicationDto } from '@/services';
+import {
+  defaultMyApplicationsFilter,
+  myApplicationsFilterFormSchema,
+  myApplicationsFilterToParams,
+  useMyJobApplicationsQuery,
+  type JobApplicationDto
+} from '@/services';
+import type { JobApplicationsListQueryParams } from '@/shared';
 import { Eye } from 'lucide-react';
+import { useCallback, useState } from 'react';
 import { ApplicationStatusBadge } from '../application-status-badge';
+import { MyApplicationsFilterFields } from './my-applications-filter-fields';
+
+type MyApplicationsFilterParams = Pick<JobApplicationsListQueryParams, 'status' | 'orderBy'>;
 
 const MY_APPLICATIONS_COLUMNS: DataTableColumn<JobApplicationDto>[] = [
   { key: 'id', header: 'Candidatura', render: (application) => <strong>#{application.id}</strong> },
@@ -24,10 +36,24 @@ const MY_APPLICATIONS_COLUMNS: DataTableColumn<JobApplicationDto>[] = [
 
 export function MyApplicationsPage() {
   const pagination = usePersistedTablePagination({ storageKey: 'minhas-candidaturas' });
+  const { setPage } = pagination;
+  const [filters, setFilters] = useState<MyApplicationsFilterParams>(() =>
+    myApplicationsFilterToParams(defaultMyApplicationsFilter)
+  );
+
   const { data, isPending, isError, error, refetch } = useMyJobApplicationsQuery({
     page: pagination.page,
-    size: pagination.pageSize
+    size: pagination.pageSize,
+    ...filters
   });
+
+  const handleFiltersChange = useCallback(
+    (next: MyApplicationsFilterParams) => {
+      setFilters(next);
+      setPage(1);
+    },
+    [setPage]
+  );
 
   return (
     <ApiQueryBoundary
@@ -49,7 +75,20 @@ export function MyApplicationsPage() {
           totalItems={data?.totalItems}
           isPending={isPending}
           emptyTitle="Nenhuma candidatura"
-          emptyMessage="Você ainda não se candidatou a nenhuma vaga."
+          emptyMessage="Nenhuma candidatura encontrada para os filtros informados."
+          filters={
+            <TableFilters title="Filtrar candidaturas" description="Filtre por status e ordenação.">
+              <FormProvider
+                validationSchema={myApplicationsFilterFormSchema}
+                defaultValues={defaultMyApplicationsFilter}
+                onSubmit={() => undefined}
+              >
+                <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'flex-end', gap: 12 }}>
+                  <MyApplicationsFilterFields onChange={handleFiltersChange} />
+                </div>
+              </FormProvider>
+            </TableFilters>
+          }
         />
       </section>
     </ApiQueryBoundary>

@@ -10,8 +10,9 @@ namespace EmpregaNet.Application.Users.Queries;
 
 /// <summary>
 /// Lista usuários (admin). <paramref name="IsDeleted"/>: null = todos; false = somente ativos; true = somente excluídos.
+/// <paramref name="Search"/> filtra por nome de usuário ou e-mail (case-insensitive).
 /// </summary>
-public sealed record GetAllUsersQuery(int Page, int Size, string? OrderBy, bool? IsDeleted = null)
+public sealed record GetAllUsersQuery(int Page, int Size, string? OrderBy, bool? IsDeleted = null, string? Search = null)
     : IRequest<ListDataPagination<UserViewModel>>, IPaginatedQuery;
 
 public sealed class GetAllUsersHandler : IRequestHandler<GetAllUsersQuery, ListDataPagination<UserViewModel>>
@@ -33,6 +34,14 @@ public sealed class GetAllUsersHandler : IRequestHandler<GetAllUsersQuery, ListD
 
         if (request.IsDeleted.HasValue)
             query = query.Where(u => u.IsDeleted == request.IsDeleted.Value);
+
+        if (!string.IsNullOrWhiteSpace(request.Search))
+        {
+            var term = request.Search.Trim().ToLower();
+            query = query.Where(u =>
+                (u.UserName != null && u.UserName.ToLower().Contains(term)) ||
+                (u.Email != null && u.Email.ToLower().Contains(term)));
+        }
 
         query = request.OrderBy switch
         {

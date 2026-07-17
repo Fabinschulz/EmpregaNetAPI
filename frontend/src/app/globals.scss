@@ -65,6 +65,7 @@ html {
   --danger: #ff6961;
   --success: #22c55e;
   --success-soft: rgba(34, 197, 94, 0.14);
+  --warning: #f59e0b;
 
   /* Estados de erro (ErrorFallback) */
   --error-page-bg: var(--bg);
@@ -184,6 +185,7 @@ html[data-theme='light'] {
   --danger: #d70015;
   --success: #22c55e;
   --success-soft: rgba(34, 197, 94, 0.12);
+  --warning: #b45309;
 
   /* Estados de erro (ErrorFallback) — light */
   --error-page-bg: var(--bg);
@@ -370,4 +372,24 @@ html[data-theme='light'] [data-sonner-toaster] {
   padding: clamp(16px, 4vw, 24px);
   background: var(--error-page-bg);
   box-sizing: border-box;
+}
+
+/* Respeita a preferência do sistema por menos movimento: neutraliza transições,
+   animações e transforms de hover em toda a aplicação. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    transition-delay: 0ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  *:hover,
+  *:focus-visible,
+  *:active {
+    transform: none !important;
+  }
 }

@@ -8,18 +8,19 @@ import { SidebarNavSubmenu } from './SidebarNavSubmenu';
 import styles from './sidebar.module.scss';
 
 type SidebarNavProps = {
+  id?: string;
   groups: ShellNavGroup[];
   collapsed: boolean;
   transitioning: boolean;
   onNavigate: () => void;
 };
 
-export function SidebarNav({ groups, collapsed, transitioning, onNavigate }: SidebarNavProps) {
+export function SidebarNav({ id = 'app-sidebar-nav', groups, collapsed, transitioning, onNavigate }: SidebarNavProps) {
   const pathname = usePathname();
 
   return (
     <nav
-      id="app-sidebar-nav"
+      id={id}
       className={clsx(styles.scroll, transitioning && styles.scrollTransitioning)}
       aria-label="Navegação principal"
       suppressHydrationWarning

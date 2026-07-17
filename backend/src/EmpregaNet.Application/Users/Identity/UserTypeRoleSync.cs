@@ -16,8 +16,6 @@ public static class UserTypeRoleSync
         RecruitmentRoleNames.Recruiter,
         RecruitmentRoleNames.Manager,
         CandidateRoleAssignment.RoleName,
-        "Interviewer",
-        "Analyst"
     ];
 
     public static IReadOnlyList<string> RolesForUserType(UserTypeEnum userType) => userType switch
@@ -26,8 +24,6 @@ public static class UserTypeRoleSync
         UserTypeEnum.Recruiter => [RecruitmentRoleNames.Recruiter],
         UserTypeEnum.Manager => [RecruitmentRoleNames.Manager],
         UserTypeEnum.Candidate => [CandidateRoleAssignment.RoleName],
-        UserTypeEnum.Interviewer => ["Interviewer"],
-        UserTypeEnum.Analyst => ["Analyst"],
         _ => []
     };
 

@@ -44,6 +44,9 @@ export const SelectField: React.FC<SelectFieldProps> = ({
   const currentValue = watch(name) as string | undefined;
   const labelText = required && label ? `${label} *` : label;
 
+  const labelId = `${name}-label`;
+  const errorId = `${name}-error`;
+
   const onChange = (value: string) => {
     const found = options.find((o) => o.value === value);
     if (found) {
@@ -53,7 +56,11 @@ export const SelectField: React.FC<SelectFieldProps> = ({
 
   return (
     <div className={cn(styles.field, className)}>
-      {labelText ? <span className={styles.label}>{labelText}</span> : null}
+      {labelText ? (
+        <span id={labelId} className={styles.label}>
+          {labelText}
+        </span>
+      ) : null}
 
       <TooltipProvider delayDuration={200}>
         <Select
@@ -62,7 +69,12 @@ export const SelectField: React.FC<SelectFieldProps> = ({
           disabled={!!readOnly}
           name={name}
         >
-          <SelectTrigger aria-invalid={!!errorsMessage} data-testid={`select-${name}-id`}>
+          <SelectTrigger
+            aria-invalid={!!errorsMessage}
+            aria-labelledby={labelText ? labelId : undefined}
+            aria-describedby={errorsMessage ? errorId : undefined}
+            data-testid={`select-${name}-id`}
+          >
             <SelectValue placeholder={placeholder} />
           </SelectTrigger>
           <SelectContent>
@@ -91,7 +103,11 @@ export const SelectField: React.FC<SelectFieldProps> = ({
         </Select>
       </TooltipProvider>
 
-      {errorsMessage ? <span className={styles.error}>{errorsMessage}</span> : null}
+      {errorsMessage ? (
+        <span id={errorId} className={styles.error} role="alert">
+          {errorsMessage}
+        </span>
+      ) : null}
     </div>
   );
 };

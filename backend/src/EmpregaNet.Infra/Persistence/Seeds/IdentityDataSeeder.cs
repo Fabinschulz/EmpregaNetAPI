@@ -23,9 +23,7 @@ public static class IdentityDataSeeder
         "Admin",
         "Candidate",
         "Recruiter",
-        "Manager",
-        "Interviewer",
-        "Analyst"
+        "Manager"
     ];
 
     public static async Task SeedAsync(WebApplication app, CancellationToken cancellationToken = default)

@@ -1,9 +1,21 @@
+using EmpregaNet.Domain.Common;
 using EmpregaNet.Domain.Entities;
 
 namespace EmpregaNet.Domain.Interfaces;
 
 public interface ICompanyRepository : IBaseRepository<Company>
 {
+    /// <summary>
+    /// Lista empresas com filtros opcionais. <paramref name="search"/> busca por nome, e-mail ou CNPJ.
+    /// </summary>
+    Task<ListDataPagination<Company>> GetAllAsync(
+        CancellationToken cancellationToken,
+        int page,
+        int size,
+        string? orderBy,
+        bool? isDeleted,
+        string? search = null);
+
     /// <summary>
     /// Busca uma empresa pelo número de registro.
     /// </summary>

@@ -1,4 +1,4 @@
-import { createPaginatedResponseSchema } from '@/shared';
+import { LIST_ORDER_BY_VALUES, createPaginatedResponseSchema, type CompaniesListQueryParams } from '@/shared';
 import { z } from 'zod';
 
 export const companySchema = z.object({
@@ -38,5 +38,29 @@ export function companyFormValuesFromDto(company: CompanyDto): CompanyFormValues
     email: company.email ?? '',
     phone: company.phone ?? '',
     documentNo: company.documentNo ?? ''
+  };
+}
+
+export const companiesFilterFormSchema = z.object({
+  search: z.string().trim().max(120, { message: 'A busca não pode exceder 120 caracteres.' }),
+  situation: z.enum(['all', 'active', 'deleted']),
+  orderBy: z.enum(LIST_ORDER_BY_VALUES)
+});
+
+export type CompaniesFilterFormValues = z.infer<typeof companiesFilterFormSchema>;
+
+export const defaultCompaniesFilter: CompaniesFilterFormValues = {
+  search: '',
+  situation: 'all',
+  orderBy: 'createdAt_DESC'
+};
+
+export function companiesFilterToParams(
+  values: CompaniesFilterFormValues
+): Pick<CompaniesListQueryParams, 'search' | 'isDeleted' | 'orderBy'> {
+  return {
+    search: values.search.trim() || undefined,
+    isDeleted: values.situation === 'all' ? undefined : values.situation === 'deleted',
+    orderBy: values.orderBy
   };
 }

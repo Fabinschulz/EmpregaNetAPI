@@ -1,4 +1,5 @@
 using EmpregaNet.Api.Controllers.Core;
+using EmpregaNet.Application.Common.Base;
 using EmpregaNet.Application.Utils;
 using EmpregaNet.Domain.Common;
 using EmpregaNet.Application.Jobs.Commands;
@@ -21,18 +22,31 @@ public class JobsController : MainController<CreateJobCommand, UpdateJobCommand,
     {
     }
 
-    /// <summary>Retorna uma lista paginada de vagas ativas, com filtros opcionais (situação e busca por título/descrição).</summary>
+    /// <summary>Assinatura genérica da base, suprimida do routing: vagas expõem a action com o filtro isActive abaixo.</summary>
+    [NonAction]
+    public override Task<IActionResult> GetAll(
+        [FromQuery] int page = 1,
+        [FromQuery] int size = 100,
+        [FromQuery] string? orderBy = null,
+        [FromQuery] bool? isDeleted = null,
+        [FromQuery] string? search = null)
+        => GetAll(page, size, orderBy, isDeleted, null, search);
+
+    /// <summary>Retorna uma lista paginada de vagas, com filtros opcionais (isActive: ativas/encerradas; busca por título/descrição).</summary>
     [AllowAnonymous]
     [HttpGet]
     [OutputCache(PolicyName = OutputCachePolicies.PublicCatalog)]
-    public override Task<IActionResult> GetAll(
+    public async Task<IActionResult> GetAll(
         [FromQuery] int page = 1,
         [FromQuery] int size = 100,
         [FromQuery] string? orderBy = null,
         [FromQuery] bool? isDeleted = null,
         [FromQuery] bool? isActive = null,
         [FromQuery] string? search = null)
-        => base.GetAll(page, size, orderBy, isDeleted, isActive, search);
+    {
+        var result = await _mediator.Send(new GetAllQuery<JobViewModel>(page, size, orderBy, isDeleted, isActive, search));
+        return Ok(result);
+    }
 
     /// <summary>Retorna os detalhes de uma vaga específica por ID, incluindo título, descrição, empresa, localização, requisitos, etc.</summary>
     [AllowAnonymous]

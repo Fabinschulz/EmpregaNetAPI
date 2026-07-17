@@ -9,6 +9,7 @@ import styles from './sidebar.module.scss';
 
 type SidebarProps = {
   id?: string;
+  className?: string;
   groups: ShellNavGroup[];
   collapsed: boolean;
   mobileOpen: boolean;
@@ -21,6 +22,7 @@ type SidebarProps = {
 
 export function Sidebar({
   id = 'app-sidebar',
+  className,
   groups,
   collapsed,
   mobileOpen,
@@ -33,7 +35,7 @@ export function Sidebar({
   return (
     <aside
       id={id}
-      className={clsx(styles.root, collapsed && styles.collapsed, mobileOpen && styles.mobileOpen)}
+      className={clsx(styles.root, collapsed && styles.collapsed, mobileOpen && styles.mobileOpen, className)}
       suppressHydrationWarning
     >
       <SidebarHeader onNavigate={onNavigate} onCloseMobile={onCloseMobile} />

@@ -33,7 +33,13 @@ public sealed class GetAllCompanyHandler : IRequestHandler<GetAllQuery<CompanyVi
 
         try
         {
-            var result = await _repository.GetAllAsync(cancellationToken, request.Page, request.Size, request.OrderBy);
+            var result = await _repository.GetAllAsync(
+                cancellationToken,
+                request.Page,
+                request.Size,
+                request.OrderBy,
+                request.IsDeleted,
+                request.Search);
             var companyViewModels = result.Data.Select(c => c.ToViewModel()).ToList();
 
             _logger.LogInformation("Total de empresas encontradas: {Count}", result.TotalItems);

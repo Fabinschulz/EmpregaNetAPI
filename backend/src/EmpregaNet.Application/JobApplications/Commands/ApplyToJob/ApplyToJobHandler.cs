@@ -13,7 +13,7 @@ public sealed record ApplyToJobCommand(long JobId);
 
 public sealed class ApplyToJobHandler : IRequestHandler<CreateCommand<ApplyToJobCommand>, long>
 {
-    private static readonly string[] NonCandidateRoles = ["Admin", "Recruiter", "Manager", "Interviewer", "Analyst"];
+    private static readonly string[] NonCandidateRoles = RecruitmentRoleNames.Staff;
     private readonly IJobRepository _jobRepository;
     private readonly IJobApplicationRepository _jobApplicationRepository;
     private readonly IHttpCurrentUser _httpCurrentUser;

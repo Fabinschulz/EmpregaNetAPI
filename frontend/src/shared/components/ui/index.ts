@@ -3,6 +3,7 @@ export * from './atoms/button';
 export * from './atoms/label';
 export * from './atoms/skeleton';
 export * from './molecules/alert';
+export * from './molecules/alert-dialog';
 export * from './molecules/command';
 export * from './molecules/input';
 export * from './molecules/popover';

@@ -46,6 +46,9 @@ export const AutocompleteField: React.FC<AutocompleteFieldProps> = ({
   const error = getFieldErrorMessage(name, validationErrors);
   const labelText = required && label ? `${label} *` : label;
 
+  const labelId = `${name}-label`;
+  const errorId = `${name}-error`;
+
   const handleSelect = (value: string) => {
     setValue(name, value, { shouldDirty: true });
     setOpen(false);
@@ -53,8 +56,12 @@ export const AutocompleteField: React.FC<AutocompleteFieldProps> = ({
   };
 
   return (
-    <div className={cn(styles.field, className)} aria-invalid={!!error}>
-      {labelText ? <span className={styles.label}>{labelText}</span> : null}
+    <div className={cn(styles.field, className)}>
+      {labelText ? (
+        <span id={labelId} className={styles.label}>
+          {labelText}
+        </span>
+      ) : null}
 
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
@@ -64,6 +71,9 @@ export const AutocompleteField: React.FC<AutocompleteFieldProps> = ({
             className={styles.trigger}
             aria-expanded={open}
             aria-haspopup="listbox"
+            aria-labelledby={labelText ? labelId : undefined}
+            aria-describedby={error ? errorId : undefined}
+            data-invalid={error ? 'true' : undefined}
           >
             <span className={cn(!selectedOption && styles.triggerMuted)}>{selectedOption?.label ?? placeholder}</span>
             <ChevronDown className={styles.chevron} size={16} aria-hidden />
@@ -95,7 +105,11 @@ export const AutocompleteField: React.FC<AutocompleteFieldProps> = ({
         </PopoverContent>
       </Popover>
 
-      {error ? <span className={styles.error}>{error}</span> : null}
+      {error ? (
+        <span id={errorId} className={styles.error} role="alert">
+          {error}
+        </span>
+      ) : null}
     </div>
   );
 };

@@ -10,7 +10,7 @@ import { reportMutationApiError, toastSuccess } from '@/utils';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { queryKeys } from '../query-keys';
-import { applyToJob, changeStatus, listAll, listMine } from './job-applications-api';
+import { applyToJob, changeStatus, deleteApplication, listAll, listByJob, listMine } from './job-applications-api';
 import { applicationStatusLabels, type ApplicationStatus } from './job-applications-schema';
 
 export function useMyJobApplicationsQuery(params?: JobApplicationsListQueryParams) {
@@ -33,6 +33,37 @@ export function useAllJobApplicationsQuery(params?: JobApplicationsAdminListQuer
     queryFn: () => listAll(listParams),
     enabled: isAuthenticated
   });
+}
+
+/** Candidaturas de uma vaga específica (equipe de recrutamento). */
+export function useApplicationsByJobQuery(jobId: number, params?: JobApplicationsListQueryParams) {
+  const { isAuthenticated } = useAuth();
+  const listParams = withDefaultListParams(params);
+
+  return useQuery({
+    queryKey: queryKeys.jobApplications.byJob(jobId, listParams),
+    queryFn: () => listByJob(jobId, listParams),
+    enabled: isAuthenticated && Number.isFinite(jobId) && jobId > 0
+  });
+}
+
+/** Exclui uma candidatura (equipe de recrutamento). */
+export function useDeleteApplicationMutation() {
+  const queryClient = useQueryClient();
+  const [apiError, setApiError] = useState<string | null>(null);
+
+  const ctx = useMutation({
+    mutationFn: (id: number) => deleteApplication(id),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: queryKeys.jobApplications.all });
+      toastSuccess('Candidatura excluída', 'A candidatura foi removida.');
+    },
+    onError: (err) => {
+      reportMutationApiError({ err, actionLabel: 'excluir', resource: 'candidatura', setApiError });
+    }
+  });
+
+  return { ...ctx, apiError };
 }
 
 export function useApplyToJobMutation(jobId: number) {

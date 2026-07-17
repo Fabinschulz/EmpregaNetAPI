@@ -59,6 +59,9 @@ export const MultiSelectField: React.FC<MultiSelectFieldProps> = ({
   const selectedOptions = options.filter((option) => selectedValues.includes(option.value));
   const labelText = required && label ? `${label} *` : label;
 
+  const labelId = `${name}-label`;
+  const errorId = `${name}-error`;
+
   const handleSelect = (value: string) => {
     const isSelected = selectedValues.includes(value);
     if (isSelected) {
@@ -86,8 +89,12 @@ export const MultiSelectField: React.FC<MultiSelectFieldProps> = ({
   );
 
   return (
-    <div className={cn(styles.field, className)} aria-invalid={!!errorsMessage}>
-      {labelText ? <span className={styles.label}>{labelText}</span> : null}
+    <div className={cn(styles.field, className)}>
+      {labelText ? (
+        <span id={labelId} className={styles.label}>
+          {labelText}
+        </span>
+      ) : null}
 
       <TooltipProvider delayDuration={200}>
         <Popover open={open} onOpenChange={setOpen}>
@@ -99,6 +106,9 @@ export const MultiSelectField: React.FC<MultiSelectFieldProps> = ({
               className={styles.trigger}
               aria-expanded={open}
               aria-haspopup="listbox"
+              aria-labelledby={labelText ? labelId : undefined}
+              aria-describedby={errorsMessage ? errorId : undefined}
+              data-invalid={errorsMessage ? 'true' : undefined}
             >
               {selectedValues.length > 0 ? (
                 <div className={styles.badges}>
@@ -160,7 +170,11 @@ export const MultiSelectField: React.FC<MultiSelectFieldProps> = ({
         </Popover>
       </TooltipProvider>
 
-      {errorsMessage ? <span className={styles.error}>{errorsMessage}</span> : null}
+      {errorsMessage ? (
+        <span id={errorId} className={styles.error} role="alert">
+          {errorsMessage}
+        </span>
+      ) : null}
     </div>
   );
 };

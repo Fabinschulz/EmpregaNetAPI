@@ -60,7 +60,8 @@
     cursor: not-allowed;
   }
 
-  &[aria-invalid='true'] {
+  &[aria-invalid='true'],
+  &[data-invalid='true'] {
     border-color: var(--control-invalid-border, rgba(239, 68, 68, 0.55));
   }
 }

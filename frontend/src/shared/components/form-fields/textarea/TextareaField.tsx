@@ -11,6 +11,7 @@ export type TextareaFieldProps = Omit<React.ComponentProps<'textarea'>, 'classNa
   label?: string;
   className?: string;
   error?: string;
+  hint?: string | null;
   onFieldChange?: (event: React.ChangeEvent<HTMLTextAreaElement>) => void;
 };
 
@@ -22,6 +23,7 @@ export const TextareaField: React.FC<TextareaFieldProps> = ({
   rows = 4,
   className,
   error: errorProp,
+  hint,
   onFieldChange,
   ...props
 }) => {
@@ -29,6 +31,10 @@ export const TextareaField: React.FC<TextareaFieldProps> = ({
   const fromForm = getFieldErrorMessage(name, validationErrors);
   const errorsMessage = errorProp ?? fromForm;
   const labelText = required && label ? `${label} *` : label;
+
+  const errorId = `${name}-error`;
+  const hintId = `${name}-hint`;
+  const describedBy = errorsMessage ? errorId : hint ? hintId : undefined;
 
   const { ref, onChange: regOnChange, ...regRest } = register(name);
   const { onChange: propOnChange, ...restProps } = props;
@@ -49,6 +55,7 @@ export const TextareaField: React.FC<TextareaFieldProps> = ({
         placeholder={placeholder}
         disabled={!!readOnly}
         aria-invalid={!!errorsMessage}
+        aria-describedby={describedBy}
         className={styles.textarea}
         required={required}
         onChange={(e) => {
@@ -58,8 +65,12 @@ export const TextareaField: React.FC<TextareaFieldProps> = ({
         }}
       />
       {errorsMessage ? (
-        <span className={styles.error} role="alert">
+        <span id={errorId} className={styles.error} role="alert">
           {errorsMessage}
+        </span>
+      ) : hint ? (
+        <span id={hintId} className={styles.hint}>
+          {hint}
         </span>
       ) : null}
     </div>

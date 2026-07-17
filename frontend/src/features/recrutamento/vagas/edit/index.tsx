@@ -1,6 +1,6 @@
 'use client';
 
-import { Alert, ApiQueryBoundary, FormFieldsSkeleton, PageHeader } from '@/components';
+import { Alert, ApiQueryBoundary, Button, FormFieldsSkeleton, PageHeader } from '@/components';
 import { FormProvider } from '@/context';
 import {
   defaultFormJob,
@@ -11,6 +11,8 @@ import {
   useUpdateJobMutation,
   type JobFormValues
 } from '@/services';
+import { Users } from 'lucide-react';
+import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useMemo } from 'react';
 import { JobFormFields } from '../job-form';
@@ -47,7 +49,18 @@ export function RecruitmentEditJobPage() {
       onRetry={() => void refetch()}
     >
       <section>
-        <PageHeader title="Editar vaga" description="Atualize os dados ou encerre a vaga." />
+        <PageHeader
+          title="Editar vaga"
+          description="Atualize os dados ou encerre a vaga."
+          actions={
+            <Button variant="outline" asChild>
+              <Link href={`/recrutamento/vagas/${jobId}/candidatos`}>
+                <Users aria-hidden />
+                Ver candidatos
+              </Link>
+            </Button>
+          }
+        />
         {apiError ? (
           <Alert variant="destructive" title="Erro">
             {apiError}
