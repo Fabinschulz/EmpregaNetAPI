@@ -1,6 +1,13 @@
 'use client';
 
-import { Button, AutocompleteField, SelectField, type AutocompleteOption } from '@/components';
+import {
+  AutocompleteField,
+  Button,
+  FilterBar,
+  FilterField,
+  SelectField,
+  type AutocompleteOption
+} from '@/components';
 import { useFormContext } from '@/context';
 import { defaultJobsFilter, jobsFilterToParams, type JobsFilterFormValues } from '@/services';
 import type { JobsListQueryParams } from '@/shared/schema';
@@ -37,21 +44,24 @@ export function JobsFilterFields({ onChange, searchOptions, searchLoading }: Job
   }, [search, status, onChange]);
 
   return (
-    <>
-      <AutocompleteField
-        name="search"
-        label="Buscar"
-        placeholder="Título ou descrição da vaga"
-        options={searchOptions}
-        loading={searchLoading}
-      />
-      <SelectField name="status" label="Situação" options={STATUS_OPTIONS} />
-      <div style={{ display: 'flex', gap: 8, flex: '0 0 auto' }}>
+    <FilterBar
+      actions={
         <Button type="button" variant="outline" onClick={() => reset(defaultJobsFilter)}>
           <X aria-hidden />
           Limpar
         </Button>
-      </div>
-    </>
+      }
+    >
+      <FilterField span={2}>
+        <AutocompleteField
+          name="search"
+          label="Buscar"
+          placeholder="Título ou descrição da vaga"
+          options={searchOptions}
+          loading={searchLoading}
+        />
+      </FilterField>
+      <SelectField name="status" label="Situação" options={STATUS_OPTIONS} />
+    </FilterBar>
   );
 }

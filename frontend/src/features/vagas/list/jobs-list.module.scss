@@ -4,6 +4,27 @@
   margin-top: 12px;
 }
 
+.toolbar {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.spinning {
+  animation: jobs-refresh-spin 0.8s linear infinite;
+}
+
+@keyframes jobs-refresh-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spinning {
+    animation: none;
+  }
+}
+
 .grid {
   display: grid;
   gap: 10px;

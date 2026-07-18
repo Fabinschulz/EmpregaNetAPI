@@ -3,11 +3,11 @@
 import { Button, Card, CardContent, CardHeader, CardTitle, PageHeader, Skeleton } from '@/components';
 import { useAuth } from '@/features/auth';
 import {
-  useAdminUsersListQuery,
-  useAllJobApplicationsQuery,
-  useCompaniesListQuery,
-  useJobsListQuery,
-  useMyJobApplicationsQuery
+    useAdminUsersListQuery,
+    useAllJobApplicationsQuery,
+    useCompaniesListQuery,
+    useJobsListQuery,
+    useMyJobApplicationsQuery
 } from '@/services';
 import { isAdmin, isRecruitmentStaff } from '@/shared';
 import { Briefcase, Building2, FileText, LayoutDashboard, Users, type LucideIcon } from 'lucide-react';

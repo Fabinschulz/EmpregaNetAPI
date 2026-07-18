@@ -41,7 +41,7 @@ export function MyApplicationsPage() {
     myApplicationsFilterToParams(defaultMyApplicationsFilter)
   );
 
-  const { data, isPending, isError, error, refetch } = useMyJobApplicationsQuery({
+  const { data, isPending, isFetching, isError, error, refetch } = useMyJobApplicationsQuery({
     page: pagination.page,
     size: pagination.pageSize,
     ...filters
@@ -74,6 +74,8 @@ export function MyApplicationsPage() {
           pagination={pagination}
           totalItems={data?.totalItems}
           isPending={isPending}
+          onRefresh={() => void refetch()}
+          isRefreshing={isFetching}
           emptyTitle="Nenhuma candidatura"
           emptyMessage="Nenhuma candidatura encontrada para os filtros informados."
           filters={
@@ -83,9 +85,7 @@ export function MyApplicationsPage() {
                 defaultValues={defaultMyApplicationsFilter}
                 onSubmit={() => undefined}
               >
-                <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'flex-end', gap: 12 }}>
-                  <MyApplicationsFilterFields onChange={handleFiltersChange} />
-                </div>
+                <MyApplicationsFilterFields onChange={handleFiltersChange} />
               </FormProvider>
             </TableFilters>
           }

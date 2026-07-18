@@ -4,11 +4,11 @@ import { ApiQueryBoundary, PageHeader, TableContainer, TableFilters, type DataTa
 import { FormProvider } from '@/context';
 import { usePersistedTablePagination } from '@/hooks';
 import {
-  candidatesFilterFormSchema,
-  candidatesFilterToParams,
-  defaultCandidatesFilter,
-  useCandidatesListQuery,
-  type UserDto
+    candidatesFilterFormSchema,
+    candidatesFilterToParams,
+    defaultCandidatesFilter,
+    useCandidatesListQuery,
+    type UserDto
 } from '@/services';
 import type { CandidatesListQueryParams } from '@/shared';
 import { Eye } from 'lucide-react';
@@ -65,7 +65,7 @@ export function RecruitmentCandidatesPage() {
       onRetry={() => void refetch()}
     >
       <section>
-        <PageHeader title="Recrutamento: Candidatos" description="Listagem de candidatos." />
+        <PageHeader title="Candidatos" description="Listagem de candidatos." />
 
         <TableContainer
           columns={CANDIDATES_COLUMNS}
@@ -74,6 +74,8 @@ export function RecruitmentCandidatesPage() {
           pagination={pagination}
           totalItems={data?.totalItems}
           isPending={isPending}
+          onRefresh={() => void refetch()}
+          isRefreshing={isFetching}
           emptyTitle="Nenhum candidato"
           emptyMessage="Nenhum candidato encontrado para os filtros informados."
           filters={
@@ -83,13 +85,11 @@ export function RecruitmentCandidatesPage() {
                 defaultValues={defaultCandidatesFilter}
                 onSubmit={() => undefined}
               >
-                <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'flex-end', gap: 12 }}>
-                  <CandidatesFilterFields
-                    onChange={handleFiltersChange}
-                    searchOptions={searchOptions}
-                    searchLoading={isFetching}
-                  />
-                </div>
+                <CandidatesFilterFields
+                  onChange={handleFiltersChange}
+                  searchOptions={searchOptions}
+                  searchLoading={isFetching}
+                />
               </FormProvider>
             </TableFilters>
           }

@@ -1,6 +1,6 @@
 'use client';
 
-import { SelectField } from '@/components';
+import { FilterBar, SelectField } from '@/components';
 import { useFormContext } from '@/context';
 import { type RecruitmentApplicationsFilterFormValues } from '@/services';
 import { DATE_ORDER_BY_OPTIONS, type ListOrderByValue } from '@/shared';
@@ -24,5 +24,9 @@ export function RecruitmentApplicationsFilterFields({ onChange }: RecruitmentApp
     onChange(orderBy);
   }, [orderBy, onChange]);
 
-  return <SelectField name="orderBy" label="Ordenar por" options={[...DATE_ORDER_BY_OPTIONS]} />;
+  return (
+    <FilterBar>
+      <SelectField name="orderBy" label="Ordenar por" options={[...DATE_ORDER_BY_OPTIONS]} />
+    </FilterBar>
+  );
 }

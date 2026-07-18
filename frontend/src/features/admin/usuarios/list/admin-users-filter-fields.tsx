@@ -1,6 +1,13 @@
 'use client';
 
-import { Button, AutocompleteField, SelectField, type AutocompleteOption } from '@/components';
+import {
+  AutocompleteField,
+  Button,
+  FilterBar,
+  FilterField,
+  SelectField,
+  type AutocompleteOption
+} from '@/components';
 import { useFormContext } from '@/context';
 import {
     adminUsersFilterToParams,
@@ -42,22 +49,25 @@ export function AdminUsersFilterFields({ onChange, searchOptions, searchLoading 
   }, [search, situation, orderBy, onChange]);
 
   return (
-    <>
-      <AutocompleteField
-        name="search"
-        label="Buscar"
-        placeholder="Nome ou e-mail"
-        options={searchOptions}
-        loading={searchLoading}
-      />
-      <SelectField name="situation" label="Situação" options={SITUATION_OPTIONS} />
-      <SelectField name="orderBy" label="Ordenar por" options={[...LIST_ORDER_BY_OPTIONS]} />
-      <div style={{ display: 'flex', gap: 8, flex: '0 0 auto' }}>
+    <FilterBar
+      actions={
         <Button type="button" variant="outline" onClick={() => reset(defaultAdminUsersFilter)}>
           <X aria-hidden />
           Limpar
         </Button>
-      </div>
-    </>
+      }
+    >
+      <FilterField span={2}>
+        <AutocompleteField
+          name="search"
+          label="Buscar"
+          placeholder="Nome ou e-mail"
+          options={searchOptions}
+          loading={searchLoading}
+        />
+      </FilterField>
+      <SelectField name="situation" label="Situação" options={SITUATION_OPTIONS} />
+      <SelectField name="orderBy" label="Ordenar por" options={[...LIST_ORDER_BY_OPTIONS]} />
+    </FilterBar>
   );
 }

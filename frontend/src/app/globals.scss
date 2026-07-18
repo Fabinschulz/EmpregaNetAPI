@@ -287,10 +287,6 @@ html[data-theme='light'] :focus-visible {
   box-shadow: var(--focus-ring);
 }
 
-main {
-  min-height: 100vh;
-}
-
 h1 {
   font-size: clamp(1.35rem, 2.2vw + 0.6rem, 1.85rem);
   line-height: 1.2;

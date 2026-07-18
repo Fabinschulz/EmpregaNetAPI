@@ -78,7 +78,7 @@ export function AdminUsersPage() {
       onRetry={refetch}
     >
       <section>
-        <PageHeader title="Admin: Usuários" description="Gestão de usuários (Admin)." />
+        <PageHeader title="Usuários" description="Gestão de usuários (Admin)." />
 
         <TableContainer
           columns={USERS_COLUMNS}
@@ -87,6 +87,8 @@ export function AdminUsersPage() {
           pagination={pagination}
           totalItems={data?.totalItems}
           isPending={isPending}
+          onRefresh={() => void refetch()}
+          isRefreshing={isFetching}
           emptyTitle="Nenhum usuário"
           emptyMessage="Nenhum usuário encontrado para os filtros informados."
           filters={
@@ -96,13 +98,11 @@ export function AdminUsersPage() {
                 defaultValues={defaultAdminUsersFilter}
                 onSubmit={() => undefined}
               >
-                <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'flex-end', gap: 12 }}>
-                  <AdminUsersFilterFields
-                    onChange={handleFiltersChange}
-                    searchOptions={searchOptions}
-                    searchLoading={isFetching}
-                  />
-                </div>
+                <AdminUsersFilterFields
+                  onChange={handleFiltersChange}
+                  searchOptions={searchOptions}
+                  searchLoading={isFetching}
+                />
               </FormProvider>
             </TableFilters>
           }

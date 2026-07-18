@@ -74,7 +74,7 @@ export function AdminCompaniesPage() {
     >
       <section>
         <PageHeader
-          title="Admin: Empresas"
+          title="Empresas"
           description="Gestão de empresas (Admin)."
           actions={
             <Button variant="primary" asChild>
@@ -93,6 +93,8 @@ export function AdminCompaniesPage() {
           pagination={pagination}
           totalItems={data?.totalItems}
           isPending={isPending}
+          onRefresh={() => void refetch()}
+          isRefreshing={isFetching}
           emptyTitle="Nenhuma empresa"
           emptyMessage="Nenhuma empresa encontrada para os filtros informados."
           filters={
@@ -102,13 +104,11 @@ export function AdminCompaniesPage() {
                 defaultValues={defaultCompaniesFilter}
                 onSubmit={() => undefined}
               >
-                <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'flex-end', gap: 12 }}>
-                  <CompaniesFilterFields
-                    onChange={handleFiltersChange}
-                    searchOptions={searchOptions}
-                    searchLoading={isFetching}
-                  />
-                </div>
+                <CompaniesFilterFields
+                  onChange={handleFiltersChange}
+                  searchOptions={searchOptions}
+                  searchLoading={isFetching}
+                />
               </FormProvider>
             </TableFilters>
           }

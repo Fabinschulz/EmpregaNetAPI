@@ -2,9 +2,11 @@
 
 import type { UseTablePaginationResult } from '@/hooks';
 import { cn } from '@/utils/lib';
+import { RefreshCw } from 'lucide-react';
 import * as React from 'react';
 import { ListRowsSkeleton } from '../../../common/loading/list-rows-skeleton';
 import { Alert } from '../../molecules/alert';
+import { Button } from '../../atoms/button';
 import { DataTable, type DataTableColumn } from './DataTable';
 import styles from './TableContainer.module.scss';
 import { TablePagination } from './TablePagination';
@@ -34,6 +36,10 @@ export type TableContainerProps<TItem> = {
   caption?: string;
   /** Nome acessível da tabela quando não há legenda visível. */
   ariaLabel?: string;
+  /** Se informado, exibe o botão "Atualizar" que refaz a busca da tabela. */
+  onRefresh?: () => void;
+  /** Atualização em andamento: desabilita o botão e gira o ícone. */
+  isRefreshing?: boolean;
   className?: string;
 };
 
@@ -55,6 +61,8 @@ export function TableContainer<TItem>({
   emptyMessage = 'Nenhum registro encontrado.',
   caption,
   ariaLabel,
+  onRefresh,
+  isRefreshing = false,
   className
 }: TableContainerProps<TItem>) {
   const hasItems = !isPending && items.length > 0;
@@ -63,15 +71,52 @@ export function TableContainer<TItem>({
     <div className={cn(styles.root, className)}>
       {filters}
 
-      {isPending ? <ListRowsSkeleton rows={skeletonRows} /> : null}
+      <div className={styles.panel}>
+        {onRefresh ? (
+          <div className={styles.panelHeader}>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              startIcon={RefreshCw}
+              iconStyleOverrides={isRefreshing ? styles.spinning : undefined}
+              onClick={onRefresh}
+              disabled={isRefreshing}
+            >
+              Atualizar
+            </Button>
+          </div>
+        ) : null}
 
-      {!isPending && items.length === 0 ? <Alert title={emptyTitle}>{emptyMessage}</Alert> : null}
+        {isPending ? (
+          <div className={styles.bodyPadded}>
+            <ListRowsSkeleton rows={skeletonRows} />
+          </div>
+        ) : null}
 
-      {hasItems ? (
-        <DataTable columns={columns} items={items} getRowKey={getRowKey} caption={caption} ariaLabel={ariaLabel} />
-      ) : null}
+        {!isPending && items.length === 0 ? (
+          <div className={styles.bodyPadded}>
+            <Alert title={emptyTitle}>{emptyMessage}</Alert>
+          </div>
+        ) : null}
 
-      {hasItems && pagination ? <TablePagination pagination={pagination} totalItems={totalItems} /> : null}
+        {hasItems ? (
+          <DataTable
+            columns={columns}
+            items={items}
+            getRowKey={getRowKey}
+            caption={caption}
+            ariaLabel={ariaLabel}
+            flush
+          />
+        ) : null}
+
+        {hasItems && pagination ? (
+          <div className={styles.panelFooter}>
+            <TablePagination pagination={pagination} totalItems={totalItems} />
+          </div>
+        ) : null}
+      </div>
     </div>
   );
 }

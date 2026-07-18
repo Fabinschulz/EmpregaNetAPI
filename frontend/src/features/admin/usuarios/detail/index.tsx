@@ -3,17 +3,17 @@
 import { Alert, ApiQueryBoundary, Card, CardContent, FormFieldsSkeleton, PageHeader } from '@/components';
 import { FormProvider } from '@/context';
 import {
-  adminUserFormValuesFromDto,
-  adminUserUpdateFormSchema,
-  defaultAdminUserUpdateForm,
-  useAdminUserQuery,
-  useUpdateAdminUserMutation,
-  type AdminUserUpdateFormValues
+    adminUserFormValuesFromDto,
+    adminUserUpdateFormSchema,
+    defaultAdminUserUpdateForm,
+    useAdminUserQuery,
+    useUpdateAdminUserMutation,
+    type AdminUserUpdateFormValues
 } from '@/services';
 import { useParams } from 'next/navigation';
 import { useMemo } from 'react';
-import { AdminUserFormFields } from './admin-user-form';
 import styles from './admin-user-detail.module.scss';
+import { AdminUserFormFields } from './admin-user-form';
 
 export function AdminUserDetailPage() {
   const params = useParams<{ id: string }>();
@@ -44,7 +44,7 @@ export function AdminUserDetailPage() {
       onRetry={() => void refetch()}
     >
       <section>
-        <PageHeader title="Admin: Usuário" description="Detalhe e alteração do tipo de usuário." />
+        <PageHeader title="Usuário" description="Detalhe e alteração do tipo de usuário." />
         {apiError ? (
           <Alert variant="destructive" title="Erro">
             {apiError}

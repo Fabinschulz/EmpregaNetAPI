@@ -1,11 +1,10 @@
 'use client';
 
-import { Button, AutocompleteField, type AutocompleteOption } from '@/components';
+import { AutocompleteField, Button, FilterBar, FilterField, type AutocompleteOption } from '@/components';
 import { useFormContext } from '@/context';
 import { defaultJobsSearch, type JobsSearchFormValues } from '@/services';
 import { X } from 'lucide-react';
 import { useEffect, useRef } from 'react';
-import styles from './jobs-search-fields.module.scss';
 
 type JobsSearchFieldsProps = {
   onChange: (search: string | undefined) => void;
@@ -27,21 +26,23 @@ export function JobsSearchFields({ onChange, searchOptions, searchLoading }: Job
   }, [search, onChange]);
 
   return (
-    <div className={styles.fields}>
-      <AutocompleteField
-        name="search"
-        label="Buscar"
-        placeholder="Cargo, palavra-chave..."
-        className={styles.search}
-        options={searchOptions}
-        loading={searchLoading}
-      />
-      <div className={styles.actions}>
+    <FilterBar
+      actions={
         <Button type="button" variant="outline" onClick={() => reset(defaultJobsSearch)}>
           <X aria-hidden />
           Limpar
         </Button>
-      </div>
-    </div>
+      }
+    >
+      <FilterField span="full">
+        <AutocompleteField
+          name="search"
+          label="Buscar"
+          placeholder="Cargo, palavra-chave..."
+          options={searchOptions}
+          loading={searchLoading}
+        />
+      </FilterField>
+    </FilterBar>
   );
 }

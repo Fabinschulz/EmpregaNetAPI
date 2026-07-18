@@ -1,6 +1,6 @@
 'use client';
 
-import { Button, SelectField } from '@/components';
+import { Button, FilterBar, SelectField } from '@/components';
 import { useFormContext } from '@/context';
 import {
   APPLICATION_STATUSES,
@@ -40,15 +40,16 @@ export function MyApplicationsFilterFields({ onChange }: MyApplicationsFilterFie
   }, [status, orderBy, onChange]);
 
   return (
-    <>
-      <SelectField name="status" label="Status" options={STATUS_OPTIONS} />
-      <SelectField name="orderBy" label="Ordenar por" options={[...DATE_ORDER_BY_OPTIONS]} />
-      <div style={{ display: 'flex', gap: 8, flex: '0 0 auto' }}>
+    <FilterBar
+      actions={
         <Button type="button" variant="outline" onClick={() => reset(defaultMyApplicationsFilter)}>
           <X aria-hidden />
           Limpar
         </Button>
-      </div>
-    </>
+      }
+    >
+      <SelectField name="status" label="Status" options={STATUS_OPTIONS} />
+      <SelectField name="orderBy" label="Ordenar por" options={[...DATE_ORDER_BY_OPTIONS]} />
+    </FilterBar>
   );
 }

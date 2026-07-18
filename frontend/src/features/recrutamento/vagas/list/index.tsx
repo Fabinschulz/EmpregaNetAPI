@@ -75,8 +75,8 @@ export function RecruitmentJobsPage() {
     >
       <section>
         <PageHeader
-          title="Recrutamento: Vagas"
-          description="Gestão de vagas (criar/editar/fechar/excluir)."
+          title="Vagas"
+          description="Gestão de vagas de emprego, incluindo criação, edição e acompanhamento das candidaturas."
           actions={
             <Button variant="primary" asChild>
               <Link href="/recrutamento/vagas/new">
@@ -94,6 +94,8 @@ export function RecruitmentJobsPage() {
           pagination={pagination}
           totalItems={data?.totalItems}
           isPending={isPending}
+          onRefresh={() => void refetch()}
+          isRefreshing={isFetching}
           emptyTitle="Nenhuma vaga"
           emptyMessage="Nenhuma vaga encontrada para os filtros informados."
           filters={
@@ -103,13 +105,11 @@ export function RecruitmentJobsPage() {
                 defaultValues={defaultJobsFilter}
                 onSubmit={() => undefined}
               >
-                <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'flex-end', gap: 12 }}>
-                  <JobsFilterFields
-                    onChange={handleFiltersChange}
-                    searchOptions={searchOptions}
-                    searchLoading={isFetching}
-                  />
-                </div>
+                <JobsFilterFields
+                  onChange={handleFiltersChange}
+                  searchOptions={searchOptions}
+                  searchLoading={isFetching}
+                />
               </FormProvider>
             </TableFilters>
           }

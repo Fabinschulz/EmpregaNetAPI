@@ -35,15 +35,17 @@ export type DataTableProps<TItem> = {
   caption?: string;
   /** Nome acessível da tabela quando não há legenda visível. */
   ariaLabel?: string;
+  /** Remove a borda/raio próprios (quando embutida num painel unificado). */
+  flush?: boolean;
 };
 
 /**
  * Tabela declarativa: o chamador define colunas (dados ou ações) e itens,
  * sem montar `TableHead`/`TableCell` manualmente.
  */
-export function DataTable<TItem>({ columns, items, getRowKey, caption, ariaLabel }: DataTableProps<TItem>) {
+export function DataTable<TItem>({ columns, items, getRowKey, caption, ariaLabel, flush }: DataTableProps<TItem>) {
   return (
-    <Table aria-label={ariaLabel}>
+    <Table aria-label={ariaLabel} flush={flush}>
       {caption ? <TableCaption>{caption}</TableCaption> : null}
       <TableHeader>
         <TableRow>

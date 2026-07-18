@@ -3,3 +3,45 @@
   gap: 12px;
   margin-top: 12px;
 }
+
+/* Painel unificado: cabeçalho (Atualizar) + tabela + paginação como um único bloco. */
+.panel {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg, var(--radius));
+  background: var(--card-bg);
+  overflow: hidden;
+}
+
+.panelHeader {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.bodyPadded {
+  padding: 12px;
+}
+
+.panelFooter {
+  border-top: 1px solid var(--border);
+  padding: 0 10px;
+}
+
+.spinning {
+  animation: table-refresh-spin 0.8s linear infinite;
+}
+
+@keyframes table-refresh-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spinning {
+    animation: none;
+  }
+}

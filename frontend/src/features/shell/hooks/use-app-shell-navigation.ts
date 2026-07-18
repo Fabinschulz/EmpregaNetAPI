@@ -56,7 +56,7 @@ export function useAppShellNavigation(roles: string[]) {
     ];
 
     const admin: ShellNavItem[] = [
-      { href: '/admin/usuarios', label: 'Utilizadores', icon: Users, visible: isAdmin(roles) },
+      { href: '/admin/usuarios', label: 'Usuários', icon: Users, visible: isAdmin(roles) },
       { href: '/admin/empresas', label: 'Empresas', icon: Building2, visible: isAdmin(roles) }
     ];
 

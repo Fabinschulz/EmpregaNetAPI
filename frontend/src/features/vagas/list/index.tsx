@@ -12,7 +12,7 @@ import {
 import { FormProvider } from '@/context';
 import { usePersistedTablePagination } from '@/hooks';
 import { defaultJobsSearch, jobsSearchFormSchema, useJobsListQuery } from '@/services';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, RefreshCw } from 'lucide-react';
 import Link from 'next/link';
 import { useCallback, useMemo, useState } from 'react';
 import { JobsSearchFields } from './jobs-search-fields';
@@ -71,6 +71,20 @@ export function JobsPage() {
               />
             </FormProvider>
           </TableFilters>
+
+          <div className={styles.toolbar}>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              startIcon={RefreshCw}
+              iconStyleOverrides={isFetching ? styles.spinning : undefined}
+              onClick={() => void refetch()}
+              disabled={isFetching}
+            >
+              Atualizar
+            </Button>
+          </div>
 
           {isPending ? <ListRowsSkeleton rows={6} /> : null}
 
