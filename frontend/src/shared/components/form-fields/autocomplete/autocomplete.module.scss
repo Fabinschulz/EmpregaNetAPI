@@ -1,9 +1,5 @@
 @use '../field-base' as field;
 
-.popoverContent {
-  padding: 0;
-}
-
 .field {
   @include field.field-shell;
 }
@@ -14,29 +10,58 @@
 
 .trigger {
   @include field.control-trigger;
+
+  justify-content: flex-start;
+  gap: 8px;
+}
+
+.icon {
+  flex-shrink: 0;
+  color: var(--muted);
+}
+
+.triggerText {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .triggerMuted {
   color: var(--muted);
 }
 
-.chevron {
+.popoverContent {
+  padding: 0;
+  width: var(--radix-popover-trigger-width);
+  min-width: 240px;
+}
+
+.status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  font-size: 0.875rem;
+  color: var(--muted);
+}
+
+.spinner {
   flex-shrink: 0;
-  opacity: 0.55;
+  animation: autocomplete-spin 0.8s linear infinite;
+}
+
+@keyframes autocomplete-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spinner {
+    animation: none;
+  }
 }
 
 .error {
   @include field.field-error;
-}
-
-.itemRow {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  width: 100%;
-}
-
-.itemSelected {
-  background: var(--brand-soft) !important;
 }

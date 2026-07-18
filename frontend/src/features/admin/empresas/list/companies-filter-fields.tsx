@@ -1,12 +1,11 @@
 'use client';
 
-import { Button, InputField, SelectField } from '@/components';
+import { Button, AutocompleteField, SelectField, type AutocompleteOption } from '@/components';
 import { useFormContext } from '@/context';
-import { useDebouncedValue } from '@/hooks';
 import {
-  companiesFilterToParams,
-  defaultCompaniesFilter,
-  type CompaniesFilterFormValues
+    companiesFilterToParams,
+    defaultCompaniesFilter,
+    type CompaniesFilterFormValues
 } from '@/services';
 import { LIST_ORDER_BY_OPTIONS, type CompaniesListQueryParams } from '@/shared';
 import { X } from 'lucide-react';
@@ -22,15 +21,16 @@ type CompaniesFilterParams = Pick<CompaniesListQueryParams, 'search' | 'isDelete
 
 type CompaniesFilterFieldsProps = {
   onChange: (params: CompaniesFilterParams) => void;
+  searchOptions: AutocompleteOption[];
+  searchLoading?: boolean;
 };
 
-export function CompaniesFilterFields({ onChange }: CompaniesFilterFieldsProps) {
+export function CompaniesFilterFields({ onChange, searchOptions, searchLoading }: CompaniesFilterFieldsProps) {
   const { watch, reset } = useFormContext<CompaniesFilterFormValues>();
 
   const search = watch('search');
   const situation = watch('situation');
   const orderBy = watch('orderBy');
-  const debouncedSearch = useDebouncedValue(search, 350);
 
   const isFirstRun = useRef(true);
   useEffect(() => {
@@ -38,12 +38,18 @@ export function CompaniesFilterFields({ onChange }: CompaniesFilterFieldsProps) 
       isFirstRun.current = false;
       return;
     }
-    onChange(companiesFilterToParams({ search: debouncedSearch, situation, orderBy }));
-  }, [debouncedSearch, situation, orderBy, onChange]);
+    onChange(companiesFilterToParams({ search, situation, orderBy }));
+  }, [search, situation, orderBy, onChange]);
 
   return (
     <>
-      <InputField name="search" label="Buscar" placeholder="Nome, e-mail ou CNPJ" />
+      <AutocompleteField
+        name="search"
+        label="Buscar"
+        placeholder="Nome, e-mail ou CNPJ"
+        options={searchOptions}
+        loading={searchLoading}
+      />
       <SelectField name="situation" label="Situação" options={SITUATION_OPTIONS} />
       <SelectField name="orderBy" label="Ordenar por" options={[...LIST_ORDER_BY_OPTIONS]} />
       <div style={{ display: 'flex', gap: 8, flex: '0 0 auto' }}>

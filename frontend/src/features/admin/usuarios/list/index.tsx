@@ -1,25 +1,25 @@
 'use client';
 
 import {
-  ApiQueryBoundary,
-  PageHeader,
-  StatusBadge,
-  TableContainer,
-  TableFilters,
-  type DataTableColumn
+    ApiQueryBoundary,
+    PageHeader,
+    StatusBadge,
+    TableContainer,
+    TableFilters,
+    type DataTableColumn
 } from '@/components';
 import { FormProvider } from '@/context';
 import { usePersistedTablePagination } from '@/hooks';
 import {
-  adminUsersFilterFormSchema,
-  adminUsersFilterToParams,
-  defaultAdminUsersFilter,
-  useAdminUsersListQuery,
-  type UserDto
+    adminUsersFilterFormSchema,
+    adminUsersFilterToParams,
+    defaultAdminUsersFilter,
+    useAdminUsersListQuery,
+    type UserDto
 } from '@/services';
 import { userTypeLabel, type AdminUsersListQueryParams } from '@/shared';
 import { Eye } from 'lucide-react';
-import { useCallback, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { AdminUsersFilterFields } from './admin-users-filter-fields';
 
 type AdminUsersFilterParams = Pick<AdminUsersListQueryParams, 'search' | 'isDeleted' | 'orderBy'>;
@@ -49,7 +49,7 @@ export function AdminUsersPage() {
     adminUsersFilterToParams(defaultAdminUsersFilter)
   );
 
-  const { data, isPending, isError, error, refetch } = useAdminUsersListQuery({
+  const { data, isPending, isFetching, isError, error, refetch } = useAdminUsersListQuery({
     page: pagination.page,
     size: pagination.pageSize,
     ...filters
@@ -63,6 +63,11 @@ export function AdminUsersPage() {
     [setPage]
   );
 
+  const searchOptions = useMemo(
+    () => (data?.data ?? []).map((user) => ({ label: user.username, value: String(user.id) })),
+    [data]
+  );
+
   return (
     <ApiQueryBoundary
       fallback="usuários"
@@ -70,7 +75,7 @@ export function AdminUsersPage() {
       isError={isError}
       error={error}
       resource="usuários"
-      onRetry={() => void refetch()}
+      onRetry={refetch}
     >
       <section>
         <PageHeader title="Admin: Usuários" description="Gestão de usuários (Admin)." />
@@ -92,7 +97,11 @@ export function AdminUsersPage() {
                 onSubmit={() => undefined}
               >
                 <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'flex-end', gap: 12 }}>
-                  <AdminUsersFilterFields onChange={handleFiltersChange} />
+                  <AdminUsersFilterFields
+                    onChange={handleFiltersChange}
+                    searchOptions={searchOptions}
+                    searchLoading={isFetching}
+                  />
                 </div>
               </FormProvider>
             </TableFilters>

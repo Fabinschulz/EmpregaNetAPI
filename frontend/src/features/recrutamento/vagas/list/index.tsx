@@ -1,28 +1,21 @@
 'use client';
 
 import {
-  ApiQueryBoundary,
-  Button,
-  PageHeader,
-  StatusBadge,
-  TableContainer,
-  TableFilters,
-  type DataTableColumn
+    ApiQueryBoundary,
+    Button,
+    PageHeader,
+    StatusBadge,
+    TableContainer,
+    TableFilters,
+    type DataTableColumn
 } from '@/components';
 import { FormProvider } from '@/context';
 import { usePersistedTablePagination } from '@/hooks';
-import {
-  defaultJobsFilter,
-  jobsFilterFormSchema,
-  jobsFilterToParams,
-  useJobsListQuery,
-  type JobDto,
-  type JobsFilterFormValues
-} from '@/services';
+import { defaultJobsFilter, jobsFilterFormSchema, useJobsListQuery, type JobDto } from '@/services';
 import type { JobsListQueryParams } from '@/shared/schema';
 import { Pencil, Plus } from 'lucide-react';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { JobsFilterFields } from './jobs-filter-fields';
 
 type JobsFilterParams = Pick<JobsListQueryParams, 'search' | 'isActive'>;
@@ -49,23 +42,27 @@ const JOBS_COLUMNS: DataTableColumn<JobDto>[] = [
 
 export function RecruitmentJobsPage() {
   const pagination = usePersistedTablePagination({ storageKey: 'recrutamento-vagas' });
+  const { setPage } = pagination;
   const [filters, setFilters] = useState<JobsFilterParams>({});
 
-  const { data, isPending, isError, error, refetch } = useJobsListQuery({
+  const { data, isPending, isFetching, isError, error, refetch } = useJobsListQuery({
     page: pagination.page,
     size: pagination.pageSize,
     ...filters
   });
 
-  const handleFilterSubmit = (values: JobsFilterFormValues) => {
-    setFilters(jobsFilterToParams(values));
-    pagination.setPage(1);
-  };
+  const handleFiltersChange = useCallback(
+    (next: JobsFilterParams) => {
+      setFilters(next);
+      setPage(1);
+    },
+    [setPage]
+  );
 
-  const handleFilterClear = () => {
-    setFilters({});
-    pagination.setPage(1);
-  };
+  const searchOptions = useMemo(
+    () => (data?.data ?? []).map((job) => ({ label: job.title, value: String(job.id) })),
+    [data]
+  );
 
   return (
     <ApiQueryBoundary
@@ -74,7 +71,7 @@ export function RecruitmentJobsPage() {
       isError={isError}
       error={error}
       resource="vagas"
-      onRetry={() => void refetch()}
+      onRetry={refetch}
     >
       <section>
         <PageHeader
@@ -104,10 +101,14 @@ export function RecruitmentJobsPage() {
               <FormProvider
                 validationSchema={jobsFilterFormSchema}
                 defaultValues={defaultJobsFilter}
-                onSubmit={handleFilterSubmit}
+                onSubmit={() => undefined}
               >
                 <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'flex-end', gap: 12 }}>
-                  <JobsFilterFields onClear={handleFilterClear} />
+                  <JobsFilterFields
+                    onChange={handleFiltersChange}
+                    searchOptions={searchOptions}
+                    searchLoading={isFetching}
+                  />
                 </div>
               </FormProvider>
             </TableFilters>

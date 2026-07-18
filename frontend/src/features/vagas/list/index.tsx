@@ -11,18 +11,19 @@ import {
 } from '@/components';
 import { FormProvider } from '@/context';
 import { usePersistedTablePagination } from '@/hooks';
-import { defaultJobsSearch, jobsSearchFormSchema, useJobsListQuery, type JobsSearchFormValues } from '@/services';
+import { defaultJobsSearch, jobsSearchFormSchema, useJobsListQuery } from '@/services';
 import { ArrowRight } from 'lucide-react';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { JobsSearchFields } from './jobs-search-fields';
 import styles from './jobs-list.module.scss';
 
 export function JobsPage() {
   const pagination = usePersistedTablePagination({ storageKey: 'vagas-publicas' });
+  const { setPage } = pagination;
   const [search, setSearch] = useState<string | undefined>(undefined);
 
-  const { data, isPending, isError, error, refetch } = useJobsListQuery({
+  const { data, isPending, isFetching, isError, error, refetch } = useJobsListQuery({
     isActive: true,
     search,
     page: pagination.page,
@@ -31,15 +32,18 @@ export function JobsPage() {
   const items = data?.data ?? [];
   const hasItems = !isPending && items.length > 0;
 
-  const handleSearchSubmit = (values: JobsSearchFormValues) => {
-    setSearch(values.search.trim() || undefined);
-    pagination.setPage(1);
-  };
+  const handleSearchChange = useCallback(
+    (next: string | undefined) => {
+      setSearch(next);
+      setPage(1);
+    },
+    [setPage]
+  );
 
-  const handleSearchClear = () => {
-    setSearch(undefined);
-    pagination.setPage(1);
-  };
+  const searchOptions = useMemo(
+    () => (data?.data ?? []).map((job) => ({ label: job.title, value: String(job.id) })),
+    [data]
+  );
 
   return (
     <ApiQueryBoundary
@@ -58,9 +62,13 @@ export function JobsPage() {
             <FormProvider
               validationSchema={jobsSearchFormSchema}
               defaultValues={defaultJobsSearch}
-              onSubmit={handleSearchSubmit}
+              onSubmit={() => undefined}
             >
-              <JobsSearchFields onClear={handleSearchClear} />
+              <JobsSearchFields
+                onChange={handleSearchChange}
+                searchOptions={searchOptions}
+                searchLoading={isFetching}
+              />
             </FormProvider>
           </TableFilters>
 

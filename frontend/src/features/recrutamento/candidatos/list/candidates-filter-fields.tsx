@@ -1,12 +1,11 @@
 'use client';
 
-import { Button, InputField, SelectField } from '@/components';
+import { Button, AutocompleteField, SelectField, type AutocompleteOption } from '@/components';
 import { useFormContext } from '@/context';
-import { useDebouncedValue } from '@/hooks';
 import {
-  candidatesFilterToParams,
-  defaultCandidatesFilter,
-  type CandidatesFilterFormValues
+    candidatesFilterToParams,
+    defaultCandidatesFilter,
+    type CandidatesFilterFormValues
 } from '@/services';
 import { LIST_ORDER_BY_OPTIONS, type CandidatesListQueryParams } from '@/shared';
 import { X } from 'lucide-react';
@@ -16,14 +15,15 @@ type CandidatesFilterParams = Pick<CandidatesListQueryParams, 'search' | 'orderB
 
 type CandidatesFilterFieldsProps = {
   onChange: (params: CandidatesFilterParams) => void;
+  searchOptions: AutocompleteOption[];
+  searchLoading?: boolean;
 };
 
-export function CandidatesFilterFields({ onChange }: CandidatesFilterFieldsProps) {
+export function CandidatesFilterFields({ onChange, searchOptions, searchLoading }: CandidatesFilterFieldsProps) {
   const { watch, reset } = useFormContext<CandidatesFilterFormValues>();
 
   const search = watch('search');
   const orderBy = watch('orderBy');
-  const debouncedSearch = useDebouncedValue(search, 350);
 
   const isFirstRun = useRef(true);
   useEffect(() => {
@@ -31,12 +31,18 @@ export function CandidatesFilterFields({ onChange }: CandidatesFilterFieldsProps
       isFirstRun.current = false;
       return;
     }
-    onChange(candidatesFilterToParams({ search: debouncedSearch, orderBy }));
-  }, [debouncedSearch, orderBy, onChange]);
+    onChange(candidatesFilterToParams({ search, orderBy }));
+  }, [search, orderBy, onChange]);
 
   return (
     <>
-      <InputField name="search" label="Buscar" placeholder="Nome ou e-mail" />
+      <AutocompleteField
+        name="search"
+        label="Buscar"
+        placeholder="Nome ou e-mail"
+        options={searchOptions}
+        loading={searchLoading}
+      />
       <SelectField name="orderBy" label="Ordenar por" options={[...LIST_ORDER_BY_OPTIONS]} />
       <div style={{ display: 'flex', gap: 8, flex: '0 0 auto' }}>
         <Button type="button" variant="outline" onClick={() => reset(defaultCandidatesFilter)}>

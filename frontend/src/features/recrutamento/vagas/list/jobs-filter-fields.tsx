@@ -1,9 +1,11 @@
 'use client';
 
-import { Button, FormSubmitButton, InputField, SelectField } from '@/components';
+import { Button, AutocompleteField, SelectField, type AutocompleteOption } from '@/components';
 import { useFormContext } from '@/context';
-import { defaultJobsFilter, type JobsFilterFormValues } from '@/services';
-import { Search, X } from 'lucide-react';
+import { defaultJobsFilter, jobsFilterToParams, type JobsFilterFormValues } from '@/services';
+import type { JobsListQueryParams } from '@/shared/schema';
+import { X } from 'lucide-react';
+import { useEffect, useRef } from 'react';
 
 const STATUS_OPTIONS = [
   { label: 'Todas', value: 'all' },
@@ -11,29 +13,41 @@ const STATUS_OPTIONS = [
   { label: 'Encerradas', value: 'closed' }
 ];
 
+type JobsFilterParams = Pick<JobsListQueryParams, 'search' | 'isActive'>;
+
 type JobsFilterFieldsProps = {
-  /** Chamado ao limpar os filtros (além do reset do formulário). */
-  onClear: () => void;
+  onChange: (params: JobsFilterParams) => void;
+  searchOptions: AutocompleteOption[];
+  searchLoading?: boolean;
 };
 
-export function JobsFilterFields({ onClear }: JobsFilterFieldsProps) {
-  const { reset, submitting } = useFormContext<JobsFilterFormValues>();
+export function JobsFilterFields({ onChange, searchOptions, searchLoading }: JobsFilterFieldsProps) {
+  const { watch, reset } = useFormContext<JobsFilterFormValues>();
 
-  const handleClear = () => {
-    reset(defaultJobsFilter);
-    onClear();
-  };
+  const search = watch('search');
+  const status = watch('status');
+
+  const isFirstRun = useRef(true);
+  useEffect(() => {
+    if (isFirstRun.current) {
+      isFirstRun.current = false;
+      return;
+    }
+    onChange(jobsFilterToParams({ search, status }));
+  }, [search, status, onChange]);
 
   return (
     <>
-      <InputField name="search" label="Buscar" placeholder="Título ou descrição da vaga" />
+      <AutocompleteField
+        name="search"
+        label="Buscar"
+        placeholder="Título ou descrição da vaga"
+        options={searchOptions}
+        loading={searchLoading}
+      />
       <SelectField name="status" label="Situação" options={STATUS_OPTIONS} />
       <div style={{ display: 'flex', gap: 8, flex: '0 0 auto' }}>
-        <FormSubmitButton variant="primary">
-          <Search aria-hidden />
-          {submitting ? 'Buscando...' : 'Buscar'}
-        </FormSubmitButton>
-        <Button type="button" variant="outline" onClick={handleClear}>
+        <Button type="button" variant="outline" onClick={() => reset(defaultJobsFilter)}>
           <X aria-hidden />
           Limpar
         </Button>

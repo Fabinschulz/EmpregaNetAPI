@@ -1,14 +1,13 @@
 'use client';
 
-import { Button, InputField, SelectField } from '@/components';
+import { Button, AutocompleteField, SelectField, type AutocompleteOption } from '@/components';
 import { useFormContext } from '@/context';
-import { useDebouncedValue } from '@/hooks';
-import { LIST_ORDER_BY_OPTIONS, type AdminUsersListQueryParams } from '@/shared';
 import {
-  adminUsersFilterToParams,
-  defaultAdminUsersFilter,
-  type AdminUsersFilterFormValues
+    adminUsersFilterToParams,
+    defaultAdminUsersFilter,
+    type AdminUsersFilterFormValues
 } from '@/services';
+import { LIST_ORDER_BY_OPTIONS, type AdminUsersListQueryParams } from '@/shared';
 import { X } from 'lucide-react';
 import { useEffect, useRef } from 'react';
 
@@ -21,17 +20,17 @@ const SITUATION_OPTIONS = [
 type AdminUsersFilterParams = Pick<AdminUsersListQueryParams, 'search' | 'isDeleted' | 'orderBy'>;
 
 type AdminUsersFilterFieldsProps = {
-  /** Recebe os parâmetros derivados sempre que um filtro muda (busca já com debounce). */
   onChange: (params: AdminUsersFilterParams) => void;
+  searchOptions: AutocompleteOption[];
+  searchLoading?: boolean;
 };
 
-export function AdminUsersFilterFields({ onChange }: AdminUsersFilterFieldsProps) {
+export function AdminUsersFilterFields({ onChange, searchOptions, searchLoading }: AdminUsersFilterFieldsProps) {
   const { watch, reset } = useFormContext<AdminUsersFilterFormValues>();
 
   const search = watch('search');
   const situation = watch('situation');
   const orderBy = watch('orderBy');
-  const debouncedSearch = useDebouncedValue(search, 350);
 
   const isFirstRun = useRef(true);
   useEffect(() => {
@@ -39,12 +38,18 @@ export function AdminUsersFilterFields({ onChange }: AdminUsersFilterFieldsProps
       isFirstRun.current = false;
       return;
     }
-    onChange(adminUsersFilterToParams({ search: debouncedSearch, situation, orderBy }));
-  }, [debouncedSearch, situation, orderBy, onChange]);
+    onChange(adminUsersFilterToParams({ search, situation, orderBy }));
+  }, [search, situation, orderBy, onChange]);
 
   return (
     <>
-      <InputField name="search" label="Buscar" placeholder="Nome ou e-mail" />
+      <AutocompleteField
+        name="search"
+        label="Buscar"
+        placeholder="Nome ou e-mail"
+        options={searchOptions}
+        loading={searchLoading}
+      />
       <SelectField name="situation" label="Situação" options={SITUATION_OPTIONS} />
       <SelectField name="orderBy" label="Ordenar por" options={[...LIST_ORDER_BY_OPTIONS]} />
       <div style={{ display: 'flex', gap: 8, flex: '0 0 auto' }}>

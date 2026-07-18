@@ -12,7 +12,7 @@ import {
 } from '@/services';
 import type { CandidatesListQueryParams } from '@/shared';
 import { Eye } from 'lucide-react';
-import { useCallback, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { CandidatesFilterFields } from './candidates-filter-fields';
 
 type CandidatesFilterParams = Pick<CandidatesListQueryParams, 'search' | 'orderBy'>;
@@ -36,7 +36,7 @@ export function RecruitmentCandidatesPage() {
     candidatesFilterToParams(defaultCandidatesFilter)
   );
 
-  const { data, isPending, isError, error, refetch } = useCandidatesListQuery({
+  const { data, isPending, isFetching, isError, error, refetch } = useCandidatesListQuery({
     page: pagination.page,
     size: pagination.pageSize,
     ...filters
@@ -48,6 +48,11 @@ export function RecruitmentCandidatesPage() {
       setPage(1);
     },
     [setPage]
+  );
+
+  const searchOptions = useMemo(
+    () => (data?.data ?? []).map((candidate) => ({ label: candidate.username, value: String(candidate.id) })),
+    [data]
   );
 
   return (
@@ -79,7 +84,11 @@ export function RecruitmentCandidatesPage() {
                 onSubmit={() => undefined}
               >
                 <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'flex-end', gap: 12 }}>
-                  <CandidatesFilterFields onChange={handleFiltersChange} />
+                  <CandidatesFilterFields
+                    onChange={handleFiltersChange}
+                    searchOptions={searchOptions}
+                    searchLoading={isFetching}
+                  />
                 </div>
               </FormProvider>
             </TableFilters>

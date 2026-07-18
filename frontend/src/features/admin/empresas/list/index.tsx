@@ -1,26 +1,26 @@
 'use client';
 
 import {
-  ApiQueryBoundary,
-  Button,
-  PageHeader,
-  TableContainer,
-  TableFilters,
-  type DataTableColumn
+    ApiQueryBoundary,
+    Button,
+    PageHeader,
+    TableContainer,
+    TableFilters,
+    type DataTableColumn
 } from '@/components';
 import { FormProvider } from '@/context';
 import { usePersistedTablePagination } from '@/hooks';
 import {
-  companiesFilterFormSchema,
-  companiesFilterToParams,
-  defaultCompaniesFilter,
-  useCompaniesListQuery,
-  type CompanyDto
+    companiesFilterFormSchema,
+    companiesFilterToParams,
+    defaultCompaniesFilter,
+    useCompaniesListQuery,
+    type CompanyDto
 } from '@/services';
 import type { CompaniesListQueryParams } from '@/shared';
 import { Pencil, Plus } from 'lucide-react';
 import Link from 'next/link';
-import { useCallback, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { CompaniesFilterFields } from './companies-filter-fields';
 
 type CompaniesFilterParams = Pick<CompaniesListQueryParams, 'search' | 'isDeleted' | 'orderBy'>;
@@ -44,7 +44,7 @@ export function AdminCompaniesPage() {
     companiesFilterToParams(defaultCompaniesFilter)
   );
 
-  const { data, isPending, isError, error, refetch } = useCompaniesListQuery({
+  const { data, isPending, isFetching, isError, error, refetch } = useCompaniesListQuery({
     page: pagination.page,
     size: pagination.pageSize,
     ...filters
@@ -58,6 +58,11 @@ export function AdminCompaniesPage() {
     [setPage]
   );
 
+  const searchOptions = useMemo(
+    () => (data?.data ?? []).map((company) => ({ label: company.name, value: String(company.id) })),
+    [data]
+  );
+
   return (
     <ApiQueryBoundary
       fallback="empresas"
@@ -65,7 +70,7 @@ export function AdminCompaniesPage() {
       isError={isError}
       error={error}
       resource="empresas"
-      onRetry={() => void refetch()}
+      onRetry={refetch}
     >
       <section>
         <PageHeader
@@ -98,7 +103,11 @@ export function AdminCompaniesPage() {
                 onSubmit={() => undefined}
               >
                 <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'flex-end', gap: 12 }}>
-                  <CompaniesFilterFields onChange={handleFiltersChange} />
+                  <CompaniesFilterFields
+                    onChange={handleFiltersChange}
+                    searchOptions={searchOptions}
+                    searchLoading={isFetching}
+                  />
                 </div>
               </FormProvider>
             </TableFilters>
