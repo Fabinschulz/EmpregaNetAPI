@@ -2,7 +2,7 @@
 
 import { AutocompleteField, Button, FilterBar, FilterField, type AutocompleteOption } from '@/components';
 import { useFormContext } from '@/context';
-import { defaultJobsSearch, type JobsSearchFormValues } from '@/services';
+import { defaultJobsSearch, type JobsSearchFormValues } from '@/features/recrutamento/vagas/service';
 import { X } from 'lucide-react';
 import { useEffect, useRef } from 'react';
 

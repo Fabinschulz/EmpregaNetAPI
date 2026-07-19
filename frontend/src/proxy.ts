@@ -1,6 +1,6 @@
 // https://nextjs.org/docs/app/api-reference/file-conventions/proxy
 
-import { readSessionFromCookieHeader } from '@/services';
+import { readSessionFromCookieHeader } from '@/shared/auth';
 import { buildForbiddenRedirectPath, evaluateRouteAccess, LOGIN_PATH, type RouteAccessDecision } from '@/utils';
 import { NextResponse, type NextRequest } from 'next/server';
 

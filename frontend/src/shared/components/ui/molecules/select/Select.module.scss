@@ -60,10 +60,14 @@
   background: var(--panel);
   color: var(--text);
   box-shadow: var(--shadow-card, var(--shadow));
+  width: var(--radix-select-trigger-width);
+  max-height: var(--radix-select-content-available-height);
 }
 
 .viewport {
   padding: 4px;
+  max-height: var(--radix-select-content-available-height);
+  overflow-y: auto;
 }
 
 .item {

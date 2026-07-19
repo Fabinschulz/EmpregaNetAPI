@@ -8,7 +8,7 @@ import {
   useChangeMyPasswordMutation,
   useDeleteMyAccountMutation,
   type ChangeMyPasswordFormValues
-} from '@/services';
+} from '../service';
 import { Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import styles from '../conta.module.scss';

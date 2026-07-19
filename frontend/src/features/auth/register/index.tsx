@@ -1,7 +1,7 @@
 'use client';
 
 import { FormProvider } from '@/context';
-import { useRegisterMutation } from '@/services';
+import { useRegisterMutation } from '../service';
 import { AuthNavLink, AuthPage } from '../shared';
 import { RegisterFormFields } from './register-form';
 import type { RegisterDto } from './register-schema';

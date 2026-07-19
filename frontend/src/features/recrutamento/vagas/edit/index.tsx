@@ -10,7 +10,7 @@ import {
   useJobQuery,
   useUpdateJobMutation,
   type JobFormValues
-} from '@/services';
+} from '../service';
 import { Users } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
@@ -22,13 +22,7 @@ export function RecruitmentEditJobPage() {
   const jobId = useMemo(() => Number(params.id), [params.id]);
   const { data: job, isPending, isError, error, refetch } = useJobQuery(jobId);
   const { apiError: updateApiError, mutateAsync: updateAsync, isPending: isUpdating } = useUpdateJobMutation(jobId);
-  const {
-    apiError: closeApiError,
-    mutateAsync: closeAsync,
-    isPending: isClosing,
-    error: closeError,
-    isError: isCloseError
-  } = useCloseJobMutation(jobId);
+  const { apiError: closeApiError, mutateAsync: closeAsync, isPending: isClosing } = useCloseJobMutation(jobId);
   const apiError = updateApiError ?? closeApiError;
 
   const initial = useMemo<JobFormValues>(() => {
@@ -42,9 +36,9 @@ export function RecruitmentEditJobPage() {
   return (
     <ApiQueryBoundary
       fallback="vaga"
-      isPending={isPending || isClosing}
-      isError={isError || isCloseError}
-      error={error || closeError}
+      isPending={isPending}
+      isError={isError}
+      error={error}
       resource="vaga"
       onRetry={() => void refetch()}
     >

@@ -10,16 +10,16 @@ import {
 } from '@/components';
 import { FormProvider } from '@/context';
 import { usePersistedTablePagination } from '@/hooks';
+import type { UserDto } from '@/shared';
+import { userTypeLabel, type AdminUsersListQueryParams } from '@/shared';
+import { Eye } from 'lucide-react';
+import { useCallback, useMemo, useState } from 'react';
 import {
     adminUsersFilterFormSchema,
     adminUsersFilterToParams,
     defaultAdminUsersFilter,
-    useAdminUsersListQuery,
-    type UserDto
-} from '@/services';
-import { userTypeLabel, type AdminUsersListQueryParams } from '@/shared';
-import { Eye } from 'lucide-react';
-import { useCallback, useMemo, useState } from 'react';
+    useAdminUsersListQuery
+} from '../service';
 import { AdminUsersFilterFields } from './admin-users-filter-fields';
 
 type AdminUsersFilterParams = Pick<AdminUsersListQueryParams, 'search' | 'isDeleted' | 'orderBy'>;

@@ -4,6 +4,8 @@ using EmpregaNet.Application.Utils;
 using EmpregaNet.Domain.Common;
 using EmpregaNet.Application.Jobs.Commands;
 using EmpregaNet.Application.Jobs.ViewModel;
+using EmpregaNet.Application.Admin.Company.Queries;
+using EmpregaNet.Application.Admin.Company.ViewModel;
 using EmpregaNet.Domain.Interfaces;
 using EmpregaNet.Api.Configuration;
 using Microsoft.AspNetCore.Authorization;
@@ -56,6 +58,21 @@ public class JobsController : MainController<CreateJobCommand, UpdateJobCommand,
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(DomainError))]
     [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(DomainError))]
     public override Task<IActionResult> GetById([FromRoute] long id) => base.GetById(id);
+
+    /// <summary>
+    /// Lista as empresas que o usuário atual pode selecionar ao publicar/editar uma vaga
+    /// (Admin: todas as ativas; recrutador/gestor: apenas a empresa vinculada). Apenas para perfis de recrutamento.
+    /// </summary>
+    [Authorize(Policy = Constants.AuthPolicies.Recrutamento)]
+    [HttpGet("selectable-companies")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IReadOnlyList<CompanyOptionViewModel>))]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(DomainError))]
+    [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(DomainError))]
+    public async Task<IActionResult> GetSelectableCompanies()
+    {
+        var result = await _mediator.Send(new GetSelectableCompaniesQuery());
+        return Ok(result);
+    }
 
     /// <summary>
     /// Cria uma nova vaga com os dados fornecidos (título, descrição, empresa, localização, requisitos, etc.). Apenas para perfis de recrutamento.

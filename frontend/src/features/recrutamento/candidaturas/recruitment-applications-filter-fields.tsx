@@ -2,7 +2,7 @@
 
 import { FilterBar, SelectField } from '@/components';
 import { useFormContext } from '@/context';
-import { type RecruitmentApplicationsFilterFormValues } from '@/services';
+import { type RecruitmentApplicationsFilterFormValues } from '@/features/candidaturas/service';
 import { DATE_ORDER_BY_OPTIONS, type ListOrderByValue } from '@/shared';
 import { useEffect, useRef } from 'react';
 

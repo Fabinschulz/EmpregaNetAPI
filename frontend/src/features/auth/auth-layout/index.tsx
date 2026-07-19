@@ -1,7 +1,7 @@
 'use client';
 
 import { Suspense, type ReactNode } from 'react';
-import { AuthLayoutFrame } from './auth-layout-frame';
+import { CenteredPageFrame } from '@/components';
 import { AuthSessionBoundary } from './auth-session-boundary';
 
 type AuthLayoutProps = {
@@ -10,10 +10,10 @@ type AuthLayoutProps = {
 
 export function AuthLayout({ children }: AuthLayoutProps) {
   return (
-    <AuthLayoutFrame>
+    <CenteredPageFrame>
       <Suspense fallback={null}>
         <AuthSessionBoundary>{children}</AuthSessionBoundary>
       </Suspense>
-    </AuthLayoutFrame>
+    </CenteredPageFrame>
   );
 }

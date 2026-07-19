@@ -2,7 +2,7 @@
 
 import { Alert, PageHeader } from '@/components';
 import { FormProvider } from '@/context';
-import { companyFormSchema, defaultFormCompany, useCreateCompanyMutation, type CompanyFormValues } from '@/services';
+import { companyFormSchema, defaultFormCompany, useCreateCompanyMutation, type CompanyFormValues } from '../service';
 import { CompanyFormFields } from '../form';
 
 export function AdminNewCompanyPage() {

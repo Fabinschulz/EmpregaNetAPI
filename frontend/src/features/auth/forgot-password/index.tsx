@@ -1,7 +1,7 @@
 'use client';
 
 import { FormProvider } from '@/context';
-import { useForgotPasswordMutation } from '@/services';
+import { useForgotPasswordMutation } from '../service';
 import { AuthNavLink, AuthPage } from '../shared';
 import { ForgotPasswordFormFields } from './forgot-password-form';
 import type { ForgotPasswordDto } from './forgot-password-schema';

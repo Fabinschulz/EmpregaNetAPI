@@ -12,8 +12,9 @@ import {
   DetailPageSkeleton,
   StatusBadge
 } from '@/components';
-import { useAuth } from '@/features/auth';
-import { useApplyToJobMutation, useJobQuery } from '@/services';
+import { useAuth } from '@/context';
+import { useApplyToJobMutation } from '@/features/candidaturas/service';
+import { useJobQuery } from '@/features/recrutamento/vagas/service';
 import { Building2, MapPin } from 'lucide-react';
 import { useParams } from 'next/navigation';
 import { useMemo } from 'react';

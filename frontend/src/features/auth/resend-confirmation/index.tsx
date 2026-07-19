@@ -1,7 +1,7 @@
 'use client';
 
 import { FormProvider } from '@/context';
-import { useResendEmailConfirmationMutation } from '@/services';
+import { useResendEmailConfirmationMutation } from '../service';
 import { AuthNavLink, AuthPage } from '../shared';
 import { ResendConfirmationFormFields } from './resend-confirmation-form';
 import type { ResendEmailConfirmationDto } from './resend-confirmation-schema';

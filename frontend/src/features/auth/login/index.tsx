@@ -1,7 +1,7 @@
 'use client';
 
 import { FormProvider } from '@/context';
-import { useLoginMutation, useLoginWithGoogleMutation } from '@/services';
+import { useLoginMutation, useLoginWithGoogleMutation } from '../service';
 import { useEffect, useRef } from 'react';
 import {
   AuthDivider,

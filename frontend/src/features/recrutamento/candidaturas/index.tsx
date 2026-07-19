@@ -22,7 +22,7 @@ import {
     useChangeApplicationStatusMutation,
     type ApplicationStatus,
     type JobApplicationDto
-} from '@/services';
+} from '@/features/candidaturas/service';
 import type { ListOrderByValue } from '@/shared';
 import { Ban, CheckCircle2, Eye, Flag, PlayCircle, RotateCcw, XCircle, type LucideIcon } from 'lucide-react';
 import { useCallback, useMemo, useState } from 'react';

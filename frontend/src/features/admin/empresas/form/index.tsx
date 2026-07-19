@@ -1,16 +1,21 @@
 'use client';
 
-import { FormSubmitButton, InputField } from '@/components';
+import {
+  FormActions,
+  FormGrid,
+  FormRow,
+  FormSection,
+  FormSubmitButton,
+  InputField,
+  PhoneField,
+  SelectField
+} from '@/components';
 import { useFormContext } from '@/context';
+import { TYPE_OF_ACTIVITY_OPTIONS, UF_OPTIONS } from '../service';
 import { Save } from 'lucide-react';
-import { CSSProperties } from 'react';
 
-const COMPANY_FORM_GRID_STYLE: CSSProperties = {
-  display: 'grid',
-  gap: 12,
-  maxWidth: 640,
-  marginTop: 12
-};
+const ACTIVITY_OPTIONS = TYPE_OF_ACTIVITY_OPTIONS.map((o) => ({ value: o.value, label: o.label }));
+const STATE_OPTIONS = UF_OPTIONS.map((o) => ({ value: o.value, label: `${o.value} - ${o.label}` }));
 
 type CompanyFormFieldsProps = {
   submitLabel: string;
@@ -20,17 +25,39 @@ export function CompanyFormFields({ submitLabel }: CompanyFormFieldsProps) {
   const { submitting } = useFormContext();
 
   return (
-    <div style={COMPANY_FORM_GRID_STYLE}>
-      <InputField name="name" label="Nome" required />
-      <InputField name="email" label="E-mail" type="email" />
-      <InputField name="phone" label="Telefone" />
-      <InputField name="documentNo" label="Documento" />
-      <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+    <FormGrid>
+      <InputField name="companyName" label="Nome" required />
+      <FormRow>
+        <InputField name="cnpj" label="CNPJ" placeholder="Somente números" required />
+        <SelectField name="typeOfActivity" label="Tipo de atividade" options={ACTIVITY_OPTIONS} required />
+      </FormRow>
+      <FormRow>
+        <InputField name="email" label="E-mail" type="email" required />
+        <PhoneField name="phone" label="Telefone" required />
+      </FormRow>
+
+      <FormSection title="Endereço">
+        <FormRow>
+          <InputField name="address.zipCode" label="CEP" placeholder="00000-000" required />
+          <SelectField name="address.state" label="Estado (UF)" options={STATE_OPTIONS} required />
+        </FormRow>
+        <InputField name="address.street" label="Logradouro" required />
+        <FormRow>
+          <InputField name="address.number" label="Número" required />
+          <InputField name="address.complement" label="Complemento" />
+        </FormRow>
+        <FormRow>
+          <InputField name="address.neighborhood" label="Bairro" required />
+          <InputField name="address.city" label="Cidade" required />
+        </FormRow>
+      </FormSection>
+
+      <FormActions>
         <FormSubmitButton variant="primary">
           <Save aria-hidden />
           {submitting ? 'Salvando...' : submitLabel}
         </FormSubmitButton>
-      </div>
-    </div>
+      </FormActions>
+    </FormGrid>
   );
 }

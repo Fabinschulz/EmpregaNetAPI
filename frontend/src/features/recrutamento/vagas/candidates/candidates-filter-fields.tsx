@@ -2,7 +2,7 @@
 
 import { SelectField, type SelectOption } from '@/components';
 import { useFormContext } from '@/context';
-import { APPLICATION_STATUSES, applicationStatusLabels } from '@/services';
+import { APPLICATION_STATUSES, applicationStatusLabels } from '@/features/candidaturas/service';
 import { DATE_ORDER_BY_OPTIONS, LIST_ORDER_BY_VALUES } from '@/shared';
 import { useEffect, useRef } from 'react';
 import { z } from 'zod';

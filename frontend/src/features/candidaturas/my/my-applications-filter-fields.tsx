@@ -8,7 +8,7 @@ import {
   defaultMyApplicationsFilter,
   myApplicationsFilterToParams,
   type MyApplicationsFilterFormValues
-} from '@/services';
+} from '../service';
 import { DATE_ORDER_BY_OPTIONS, type JobApplicationsListQueryParams } from '@/shared';
 import { X } from 'lucide-react';
 import { useEffect, useRef } from 'react';

@@ -2,7 +2,7 @@
 
 import { useAuth } from '@/context';
 import { AuthSessionChecking } from '@/features/auth/shared';
-import { me } from '@/services';
+import { me } from '@/features/conta/service';
 import { resolvePostLoginPath } from '@/utils';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useRef, useState, type ReactNode } from 'react';

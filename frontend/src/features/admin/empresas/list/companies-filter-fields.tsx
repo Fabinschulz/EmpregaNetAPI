@@ -13,7 +13,7 @@ import {
     companiesFilterToParams,
     defaultCompaniesFilter,
     type CompaniesFilterFormValues
-} from '@/services';
+} from '../service';
 import { LIST_ORDER_BY_OPTIONS, type CompaniesListQueryParams } from '@/shared';
 import { X } from 'lucide-react';
 import { useEffect, useRef } from 'react';

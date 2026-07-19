@@ -1,15 +1,15 @@
 'use client';
 
-import type { UserLoggedDto } from '@/services';
-import { logout as apiLogout } from '@/services';
-import { registerAxiosAuthHandlers } from '@/services/axios/axios-auth';
-import React, { createContext, useCallback, useContext, useEffect, useMemo, useSyncExternalStore } from 'react';
 import {
-  clearSessionMetadata,
-  getSessionMetadataSnapshot,
-  saveSessionMetadata,
-  subscribeSessionMetadata
-} from 'src/services/users/session';
+    logout as apiLogout,
+    clearSessionMetadata,
+    getSessionMetadataSnapshot,
+    registerAxiosAuthHandlers,
+    saveSessionMetadata,
+    subscribeSessionMetadata,
+    type UserLoggedDto
+} from '@/shared';
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useSyncExternalStore } from 'react';
 
 type AuthState = {
   isAuthenticated: boolean;

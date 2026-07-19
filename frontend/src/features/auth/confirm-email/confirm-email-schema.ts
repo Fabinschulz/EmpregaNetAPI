@@ -1,4 +1,4 @@
-import { confirmEmailSchema, type ConfirmEmailDto } from '@/services';
+import { confirmEmailSchema, type ConfirmEmailDto } from '../service';
 
 export { confirmEmailSchema, type ConfirmEmailDto };
 

@@ -13,7 +13,7 @@ import {
     candidatesFilterToParams,
     defaultCandidatesFilter,
     type CandidatesFilterFormValues
-} from '@/services';
+} from '../service';
 import { LIST_ORDER_BY_OPTIONS, type CandidatesListQueryParams } from '@/shared';
 import { X } from 'lucide-react';
 import { useEffect, useRef } from 'react';

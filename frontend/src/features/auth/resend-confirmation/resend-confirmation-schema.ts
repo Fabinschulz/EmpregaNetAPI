@@ -1,4 +1,4 @@
-import { resendEmailConfirmationSchema, type ResendEmailConfirmationDto } from '@/services';
+import { resendEmailConfirmationSchema, type ResendEmailConfirmationDto } from '../service';
 
 export { resendEmailConfirmationSchema, type ResendEmailConfirmationDto };
 

@@ -19,7 +19,7 @@ import {
   useMeQuery,
   useUpdateMyProfileMutation,
   type ProfileFormValues
-} from '@/services';
+} from '../service';
 import styles from '../conta.module.scss';
 import { ProfileFormFields } from './profile-form-fields';
 

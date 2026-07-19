@@ -1,6 +1,6 @@
 'use client';
 
-import { AuthLayoutFrame } from '@/features/auth/auth-layout/auth-layout-frame';
+import { CenteredPageFrame } from '@/components';
 import type { ReactNode } from 'react';
 
 type StatusLayoutProps = {
@@ -12,5 +12,5 @@ type StatusLayoutProps = {
  * sem redirecionar utilizadores já autenticados.
  */
 export function StatusLayout({ children }: StatusLayoutProps) {
-  return <AuthLayoutFrame>{children}</AuthLayoutFrame>;
+  return <CenteredPageFrame>{children}</CenteredPageFrame>;
 }

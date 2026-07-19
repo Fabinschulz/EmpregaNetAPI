@@ -1,4 +1,4 @@
-import { resetPasswordFormSchema, type ResetPasswordFormValues } from '@/services';
+import { resetPasswordFormSchema, type ResetPasswordFormValues } from '../service';
 
 export { resetPasswordFormSchema, type ResetPasswordFormValues };
 

@@ -1,4 +1,4 @@
-import { loginSchema, type LoginDto } from '@/services';
+import { loginSchema, type LoginDto } from '../service';
 
 export { loginSchema, type LoginDto };
 

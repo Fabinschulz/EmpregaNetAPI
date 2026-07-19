@@ -1,28 +1,27 @@
 'use client';
 
-import { FormSubmitButton, SelectField } from '@/components';
+import { FormActions, FormGrid, FormSubmitButton, SelectField } from '@/components';
 import { useFormContext } from '@/context';
 import { USER_TYPE_OPTIONS } from '@/shared';
 import { Save } from 'lucide-react';
-import styles from './admin-user-detail.module.scss';
 
 export function AdminUserFormFields() {
-  const { submitting } = useFormContext();
+  const { submitting, readOnly } = useFormContext();
 
   return (
-    <div className={styles.form}>
+    <FormGrid>
       <SelectField
         name="userType"
         label="Tipo de Usuário"
         options={[...USER_TYPE_OPTIONS]}
         placeholder="Selecione o tipo de usuário"
       />
-      <div className={styles.actions}>
-        <FormSubmitButton variant="primary">
+      <FormActions>
+        <FormSubmitButton variant="primary" disabled={readOnly}>
           <Save aria-hidden />
           {submitting ? 'Salvando...' : 'Salvar'}
         </FormSubmitButton>
-      </div>
-    </div>
+      </FormActions>
+    </FormGrid>
   );
 }

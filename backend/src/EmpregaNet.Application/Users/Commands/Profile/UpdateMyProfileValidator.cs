@@ -1,3 +1,4 @@
+using EmpregaNet.Application.Utils;
 using FluentValidation;
 
 namespace EmpregaNet.Application.Users.Commands;
@@ -24,6 +25,12 @@ public sealed class UpdateMyProfileCommandValidator : AbstractValidator<UpdateMy
                 .MaximumLength(256)
                 .WithMessage("O nome de usuário deve ter entre 3 e 256 caracteres.");
         });
+
+        // Mesma regra do registro: telefone de usuário é celular BR (DDD + 9 dígitos).
+        RuleFor(x => x.PhoneNumber!)
+            .Cascade(CascadeMode.Stop)
+            .IsBrazilianCellPhone()
+            .When(x => !string.IsNullOrWhiteSpace(x.PhoneNumber));
     }
 
     private static bool HasAtLeastOneField(UpdateMyProfileCommand c) =>

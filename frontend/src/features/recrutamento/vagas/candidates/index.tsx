@@ -20,10 +20,10 @@ import {
   useApplicationsByJobQuery,
   useChangeApplicationStatusMutation,
   useDeleteApplicationMutation,
-  useJobQuery,
   type ApplicationStatus,
   type JobApplicationDto
-} from '@/services';
+} from '@/features/candidaturas/service';
+import { useJobQuery } from '../service';
 import {
   Ban,
   CheckCircle2,

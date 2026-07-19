@@ -1,4 +1,4 @@
-import { forgotPasswordSchema, type ForgotPasswordDto } from '@/services';
+import { forgotPasswordSchema, type ForgotPasswordDto } from '../service';
 
 export { forgotPasswordSchema, type ForgotPasswordDto };
 

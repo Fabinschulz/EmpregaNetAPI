@@ -11,7 +11,7 @@ import {
   useCompanyQuery,
   useUpdateCompanyMutation,
   type CompanyFormValues
-} from '@/services';
+} from '../service';
 import { CompanyFormFields } from '../form';
 
 export function AdminEditCompanyPage() {

@@ -16,7 +16,7 @@ import {
     defaultCompaniesFilter,
     useCompaniesListQuery,
     type CompanyDto
-} from '@/services';
+} from '../service';
 import type { CompaniesListQueryParams } from '@/shared';
 import { Pencil, Plus } from 'lucide-react';
 import Link from 'next/link';

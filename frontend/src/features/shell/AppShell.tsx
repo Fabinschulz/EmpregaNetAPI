@@ -1,17 +1,16 @@
 'use client';
 
-import { useTheme } from '@/context';
-import { useAuth } from '@/features/auth';
-import { startRouterTransition, toastSuccess } from '@/utils/lib';
+import { useAuth, useTheme } from '@/context';
+import { useHasMounted } from '@/hooks';
+import { startRouterTransition, toastSuccess } from '@/utils';
 import clsx from 'clsx';
 import { usePathname, useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
-import { useHasMounted } from '@/hooks/use-has-mounted';
+import styles from './AppShell.module.scss';
 import { useAppShellNavigation } from './hooks/use-app-shell-navigation';
 import { MainHeader } from './main-header';
 import { MobileNav } from './MobileNav';
 import { Sidebar } from './sidebar';
-import styles from './AppShell.module.scss';
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();

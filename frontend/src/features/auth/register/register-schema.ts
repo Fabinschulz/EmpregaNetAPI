@@ -1,4 +1,4 @@
-import { registerFormSchema, type RegisterDto } from '@/services';
+import { registerFormSchema, type RegisterDto } from '../service';
 
 export { registerFormSchema, type RegisterDto };
 

@@ -1,7 +1,7 @@
 'use client';
 
 import { Alert } from '@/components';
-import { useConfirmEmailMutation } from '@/services';
+import { useConfirmEmailMutation } from '../service';
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useMemo, useRef } from 'react';
 import { AuthNavLink, AuthPage } from '../shared';

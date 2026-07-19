@@ -1,14 +1,11 @@
 'use client';
 
 import { Button, Card, CardContent, CardHeader, CardTitle, PageHeader, Skeleton } from '@/components';
-import { useAuth } from '@/features/auth';
-import {
-    useAdminUsersListQuery,
-    useAllJobApplicationsQuery,
-    useCompaniesListQuery,
-    useJobsListQuery,
-    useMyJobApplicationsQuery
-} from '@/services';
+import { useAuth } from '@/context';
+import { useCompaniesListQuery } from '@/features/admin/empresas/service';
+import { useAdminUsersListQuery } from '@/features/admin/usuarios/service';
+import { useAllJobApplicationsQuery, useMyJobApplicationsQuery } from '@/features/candidaturas/service';
+import { useJobsListQuery } from '@/features/recrutamento/vagas/service';
 import { isAdmin, isRecruitmentStaff } from '@/shared';
 import { Briefcase, Building2, FileText, LayoutDashboard, Users, type LucideIcon } from 'lucide-react';
 import Link from 'next/link';
@@ -147,7 +144,6 @@ function AdminManagementSection() {
   );
 }
 
-/** Destaque de gestão para o Manager (não-admin): visão consolidada do pipeline. */
 function ManagerManagementSection() {
   return (
     <section className={styles.section} aria-label="Visão de gestão">

@@ -2,7 +2,7 @@
 
 import { Alert } from '@/components';
 import { FormProvider } from '@/context';
-import { useResetPasswordMutation } from '@/services';
+import { useResetPasswordMutation } from '../service';
 import { useSearchParams } from 'next/navigation';
 import { useMemo } from 'react';
 import { AuthNavLink, AuthPage } from '../shared';

@@ -9,7 +9,7 @@ import {
   type AutocompleteOption
 } from '@/components';
 import { useFormContext } from '@/context';
-import { defaultJobsFilter, jobsFilterToParams, type JobsFilterFormValues } from '@/services';
+import { defaultJobsFilter, jobsFilterToParams, type JobsFilterFormValues } from '../service';
 import type { JobsListQueryParams } from '@/shared/schema';
 import { X } from 'lucide-react';
 import { useEffect, useRef } from 'react';

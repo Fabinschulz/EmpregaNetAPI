@@ -1,10 +1,10 @@
 'use client';
 
 import { TooltipProvider } from '@/components';
-import { AuthProvider, ThemeProvider } from '@/context';
+import { AuthProvider } from '@/context';
 import { QueryProvider } from '@/utils';
 import type { ReactNode } from 'react';
-import { ThemedToaster } from './theme-provider';
+import { ThemedToaster, ThemeProvider } from './theme-provider';
 
 type AppProvidersProps = {
   children: ReactNode;

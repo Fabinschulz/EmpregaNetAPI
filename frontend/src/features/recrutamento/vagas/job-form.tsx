@@ -1,16 +1,12 @@
 'use client';
 
-import { Button, FormSubmitButton, InputField, TextareaField } from '@/components';
+import { Button, FormActions, FormGrid, FormRow, FormSubmitButton, InputField, SelectField, TextareaField } from '@/components';
 import { useFormContext } from '@/context';
+import { JOB_TYPE_OPTIONS, useSelectableCompaniesQuery } from './service';
 import { Archive, Save } from 'lucide-react';
-import type { CSSProperties } from 'react';
+import { useMemo } from 'react';
 
-const JOB_FORM_GRID_STYLE: CSSProperties = {
-  display: 'grid',
-  gap: 12,
-  maxWidth: 640,
-  marginTop: 12
-};
+const JOB_TYPE_SELECT_OPTIONS = JOB_TYPE_OPTIONS.map((o) => ({ value: o.value, label: o.label }));
 
 type JobFormFieldsProps = {
   submitLabel: string;
@@ -20,13 +16,29 @@ type JobFormFieldsProps = {
 
 export function JobFormFields({ submitLabel, onClose, closeDisabled }: JobFormFieldsProps) {
   const { submitting } = useFormContext();
+  const { data: companies, isPending: companiesLoading } = useSelectableCompaniesQuery();
+
+  const companyOptions = useMemo(
+    () => (companies ?? []).map((company) => ({ value: String(company.id), label: company.name })),
+    [companies]
+  );
 
   return (
-    <div style={JOB_FORM_GRID_STYLE}>
+    <FormGrid>
+      <SelectField
+        name="companyId"
+        label="Empresa"
+        options={companyOptions}
+        placeholder={companiesLoading ? 'Carregando empresas...' : 'Selecione a empresa'}
+        required
+      />
       <InputField name="title" label="Título" required />
-      <InputField name="location" label="Localização" />
+      <FormRow>
+        <SelectField name="jobType" label="Tipo de vaga" options={JOB_TYPE_SELECT_OPTIONS} required />
+        <InputField name="salary" label="Salário (R$)" type="number" min={0} step="0.01" required />
+      </FormRow>
       <TextareaField name="description" label="Descrição" rows={5} />
-      <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+      <FormActions>
         <FormSubmitButton variant="primary">
           <Save aria-hidden />
           {submitting ? 'Salvando...' : submitLabel}
@@ -37,7 +49,7 @@ export function JobFormFields({ submitLabel, onClose, closeDisabled }: JobFormFi
             Encerrar vaga
           </Button>
         ) : null}
-      </div>
-    </div>
+      </FormActions>
+    </FormGrid>
   );
 }

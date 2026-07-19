@@ -1,7 +1,7 @@
 'use client';
 
 import { StatusBadge, type StatusTone } from '@/components';
-import { applicationStatusLabels, parseApplicationStatus, type ApplicationStatus } from '@/services';
+import { applicationStatusLabels, parseApplicationStatus, type ApplicationStatus } from './service';
 
 const STATUS_TONE: Record<ApplicationStatus, StatusTone> = {
   Pending: 'warning',

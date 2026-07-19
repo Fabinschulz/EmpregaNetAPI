@@ -9,7 +9,7 @@ import {
   myApplicationsFilterToParams,
   useMyJobApplicationsQuery,
   type JobApplicationDto
-} from '@/services';
+} from '../service';
 import type { JobApplicationsListQueryParams } from '@/shared';
 import { Eye } from 'lucide-react';
 import { useCallback, useState } from 'react';

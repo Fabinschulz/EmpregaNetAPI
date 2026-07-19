@@ -3,16 +3,15 @@
 import { ApiQueryBoundary, PageHeader, TableContainer, TableFilters, type DataTableColumn } from '@/components';
 import { FormProvider } from '@/context';
 import { usePersistedTablePagination } from '@/hooks';
+import type { CandidatesListQueryParams, UserDto } from '@/shared';
+import { Eye } from 'lucide-react';
+import { useCallback, useMemo, useState } from 'react';
 import {
     candidatesFilterFormSchema,
     candidatesFilterToParams,
     defaultCandidatesFilter,
-    useCandidatesListQuery,
-    type UserDto
-} from '@/services';
-import type { CandidatesListQueryParams } from '@/shared';
-import { Eye } from 'lucide-react';
-import { useCallback, useMemo, useState } from 'react';
+    useCandidatesListQuery
+} from '../service';
 import { CandidatesFilterFields } from './candidates-filter-fields';
 
 type CandidatesFilterParams = Pick<CandidatesListQueryParams, 'search' | 'orderBy'>;

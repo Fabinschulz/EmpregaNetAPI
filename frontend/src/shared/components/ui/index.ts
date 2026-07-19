@@ -12,5 +12,6 @@ export * from './molecules/status-badge';
 export * from './molecules/tooltip';
 export * from './organisms/card';
 export * from './organisms/filters';
+export * from './organisms/page-frame';
 export * from './organisms/page-header';
 export * from './organisms/table';

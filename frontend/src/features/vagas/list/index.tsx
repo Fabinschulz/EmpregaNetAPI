@@ -11,7 +11,7 @@ import {
 } from '@/components';
 import { FormProvider } from '@/context';
 import { usePersistedTablePagination } from '@/hooks';
-import { defaultJobsSearch, jobsSearchFormSchema, useJobsListQuery } from '@/services';
+import { defaultJobsSearch, jobsSearchFormSchema, useJobsListQuery } from '@/features/recrutamento/vagas/service';
 import { ArrowRight, RefreshCw } from 'lucide-react';
 import Link from 'next/link';
 import { useCallback, useMemo, useState } from 'react';

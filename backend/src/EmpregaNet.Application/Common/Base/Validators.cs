@@ -1,4 +1,5 @@
 using EmpregaNet.Domain.Entities;
+using EmpregaNet.Domain.Enums;
 using FluentValidation;
 
 namespace EmpregaNet.Application.Common.Base;
@@ -19,7 +20,16 @@ public sealed class AddressValidator : AbstractValidator<Address>
             .MaximumLength(100).WithMessage("A cidade deve ter no máximo 100 caracteres.");
 
         RuleFor(a => a.State)
-            .IsInEnum().WithMessage("Estado inválido.");
+            .IsInEnum().WithMessage("Estado inválido.")
+            .NotEqual(UF.NaoSelecionado).WithMessage("O estado é obrigatório.");
+
+        RuleFor(a => a.Neighborhood)
+            .NotEmpty().WithMessage("O bairro é obrigatório.")
+            .MaximumLength(100).WithMessage("O bairro deve ter no máximo 100 caracteres.");
+
+        RuleFor(a => a.Number)
+            .NotEmpty().WithMessage("O número é obrigatório.")
+            .MaximumLength(20).WithMessage("O número deve ter no máximo 20 caracteres.");
 
         RuleFor(a => a.ZipCode)
             .NotEmpty().WithMessage("O CEP é obrigatório.")
