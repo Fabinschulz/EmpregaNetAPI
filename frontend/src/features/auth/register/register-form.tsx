@@ -2,13 +2,13 @@
 
 import { FormSubmitButton, InputField } from '@/components';
 import { useFormContext } from '@/context';
-import { AuthFormActions, AuthFormGrid } from '../shared';
+import { StandalonePageFormActions, StandalonePageFormGrid } from '@/components';
 
 export function RegisterFormFields() {
   const { submitting } = useFormContext();
 
   return (
-    <AuthFormGrid>
+    <StandalonePageFormGrid>
       <InputField name="username" label="Nome de usuário" autoComplete="username" required />
       <InputField name="email" label="E-mail" type="email" autoComplete="email" required />
       <InputField name="password" label="Senha" type="password" autoComplete="new-password" required />
@@ -19,9 +19,9 @@ export function RegisterFormFields() {
         autoComplete="new-password"
         required
       />
-      <AuthFormActions>
+      <StandalonePageFormActions>
         <FormSubmitButton variant="primary">{submitting ? 'Criando conta...' : 'Criar conta'}</FormSubmitButton>
-      </AuthFormActions>
-    </AuthFormGrid>
+      </StandalonePageFormActions>
+    </StandalonePageFormGrid>
   );
 }

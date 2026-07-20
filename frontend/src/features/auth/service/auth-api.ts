@@ -1,21 +1,21 @@
 import { axiosApi } from '@/shared/api';
 import { userLoggedSchema, type UserLoggedDto } from '@/shared/auth';
 import {
-    authMessageResponseSchema,
-    confirmEmailSchema,
-    forgotPasswordSchema,
-    loginSchema,
-    loginWithGoogleSchema,
-    registerSchema,
-    resendEmailConfirmationSchema,
-    resetPasswordFormSchema,
-    type ConfirmEmailDto,
-    type ForgotPasswordDto,
-    type LoginDto,
-    type LoginWithGoogleDto,
-    type RegisterDto,
-    type ResendEmailConfirmationDto,
-    type ResetPasswordFormValues
+  authMessageResponseSchema,
+  confirmEmailSchema,
+  forgotPasswordSchema,
+  loginSchema,
+  loginWithGoogleSchema,
+  registerSchema,
+  resendEmailConfirmationSchema,
+  resetPasswordFormSchema,
+  type ConfirmEmailDto,
+  type ForgotPasswordDto,
+  type LoginDto,
+  type LoginWithGoogleDto,
+  type RegisterDto,
+  type ResendEmailConfirmationDto,
+  type ResetPasswordFormValues
 } from './auth-schema';
 
 export async function register(dto: RegisterDto): Promise<string> {

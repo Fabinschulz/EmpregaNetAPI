@@ -1,27 +1,27 @@
 'use client';
 
 import {
-    ApiQueryBoundary,
-    ConfirmDialog,
-    PageHeader,
-    TableContainer,
-    TableFilters,
-    type DataTableColumn,
-    type RowAction
+  ApiQueryBoundary,
+  ConfirmDialog,
+  PageHeader,
+  TableContainer,
+  TableFilters,
+  type DataTableColumn,
+  type RowAction
 } from '@/components';
 import { FormProvider } from '@/context';
 import { ApplicationStatusBadge } from '@/features/candidaturas/application-status-badge';
 import { usePersistedTablePagination } from '@/hooks';
 import {
-    applicationStatusTransitions,
-    applicationTransitionLabels,
-    defaultRecruitmentApplicationsFilter,
-    parseApplicationStatus,
-    recruitmentApplicationsFilterFormSchema,
-    useAllJobApplicationsQuery,
-    useChangeApplicationStatusMutation,
-    type ApplicationStatus,
-    type JobApplicationDto
+  applicationStatusTransitions,
+  applicationTransitionLabels,
+  defaultRecruitmentApplicationsFilter,
+  parseApplicationStatus,
+  recruitmentApplicationsFilterFormSchema,
+  useAllJobApplicationsQuery,
+  useChangeApplicationStatusMutation,
+  type ApplicationStatus,
+  type JobApplicationDto
 } from '@/features/candidaturas/service';
 import type { ListOrderByValue } from '@/shared';
 import { Ban, CheckCircle2, Eye, Flag, PlayCircle, RotateCcw, XCircle, type LucideIcon } from 'lucide-react';
@@ -124,10 +124,7 @@ export function RecruitmentApplicationsPage() {
       onRetry={() => void refetch()}
     >
       <section>
-        <PageHeader
-          title="Candidaturas"
-          description="Acompanhe e avance as candidaturas pelo processo seletivo."
-        />
+        <PageHeader title="Candidaturas" description="Acompanhe e avance as candidaturas pelo processo seletivo." />
 
         <TableContainer
           columns={columns}

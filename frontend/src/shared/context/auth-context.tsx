@@ -1,14 +1,14 @@
 'use client';
 
+import { registerAxiosAuthHandlers } from '@/shared/api';
 import {
     logout as apiLogout,
     clearSessionMetadata,
     getSessionMetadataSnapshot,
-    registerAxiosAuthHandlers,
     saveSessionMetadata,
     subscribeSessionMetadata,
     type UserLoggedDto
-} from '@/shared';
+} from '@/shared/auth';
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useSyncExternalStore } from 'react';
 
 type AuthState = {

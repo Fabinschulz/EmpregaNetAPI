@@ -2,13 +2,13 @@
 
 import { FormSubmitButton, InputField } from '@/components';
 import { useFormContext } from '@/context';
-import { AuthFormActions, AuthFormGrid } from '../shared';
+import { StandalonePageFormActions, StandalonePageFormGrid } from '@/components';
 
 export function ResetPasswordFormFields() {
   const { submitting } = useFormContext();
 
   return (
-    <AuthFormGrid>
+    <StandalonePageFormGrid>
       <InputField name="newPassword" label="Nova senha" type="password" autoComplete="new-password" required />
       <InputField
         name="newPasswordConfirmation"
@@ -17,9 +17,9 @@ export function ResetPasswordFormFields() {
         autoComplete="new-password"
         required
       />
-      <AuthFormActions>
+      <StandalonePageFormActions>
         <FormSubmitButton variant="primary">{submitting ? 'Salvando...' : 'Redefinir senha'}</FormSubmitButton>
-      </AuthFormActions>
-    </AuthFormGrid>
+      </StandalonePageFormActions>
+    </StandalonePageFormGrid>
   );
 }

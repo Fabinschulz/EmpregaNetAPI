@@ -2,7 +2,12 @@
 
 import { Alert, Button } from '@/components';
 import { useAuth } from '@/context';
-import { AuthFooterPrompt, AuthFormActions, AuthNavLink, AuthPage } from '@/features/auth/shared';
+import {
+  StandalonePageFooterPrompt,
+  StandalonePageFormActions,
+  StandalonePageNavLink,
+  StandalonePage
+} from '@/components';
 import { DEFAULT_POST_LOGIN_PATH, isSafeInternalPath, startRouterTransition } from '@/utils';
 import { LayoutDashboard } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -20,13 +25,13 @@ export function Unauthorized() {
   };
 
   return (
-    <AuthPage
+    <StandalonePage
       title="Acesso não autorizado"
       description="A sua conta não tem permissão para acessar a esta área da EmpregaUAI."
       footer={
-        <AuthFooterPrompt prompt="Precisa de outra conta?">
-          <AuthNavLink href="/login">Iniciar sessão com outro utilizador</AuthNavLink>
-        </AuthFooterPrompt>
+        <StandalonePageFooterPrompt prompt="Precisa de outra conta?">
+          <StandalonePageNavLink href="/login">Iniciar sessão com outro utilizador</StandalonePageNavLink>
+        </StandalonePageFooterPrompt>
       }
     >
       <Alert variant="destructive" title="Permissão insuficiente">
@@ -42,11 +47,11 @@ export function Unauthorized() {
         . Se acredita que isto é um erro, contacte o administrador da plataforma.
       </Alert>
 
-      <AuthFormActions>
+      <StandalonePageFormActions>
         <Button type="button" variant="primary" startIcon={LayoutDashboard} onClick={handleGoDashboard}>
           Ir para o painel
         </Button>
-      </AuthFormActions>
-    </AuthPage>
+      </StandalonePageFormActions>
+    </StandalonePage>
   );
 }

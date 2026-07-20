@@ -1,4 +1,3 @@
-
 export const USER_TYPES = [
   { value: 'Candidate', label: 'Candidato' },
   { value: 'Recruiter', label: 'Recrutador' },
@@ -16,7 +15,6 @@ const LABEL_OR_VALUE_TO_VALUE = new Map<string, UserTypeValue>(
     [t.label.toLowerCase(), t.value]
   ])
 );
-
 
 export function normalizeUserTypeValue(input: string | null | undefined): UserTypeValue | '' {
   if (!input) return '';

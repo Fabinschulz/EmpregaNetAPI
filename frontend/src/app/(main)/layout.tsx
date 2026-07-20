@@ -1,5 +1,5 @@
 import { Suspense } from 'react';
-import { MainLayout } from '@/features/shell';
+import { MainLayout } from '@/shared/shell';
 
 function MainChromeFallback() {
   return (

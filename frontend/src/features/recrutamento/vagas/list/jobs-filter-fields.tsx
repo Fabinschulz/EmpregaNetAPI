@@ -1,13 +1,6 @@
 'use client';
 
-import {
-  AutocompleteField,
-  Button,
-  FilterBar,
-  FilterField,
-  SelectField,
-  type AutocompleteOption
-} from '@/components';
+import { AutocompleteField, Button, FilterBar, FilterField, SelectField, type AutocompleteOption } from '@/components';
 import { useFormContext } from '@/context';
 import { defaultJobsFilter, jobsFilterToParams, type JobsFilterFormValues } from '../service';
 import type { JobsListQueryParams } from '@/shared/schema';

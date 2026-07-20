@@ -2,10 +2,10 @@
 
 import { Alert } from '@/components';
 import type { ReactNode } from 'react';
-import styles from './auth-page.module.scss';
-import { EmpregaUaiLogo } from './empregauai-logo';
+import { EmpregaUaiLogo } from '../branding';
+import styles from './standalone-page.module.scss';
 
-type AuthPageProps = {
+type StandalonePageProps = {
   title: string;
   description?: string;
   children: ReactNode;
@@ -14,7 +14,19 @@ type AuthPageProps = {
   successMessage?: string | null;
 };
 
-export function AuthPage({ title, description, children, footer, apiError, successMessage }: AuthPageProps) {
+/**
+ * Shell de página autônoma (fora do AppShell): auth (login, registro, senha...)
+ * e páginas de estado (ex.: não autorizado). Cabeçalho com marca + título,
+ * corpo com alertas de sucesso/erro e rodapé opcional.
+ */
+export function StandalonePage({
+  title,
+  description,
+  children,
+  footer,
+  apiError,
+  successMessage
+}: StandalonePageProps) {
   return (
     <section className={styles.page} aria-labelledby="auth-page-title" suppressHydrationWarning>
       <header className={styles.header}>
@@ -47,15 +59,15 @@ export function AuthPage({ title, description, children, footer, apiError, succe
   );
 }
 
-export function AuthFormGrid({ children }: { children: ReactNode }) {
+export function StandalonePageFormGrid({ children }: { children: ReactNode }) {
   return <div className={styles.formGrid}>{children}</div>;
 }
 
-export function AuthFormActions({ children }: { children: ReactNode }) {
+export function StandalonePageFormActions({ children }: { children: ReactNode }) {
   return <div className={styles.actions}>{children}</div>;
 }
 
-export function AuthDivider() {
+export function StandalonePageDivider() {
   return (
     <p className={styles.divider} role="separator">
       ou
@@ -63,12 +75,12 @@ export function AuthDivider() {
   );
 }
 
-type AuthFooterPromptProps = {
+type StandalonePageFooterPromptProps = {
   prompt: string;
   children: ReactNode;
 };
 
-export function AuthFooterPrompt({ prompt, children }: AuthFooterPromptProps) {
+export function StandalonePageFooterPrompt({ prompt, children }: StandalonePageFooterPromptProps) {
   return (
     <>
       <p className={styles.footerPromptText}>{prompt}</p>

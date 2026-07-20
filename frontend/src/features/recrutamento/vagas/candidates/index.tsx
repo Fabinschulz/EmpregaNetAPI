@@ -24,17 +24,7 @@ import {
   type JobApplicationDto
 } from '@/features/candidaturas/service';
 import { useJobQuery } from '../service';
-import {
-  Ban,
-  CheckCircle2,
-  Flag,
-  Pencil,
-  PlayCircle,
-  RotateCcw,
-  Trash2,
-  XCircle,
-  type LucideIcon
-} from 'lucide-react';
+import { Ban, CheckCircle2, Flag, Pencil, PlayCircle, RotateCcw, Trash2, XCircle, type LucideIcon } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useMemo, useState } from 'react';
@@ -169,10 +159,7 @@ export function CandidatesByJobPage() {
       deleteApplication(pending.application.id, { onSuccess: () => setPending(null) });
       return;
     }
-    changeStatus(
-      { id: pending.application.id, status: pending.target },
-      { onSuccess: () => setPending(null) }
-    );
+    changeStatus({ id: pending.application.id, status: pending.target }, { onSuccess: () => setPending(null) });
   };
 
   return (
@@ -208,7 +195,10 @@ export function CandidatesByJobPage() {
           emptyTitle="Nenhuma candidatura"
           emptyMessage="Nenhuma candidatura encontrada para os filtros informados."
           filters={
-            <TableFilters title="Filtrar candidaturas" description="Filtre por status e ordene pela data de recebimento.">
+            <TableFilters
+              title="Filtrar candidaturas"
+              description="Filtre por status e ordene pela data de recebimento."
+            >
               <FormProvider
                 validationSchema={candidatesFilterSchema}
                 defaultValues={defaultCandidatesFilter}

@@ -1,9 +1,5 @@
 import { userSchema, type UserDto } from '@/shared/auth';
-import {
-    LIST_ORDER_BY_VALUES,
-    createPaginatedResponseSchema,
-    type AdminUsersListQueryParams
-} from '@/shared/schema';
+import { LIST_ORDER_BY_VALUES, createPaginatedResponseSchema, type AdminUsersListQueryParams } from '@/shared/schema';
 import { normalizeUserTypeValue } from '@/utils';
 import { z } from 'zod';
 

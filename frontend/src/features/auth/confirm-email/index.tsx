@@ -4,7 +4,7 @@ import { Alert } from '@/components';
 import { useConfirmEmailMutation } from '../service';
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useMemo, useRef } from 'react';
-import { AuthNavLink, AuthPage } from '../shared';
+import { StandalonePageNavLink, StandalonePage } from '@/components';
 import type { ConfirmEmailDto } from './confirm-email-schema';
 
 export function ConfirmEmail() {
@@ -29,29 +29,29 @@ export function ConfirmEmail() {
   }, [mutateAsync, payload]);
 
   return (
-    <AuthPage
+    <StandalonePage
       title="Confirmar e-mail"
       description="Estamos a validar o seu endereço de e-mail para activar a conta."
       apiError={apiError}
       successMessage={successMessage}
       footer={
         <>
-          <AuthNavLink href="/login">Ir para o login</AuthNavLink>
+          <StandalonePageNavLink href="/login">Ir para o login</StandalonePageNavLink>
           {' · '}
-          <AuthNavLink href="/resend-confirmation">Reenviar e-mail</AuthNavLink>
+          <StandalonePageNavLink href="/resend-confirmation">Reenviar e-mail</StandalonePageNavLink>
         </>
       }
     >
       {!payload && !successMessage && !isPending ? (
         <Alert variant="destructive" title="Link inválido">
           O link de confirmação está incompleto. Peça um novo em{' '}
-          <AuthNavLink href="/resend-confirmation">reenviar confirmação</AuthNavLink>.
+          <StandalonePageNavLink href="/resend-confirmation">reenviar confirmação</StandalonePageNavLink>.
         </Alert>
       ) : payload && isPending && !successMessage && !apiError ? (
         <p role="status" style={{ margin: 0, color: 'var(--muted)', textAlign: 'center' }}>
           A confirmar o seu e-mail…
         </p>
       ) : null}
-    </AuthPage>
+    </StandalonePage>
   );
 }

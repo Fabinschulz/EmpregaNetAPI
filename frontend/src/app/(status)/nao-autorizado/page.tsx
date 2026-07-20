@@ -1,5 +1,5 @@
-import { AuthSessionChecking } from '@/features/auth/shared';
-import { Unauthorized } from '@/features/status';
+import { AuthSessionChecking } from '@/components';
+import { Unauthorized } from '@/shared/status';
 import { Suspense } from 'react';
 
 export default function UnauthorizedPage() {

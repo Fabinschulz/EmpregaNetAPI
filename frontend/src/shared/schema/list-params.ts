@@ -14,10 +14,9 @@ export type ListOrderByValue = (typeof LIST_ORDER_BY_VALUES)[number];
 
 export const LIST_ORDER_BY_OPTIONS: ReadonlyArray<{ value: ListOrderByValue; label: string }> = [
   { value: 'createdAt_DESC', label: 'Mais recentes' },
-  { value: 'createdAt_ASC', label: 'Mais antigas' },
+  { value: 'createdAt_ASC', label: 'Mais antigas' }
   // { value: 'id_DESC', label: 'Usuários mais recentes' },
   // { value: 'id_ASC', label: 'Usuários mais antigos' }
-
 ];
 
 export const DATE_ORDER_BY_OPTIONS: ReadonlyArray<{ value: ListOrderByValue; label: string }> = [
@@ -44,7 +43,9 @@ export type JobsListQueryParams = ListQueryParams & Pick<SoftDeleteFilterParams,
 
 export type CompaniesListQueryParams = ListQueryParams & SoftDeleteFilterParams & SearchFilterParams;
 
-export type AdminUsersListQueryParams = ListQueryParams & Pick<SoftDeleteFilterParams, 'isDeleted'> & SearchFilterParams;
+export type AdminUsersListQueryParams = ListQueryParams &
+  Pick<SoftDeleteFilterParams, 'isDeleted'> &
+  SearchFilterParams;
 
 export type CandidatesListQueryParams = ListQueryParams & SearchFilterParams;
 

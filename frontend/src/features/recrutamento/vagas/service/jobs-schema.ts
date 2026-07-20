@@ -51,7 +51,6 @@ export const companyOptionSchema = z.object({
 export const companyOptionsResponseSchema = z.array(companyOptionSchema);
 export type CompanyOption = z.infer<typeof companyOptionSchema>;
 
-
 export const jobFormSchema = z.object({
   companyId: z.string().min(1, 'Selecione a empresa.'),
   title: z.string().trim().min(1, 'Informe o título.').max(100, 'O título deve ter no máximo 100 caracteres.'),

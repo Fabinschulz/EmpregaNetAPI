@@ -1,13 +1,13 @@
 import Link from 'next/link';
-import styles from './auth-page.module.scss';
+import styles from './standalone-page.module.scss';
 
-type AuthNavLinkProps = {
+type StandalonePageNavLinkProps = {
   href: string;
   children: React.ReactNode;
   muted?: boolean;
 };
 
-export function AuthNavLink({ href, children, muted }: AuthNavLinkProps) {
+export function StandalonePageNavLink({ href, children, muted }: StandalonePageNavLinkProps) {
   return (
     <Link href={href} className={muted ? styles.linkMuted : styles.link}>
       {children}
@@ -15,10 +15,10 @@ export function AuthNavLink({ href, children, muted }: AuthNavLinkProps) {
   );
 }
 
-type AuthLinkRowProps = {
+type StandalonePageLinkRowProps = {
   children: React.ReactNode;
 };
 
-export function AuthLinkRow({ children }: AuthLinkRowProps) {
+export function StandalonePageLinkRow({ children }: StandalonePageLinkRowProps) {
   return <div className={styles.linkRow}>{children}</div>;
 }

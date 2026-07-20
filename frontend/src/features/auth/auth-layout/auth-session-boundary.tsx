@@ -1,7 +1,7 @@
 'use client';
 
 import { useAuth } from '@/context';
-import { AuthSessionChecking } from '@/features/auth/shared';
+import { AuthSessionChecking } from '@/components';
 import { me } from '@/features/conta/service';
 import { resolvePostLoginPath } from '@/utils';
 import { useRouter, useSearchParams } from 'next/navigation';

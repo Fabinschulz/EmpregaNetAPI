@@ -5,7 +5,7 @@ import { FormProvider } from '@/context';
 import { useResetPasswordMutation } from '../service';
 import { useSearchParams } from 'next/navigation';
 import { useMemo } from 'react';
-import { AuthNavLink, AuthPage } from '../shared';
+import { StandalonePageNavLink, StandalonePage } from '@/components';
 import { ResetPasswordFormFields } from './reset-password-form';
 import type { ResetPasswordFormValues } from './reset-password-schema';
 import { resetPasswordDefaultValues, resetPasswordFormSchema } from './reset-password-schema';
@@ -30,21 +30,21 @@ export function ResetPassword() {
   const handleSubmit = async (formValue: ResetPasswordFormValues) => await mutateAsync(formValue);
 
   return (
-    <AuthPage
+    <StandalonePage
       title="Nova senha"
       description="Defina uma nova senha para a sua conta EmpregaUAI."
       apiError={apiError}
       successMessage={successMessage}
       footer={
         <>
-          <AuthNavLink href="/login">Voltar ao login</AuthNavLink>
+          <StandalonePageNavLink href="/login">Voltar ao login</StandalonePageNavLink>
         </>
       }
     >
       {!linkValid && !successMessage && !isPending ? (
         <Alert variant="destructive" title="Link inválido">
           O link de redefinição está incompleto ou expirou. Solicite um novo em{' '}
-          <AuthNavLink href="/forgot-password">recuperar senha</AuthNavLink>.
+          <StandalonePageNavLink href="/forgot-password">recuperar senha</StandalonePageNavLink>.
         </Alert>
       ) : linkValid && defaultValues && !successMessage ? (
         <FormProvider
@@ -56,6 +56,6 @@ export function ResetPassword() {
           <ResetPasswordFormFields />
         </FormProvider>
       ) : null}
-    </AuthPage>
+    </StandalonePage>
   );
 }

@@ -1,12 +1,12 @@
 'use client';
 
 import {
-    ApiQueryBoundary,
-    PageHeader,
-    StatusBadge,
-    TableContainer,
-    TableFilters,
-    type DataTableColumn
+  ApiQueryBoundary,
+  PageHeader,
+  StatusBadge,
+  TableContainer,
+  TableFilters,
+  type DataTableColumn
 } from '@/components';
 import { FormProvider } from '@/context';
 import { usePersistedTablePagination } from '@/hooks';
@@ -15,10 +15,10 @@ import { userTypeLabel, type AdminUsersListQueryParams } from '@/shared';
 import { Eye } from 'lucide-react';
 import { useCallback, useMemo, useState } from 'react';
 import {
-    adminUsersFilterFormSchema,
-    adminUsersFilterToParams,
-    defaultAdminUsersFilter,
-    useAdminUsersListQuery
+  adminUsersFilterFormSchema,
+  adminUsersFilterToParams,
+  defaultAdminUsersFilter,
+  useAdminUsersListQuery
 } from '../service';
 import { AdminUsersFilterFields } from './admin-users-filter-fields';
 

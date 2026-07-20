@@ -1,21 +1,14 @@
 'use client';
 
-import {
-    ApiQueryBoundary,
-    Button,
-    PageHeader,
-    TableContainer,
-    TableFilters,
-    type DataTableColumn
-} from '@/components';
+import { ApiQueryBoundary, Button, PageHeader, TableContainer, TableFilters, type DataTableColumn } from '@/components';
 import { FormProvider } from '@/context';
 import { usePersistedTablePagination } from '@/hooks';
 import {
-    companiesFilterFormSchema,
-    companiesFilterToParams,
-    defaultCompaniesFilter,
-    useCompaniesListQuery,
-    type CompanyDto
+  companiesFilterFormSchema,
+  companiesFilterToParams,
+  defaultCompaniesFilter,
+  useCompaniesListQuery,
+  type CompanyDto
 } from '../service';
 import type { CompaniesListQueryParams } from '@/shared';
 import { Pencil, Plus } from 'lucide-react';
@@ -40,9 +33,7 @@ const COMPANIES_COLUMNS: DataTableColumn<CompanyDto>[] = [
 export function AdminCompaniesPage() {
   const pagination = usePersistedTablePagination({ storageKey: 'admin-empresas' });
   const { setPage } = pagination;
-  const [filters, setFilters] = useState<CompaniesFilterParams>(() =>
-    companiesFilterToParams(defaultCompaniesFilter)
-  );
+  const [filters, setFilters] = useState<CompaniesFilterParams>(() => companiesFilterToParams(defaultCompaniesFilter));
 
   const { data, isPending, isFetching, isError, error, refetch } = useCompaniesListQuery({
     page: pagination.page,

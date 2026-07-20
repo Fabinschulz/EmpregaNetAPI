@@ -33,11 +33,7 @@ export function JobDetailPage() {
     void mutateAsync();
   }
 
-  const applyLabel = !isAuthenticated
-    ? 'Faça login para se candidatar'
-    : isApplying
-      ? 'Enviando...'
-      : 'Candidatar-me';
+  const applyLabel = !isAuthenticated ? 'Faça login para se candidatar' : isApplying ? 'Enviando...' : 'Candidatar-me';
 
   return (
     <ApiQueryBoundary

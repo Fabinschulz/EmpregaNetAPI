@@ -1,12 +1,12 @@
 import { axiosApi, createAxiosConfig } from '@/shared/api';
 import type { CompaniesListQueryParams } from '@/shared/schema';
 import {
-    companiesListResponseSchema,
-    CompanyDto,
-    companyFormSchema,
-    companyFormToApiPayload,
-    companySchema,
-    type CompaniesListResponseDto
+  companiesListResponseSchema,
+  CompanyDto,
+  companyFormSchema,
+  companyFormToApiPayload,
+  companySchema,
+  type CompaniesListResponseDto
 } from './companies-schema';
 
 export async function listCompanies(params?: CompaniesListQueryParams): Promise<CompaniesListResponseDto> {

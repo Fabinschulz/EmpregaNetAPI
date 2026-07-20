@@ -1,14 +1,14 @@
 import { axiosApi, createAxiosConfig } from '@/shared/api';
 import type { JobsListQueryParams } from '@/shared/schema';
 import {
-    companyOptionsResponseSchema,
-    jobFormSchema,
-    jobFormToApiPayload,
-    jobSchema,
-    jobsListResponseSchema,
-    type CompanyOption,
-    type JobDto,
-    type JobsListResponseDto
+  companyOptionsResponseSchema,
+  jobFormSchema,
+  jobFormToApiPayload,
+  jobSchema,
+  jobsListResponseSchema,
+  type CompanyOption,
+  type JobDto,
+  type JobsListResponseDto
 } from './jobs-schema';
 
 export async function listJobs(params?: JobsListQueryParams): Promise<JobsListResponseDto> {

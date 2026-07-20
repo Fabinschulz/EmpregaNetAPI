@@ -2,17 +2,17 @@
 
 import { FormSubmitButton, InputField } from '@/components';
 import { useFormContext } from '@/context';
-import { AuthFormActions, AuthFormGrid } from '../shared';
+import { StandalonePageFormActions, StandalonePageFormGrid } from '@/components';
 
 export function ResendConfirmationFormFields() {
   const { submitting } = useFormContext();
 
   return (
-    <AuthFormGrid>
+    <StandalonePageFormGrid>
       <InputField name="email" label="E-mail da conta" type="email" autoComplete="email" required />
-      <AuthFormActions>
+      <StandalonePageFormActions>
         <FormSubmitButton variant="primary">{submitting ? 'Enviando...' : 'Reenviar confirmação'}</FormSubmitButton>
-      </AuthFormActions>
-    </AuthFormGrid>
+      </StandalonePageFormActions>
+    </StandalonePageFormGrid>
   );
 }

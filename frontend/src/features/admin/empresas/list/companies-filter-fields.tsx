@@ -1,19 +1,8 @@
 'use client';
 
-import {
-  AutocompleteField,
-  Button,
-  FilterBar,
-  FilterField,
-  SelectField,
-  type AutocompleteOption
-} from '@/components';
+import { AutocompleteField, Button, FilterBar, FilterField, SelectField, type AutocompleteOption } from '@/components';
 import { useFormContext } from '@/context';
-import {
-    companiesFilterToParams,
-    defaultCompaniesFilter,
-    type CompaniesFilterFormValues
-} from '../service';
+import { companiesFilterToParams, defaultCompaniesFilter, type CompaniesFilterFormValues } from '../service';
 import { LIST_ORDER_BY_OPTIONS, type CompaniesListQueryParams } from '@/shared';
 import { X } from 'lucide-react';
 import { useEffect, useRef } from 'react';

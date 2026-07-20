@@ -2,7 +2,12 @@ import { axiosApi, createAxiosConfig } from '@/shared/api';
 import { userSchema, type UserDto } from '@/shared/auth';
 import { onlyDigits } from '@/utils';
 import { z } from 'zod';
-import { changeMyPasswordFormSchema, profileFormSchema, type ChangeMyPasswordFormValues, type ProfileFormValues } from './conta-schema';
+import {
+  changeMyPasswordFormSchema,
+  profileFormSchema,
+  type ChangeMyPasswordFormValues,
+  type ProfileFormValues
+} from './conta-schema';
 
 const messageResponseSchema = z.object({ message: z.string() });
 

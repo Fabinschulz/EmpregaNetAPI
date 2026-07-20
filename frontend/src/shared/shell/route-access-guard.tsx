@@ -1,7 +1,7 @@
 'use client';
 
 import { useAuth } from '@/context';
-import { AuthSessionChecking } from '@/features/auth/shared';
+import { AuthSessionChecking } from '@/components';
 import { buildForbiddenRedirectPath, buildLoginRedirectPath, evaluateRouteAccess } from '@/utils';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, type ReactNode } from 'react';

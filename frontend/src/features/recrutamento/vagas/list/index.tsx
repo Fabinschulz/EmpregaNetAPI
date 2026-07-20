@@ -1,13 +1,13 @@
 'use client';
 
 import {
-    ApiQueryBoundary,
-    Button,
-    PageHeader,
-    StatusBadge,
-    TableContainer,
-    TableFilters,
-    type DataTableColumn
+  ApiQueryBoundary,
+  Button,
+  PageHeader,
+  StatusBadge,
+  TableContainer,
+  TableFilters,
+  type DataTableColumn
 } from '@/components';
 import { FormProvider } from '@/context';
 import { usePersistedTablePagination } from '@/hooks';

@@ -4,14 +4,14 @@ import { FormProvider } from '@/context';
 import { useLoginMutation, useLoginWithGoogleMutation } from '../service';
 import { useEffect, useRef } from 'react';
 import {
-  AuthDivider,
-  AuthFooterPrompt,
-  AuthFormActions,
-  AuthLinkRow,
-  AuthNavLink,
-  AuthPage,
-  GoogleSignInButton
-} from '../shared';
+  StandalonePageDivider,
+  StandalonePageFooterPrompt,
+  StandalonePageFormActions,
+  StandalonePageLinkRow,
+  StandalonePageNavLink,
+  StandalonePage
+} from '@/components';
+import { GoogleSignInButton } from '../shared';
 import { LoginFormFields } from './login-form';
 import type { LoginDto } from './login-schema';
 import { loginDefaultValues, loginSchema } from './login-schema';
@@ -38,32 +38,32 @@ export function Login() {
   const isBusy = isPending || googleMutation.isPending;
 
   return (
-    <AuthPage
+    <StandalonePage
       title="Acesse sua conta"
       apiError={displayError}
       footer={
-        <AuthFooterPrompt prompt="Não tem uma conta?">
-          <AuthNavLink href="/register">Inscrever-se</AuthNavLink>
-        </AuthFooterPrompt>
+        <StandalonePageFooterPrompt prompt="Não tem uma conta?">
+          <StandalonePageNavLink href="/register">Inscrever-se</StandalonePageNavLink>
+        </StandalonePageFooterPrompt>
       }
     >
       <FormProvider validationSchema={loginSchema} defaultValues={loginDefaultValues} onSubmit={handleSubmit}>
         <LoginFormFields />
-        <AuthLinkRow>
-          <AuthNavLink href="/forgot-password" muted>
+        <StandalonePageLinkRow>
+          <StandalonePageNavLink href="/forgot-password" muted>
             Esqueceu a senha?
-          </AuthNavLink>
-          <AuthNavLink href="/resend-confirmation" muted>
+          </StandalonePageNavLink>
+          <StandalonePageNavLink href="/resend-confirmation" muted>
             Reenviar confirmação de e-mail
-          </AuthNavLink>
-        </AuthLinkRow>
+          </StandalonePageNavLink>
+        </StandalonePageLinkRow>
       </FormProvider>
 
-      <AuthDivider />
+      <StandalonePageDivider />
 
-      <AuthFormActions>
+      <StandalonePageFormActions>
         <GoogleSignInButton onCredential={handleGoogleCredential} disabled={isBusy} />
-      </AuthFormActions>
-    </AuthPage>
+      </StandalonePageFormActions>
+    </StandalonePage>
   );
 }
