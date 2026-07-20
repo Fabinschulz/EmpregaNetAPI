@@ -1,4 +1,4 @@
-import type { DomainErrorDto } from '@/shared';
+import type { DomainErrorDto } from '@/shared/schema';
 import { parseApiError } from '@/utils';
 
 export type QueryApiErrorState = {

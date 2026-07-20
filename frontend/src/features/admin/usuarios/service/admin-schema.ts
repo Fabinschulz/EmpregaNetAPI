@@ -1,11 +1,10 @@
+import { userSchema, type UserDto } from '@/shared/auth';
 import {
     LIST_ORDER_BY_VALUES,
     createPaginatedResponseSchema,
-    normalizeUserTypeValue,
-    userSchema,
-    type AdminUsersListQueryParams,
-    type UserDto
-} from '@/shared';
+    type AdminUsersListQueryParams
+} from '@/shared/schema';
+import { normalizeUserTypeValue } from '@/utils';
 import { z } from 'zod';
 
 export const adminUsersListResponseSchema = createPaginatedResponseSchema(userSchema);

@@ -1,4 +1,4 @@
-import { refreshToken, type UserLoggedDto } from '@/shared';
+import { refreshToken, type UserLoggedDto } from '@/shared/auth';
 import type { AxiosError, AxiosInstance, InternalAxiosRequestConfig } from 'axios';
 
 type AuthHandlers = {

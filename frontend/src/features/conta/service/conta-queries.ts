@@ -1,7 +1,7 @@
 'use client';
 
 import { useAuth } from '@/context';
-import { saveSessionMetadata } from '@/shared';
+import { saveSessionMetadata } from '@/shared/auth';
 import { reportMutationApiError, startRouterTransition, toastSuccess } from '@/utils';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';

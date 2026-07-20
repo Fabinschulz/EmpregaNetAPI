@@ -1,4 +1,4 @@
-import { domainErrorSchema, type DomainErrorDto } from '@/shared';
+import { domainErrorSchema, type DomainErrorDto } from '@/shared/schema';
 
 const UNKNOWN_ERROR_MESSAGE = 'Erro desconhecido. Por favor, entre em contato com o suporte técnico.';
 

@@ -1,4 +1,5 @@
-import { axiosApi, userLoggedSchema, type UserLoggedDto } from '@/shared';
+import { axiosApi } from '@/shared/api';
+import { userLoggedSchema, type UserLoggedDto } from '@/shared/auth';
 import {
     authMessageResponseSchema,
     confirmEmailSchema,

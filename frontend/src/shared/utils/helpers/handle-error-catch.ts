@@ -1,4 +1,4 @@
-import { type DomainErrorDto } from '@/shared';
+import { type DomainErrorDto } from '@/shared/schema';
 import { isAxiosError } from 'axios';
 import { ApiStatusCode } from '../enums';
 import { formatDomainErrorMessage, tryParseDomainError } from '../errors/domain-error';

@@ -1,4 +1,5 @@
-import { axiosApi, createAxiosConfig, type CompaniesListQueryParams } from '@/shared';
+import { axiosApi, createAxiosConfig } from '@/shared/api';
+import type { CompaniesListQueryParams } from '@/shared/schema';
 import {
     companiesListResponseSchema,
     CompanyDto,

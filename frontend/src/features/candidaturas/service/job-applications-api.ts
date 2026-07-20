@@ -1,4 +1,5 @@
-import { axiosApi, createAxiosConfig, type JobApplicationsAdminListQueryParams, type JobApplicationsListQueryParams } from '@/shared';
+import { axiosApi, createAxiosConfig } from '@/shared/api';
+import type { JobApplicationsAdminListQueryParams, JobApplicationsListQueryParams } from '@/shared/schema';
 import {
     applyToJobSchema,
     changeApplicationStatusSchema,

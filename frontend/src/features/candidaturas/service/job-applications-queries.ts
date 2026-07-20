@@ -5,7 +5,7 @@ import {
   withDefaultListParams,
   type JobApplicationsAdminListQueryParams,
   type JobApplicationsListQueryParams
-} from '@/shared';
+} from '@/shared/schema';
 import { reportMutationApiError, toastSuccess } from '@/utils';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';

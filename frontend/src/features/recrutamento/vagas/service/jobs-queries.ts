@@ -1,6 +1,6 @@
 'use client';
 
-import { withDefaultListParams, type JobsListQueryParams } from '@/shared';
+import { withDefaultListParams, type JobsListQueryParams } from '@/shared/schema';
 import { reportMutationApiError, startRouterTransition } from '@/utils';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';

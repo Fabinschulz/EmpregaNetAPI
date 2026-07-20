@@ -1,4 +1,4 @@
-import type { ListQueryParams } from '@/shared';
+import type { ListQueryParams } from '@/shared/schema';
 
 /** Query keys do domínio de candidatos. */
 export const candidatesKeys = {

@@ -1,4 +1,4 @@
-import { createPaginatedResponseSchema, type JobsListQueryParams } from '@/shared';
+import { createPaginatedResponseSchema, type JobsListQueryParams } from '@/shared/schema';
 import { z } from 'zod';
 
 export const JOB_TYPE_OPTIONS = [

@@ -1,5 +1,5 @@
 import { registerSchema } from '@/features/auth/service';
-import { isValidBrazilCellPhone, maskBrazilPhone } from '@/shared';
+import { isValidBrazilCellPhone, maskBrazilPhone } from '@/utils';
 import { z } from 'zod';
 
 export const profileFormSchema = registerSchema.pick({ username: true, email: true }).extend({

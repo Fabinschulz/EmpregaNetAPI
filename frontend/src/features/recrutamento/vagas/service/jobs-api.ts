@@ -1,4 +1,5 @@
-import { axiosApi, createAxiosConfig, type JobsListQueryParams } from '@/shared';
+import { axiosApi, createAxiosConfig } from '@/shared/api';
+import type { JobsListQueryParams } from '@/shared/schema';
 import {
     companyOptionsResponseSchema,
     jobFormSchema,

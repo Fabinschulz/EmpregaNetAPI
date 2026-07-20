@@ -1,4 +1,6 @@
-import { axiosApi, createAxiosConfig, userSchema, type CandidatesListQueryParams } from '@/shared';
+import { axiosApi, createAxiosConfig } from '@/shared/api';
+import { userSchema } from '@/shared/auth';
+import type { CandidatesListQueryParams } from '@/shared/schema';
 import { candidatesListResponseSchema, type CandidatesListResponseDto } from './candidates-schema';
 
 export async function listCandidates(params?: CandidatesListQueryParams): Promise<CandidatesListResponseDto> {

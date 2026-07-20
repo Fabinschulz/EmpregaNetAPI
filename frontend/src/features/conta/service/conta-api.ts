@@ -1,4 +1,6 @@
-import { axiosApi, createAxiosConfig, onlyDigits, userSchema, type UserDto } from '@/shared';
+import { axiosApi, createAxiosConfig } from '@/shared/api';
+import { userSchema, type UserDto } from '@/shared/auth';
+import { onlyDigits } from '@/utils';
 import { z } from 'zod';
 import { changeMyPasswordFormSchema, profileFormSchema, type ChangeMyPasswordFormValues, type ProfileFormValues } from './conta-schema';
 

@@ -11,7 +11,10 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "test": "tsx ./node_modules/@cucumber/cucumber/bin/cucumber.js",
+    "test:unit": "tsx ./node_modules/@cucumber/cucumber/bin/cucumber.js --profile unit",
+    "test:integration": "tsx ./node_modules/@cucumber/cucumber/bin/cucumber.js --profile integration"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
@@ -39,16 +42,20 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@cucumber/cucumber": "^12.9.0",
+    "@types/chai": "^5.2.3",
     "@types/node": "^25.6.2",
     "@types/qs": "^6.15.1",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
+    "chai": "^6.2.2",
     "eslint": "^10.3.0",
     "eslint-config-next": "16.2.6",
     "eslint-config-prettier": "^10.1.8",
     "prettier": "^3.6.2",
     "sass": "^1.99.0",
     "shadcn": "^4.7.0",
+    "tsx": "^4.23.1",
     "typescript": "^6.0.3"
   }
 }

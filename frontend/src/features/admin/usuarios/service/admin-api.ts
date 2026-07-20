@@ -1,4 +1,6 @@
-import { axiosApi, createAxiosConfig, UserDto, userSchema, type AdminUsersListQueryParams } from '@/shared';
+import { axiosApi, createAxiosConfig } from '@/shared/api';
+import { UserDto, userSchema } from '@/shared/auth';
+import type { AdminUsersListQueryParams } from '@/shared/schema';
 import { adminUsersListResponseSchema, type AdminUsersListResponseDto } from './admin-schema';
 
 export async function listAdminUsers(params?: AdminUsersListQueryParams): Promise<AdminUsersListResponseDto> {

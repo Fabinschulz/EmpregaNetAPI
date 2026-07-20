@@ -1,4 +1,4 @@
-import { axiosApi } from '@/shared';
+import { axiosApi } from '@/shared/api';
 import { refreshTokenSchema, userLoggedSchema, type RefreshTokenDto, type UserLoggedDto } from './auth-schema';
 
 /**

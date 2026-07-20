@@ -1,4 +1,4 @@
-import { LIST_ORDER_BY_VALUES, createPaginatedResponseSchema, type JobApplicationsListQueryParams } from '@/shared';
+import { LIST_ORDER_BY_VALUES, createPaginatedResponseSchema, type JobApplicationsListQueryParams } from '@/shared/schema';
 import { z } from 'zod';
 
 export const jobApplicationSchema = z.object({

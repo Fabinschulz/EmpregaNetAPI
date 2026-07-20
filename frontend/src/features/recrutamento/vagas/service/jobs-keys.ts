@@ -1,4 +1,4 @@
-import type { ListQueryParams } from '@/shared';
+import type { ListQueryParams } from '@/shared/schema';
 
 /** Query keys do domínio de vagas (compartilhadas pelo catálogo público e recrutamento). */
 export const jobsKeys = {

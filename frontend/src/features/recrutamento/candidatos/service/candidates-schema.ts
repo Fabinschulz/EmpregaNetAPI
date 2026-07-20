@@ -1,4 +1,5 @@
-import { LIST_ORDER_BY_VALUES, createPaginatedResponseSchema, userSchema, type CandidatesListQueryParams } from '@/shared';
+import { userSchema } from '@/shared/auth';
+import { LIST_ORDER_BY_VALUES, createPaginatedResponseSchema, type CandidatesListQueryParams } from '@/shared/schema';
 import { z } from 'zod';
 
 export const candidatesListResponseSchema = createPaginatedResponseSchema(userSchema);

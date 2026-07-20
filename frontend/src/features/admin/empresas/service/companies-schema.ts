@@ -1,10 +1,5 @@
-import {
-  LIST_ORDER_BY_VALUES,
-  createPaginatedResponseSchema,
-  maskBrazilPhone,
-  onlyDigits,
-  type CompaniesListQueryParams
-} from '@/shared';
+import { LIST_ORDER_BY_VALUES, createPaginatedResponseSchema, type CompaniesListQueryParams } from '@/shared/schema';
+import { maskBrazilPhone, onlyDigits } from '@/utils';
 import { z } from 'zod';
 
 export const TYPE_OF_ACTIVITY_OPTIONS = [
@@ -52,7 +47,7 @@ const UF_VALUE_SET = new Set<string>(UF_OPTIONS.map((o) => o.value));
 export function normalizeUf(input: string | number | null | undefined): string {
   if (input == null) return '';
   if (typeof input === 'number') return UF_ORDER[input] ?? '';
-  const trimmed = input.trim();
+  const trimmed = input.trim().toUpperCase();
   if (UF_VALUE_SET.has(trimmed)) return trimmed;
 
   const asIndex = Number(trimmed);
