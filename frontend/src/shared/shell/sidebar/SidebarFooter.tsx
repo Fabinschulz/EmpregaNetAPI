@@ -2,15 +2,17 @@
 
 import { Button } from '@/components/ui';
 import { PanelLeft, PanelLeftClose } from 'lucide-react';
+import Link from 'next/link';
 import styles from './sidebar.module.scss';
 
 type SidebarFooterProps = {
   collapsed: boolean;
+  isAuthenticated: boolean;
   onToggleCollapsed: () => void;
   onLogout: () => void;
 };
 
-export function SidebarFooter({ collapsed, onToggleCollapsed, onLogout }: SidebarFooterProps) {
+export function SidebarFooter({ collapsed, isAuthenticated, onToggleCollapsed, onLogout }: SidebarFooterProps) {
   return (
     <div className={styles.footer}>
       <div className={styles.footerRailSlot}>
@@ -29,9 +31,15 @@ export function SidebarFooter({ collapsed, onToggleCollapsed, onLogout }: Sideba
           )}
         </Button>
       </div>
-      <Button variant="outline" size="sm" className={styles.logoutBtn} onClick={onLogout}>
-        Sair
-      </Button>
+      {isAuthenticated ? (
+        <Button variant="outline" size="sm" className={styles.logoutBtn} onClick={onLogout}>
+          Sair
+        </Button>
+      ) : (
+        <Button variant="primary" size="sm" className={styles.logoutBtn} asChild>
+          <Link href="/login">Entrar</Link>
+        </Button>
+      )}
     </div>
   );
 }

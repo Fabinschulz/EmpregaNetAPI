@@ -49,6 +49,7 @@ export const axiosApi = {
 /**
  * Config para chamadas autenticadas. A autenticação é feita pelo cookie httpOnly
  * (enviado automaticamente por `withCredentials`) -> não há header Bearer nem token em JS.
+ * obs: o token JWT é armazenado no cookie httpOnly, que não é acessível via JS, mas é enviado automaticamente pelo navegador em requisições para o mesmo domínio.
  */
 export function createAxiosConfig<T>(params?: T) {
   return {

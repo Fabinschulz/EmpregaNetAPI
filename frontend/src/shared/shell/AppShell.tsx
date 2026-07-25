@@ -12,10 +12,20 @@ import { MainHeader } from './main-header';
 import { MobileNav } from './MobileNav';
 import { Sidebar } from './sidebar';
 
+/**
+ * Moldura única da aplicação (sidebar + header + conteúdo), usada tanto nas rotas
+ * autenticadas quanto nas públicas (catálogo de vagas).
+ *
+ * Adapta-se à sessão: sem autenticação, o menu mostra apenas o que é utilizável sem login,
+ * a saudação omite o nome e as ações de conta viram "Entrar".
+ *
+ * Não bloqueia o `children`: ele é renderizado incondicionalmente, então conteúdo vindo de
+ * Server Components continua a ser renderizado no servidor (SSR/SEO preservados).
+ */
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
-  const { roles, logout, username, email } = useAuth();
+  const { roles, logout, username, email, isAuthenticated } = useAuth();
   const { resolvedTheme, setTheme } = useTheme();
   const themeMounted = useHasMounted();
 
@@ -32,7 +42,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   }
 
   const displayName = username?.trim() || email?.trim() || 'Usuário';
-  const navGroups = useAppShellNavigation(roles);
+  const navGroups = useAppShellNavigation(roles, isAuthenticated);
 
   const closeMobile = useCallback(() => setMobileOpen(false), []);
 
@@ -70,6 +80,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         collapsed={railCollapsed}
         mobileOpen={false}
         railTransitioning={railTransitioning}
+        isAuthenticated={isAuthenticated}
         onNavigate={closeMobile}
         onCloseMobile={closeMobile}
         onToggleCollapsed={toggleRailCollapsed}
@@ -80,6 +91,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         open={mobileOpen}
         onOpenChange={setMobileOpen}
         groups={navGroups}
+        isAuthenticated={isAuthenticated}
         onNavigate={closeMobile}
         onLogout={handleLogout}
       />
@@ -90,12 +102,13 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           email={email}
           themeMounted={themeMounted}
           resolvedTheme={resolvedTheme}
+          isAuthenticated={isAuthenticated}
           onToggleTheme={toggleLightDark}
           onOpenMobileMenu={() => setMobileOpen(true)}
           mobileMenuOpen={mobileOpen}
         />
 
-        <main id="conteudo" className={styles.main}>
+        <main id="conteudo" className={styles.main} suppressHydrationWarning>
           {children}
         </main>
       </section>

@@ -14,6 +14,7 @@ type SidebarProps = {
   collapsed: boolean;
   mobileOpen: boolean;
   railTransitioning: boolean;
+  isAuthenticated: boolean;
   onNavigate: () => void;
   onCloseMobile: () => void;
   onToggleCollapsed: () => void;
@@ -27,6 +28,7 @@ export function Sidebar({
   collapsed,
   mobileOpen,
   railTransitioning,
+  isAuthenticated,
   onNavigate,
   onCloseMobile,
   onToggleCollapsed,
@@ -40,7 +42,12 @@ export function Sidebar({
     >
       <SidebarHeader onNavigate={onNavigate} onCloseMobile={onCloseMobile} />
       <SidebarNav groups={groups} collapsed={collapsed} transitioning={railTransitioning} onNavigate={onNavigate} />
-      <SidebarFooter collapsed={collapsed} onToggleCollapsed={onToggleCollapsed} onLogout={onLogout} />
+      <SidebarFooter
+        collapsed={collapsed}
+        isAuthenticated={isAuthenticated}
+        onToggleCollapsed={onToggleCollapsed}
+        onLogout={onLogout}
+      />
     </aside>
   );
 }

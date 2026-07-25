@@ -1,6 +1,7 @@
 'use client';
 
 import { Button } from '@/components/ui';
+import { useHasMounted } from '@/hooks';
 import { Menu, Moon, Sun } from 'lucide-react';
 import Link from 'next/link';
 import { UserAvatar } from '../user-avatar';
@@ -12,6 +13,7 @@ type MainHeaderProps = {
   email: string | null;
   themeMounted: boolean;
   resolvedTheme: string | undefined;
+  isAuthenticated: boolean;
   onToggleTheme: () => void;
   onOpenMobileMenu: () => void;
   mobileMenuOpen: boolean;
@@ -22,12 +24,14 @@ export function MainHeader({
   email,
   themeMounted,
   resolvedTheme,
+  isAuthenticated,
   onToggleTheme,
   onOpenMobileMenu,
   mobileMenuOpen
 }: MainHeaderProps) {
-  const name = firstName(displayName);
-  const { weekday, day, month, year } = formatGreetingDateParts();
+  const name = isAuthenticated ? firstName(displayName) : undefined;
+  const mounted = useHasMounted();
+  const date = mounted ? formatGreetingDateParts() : null;
   const profileTitle = email?.trim() || displayName;
 
   return (
@@ -46,7 +50,7 @@ export function MainHeader({
           <Menu className={styles.headerIcon} aria-hidden />
         </Button>
 
-        <p className={styles.greeting}>
+        <p className={styles.greeting} suppressHydrationWarning>
           Olá
           {name ? (
             <>
@@ -54,10 +58,14 @@ export function MainHeader({
               <span className={styles.accent}>{name}</span>
             </>
           ) : null}
-          , hoje é {weekday},{' '}
-          <span className={styles.accent}>
-            {day} de {month} de {year}
-          </span>
+          {date ? (
+            <>
+              , hoje é {date.weekday},{' '}
+              <span className={styles.accent}>
+                {date.day} de {date.month} de {date.year}
+              </span>
+            </>
+          ) : null}
         </p>
       </div>
 
@@ -82,10 +90,16 @@ export function MainHeader({
           )}
         </Button>
 
-        <Link href="/conta/perfil" className={styles.avatarLink} title={profileTitle}>
-          <UserAvatar name={displayName} />
-          <span className="sr-only">Conta e perfil de {displayName}</span>
-        </Link>
+        {isAuthenticated ? (
+          <Link href="/conta/perfil" className={styles.avatarLink} title={profileTitle}>
+            <UserAvatar name={displayName} />
+            <span className="sr-only">Conta e perfil de {displayName}</span>
+          </Link>
+        ) : (
+          <Button variant="primary" size="sm" asChild>
+            <Link href="/login">Entrar</Link>
+          </Button>
+        )}
       </div>
     </header>
   );

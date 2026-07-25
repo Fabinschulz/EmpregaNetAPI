@@ -26,17 +26,17 @@ export type ShellNavGroup = {
   items: ShellNavItem[];
 };
 
-export function useAppShellNavigation(roles: string[]) {
+export function useAppShellNavigation(roles: string[], isAuthenticated: boolean) {
   return useMemo(() => {
     const principal: ShellNavItem[] = [
-      { href: '/dashboard', label: 'Painel', icon: LayoutDashboard, visible: true },
+      { href: '/dashboard', label: 'Painel', icon: LayoutDashboard, visible: isAuthenticated },
       { href: '/vagas', label: 'Vagas', icon: Briefcase, visible: true },
-      { href: '/candidaturas', label: 'Minhas candidaturas', icon: FileText, visible: true },
+      { href: '/candidaturas', label: 'Minhas candidaturas', icon: FileText, visible: isAuthenticated },
       {
         href: '/conta/perfil',
         label: 'Conta',
         icon: UserCircle,
-        visible: true,
+        visible: isAuthenticated,
         children: [
           { href: '/conta/perfil', label: 'Perfil', visible: true },
           { href: '/conta/seguranca', label: 'Segurança', visible: true }
@@ -71,5 +71,5 @@ export function useAppShellNavigation(roles: string[]) {
     }
 
     return groups;
-  }, [roles]);
+  }, [roles, isAuthenticated]);
 }

@@ -23,7 +23,7 @@ export type TableFiltersProps = {
  */
 export function TableFilters({ title, description, actions, children, className }: TableFiltersProps) {
   return (
-    <section className={cn(styles.root, className)} aria-label={title}>
+    <section className={cn(styles.root, className)} aria-label={title} suppressHydrationWarning>
       <header className={styles.header}>
         <div>
           <h2 className={styles.title}>{title}</h2>

@@ -13,6 +13,7 @@ type MobileNavProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   groups: ShellNavGroup[];
+  isAuthenticated: boolean;
   onNavigate: () => void;
   onLogout: () => void;
 };
@@ -22,7 +23,7 @@ type MobileNavProps = {
  * `aria-modal`, focus-trap, fecha no Escape e no clique fora, e devolve o foco
  * ao botão que o abriu. Reaproveita o visual do sidebar existente.
  */
-export function MobileNav({ open, onOpenChange, groups, onNavigate, onLogout }: MobileNavProps) {
+export function MobileNav({ open, onOpenChange, groups, isAuthenticated, onNavigate, onLogout }: MobileNavProps) {
   const close = () => onOpenChange(false);
 
   return (
@@ -39,7 +40,12 @@ export function MobileNav({ open, onOpenChange, groups, onNavigate, onLogout }: 
             transitioning={false}
             onNavigate={onNavigate}
           />
-          <SidebarFooter collapsed={false} onToggleCollapsed={close} onLogout={onLogout} />
+          <SidebarFooter
+            collapsed={false}
+            isAuthenticated={isAuthenticated}
+            onToggleCollapsed={close}
+            onLogout={onLogout}
+          />
         </Dialog.Content>
       </Dialog.Portal>
     </Dialog.Root>
