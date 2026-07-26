@@ -2,6 +2,7 @@ export * from './atoms/badge';
 export * from './atoms/button';
 export * from './atoms/label';
 export * from './atoms/skeleton';
+export * from './atoms/spinner';
 export * from './molecules/alert';
 export * from './molecules/alert-dialog';
 export * from './molecules/command';

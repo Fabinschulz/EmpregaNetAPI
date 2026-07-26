@@ -12,7 +12,7 @@ type DetailPageSkeletonProps = {
 export function DetailPageSkeleton({ bodyLines = 4 }: DetailPageSkeletonProps) {
   return (
     <div className={styles.wrap} role="status" aria-live="polite" aria-busy="true">
-      <span className="sr-only">A carregar conteúdo…</span>
+      <span className="sr-only">Carregando conteúdo…</span>
       <Skeleton className={styles.title} />
       {Array.from({ length: bodyLines }, (_, i) => (
         <Skeleton key={i} className={i === bodyLines - 1 ? styles.lineShort : styles.line} />

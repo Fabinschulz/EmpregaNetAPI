@@ -1,0 +1,33 @@
+.root {
+  min-height: 40vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 24px;
+  color: var(--muted);
+  font-family: var(--font-sans);
+
+  // Evita o "flash" de loading: em cargas rápidas (< 250ms) o indicador nunca chega a
+  // ser visto. `backwards` aplica opacidade 0 durante o atraso, antes da animação começar.
+  animation: loading-state-fade-in 0.2s ease 0.25s backwards;
+}
+
+.fullscreen {
+  min-height: 100vh;
+}
+
+.label {
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+@keyframes loading-state-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

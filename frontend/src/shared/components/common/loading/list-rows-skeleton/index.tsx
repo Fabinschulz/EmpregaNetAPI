@@ -11,7 +11,7 @@ type ListRowsSkeletonProps = {
 export function ListRowsSkeleton({ rows = 5 }: ListRowsSkeletonProps) {
   return (
     <div className={styles.wrap} role="status" aria-live="polite" aria-busy="true">
-      <span className="sr-only">A carregar conteúdo…</span>
+      <span className="sr-only">Carregando conteúdo…</span>
       {Array.from({ length: rows }, (_, i) => (
         <div key={i} className={styles.row}>
           <div className={styles.col}>

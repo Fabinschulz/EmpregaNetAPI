@@ -12,7 +12,7 @@ type FormFieldsSkeletonProps = {
 export function FormFieldsSkeleton({ fields = 5 }: FormFieldsSkeletonProps) {
   return (
     <div className={styles.wrap} role="status" aria-live="polite" aria-busy="true">
-      <span className="sr-only">A carregar conteúdo…</span>
+      <span className="sr-only">Carregando conteúdo…</span>
       {Array.from({ length: fields }, (_, i) => (
         <Skeleton key={i} className={clsx(styles.field, i === 0 ? styles.mid : styles.wide)} />
       ))}

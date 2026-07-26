@@ -1,0 +1,55 @@
+.root {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.ring {
+  display: block;
+  width: var(--spinner-size);
+  height: var(--spinner-size);
+  border-radius: 50%;
+  border: var(--spinner-thickness) solid color-mix(in srgb, currentColor 22%, transparent);
+  border-top-color: currentColor;
+  animation: spinner-rotate 0.8s linear infinite;
+}
+
+.sm {
+  --spinner-size: 16px;
+  --spinner-thickness: 2px;
+}
+
+.md {
+  --spinner-size: 24px;
+  --spinner-thickness: 2.5px;
+}
+
+.lg {
+  --spinner-size: 36px;
+  --spinner-thickness: 3px;
+}
+
+@keyframes spinner-rotate {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// Sem rotação para quem pede menos movimento. Em vez de congelar o anel (que pareceria
+// quebrado), pulsa a opacidade — ainda comunica "em andamento", sem movimento vestibular.
+@media (prefers-reduced-motion: reduce) {
+  .ring {
+    animation: spinner-pulse 1.4s ease-in-out infinite;
+  }
+
+  @keyframes spinner-pulse {
+    0%,
+    100% {
+      opacity: 0.35;
+    }
+    50% {
+      opacity: 1;
+    }
+  }
+}

@@ -55,8 +55,8 @@ A mudança **quebra compatibilidade** com .NET >=10, contratos HTTP, Zod ou API 
 | Área | Convenções |
 | ---- | ---------- |
 | **Backend** | Domain → Application → Infra → Api; xUnit + FluentAssertions + Moq |
-| **Frontend** | Next.js App Router, React 19, TypeScript, **SCSS modules** (sem Tailwind); Zod em `src/services/` |
-| **Auth** | JWT + cookies HttpOnly (API) + cookie legível pelo proxy (`empreganet_access_token`); `AuthProvider` único em `AppProviders` |
+| **Frontend** | Next.js 16 App Router (`cacheComponents`), React 19, TypeScript, **SCSS modules** (sem Tailwind); Zod no `service/` de cada feature (`src/features/<domínio>/service/`) |
+| **Auth** | JWT em cookie **httpOnly** `access_token` (nenhum token em JS); proxy (`src/proxy.ts`) e guard cliente partilham `evaluateRouteAccess`; `AuthProvider` único em `AppProviders` |
 
 ### C# / .NET (quando relevante)
 

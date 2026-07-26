@@ -11,9 +11,23 @@ Ao revisar, no entanto, o Identity já implementa uma proteção de brute-force 
 Ter as duas políticas ao mesmo tempo (rate limit dedicado de auth + lockout do Identity) duplicava a responsabilidade de "proteger contra tentativas repetidas de login" em duas camadas com configuração própria, sem ganho real de segurança.
 
 ## Decisão
-- Existe **uma única política de rate limit** (`FixedWindowPolicy`), particionada por IP (`RateLimitPartition.GetFixedWindowLimiter` usando `Connection.RemoteIpAddress`), aplicada a todos os endpoints via `RequireRateLimiting` global — sem atributos `[EnableRateLimiting]` espalhados pelos controllers.
-- Limite atual: 5 requisições / 10 segundos por IP (configurável em `RateLimiting:PermitLimit`/`WindowInSeconds` no appsettings, sem necessidade de recompilar).
+- Existe **uma única política de rate limit** (`GlobalPolicy`), aplicada a todos os endpoints via `RequireRateLimiting` global — sem atributos `[EnableRateLimiting]` espalhados pelos controllers.
 - A proteção contra brute-force de senha continua sendo responsabilidade do **lockout do Identity** (por conta, não por IP).
+
+### Revisão 2026-07-25 — token bucket e partição por utilizador
+
+O limite original (janela fixa, 5 req/10s por IP) causou **incidente em produção**: 429 em uso legítimo em todas as telas, exatamente o risco antecipado na secção "Consequências". Reproduzido com 15 requisições paralelas → 5×200 seguidas de 10×429.
+
+Alterações:
+
+| Antes | Agora | Porquê |
+| ----- | ----- | ------ |
+| Janela fixa | **Token bucket** (`BurstCapacity` + `SustainedPerPeriod`) | A janela fixa não distingue pico legítimo (uma tela que dispara várias chamadas ao carregar) de abuso (taxa sustentada). O balde absorve o pico e limita a taxa. |
+| Partição só por IP | **Utilizador autenticado quando há sessão, IP como fallback** | Só por IP, utilizadores atrás do mesmo NAT partilham balde e derrubam-se entre si. |
+| 5 req / 10 s | 120 de pico + 60/10 s sustentado (240/120 em Dev) | Ordem de grandeza compatível com uso real. |
+| Sem isenção | `RateLimiting:BypassIps` | O SSR do Next.js busca dados a partir do **servidor**: todo esse tráfego chega de um único IP e esgotaria o balde sozinho. |
+| — | `RateLimiting:Enabled` | Válvula de escape para desligar em incidente sem recompilar. |
+
 
 ## Consequências
 

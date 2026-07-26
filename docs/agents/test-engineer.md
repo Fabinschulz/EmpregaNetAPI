@@ -42,7 +42,8 @@ Se requisitos ou stack sob teste forem ambíguos, pergunte só o que bloqueia es
 
 ## Frontend
 
-- **Libraries**: família Testing Library (React Testing Library ou equivalente da stack).
+- **Libraries**: **Cucumber (BDD)** em `frontend/tests/` — `specs/` (`.feature`) + `steps/` + `support/`; perfis `pnpm test:unit` e `pnpm test:integration`. **Testing Library, Jest, Cypress e Playwright não estão instalados** — não presuma que existem; propor a adição é decisão explícita.
+- **Foco atual**: lógica pura de alto risco (schemas Zod e mappers, controlo de acesso a rotas, máscaras/normalizações) e fluxos de formulário validação → payload.
 - **Teste como usuário**: interações e resultados visíveis; **não** faça asserts em hooks internos, estado privado ou internals de componentes salvo se a tarefa exigir um contrato técnico muito estreito.
 - **Mocks**: limite a **APIs externas** e fronteiras que o ambiente de teste não controla.
 

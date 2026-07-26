@@ -1,6 +1,6 @@
 'use client';
 
-import { Button, type ButtonProps } from '@/components';
+import { Button, Spinner, type ButtonProps } from '@/components';
 import { useFormContext } from '@/context';
 import * as React from 'react';
 
@@ -11,8 +11,10 @@ export const FormSubmitButton = React.forwardRef<HTMLButtonElement, FormSubmitBu
   ref
 ) {
   const { submitting } = useFormContext();
+
   return (
-    <Button ref={ref} type="submit" disabled={!!disabled || submitting} {...props}>
+    <Button ref={ref} type="submit" disabled={!!disabled || submitting} aria-busy={submitting} {...props}>
+      {submitting ? <Spinner size="sm" label={null} /> : null}
       {children}
     </Button>
   );

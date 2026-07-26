@@ -29,12 +29,14 @@ Você é um engenheiro de frontend sênior. Seu trabalho é entregar **UI clara 
 
 ### EmpregaNet (frontend/)
 
-- **Arquitetura**: Pastas por feature; separação entre UI, lógica de aplicação e `src/services/` (API + Zod por domínio).
-- **Auth e RBAC**: Middleware/proxy Next.js para rotas protegidas; capacidades centralizadas (evitar strings mágicas espalhadas); menus/ações conforme papéis.
-- **API**: Cliente HTTP centralizado (p.ex. axios); validar respostas na fronteira com Zod quando aplicável.
-- **Real-time**: SSE apenas quando o produto exigir push; hook/serviço com backoff, reconexão e erro visível.
-- **UI**: Radix/ShadCN **adaptado a SCSS** (módulos `.module.scss`); **não** introduzir Tailwind.
-- **Forms**: React Hook Form + resolvers Zod alinhados ao projeto.
+- **Arquitetura**: Pastas por feature. O service (API + Zod + queries + keys) vive na feature dona, em `src/features/<domínio>/service/` — **`src/services/` não existe mais**. Infra transversal em `src/shared/api` (axios) e `src/shared/auth` (sessão).
+- **Renderização**: Next 16 com `cacheComponents: true`. Padrão é Client + React Query; Server Component só onde há SEO (rotas públicas em `(public)`, sem `RouteAccessGuard` — é o guard, não o `AppShell`, que bloqueia o SSR). `<Suspense>` sempre **acima** do shell cliente. Nada de `new Date()` no prerender. Detalhes e armadilhas: [`docs/skills/frontend-skill/SKILL.md`](../skills/frontend-skill/SKILL.md) §5.1.
+- **Auth e RBAC**: Proxy Next.js (`src/proxy.ts`) + guard no cliente compartilham a **mesma** política (`evaluateRouteAccess`); menus/ações conforme papéis. Backend continua sendo a fonte de verdade.
+- **API**: Cliente HTTP centralizado (axios); validar respostas **e** payloads de saída com Zod na fronteira.
+- **UI**: Radix/ShadCN **adaptado a SCSS** (módulos `.module.scss`); **não** introduzir Tailwind. Shell único (`src/shared/shell/AppShell`) para rotas públicas e autenticadas.
+- **Loading**: usar os componentes canónicos — skeletons quando a forma é conhecida, `LoadingState` para espera indeterminada, `Spinner` embutido, `FormSubmitButton` em submissões. Não criar indicadores ad-hoc.
+- **Forms**: React Hook Form + resolvers Zod via `FormProvider` do projeto.
+- **Idioma**: copy em **pt-BR**, incluindo textos `sr-only` e mensagens de erro.
 
 ## Output
 
