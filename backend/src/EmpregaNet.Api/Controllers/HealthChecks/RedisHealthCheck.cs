@@ -22,12 +22,6 @@ public sealed class RedisHealthCheck : IHealthCheck
         {
             var latency = await _redis.GetDatabase().PingAsync();
 
-            if (latency == TimeSpan.Zero)
-            {
-                _logger.LogWarning("Redis respondeu com latência zero.");
-                return HealthCheckResult.Unhealthy("Redis indisponível.");
-            }
-
             return HealthCheckResult.Healthy($"Redis disponível (latência {latency.TotalMilliseconds:F0} ms).");
         }
         catch (Exception ex)

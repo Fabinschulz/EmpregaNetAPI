@@ -52,8 +52,8 @@ public static class DependencyInjection
                     await next.Invoke();
                 });
 
-        app.MapControllers()
-           .RequireRateLimiting(RateLimit.PolicyName);
+
+        app.MapControllers();
         app.MapHealthChecks("/health");
         // app.MapIdentityApi<Usuario>();
 

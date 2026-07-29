@@ -1,40 +1,36 @@
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using EmpregaNet.Infra.Persistence.Database;
-using Microsoft.EntityFrameworkCore;
+
 
 public class DatabaseCheck : IHealthCheck
 {
-    
     private readonly PostgreSqlContext _context;
     private readonly ILogger<DatabaseCheck> _logger;
 
-    public DatabaseCheck(PostgreSqlContext context, ILogger<DatabaseCheck> logger)        
+    public DatabaseCheck(PostgreSqlContext context, ILogger<DatabaseCheck> logger)
     {
         _context = context;
         _logger = logger;
-    }    
-    
-    public Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default)
-    {  
-        _logger.LogDebug("starting healthcheck");
+    }
+
+    public async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default)
+    {
         try
         {
-            var connection = _context.Database.GetDbConnection();
-            if (connection.State == System.Data.ConnectionState.Open)
+            var canConnect = await _context.Database.CanConnectAsync(cancellationToken);
+
+            if (canConnect)
             {
-                _logger.LogDebug("healthcheck success");
-                return Task.FromResult(HealthCheckResult.Healthy("Database is running"));
+                return HealthCheckResult.Healthy("Banco de dados acessível.");
             }
-            else
-            {
-                _logger.LogCritical("Database not running");
-                return Task.FromResult(HealthCheckResult.Unhealthy("Database is not running"));
-            }
+
+            _logger.LogCritical("Health check: banco de dados inacessível.");
+            return HealthCheckResult.Unhealthy("Banco de dados inacessível.");
         }
         catch (Exception ex)
         {
-            _logger.LogCritical($"Database not running: {ex.Message}");
-            return Task.FromResult(HealthCheckResult.Unhealthy("Database is not running"));
+            _logger.LogCritical(ex, "Health check: falha ao conectar no banco de dados.");
+            return HealthCheckResult.Unhealthy("Banco de dados inacessível.", ex);
         }
     }
 }

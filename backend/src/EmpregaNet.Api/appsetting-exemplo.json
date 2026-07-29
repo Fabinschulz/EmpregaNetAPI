@@ -1,9 +1,9 @@
 {
+  "ASPNETCORE_ENVIRONMENT": "Development",
   "Logging": {
     "LogLevel": {
-      "Default": "Information",
-      "Microsoft.AspNetCore": "Warning",
-      "Microsoft.EntityFrameworkCore": "Warning"
+      "Default": "Debug",
+      "Microsoft.AspNetCore": "Information"
     }
   },
   "ConnectionStrings": {
@@ -17,10 +17,13 @@
     "RefreshTokenExpirationDays": 14
   },
   "AppUrls": {
-    "PublicAppBaseUrl": "https://localhost:3000",
+    "PublicAppBaseUrl": "http://localhost:3000",
     "PasswordResetPath": "/reset-password",
     "EmailConfirmationPath": "/confirm-email",
-    "CorsAllowedOrigins": ["http://localhost:3000", "https://localhost:3000"]
+    "CorsAllowedOrigins": [
+      "http://localhost:3000",
+      "https://localhost:3000"
+    ]
   },
   "GoogleAuth": {
     "ClientIds": []
@@ -41,9 +44,16 @@
     "AdminPassword": ""
   },
   "RateLimiting": {
-    "PermitLimit": 5,
-    "WindowInSeconds": 10,
-    "QueueLimit": 0
+    "Enabled": true,
+    "BurstCapacity": 240,
+    "SustainedPerPeriod": 120,
+    "ReplenishmentPeriodInSeconds": 10,
+    "QueueLimit": 0,
+    "BypassIps": [],
+    "ExemptPaths": [ "/health" ],
+    "MaxTrackedPartitions": 20000,
+    "IdleEvictionAfterSeconds": 600,
+    "EvictionSweepIntervalSeconds": 60
   },
   "EmailThrottle": {
     "MaxPerDay": 5

@@ -21,8 +21,8 @@ jobs:
 
   deploy-ec2:
     needs: docker-ecr
-    if: github.ref == 'refs/heads/main'
-    uses: ./.github/workflows/deploy-ec2.yml
+    if: github.ref == 'refs/heads/master'
+    uses: ./.github/workflows/ec2.yml
     with:
       image_uri: ${{ needs.docker-ecr.outputs.image_uri }}
       ecr_registry: ${{ needs.docker-ecr.outputs.ecr_registry }}

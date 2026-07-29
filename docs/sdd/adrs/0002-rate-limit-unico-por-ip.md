@@ -11,7 +11,7 @@ Ao revisar, no entanto, o Identity já implementa uma proteção de brute-force 
 Ter as duas políticas ao mesmo tempo (rate limit dedicado de auth + lockout do Identity) duplicava a responsabilidade de "proteger contra tentativas repetidas de login" em duas camadas com configuração própria, sem ganho real de segurança.
 
 ## Decisão
-- Existe **uma única política de rate limit** (`GlobalPolicy`), aplicada a todos os endpoints via `RequireRateLimiting` global — sem atributos `[EnableRateLimiting]` espalhados pelos controllers.
+- Existe **uma única política de rate limit**, aplicada a **toda** requisição via `RateLimiterOptions.GlobalLimiter` — sem atributos `[EnableRateLimiting]`/`RequireRateLimiting` espalhados pelos controllers.
 - A proteção contra brute-force de senha continua sendo responsabilidade do **lockout do Identity** (por conta, não por IP).
 
 ### Revisão 2026-07-25 — token bucket e partição por utilizador
@@ -28,6 +28,26 @@ Alterações:
 | Sem isenção | `RateLimiting:BypassIps` | O SSR do Next.js busca dados a partir do **servidor**: todo esse tráfego chega de um único IP e esgotaria o balde sozinho. |
 | — | `RateLimiting:Enabled` | Válvula de escape para desligar em incidente sem recompilar. |
 
+### Revisão 2026-07-26 — tabela de baldes limitada e auto-limpa
+
+Ao avaliar se o desenho acima já bastava, identificou-se um segundo furo: o mecanismo padrão do ASP.NET Core para políticas particionadas (`AddPolicy` + `RateLimitPartition.Get*`) cria um `RateLimiter` por chave de partição e **guarda para sempre** — confirmado inspecionando a documentação e o binário dos pacotes `System.Threading.RateLimiting`/`Microsoft.AspNetCore.RateLimiting` instalados localmente: não existe nenhuma API de limpeza ou teto de tamanho. Cada balde criado (um por IP/utilizador) mantém, além do próprio objeto, um timer de reposição (`AutoReplenishment`) rodando **indefinidamente**, mesmo após a origem parar de mandar tráfego.
+
+Isso torna a própria proteção um vetor de exaustão: uma origem que varia a identidade a cada requisição (rotação de IP, IPv6, ou simplesmente tráfego orgânico disperso da internet) faz a tabela crescer sem fim.
+
+**Correção:** substituição do `AddPolicy` (partitioner-based, cache interno do framework) por um `PartitionedRateLimiter<HttpContext>` próprio (`BoundedEvictingRateLimiter`, em `RateLimiterExtensions.cs`), atribuído via `GlobalLimiter`, com:
+
+1. **Limpeza por ociosidade** — varredura periódica (`EvictionSweepIntervalSeconds`) remove e descarta baldes cheios (sem pedidos) há mais de `IdleEvictionAfterSeconds`; usa a propriedade `IdleDuration` exposta pela própria `RateLimiter` para esse fim.
+2. **Teto rígido** (`MaxTrackedPartitions`) — acima do teto, identidades novas caem num balde agregado de excedente (10× a capacidade individual) em vez de ganharem balde próprio, travando o crescimento mesmo dentro da janela de uma única varredura.
+3. **Isenções sem estado** (`ExemptPaths`, padrão `["/health"]`) — health checks nunca entram na tabela nem são limitados; um orquestrador/monitor não deve jamais receber 429 de uma sonda de saúde.
+4. **Recriação segura** — a corrida rara entre uma requisição e a varredura de limpeza (balde descartado entre resolver a referência e usá-la) é tratada com `catch (ObjectDisposedException)` + recriação e nova tentativa única, tanto no caminho síncrono quanto no assíncrono.
+
+Como o `GlobalLimiter` aplica-se incondicionalmente, deixou de ser necessário `RequireRateLimiting(...)` em `MapControllers()` — removido.
+
+**Verificado (não apenas por leitura de código):**
+- Rajada de 400 requisições → mistura de `200`/`429` preservada (comportamento correto mantido após o refactor).
+- `/health` sob rajada de 30 requisições → nunca retornou `429` (isenção funcionando).
+- Ciclo completo de varredura de limpeza (thresholds reduzidos via variável de ambiente só para o teste) executado sob carga real → sem exceções, sem 500, capacidade plena disponível depois.
+- **Não verificado por teste de carga real:** o caminho do teto (`MaxTrackedPartitions`) exigiria milhares de identidades de origem distintas, impraticável a partir de uma única máquina de desenvolvimento sem enfraquecer a config de `ForwardedHeaders` — validado por revisão de código, não por execução.
 
 ## Consequências
 
