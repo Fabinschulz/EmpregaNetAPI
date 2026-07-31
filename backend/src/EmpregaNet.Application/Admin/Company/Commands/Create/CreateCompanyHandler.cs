@@ -47,6 +47,24 @@ public sealed class CreateCompanyCommandHandler : IRequestHandler<CreateCommand<
                 DomainErrorEnum.RESOURCE_ALREADY_EXISTS);
         }
 
+        var companyName = request.entity.CompanyName.Trim();
+        if (await _companyRepository.ExistsByNameAsync(companyName))
+        {
+            throw new ValidationAppException(
+                nameof(request.entity.CompanyName),
+                $"Já existe uma empresa registrada com o nome '{companyName}'.",
+                DomainErrorEnum.RESOURCE_ALREADY_EXISTS);
+        }
+
+        var email = request.entity.Email.Trim();
+        if (await _companyRepository.ExistsByEmailAsync(email))
+        {
+            throw new ValidationAppException(
+                nameof(request.entity.Email),
+                $"Já existe uma empresa registrada com o e-mail '{email}'.",
+                DomainErrorEnum.RESOURCE_ALREADY_EXISTS);
+        }
+
         var company = CompanyFactory.Create(request.entity);
         var createdCompanyId = await _companyRepository.CreateAsync(company, cancellationToken);
 

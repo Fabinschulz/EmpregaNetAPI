@@ -1,24 +1,24 @@
 'use client';
 
 import {
-  ApiQueryBoundary,
-  PageHeader,
-  StatusBadge,
-  TableContainer,
-  TableFilters,
-  type DataTableColumn
+    ApiQueryBoundary,
+    PageHeader,
+    StatusBadge,
+    TableContainer,
+    TableFilters,
+    type DataTableColumn
 } from '@/components';
 import { FormProvider } from '@/context';
 import { usePersistedTablePagination } from '@/hooks';
 import type { UserDto } from '@/shared';
-import { userTypeLabel, type AdminUsersListQueryParams } from '@/shared';
+import { formatDate, userTypeLabel, type AdminUsersListQueryParams } from '@/shared';
 import { Eye } from 'lucide-react';
 import { useCallback, useMemo, useState } from 'react';
 import {
-  adminUsersFilterFormSchema,
-  adminUsersFilterToParams,
-  defaultAdminUsersFilter,
-  useAdminUsersListQuery
+    adminUsersFilterFormSchema,
+    adminUsersFilterToParams,
+    defaultAdminUsersFilter,
+    useAdminUsersListQuery
 } from '../service';
 import { AdminUsersFilterFields } from './admin-users-filter-fields';
 
@@ -35,6 +35,7 @@ const USERS_COLUMNS: DataTableColumn<UserDto>[] = [
       <StatusBadge label={user.isDeleted ? 'Excluído' : 'Ativo'} tone={user.isDeleted ? 'negative' : 'positive'} />
     )
   },
+  { key: 'createdAt', header: 'Criado em', render: (user) => formatDate(user.createdAt) },
   {
     key: 'actions',
     type: 'actions',

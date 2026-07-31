@@ -2,8 +2,8 @@
 
 import { Alert, PageHeader } from '@/components';
 import { FormProvider } from '@/context';
-import { companyFormSchema, defaultFormCompany, useCreateCompanyMutation, type CompanyFormValues } from '../service';
 import { CompanyFormFields } from '../form';
+import { companyFormSchema, defaultFormCompany, useCreateCompanyMutation, type CompanyFormValues } from '../service';
 
 export function AdminNewCompanyPage() {
   const { apiError, mutateAsync } = useCreateCompanyMutation();
@@ -13,7 +13,7 @@ export function AdminNewCompanyPage() {
     <div>
       <PageHeader title="Nova empresa" description="Cadastre uma nova empresa parceira." />
       {apiError ? (
-        <Alert variant="destructive" title="Erro">
+        <Alert variant="destructive" title="Erro" className="my-4">
           {apiError}
         </Alert>
       ) : null}

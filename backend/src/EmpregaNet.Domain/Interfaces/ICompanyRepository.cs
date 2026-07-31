@@ -30,4 +30,18 @@ public interface ICompanyRepository : IBaseRepository<Company>
     /// <returns>True se a empresa existir, caso contrário false.</returns>
     Task<bool> ExistsByCnpjAsync(string cnpj);
 
+    /// <summary>
+    /// Verifica se já existe empresa com o mesmo nome.
+    /// </summary>
+    /// <param name="companyName">Nome da empresa.</param>
+    /// <param name="ignoreId">Id a desconsiderar (a própria empresa, ao atualizar).</param>
+    Task<bool> ExistsByNameAsync(string companyName, long? ignoreId = null);
+
+    /// <summary>
+    /// Verifica se já existe empresa com o mesmo e-mail.
+    /// </summary>
+    /// <param name="email">E-mail da empresa.</param>
+    /// <param name="ignoreId">Id a desconsiderar (a própria empresa, ao atualizar).</param>
+    Task<bool> ExistsByEmailAsync(string email, long? ignoreId = null);
+
 }

@@ -5,10 +5,6 @@ description: >-
   Zod e React Hook Form, service por feature, auth/RBAC, Server vs Client Components (cacheComponents),
   estados de carregamento canónicos e testes BDD com Cucumber.
   Use ao criar ou alterar UI, hooks, cliente HTTP, fluxos ou acessibilidade no monorepo frontend.
-author: EmpregaNet
-version: 2.1.0
-date: 2026-07-25
-status: Approved
 ---
 
 # Frontend (Next.js — monorepo EmpregaNet)

@@ -62,4 +62,18 @@ public class CompanyRepository : BaseRepository<Company>, ICompanyRepository
                              .AsNoTracking()
                              .AnyAsync(c => c.RegistrationNumber == cnpj);
     }
+
+    public async Task<bool> ExistsByNameAsync(string companyName, long? ignoreId = null)
+    {
+        return await _context.Companies
+                             .AsNoTracking()
+                             .AnyAsync(c => c.CompanyName == companyName && (ignoreId == null || c.Id != ignoreId));
+    }
+
+    public async Task<bool> ExistsByEmailAsync(string email, long? ignoreId = null)
+    {
+        return await _context.Companies
+                             .AsNoTracking()
+                             .AnyAsync(c => c.Email == email && (ignoreId == null || c.Id != ignoreId));
+    }
 }

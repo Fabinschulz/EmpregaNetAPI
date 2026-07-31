@@ -3,14 +3,14 @@
 import { ApiQueryBoundary, PageHeader, TableContainer, TableFilters, type DataTableColumn } from '@/components';
 import { FormProvider } from '@/context';
 import { usePersistedTablePagination } from '@/hooks';
-import type { CandidatesListQueryParams, UserDto } from '@/shared';
+import { formatDate, type CandidatesListQueryParams, type UserDto } from '@/shared';
 import { Eye } from 'lucide-react';
 import { useCallback, useMemo, useState } from 'react';
 import {
-  candidatesFilterFormSchema,
-  candidatesFilterToParams,
-  defaultCandidatesFilter,
-  useCandidatesListQuery
+    candidatesFilterFormSchema,
+    candidatesFilterToParams,
+    defaultCandidatesFilter,
+    useCandidatesListQuery
 } from '../service';
 import { CandidatesFilterFields } from './candidates-filter-fields';
 
@@ -19,6 +19,7 @@ type CandidatesFilterParams = Pick<CandidatesListQueryParams, 'search' | 'orderB
 const CANDIDATES_COLUMNS: DataTableColumn<UserDto>[] = [
   { key: 'username', header: 'Candidato', render: (candidate) => <strong>{candidate.username}</strong> },
   { key: 'email', header: 'E-mail', render: (candidate) => candidate.email },
+  { key: 'createdAt', header: 'Cadastrado em', render: (candidate) => formatDate(candidate.createdAt) },
   {
     key: 'actions',
     type: 'actions',

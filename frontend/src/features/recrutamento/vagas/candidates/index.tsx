@@ -1,38 +1,39 @@
 'use client';
 
 import {
-  ApiQueryBoundary,
-  Button,
-  ConfirmDialog,
-  PageHeader,
-  TableContainer,
-  TableFilters,
-  type DataTableColumn,
-  type RowAction
+    ApiQueryBoundary,
+    Button,
+    ConfirmDialog,
+    PageHeader,
+    TableContainer,
+    TableFilters,
+    type DataTableColumn,
+    type RowAction
 } from '@/components';
 import { FormProvider } from '@/context';
 import { ApplicationStatusBadge } from '@/features/candidaturas/application-status-badge';
-import { usePersistedTablePagination } from '@/hooks';
 import {
-  applicationStatusTransitions,
-  applicationTransitionLabels,
-  parseApplicationStatus,
-  useApplicationsByJobQuery,
-  useChangeApplicationStatusMutation,
-  useDeleteApplicationMutation,
-  type ApplicationStatus,
-  type JobApplicationDto
+    applicationStatusTransitions,
+    applicationTransitionLabels,
+    parseApplicationStatus,
+    useApplicationsByJobQuery,
+    useChangeApplicationStatusMutation,
+    useDeleteApplicationMutation,
+    type ApplicationStatus,
+    type JobApplicationDto
 } from '@/features/candidaturas/service';
-import { useJobQuery } from '../service';
+import { usePersistedTablePagination } from '@/hooks';
+import { formatDate } from '@/shared';
 import { Ban, CheckCircle2, Flag, Pencil, PlayCircle, RotateCcw, Trash2, XCircle, type LucideIcon } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useMemo, useState } from 'react';
+import { useJobQuery } from '../service';
 import {
-  CandidatesFilterFields,
-  candidatesFilterSchema,
-  defaultCandidatesFilter,
-  type CandidatesFilterParams
+    CandidatesFilterFields,
+    candidatesFilterSchema,
+    defaultCandidatesFilter,
+    type CandidatesFilterParams
 } from './candidates-filter-fields';
 import styles from './candidates.module.scss';
 
@@ -50,14 +51,6 @@ const TRANSITION_ICON: Record<ApplicationStatus, LucideIcon> = {
 
 /** Transições que exigem confirmação por serem terminais/negativas. */
 const DESTRUCTIVE_TRANSITIONS: ReadonlySet<ApplicationStatus> = new Set<ApplicationStatus>(['Rejected', 'Canceled']);
-
-const dateFormatter = new Intl.DateTimeFormat('pt-BR', { dateStyle: 'short' });
-
-function formatCreatedAt(value: string | undefined): string {
-  if (!value) return '—';
-  const parsed = new Date(value);
-  return Number.isNaN(parsed.getTime()) ? '—' : dateFormatter.format(parsed);
-}
 
 type PendingAction =
   | { type: 'status'; application: JobApplicationDto; target: ApplicationStatus }
@@ -94,7 +87,7 @@ export function CandidatesByJobPage() {
         header: 'Status',
         render: (application) => <ApplicationStatusBadge status={application.status} />
       },
-      { key: 'createdAt', header: 'Recebida em', render: (application) => formatCreatedAt(application.createdAt) },
+      { key: 'createdAt', header: 'Recebida em', render: (application) => formatDate(application.createdAt) },
       {
         key: 'actions',
         type: 'actions',

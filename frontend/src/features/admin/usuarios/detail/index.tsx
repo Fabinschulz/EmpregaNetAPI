@@ -1,40 +1,32 @@
 'use client';
 
 import {
-  Alert,
-  ApiQueryBoundary,
-  Badge,
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-  FormFieldsSkeleton,
-  PageHeader,
-  StatusBadge
+    Alert,
+    ApiQueryBoundary,
+    Badge,
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
+    FormFieldsSkeleton,
+    PageHeader,
+    StatusBadge
 } from '@/components';
 import { FormProvider } from '@/context';
-import {
-  adminUserFormValuesFromDto,
-  adminUserUpdateFormSchema,
-  defaultAdminUserUpdateForm,
-  useAdminUserQuery,
-  useUpdateAdminUserMutation,
-  type AdminUserUpdateFormValues
-} from '../service';
-import { userTypeLabel } from '@/shared';
+import { formatDateTime, userTypeLabel } from '@/shared';
 import { useParams } from 'next/navigation';
 import { useMemo, type ReactNode } from 'react';
+import {
+    adminUserFormValuesFromDto,
+    adminUserUpdateFormSchema,
+    defaultAdminUserUpdateForm,
+    useAdminUserQuery,
+    useUpdateAdminUserMutation,
+    type AdminUserUpdateFormValues
+} from '../service';
 import styles from './admin-user-detail.module.scss';
 import { AdminUserFormFields } from './admin-user-form';
-
-const dateTimeFormatter = new Intl.DateTimeFormat('pt-BR', { dateStyle: 'medium', timeStyle: 'short' });
-
-function formatDateTime(value?: string | null): string {
-  if (!value) return '—';
-  const parsed = new Date(value);
-  return Number.isNaN(parsed.getTime()) ? '—' : dateTimeFormatter.format(parsed);
-}
 
 function initialsOf(name: string): string {
   const letters = name

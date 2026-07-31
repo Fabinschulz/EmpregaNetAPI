@@ -1,17 +1,17 @@
 'use client';
 
 import {
-  ApiQueryBoundary,
-  Button,
-  PageHeader,
-  StatusBadge,
-  TableContainer,
-  TableFilters,
-  type DataTableColumn
+    ApiQueryBoundary,
+    Button,
+    PageHeader,
+    StatusBadge,
+    TableContainer,
+    TableFilters,
+    type DataTableColumn
 } from '@/components';
 import { FormProvider } from '@/context';
 import { usePersistedTablePagination } from '@/hooks';
-import type { JobsListQueryParams } from '@/shared';
+import { formatDate, type JobsListQueryParams } from '@/shared';
 import { Pencil, Plus } from 'lucide-react';
 import Link from 'next/link';
 import { useCallback, useMemo, useState } from 'react';
@@ -33,6 +33,7 @@ const JOBS_COLUMNS: DataTableColumn<JobDto>[] = [
       />
     )
   },
+  { key: 'createdAt', header: 'Criado em', render: (job) => formatDate(job.createdAt) },
   {
     key: 'actions',
     type: 'actions',

@@ -41,6 +41,16 @@ export function maskBrazilPhone(value: string | null | undefined): string {
   return `(${d.slice(0, 2)}) ${d.slice(2, 7)}-${d.slice(7)}`;
 }
 
+/** Aplica a máscara de CEP conforme o usuário digita: `00000-000`. */
+export function maskZipCode(value: string | null | undefined): string {
+  const d = onlyDigits(value).slice(0, 8);
+  return d.length <= 5 ? d : `${d.slice(0, 5)}-${d.slice(5)}`;
+}
+
+export function isCompleteZipCode(value: string | null | undefined): boolean {
+  return onlyDigits(value).length === 8;
+}
+
 /**
  * Valida um telefone brasileiro (fixo com 10 dígitos ou celular com 11 dígitos).
  * Rejeita DDD iniciado em 0, dígitos todos iguais e celular sem o 9 na terceira posição.

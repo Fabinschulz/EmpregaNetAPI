@@ -4,10 +4,6 @@ description: >-
   Skill completa EmpregaNet: .NET Clean Architecture, mediator interno, Domain/Application/Infra/Api,
   EF Core, validação e testes (xUnit, FluentAssertions, Moq, integração com fixture in-memory).
   Use para qualquer trabalho em backend/src ou backend/tests, alinhado a SDD e agentes dotnet-*.
-author: EmpregaNet
-version: 2.0.0
-date: 2026-05-07
-status: Approved
 ---
 
 # Backend (.NET — EmpregaNet API)

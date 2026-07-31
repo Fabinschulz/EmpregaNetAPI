@@ -62,6 +62,24 @@ public sealed class UpdateCompanyHandler : IRequestHandler<UpdateCommand<UpdateC
                     DomainErrorEnum.INVALID_ACTION_FOR_STATUS);
             }
 
+            var companyName = request.entity.CompanyName.Trim();
+            if (await _companyRepository.ExistsByNameAsync(companyName, request.Id))
+            {
+                throw new ValidationAppException(
+                    nameof(request.entity.CompanyName),
+                    $"Já existe outra empresa registrada com o nome '{companyName}'.",
+                    DomainErrorEnum.RESOURCE_ALREADY_EXISTS);
+            }
+
+            var email = request.entity.Email.Trim();
+            if (await _companyRepository.ExistsByEmailAsync(email, request.Id))
+            {
+                throw new ValidationAppException(
+                    nameof(request.entity.Email),
+                    $"Já existe outra empresa registrada com o e-mail '{email}'.",
+                    DomainErrorEnum.RESOURCE_ALREADY_EXISTS);
+            }
+
             var updatedCompany = CompanyFactory.Update(company, request.entity);
             await _companyRepository.UpdateAsync(updatedCompany, cancellationToken);
 

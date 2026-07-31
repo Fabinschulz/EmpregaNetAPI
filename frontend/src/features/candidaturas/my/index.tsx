@@ -3,17 +3,17 @@
 import { ApiQueryBoundary, PageHeader, TableContainer, TableFilters, type DataTableColumn } from '@/components';
 import { FormProvider } from '@/context';
 import { usePersistedTablePagination } from '@/hooks';
-import {
-  defaultMyApplicationsFilter,
-  myApplicationsFilterFormSchema,
-  myApplicationsFilterToParams,
-  useMyJobApplicationsQuery,
-  type JobApplicationDto
-} from '../service';
-import type { JobApplicationsListQueryParams } from '@/shared';
+import { formatDate, type JobApplicationsListQueryParams } from '@/shared';
 import { Eye } from 'lucide-react';
 import { useCallback, useState } from 'react';
 import { ApplicationStatusBadge } from '../application-status-badge';
+import {
+    defaultMyApplicationsFilter,
+    myApplicationsFilterFormSchema,
+    myApplicationsFilterToParams,
+    useMyJobApplicationsQuery,
+    type JobApplicationDto
+} from '../service';
 import { MyApplicationsFilterFields } from './my-applications-filter-fields';
 
 type MyApplicationsFilterParams = Pick<JobApplicationsListQueryParams, 'status' | 'orderBy'>;
@@ -26,6 +26,7 @@ const MY_APPLICATIONS_COLUMNS: DataTableColumn<JobApplicationDto>[] = [
     header: 'Status',
     render: (application) => <ApplicationStatusBadge status={application.status} />
   },
+  { key: 'createdAt', header: 'Enviada em', render: (application) => formatDate(application.createdAt) },
   {
     key: 'actions',
     type: 'actions',

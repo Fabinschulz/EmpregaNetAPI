@@ -3,17 +3,18 @@
 import { ApiQueryBoundary, Button, PageHeader, TableContainer, TableFilters, type DataTableColumn } from '@/components';
 import { FormProvider } from '@/context';
 import { usePersistedTablePagination } from '@/hooks';
-import {
-  companiesFilterFormSchema,
-  companiesFilterToParams,
-  defaultCompaniesFilter,
-  useCompaniesListQuery,
-  type CompanyDto
-} from '../service';
 import type { CompaniesListQueryParams } from '@/shared';
+import { formatDate } from '@/utils';
 import { Pencil, Plus } from 'lucide-react';
 import Link from 'next/link';
 import { useCallback, useMemo, useState } from 'react';
+import {
+    companiesFilterFormSchema,
+    companiesFilterToParams,
+    defaultCompaniesFilter,
+    useCompaniesListQuery,
+    type CompanyDto
+} from '../service';
 import { CompaniesFilterFields } from './companies-filter-fields';
 
 type CompaniesFilterParams = Pick<CompaniesListQueryParams, 'search' | 'isDeleted' | 'orderBy'>;
@@ -23,6 +24,7 @@ const COMPANIES_COLUMNS: DataTableColumn<CompanyDto>[] = [
   { key: 'email', header: 'E-mail', render: (company) => company.email ?? '—' },
   { key: 'phone', header: 'Telefone', render: (company) => company.phone ?? '—' },
   { key: 'documentNo', header: 'CNPJ', render: (company) => company.documentNo ?? '—' },
+  { key: 'createdAt', header: 'Criado em', render: (company) => formatDate(company.createdAt) },
   {
     key: 'actions',
     type: 'actions',

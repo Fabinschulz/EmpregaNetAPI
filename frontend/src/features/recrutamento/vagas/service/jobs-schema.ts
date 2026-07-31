@@ -36,7 +36,8 @@ export const jobSchema = z.object({
   companyId: z.number().int().nullable().optional(),
   salary: z.number().nullable().optional(),
   jobType: z.union([z.string(), z.number()]).nullable().optional(),
-  isActive: z.boolean().optional()
+  isActive: z.boolean().optional(),
+  createdAt: z.string().nullable().optional()
 });
 
 export type JobDto = z.infer<typeof jobSchema>;

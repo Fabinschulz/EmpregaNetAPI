@@ -1,7 +1,7 @@
 import {
-  LIST_ORDER_BY_VALUES,
-  createPaginatedResponseSchema,
-  type JobApplicationsListQueryParams
+    LIST_ORDER_BY_VALUES,
+    createPaginatedResponseSchema,
+    type JobApplicationsListQueryParams
 } from '@/shared/schema';
 import { z } from 'zod';
 
@@ -10,7 +10,7 @@ export const jobApplicationSchema = z.object({
   jobId: z.number().int().optional(),
   candidateId: z.number().int().optional(),
   status: z.string().nullable().optional(),
-  createdAt: z.string().datetime().optional()
+  createdAt: z.string().nullable().optional()
 });
 
 export type JobApplicationDto = z.infer<typeof jobApplicationSchema>;

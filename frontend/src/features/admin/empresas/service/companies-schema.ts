@@ -116,7 +116,8 @@ export const companySchema = z
     email: z.string().nullable().optional(),
     phone: z.string().nullable().optional(),
     typeOfActivity: z.string().nullable().optional(),
-    address: addressReadSchema.nullable().optional()
+    address: addressReadSchema.nullable().optional(),
+    createdAt: z.string().nullable().optional()
   })
   .transform((c) => ({
     id: c.id,
@@ -125,7 +126,8 @@ export const companySchema = z
     email: c.email ?? null,
     phone: c.phone ?? null,
     typeOfActivity: c.typeOfActivity ?? null,
-    address: c.address ?? null
+    address: c.address ?? null,
+    createdAt: c.createdAt ?? null
   }));
 
 export type CompanyDto = z.infer<typeof companySchema>;
