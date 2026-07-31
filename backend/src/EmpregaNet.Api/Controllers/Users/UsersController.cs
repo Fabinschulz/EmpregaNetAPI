@@ -58,9 +58,7 @@ public class UsersController : ControllerBase
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(DomainError))]
     public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenCommand? command)
     {
-        var refresh = command?.RefreshToken
-            ?? Request.Cookies[Constants.AuthCookies.RefreshToken]
-            ?? string.Empty;
+        var refresh = ResolveRefreshToken(command?.RefreshToken);
         var result = await Mediator.Send(new RefreshTokenCommand(refresh));
         _authCookies.AppendLoginCookies(Response, result);
         return Ok(result);
@@ -76,13 +74,29 @@ public class UsersController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> Logout([FromBody] LogoutCommand? command)
     {
-        var refresh = command?.RefreshToken
-            ?? Request.Cookies[Constants.AuthCookies.RefreshToken]
-            ?? string.Empty;
-            
+        var refresh = ResolveRefreshToken(command?.RefreshToken);
+
         await Mediator.Send(new LogoutCommand(refresh));
         _authCookies.ClearLoginCookies(Response);
         return Ok(new { message = "Sessão encerrada com sucesso." });
+    }
+
+    /// <summary>
+    /// Resolve o refresh token: corpo da requisição primeiro, cookie httpOnly como fallback.
+    /// </summary>
+    /// <remarks>
+    /// Usa verificação de vazio em vez de <c>??</c>: um corpo com <c>{"refreshToken": ""}</c>
+    /// produz string vazia (não nula), então o <c>??</c> não caía para o cookie e a renovação
+    /// falhava mesmo havendo um cookie válido.
+    /// </remarks>
+    private string ResolveRefreshToken(string? fromBody)
+    {
+        if (!string.IsNullOrWhiteSpace(fromBody))
+            return fromBody;
+
+        var fromCookie = Request.Cookies[Constants.AuthCookies.RefreshToken];
+
+        return string.IsNullOrWhiteSpace(fromCookie) ? string.Empty : fromCookie;
     }
 
     /// <summary>Autentica com Google: envie o <c>id_token</c> obtido no cliente (Sign-In SDK). Requer <c>GoogleAuth:ClientIds</c> configurado.</summary>

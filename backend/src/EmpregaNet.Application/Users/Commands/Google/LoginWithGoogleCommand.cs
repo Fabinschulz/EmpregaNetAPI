@@ -5,12 +5,21 @@ using EmpregaNet.Application.Users.Identity;
 using EmpregaNet.Application.Utils;
 using EmpregaNet.Domain.Entities;
 using EmpregaNet.Domain.Enums;
+using EmpregaNet.Domain.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 
 namespace EmpregaNet.Application.Users.Commands;
 
-public sealed record LoginWithGoogleCommand(string IdToken) : IRequest<UserLoggedViewModel>;
+/// <summary>
+/// Autentica com Google a partir do <c>id_token</c> obtido no cliente.
+/// </summary>
+/// <remarks>
+/// <b>Transacional:</b> o provisionamento de uma conta nova escreve em três passos (utilizador,
+/// role, login externo). Sem transação, uma falha no meio deixava o utilizador persistido sem
+/// credencial utilizável. O <c>TransactionBehavior</c> garante tudo-ou-nada.
+/// </remarks>
+public sealed record LoginWithGoogleCommand(string IdToken) : IRequest<UserLoggedViewModel>, ITransactional;
 
 public sealed class LoginWithGoogleHandler : IRequestHandler<LoginWithGoogleCommand, UserLoggedViewModel>
 {
@@ -67,6 +76,7 @@ public sealed class LoginWithGoogleHandler : IRequestHandler<LoginWithGoogleComm
                     DomainErrorEnum.INVALID_ACTION_FOR_STATUS);
             }
 
+            await EnsureCandidateRoleOrThrowAsync(user, cancellationToken);
             return await BuildTokenWithRefreshAsync(user, cancellationToken);
         }
 
@@ -84,11 +94,15 @@ public sealed class LoginWithGoogleHandler : IRequestHandler<LoginWithGoogleComm
             var addLogin = await _userManager.AddLoginAsync(user, new UserLoginInfo(Constants.ExternalLogin.GoogleProvider, payload.Subject, "Google"));
             if (!addLogin.Succeeded)
             {
+                // Nunca compensar com remoção aqui: esta é uma conta pré-existente, criada por
+                // outro caminho. Apagá-la destruiria dados legítimos do utilizador.
                 var msg = addLogin.Errors.FirstOrDefault()?.Description ?? "Não foi possível associar o login Google.";
                 throw new ValidationAppException(nameof(request.IdToken), msg, DomainErrorEnum.RESOURCE_ERROR);
             }
 
             _logger.LogInformation("Login Google associado ao usuário existente {UserId}.", user.Id);
+
+            await EnsureCandidateRoleOrThrowAsync(user, cancellationToken);
             return await BuildTokenWithRefreshAsync(user, cancellationToken);
         }
 
@@ -108,18 +122,48 @@ public sealed class LoginWithGoogleHandler : IRequestHandler<LoginWithGoogleComm
             throw new ValidationAppException(nameof(request.IdToken), msg, DomainErrorEnum.RESOURCE_CREATION_FAILED);
         }
 
-        await CandidateRoleAssignment.EnsureCandidateRoleAsync(user, _userManager, _roleManager, cancellationToken);
+        var roleResult = await CandidateRoleAssignment.EnsureCandidateRoleAsync(user, _userManager, _roleManager, cancellationToken);
+        if (!roleResult.Succeeded)
+        {
+            var msg = roleResult.Errors.FirstOrDefault()?.Description ?? "Falha ao atribuir a role de candidato.";
+            _logger.LogError("Provisionamento via Google abortado: falha ao atribuir a role de candidato. {Errors}", msg);
+            throw new ValidationAppException(nameof(request.IdToken), msg, DomainErrorEnum.RESOURCE_CREATION_FAILED);
+        }
 
         var login = await _userManager.AddLoginAsync(user, new UserLoginInfo(Constants.ExternalLogin.GoogleProvider, payload.Subject, "Google"));
         if (!login.Succeeded)
         {
-            _logger.LogError("Usuário {UserId} criado via Google mas falha ao registrar login externo.", user.Id);
             var msg = login.Errors.FirstOrDefault()?.Description ?? "Falha ao finalizar login social.";
+            _logger.LogError("Provisionamento via Google abortado: falha ao registar o login externo. {Errors}", msg);
             throw new ValidationAppException(nameof(request.IdToken), msg, DomainErrorEnum.RESOURCE_ERROR);
         }
 
         _logger.LogInformation("Novo usuário {UserId} criado via Google.", user.Id);
         return await BuildTokenWithRefreshAsync(user, cancellationToken);
+    }
+
+    /// <summary>
+    /// Garante a role de candidato em contas já existentes.
+    /// </summary>
+    /// <remarks>
+    /// Necessário nos caminhos de conta existente porque a atribuição de role só acontecia na
+    /// criação. Se ela tivesse falhado nessa altura, e falhava em silêncio, o utilizador ficava
+    /// permanentemente sem role: nenhum login posterior repetia a tentativa.
+    /// </remarks>
+    private async Task EnsureCandidateRoleOrThrowAsync(User user, CancellationToken cancellationToken)
+    {
+        var result = await CandidateRoleAssignment.EnsureCandidateRoleAsync(user, _userManager, _roleManager, cancellationToken);
+
+        if (result.Succeeded)
+            return;
+
+        var msg = string.Join("; ", result.Errors.Select(e => e.Description));
+        _logger.LogError("Falha ao garantir a role de candidato no utilizador {UserId}: {Errors}", user.Id, msg);
+
+        throw new ValidationAppException(
+            nameof(LoginWithGoogleCommand.IdToken),
+            "Não foi possível concluir o login social.",
+            DomainErrorEnum.RESOURCE_ERROR);
     }
 
     private async Task<UserLoggedViewModel> BuildTokenWithRefreshAsync(User user, CancellationToken cancellationToken)

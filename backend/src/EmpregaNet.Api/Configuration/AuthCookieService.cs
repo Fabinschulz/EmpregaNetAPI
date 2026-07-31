@@ -19,23 +19,34 @@ public sealed class AuthCookieService(IConfiguration configuration, IHostEnviron
         }
     }
 
+    /// <summary>
+    /// Remove os cookies de autenticação.
+    /// </summary>
+    /// <remarks>
+    /// A remoção precisa repetir os mesmos atributos usados na emissão. O navegador identifica
+    /// um cookie por nome + domínio + caminho; divergir nesses atributos faz o
+    /// <c>Set-Cookie</c> de expiração criar/apagar um cookie diferente e deixar o original
+    /// intacto, ou seja, um logout que não desloga.
+    /// </remarks>
     public void ClearLoginCookies(HttpResponse response)
     {
-        response.Cookies.Delete(Constants.AuthCookies.AccessToken);
-        response.Cookies.Delete(Constants.AuthCookies.RefreshToken);
+        var options = BuildCookieOptions(null);
+
+        response.Cookies.Delete(Constants.AuthCookies.AccessToken, options);
+        response.Cookies.Delete(Constants.AuthCookies.RefreshToken, options);
     }
 
     private void Append(HttpResponse response, string name, string value, TimeSpan maxAge)
+        => response.Cookies.Append(name, value, BuildCookieOptions(maxAge));
+
+    private CookieOptions BuildCookieOptions(TimeSpan? maxAge) => new()
     {
-        response.Cookies.Append(name, value, new CookieOptions
-        {
-            HttpOnly = true,
-            Secure = !environment.IsDevelopment(),
-            SameSite = SameSiteMode.Lax,
-            Path = "/",
-            MaxAge = maxAge
-        });
-    }
+        HttpOnly = true,
+        Secure = !environment.IsDevelopment(),
+        SameSite = SameSiteMode.Lax,
+        Path = "/",
+        MaxAge = maxAge
+    };
 
     private static string StripBearer(string token) =>
         token.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase) ? token[7..] : token;

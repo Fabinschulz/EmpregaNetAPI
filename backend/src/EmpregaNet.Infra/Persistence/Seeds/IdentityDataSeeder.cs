@@ -130,7 +130,9 @@ public static class IdentityDataSeeder
         var email = options.AdminEmail.Trim();
         var userName = string.IsNullOrWhiteSpace(options.AdminUserName) ? email : options.AdminUserName.Trim();
 
-        var existing = await userManager.FindByEmailAsync(email);
+        var existing = await userManager.FindByEmailAsync(email)
+                       ?? await userManager.FindByNameAsync(userName);
+
         if (existing is not null)
         {
             if (!await userManager.IsInRoleAsync(existing, "Admin"))
@@ -139,10 +141,10 @@ public static class IdentityDataSeeder
                 if (!addRole.Succeeded)
                 {
                     var msg = string.Join("; ", addRole.Errors.Select(e => e.Description));
-                    logger.LogWarning("Usuário {Email} existe mas não estava na role Admin; falha ao associar: {Errors}", email, msg);
+                    logger.LogWarning("Utilizador {Email} existe mas não estava na role Admin; falha ao associar: {Errors}", existing.Email, msg);
                 }
                 else
-                    logger.LogInformation("Role Admin associada ao usuário existente {Email}.", email);
+                    logger.LogInformation("Role Admin associada ao utilizador existente {Email}.", existing.Email);
             }
 
             return;
@@ -159,9 +161,12 @@ public static class IdentityDataSeeder
         var createResult = await userManager.CreateAsync(admin, options.AdminPassword);
         if (!createResult.Succeeded)
         {
+            // Não lança: o administrador é opcional por desenho (sem senha configurada nem se
+            // tenta criar). Uma falha aqui é de configuração ou de dados pré-existentes e não
+            // justifica impedir a API de servir requisições.
             var msg = string.Join("; ", createResult.Errors.Select(e => e.Description));
-            logger.LogError("Falha ao criar usuário administrador: {Errors}", msg);
-            throw new InvalidOperationException($"Seed: não foi possível criar o administrador: {msg}");
+            logger.LogError("Seed: não foi possível criar o utilizador administrador: {Errors}", msg);
+            return;
         }
 
         var roleResult = await userManager.AddToRoleAsync(admin, "Admin");

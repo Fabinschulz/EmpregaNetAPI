@@ -10,19 +10,33 @@ public static class CandidateRoleAssignment
 {
     public const string RoleName = "Candidate";
 
-    public static async Task EnsureCandidateRoleAsync(
+    /// <summary>
+    /// Garante que o operador tem a role de candidato.
+    /// </summary>
+    /// <returns>
+    /// O resultado da operação. <b>Devolve</b> em vez de ignorar: antes os
+    /// <see cref="IdentityResult"/> de <c>CreateAsync</c> e <c>AddToRoleAsync</c> eram
+    /// descartados, então uma falha ao associar a role passava em silêncio e o operador ficava
+    /// sem role nenhuma, sem qualquer sinal para quem chamou.
+    /// </returns>
+    public static async Task<IdentityResult> EnsureCandidateRoleAsync(
         User user,
         UserManager<User> userManager,
         RoleManager<Role> roleManager,
         CancellationToken cancellationToken = default)
     {
         _ = cancellationToken;
+
         if (await userManager.IsInRoleAsync(user, RoleName))
-            return;
+            return IdentityResult.Success;
 
         if (!await roleManager.RoleExistsAsync(RoleName))
-            await roleManager.CreateAsync(new Role { Name = RoleName });
+        {
+            var createRole = await roleManager.CreateAsync(new Role { Name = RoleName });
+            if (!createRole.Succeeded)
+                return createRole;
+        }
 
-        await userManager.AddToRoleAsync(user, RoleName);
+        return await userManager.AddToRoleAsync(user, RoleName);
     }
 }

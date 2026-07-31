@@ -1,6 +1,7 @@
 using System.Text.Json.Serialization;
 using EmpregaNet.Api.Controllers.HealthChecks;
 using EmpregaNet.Api.Configuration;
+using EmpregaNet.Api.Middleware;
 using EmpregaNet.Application.Auth;
 using EmpregaNet.Infra.Cache;
 using EmpregaNet.Infra.Extensions;
@@ -11,6 +12,8 @@ public static class DependencyInjection
 
     public static void SetupApiServices(this WebApplication app)
     {
+        app.UseMiddleware<CorrelationIdMiddleware>();
+
         // Configura o uso de headers de proxy reverso (X-Forwarded-For, X-Forwarded-Proto) caso esteja atrás de um proxy reverso.
         app.UseForwardedHeadersIfConfigured();
 

@@ -4,6 +4,7 @@ using EmpregaNet.Application.Abstraction;
 using EmpregaNet.Application.Users.Identity;
 using EmpregaNet.Domain.Entities;
 using EmpregaNet.Domain.Enums;
+using EmpregaNet.Domain.Interfaces;
 using FluentValidation;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
@@ -11,13 +12,26 @@ using Microsoft.Extensions.Options;
 
 namespace EmpregaNet.Application.Users.Commands;
 
+/// <summary>
+/// Registo por e-mail e senha.
+/// </summary>
+/// <remarks>
+/// <b>Transacional:</b> a criação do utilizador e a atribuição da role passam a ser tudo-ou-nada.
+/// Antes, uma falha na role deixava o utilizador criado <b>sem role nenhuma</b>, de forma
+/// permanente, nenhum login posterior repetia a tentativa.
+///
+/// <para><b>Ressalva:</b> o envio do e-mail de confirmação é um efeito colateral que não faz
+/// rollback. Ele acontece antes do commit, portanto uma falha no commit pode deixar um e-mail
+/// enviado para um registo que não existe, o link falha e o utilizador repete o registo. Foi
+/// aceite em troca da atomicidade de utilizador + role, que é um problema permanente de dados.</para>
+/// </remarks>
 public sealed record RegisterUserCommand(
     string Username,
     string Email,
     string Password,
     string PasswordConfirmation,
     string? PhoneNumber
-) : IRequest<long>;
+) : IRequest<long>, ITransactional;
 
 public sealed class RegisterUserHandler : IRequestHandler<RegisterUserCommand, long>
 {
@@ -87,7 +101,20 @@ public sealed class RegisterUserHandler : IRequestHandler<RegisterUserCommand, l
             throw new ValidationAppException(nameof(request.Username), errorMessage, DomainErrorEnum.RESOURCE_CREATION_FAILED);
         }
 
-        await CandidateRoleAssignment.EnsureCandidateRoleAsync(user, _userManager, _roleManager, cancellationToken);
+
+        var roleResult = await CandidateRoleAssignment.EnsureCandidateRoleAsync(user, _userManager, _roleManager, cancellationToken);
+        if (!roleResult.Succeeded)
+        {
+            var roleErrors = string.Join("; ", roleResult.Errors.Select(e => e.Description));
+            _logger.LogError(
+                "Registo abortado: falha ao atribuir a role {Role} ao utilizador {Username}: {Errors}",
+                CandidateRoleAssignment.RoleName, request.Username, roleErrors);
+
+            throw new ValidationAppException(
+                nameof(request.Username),
+                "Não foi possível concluir o registo.",
+                DomainErrorEnum.RESOURCE_CREATION_FAILED);
+        }
 
         try
         {
