@@ -31,7 +31,6 @@ await IdentityDataSeeder.SeedAsync(app);
 app.SetupApiServices();
 app.UseExceptionHandler();
 app.UseSentryTracingMiddleware();
-app.UseRateLimiter();
 app.Run();
 
 #endregion

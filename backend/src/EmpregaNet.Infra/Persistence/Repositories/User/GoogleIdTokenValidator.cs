@@ -3,6 +3,9 @@ using EmpregaNet.Application.Abstraction;
 using Google.Apis.Auth;
 using Microsoft.Extensions.Options;
 
+/// <summary>
+/// Validação de tokens ID do Google Sign-In (client IDs OAuth permitidos).
+/// </summary>
 public sealed class GoogleIdTokenValidator : IGoogleIdTokenValidator
 {
     private readonly GoogleAuthOptions _options;

@@ -41,6 +41,7 @@ public static class DependencyInjection
         app.UseHttpsRedirection()
            .UseCors(CorsPolicyConfig.DefaultPolicyName)
            .UseAuthentication()
+           .UseRateLimiter()
            .UseAuthorization()
            .UseOutputCache()
            .UseSwaggerSetup()

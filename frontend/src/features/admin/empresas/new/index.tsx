@@ -13,7 +13,7 @@ export function AdminNewCompanyPage() {
     <div>
       <PageHeader title="Nova empresa" description="Cadastre uma nova empresa parceira." />
       {apiError ? (
-        <Alert variant="destructive" title="Erro" className="my-4">
+        <Alert variant="destructive" title="Erro" style={{ margin: '1rem 0' }}>
           {apiError}
         </Alert>
       ) : null}

@@ -49,6 +49,32 @@ Como o `GlobalLimiter` aplica-se incondicionalmente, deixou de ser necessário `
 - Ciclo completo de varredura de limpeza (thresholds reduzidos via variável de ambiente só para o teste) executado sob carga real → sem exceções, sem 500, capacidade plena disponível depois.
 - **Não verificado por teste de carga real:** o caminho do teto (`MaxTrackedPartitions`) exigiria milhares de identidades de origem distintas, impraticável a partir de uma única máquina de desenvolvimento sem enfraquecer a config de `ForwardedHeaders` — validado por revisão de código, não por execução.
 
+### Revisão 2026-07-31 — limitador antes do `UseAuthorization`
+
+O `UseRateLimiter()` estava registado em `Program.cs`, **depois** de `SetupApiServices()` — ou seja, depois de `UseAuthentication` **e** de `UseAuthorization`. Como o `AuthorizationMiddleware` **curto-circuita** quando a política do endpoint falha (responde 401/403 sem chamar o próximo middleware), toda requisição a endpoint protegido sem token, ou com token inválido, era rejeitada **antes de chegar ao limitador** e portanto nunca gastava ficha.
+
+Efeito prático: era possível martelar indefinidamente qualquer endpoint protegido com um token inválido sem nunca receber 429. Os endpoints de auth (`login`, `register`, ...) não tinham esse furo, porque são `[AllowAnonymous]` e passam pelo `UseAuthorization` sem curto-circuitar — o brute-force de senha já estava coberto (e tem o lockout do Identity por trás, ver Decisão acima).
+
+**Correção:** `UseRateLimiter()` movido de `Program.cs` para dentro do encadeamento de `SetupApiServices()`, entre `UseAuthentication()` e `UseAuthorization()`. A posição é deliberada nos dois lados:
+
+- **depois de `UseAuthentication`**: o `HttpContext.User` já está preenchido, então `GetPartitionKey` continua a particionar por utilizador autenticado, sem cair no *fallback* por IP (que faria colegas atrás do mesmo NAT partilhar balde);
+- **antes de `UseAuthorization`**: requisições que terminarão em 401/403 também consomem ficha.
+
+O `UseOutputCache` fica depois do limitador, portanto uma resposta servida do cache também gasta ficha — correto, é uma requisição como qualquer outra.
+
+**Verificado (execução real, PostgreSQL e Redis a correr, perfil Development com `BurstCapacity` 240 / `SustainedPerPeriod` 120):**
+
+| Cenário | Antes | Depois |
+| ------- | ----- | ------ |
+| Rajada de 400 a `/api/users/me` (protegido, sem token) | 400 × `401`, nenhum `429` | 343 × `401` + **57 × `429`** |
+| 40 pedidos a `/health` durante a rajada acima | — | 40 × `200`, **nenhum `429`** (isenção intacta) |
+| Corpo do `429` | — | `DomainError` (`TOO_MANY_REQUESTS`) + header `Retry-After: 10` |
+| Suíte de testes | 64 aprovados | 64 aprovados |
+
+Os 343 (em vez de exactamente 240) refletem a reposição de fichas a decorrer durante a janela de disparo da rajada — comportamento esperado do token bucket, não excesso de permissividade.
+
+A mesma correção foi aplicada ao projeto **OAuth** (`easymart/backend/OAuth`), que recebeu este limitador por transplante.
+
 ## Consequências
 
 **Positivas:**
