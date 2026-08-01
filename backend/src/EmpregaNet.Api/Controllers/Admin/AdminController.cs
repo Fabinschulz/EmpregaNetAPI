@@ -5,7 +5,7 @@ using EmpregaNet.Application.Common.Cache;
 using EmpregaNet.Application.Users.Queries;
 using EmpregaNet.Application.Users.ViewModel;
 using EmpregaNet.Application.Utils;
-using EmpregaNet.Domain.Interfaces;
+using EmpregaNet.Application.Abstraction;
 using EmpregaNet.Api.Configuration;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

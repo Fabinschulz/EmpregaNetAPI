@@ -5,7 +5,6 @@ using EmpregaNet.Application.Abstraction;
 using EmpregaNet.Application.Users.ViewModel;
 using EmpregaNet.Domain.Entities;
 using EmpregaNet.Domain.Enums;
-using EmpregaNet.Domain.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 

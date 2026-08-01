@@ -17,7 +17,6 @@ namespace EmpregaNet.Infra.Behaviors;
 /// <typeparam name="TResponse">Tipo da resposta.</typeparam>
 public class PerformanceBehaviour<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse> where TRequest : IRequest<TResponse>
 {
-    private readonly Stopwatch _timer;
     private readonly ILogger<PerformanceBehaviour<TRequest, TResponse>> _logger;
     private readonly IHttpCurrentUser _currentUser;
 
@@ -31,7 +30,6 @@ public class PerformanceBehaviour<TRequest, TResponse> : IPipelineBehavior<TRequ
     {
         _logger = logger;
         _currentUser = currentUser;
-        _timer = new Stopwatch();
     }
 
     /// <summary>
@@ -44,23 +42,25 @@ public class PerformanceBehaviour<TRequest, TResponse> : IPipelineBehavior<TRequ
     /// <returns>A resposta processada.</returns>
     public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
     {
-        _timer.Start();
-        var response = await next();
-        _timer.Stop();
+        var timer = Stopwatch.StartNew();
 
-        var elapsedMilliseconds = _timer.ElapsedMilliseconds;
+        var response = await next();
+
+        timer.Stop();
+
+        var elapsedMilliseconds = timer.ElapsedMilliseconds;
 
         // Limiar configurado: 500 ms
         if (elapsedMilliseconds > 500)
         {
-            var requestName = typeof(TRequest).Name;
             var user = _currentUser.GetContextUser();
-            var userId = user?.UserToken.Id;
-            var userName = user?.UserToken.Username ?? string.Empty;
-
-            _logger.LogWarning("EmpregaNet Long Running Request: {Name} ({ElapsedMilliseconds} ms) {@UserId} {@UserName} {@Request}",
-                requestName, elapsedMilliseconds, userId, userName, request
-            );
+            
+            _logger.LogWarning(
+                "EmpregaNet Long Running Request: {Name} ({ElapsedMilliseconds} ms) UserId={UserId} UserName={UserName}",
+                typeof(TRequest).Name,
+                elapsedMilliseconds,
+                user?.UserToken.Id,
+                user?.UserToken.Username ?? string.Empty);
         }
 
         return response;

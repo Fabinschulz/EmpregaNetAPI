@@ -1,5 +1,5 @@
 using EmpregaNet.Api.Configuration.OutputCache;
-using EmpregaNet.Domain.Interfaces;
+using EmpregaNet.Application.Abstraction;
 using EmpregaNet.Infra.Cache;
 
 namespace EmpregaNet.Api.Configuration;

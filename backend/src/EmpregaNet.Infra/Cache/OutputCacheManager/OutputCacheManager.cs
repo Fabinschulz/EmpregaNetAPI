@@ -1,5 +1,5 @@
 using EmpregaNet.Application.Common.Cache;
-using EmpregaNet.Domain.Interfaces;
+using EmpregaNet.Application.Abstraction;
 using Microsoft.AspNetCore.OutputCaching;
 using Microsoft.Extensions.Logging;
 

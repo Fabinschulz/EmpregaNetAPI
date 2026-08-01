@@ -1,7 +1,7 @@
 using EmpregaNet.Domain.Common;
 using Microsoft.AspNetCore.Mvc;
 using EmpregaNet.Application.Common.Base;
-using EmpregaNet.Domain.Interfaces;
+using EmpregaNet.Application.Abstraction;
 using EmpregaNet.Api.Configuration;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;

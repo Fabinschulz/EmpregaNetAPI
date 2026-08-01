@@ -1,7 +1,7 @@
 using EmpregaNet.Application.Common.Exceptions;
 using EmpregaNet.Domain.Entities;
 using EmpregaNet.Domain.Enums;
-using EmpregaNet.Domain.Interfaces;
+using EmpregaNet.Application.Abstraction;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 

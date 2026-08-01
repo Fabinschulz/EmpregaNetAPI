@@ -1,8 +1,13 @@
-namespace EmpregaNet.Domain.Interfaces;
+namespace EmpregaNet.Application.Abstraction;
 
 /// <summary>
 /// Invalidação do Output Cache HTTP por tags (handlers e controllers após mutações).
 /// </summary>
+/// <remarks>
+/// Vive na Application, não no Domain: cache é preocupação de infraestrutura — tags, TTL,
+/// despejo do store. O domínio não deve conhecer nada disso, e nenhuma regra de negócio depende
+/// desta abstração.
+/// </remarks>
 public interface IOutputCacheManager
 {
     /// <summary>

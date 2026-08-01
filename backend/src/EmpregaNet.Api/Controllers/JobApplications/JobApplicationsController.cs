@@ -6,7 +6,7 @@ using EmpregaNet.Application.JobApplications.Commands;
 using EmpregaNet.Application.JobApplications.Queries;
 using EmpregaNet.Application.JobApplications.ViewModel;
 using EmpregaNet.Domain.Common;
-using EmpregaNet.Domain.Interfaces;
+using EmpregaNet.Application.Abstraction;
 using EmpregaNet.Api.Configuration;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

@@ -3,7 +3,7 @@ using EmpregaNet.Application.Utils;
 using EmpregaNet.Api.Controllers.Core;
 using EmpregaNet.Application.Admin.Company.ViewModel;
 using EmpregaNet.Application.Admin.Company.Commands;
-using EmpregaNet.Domain.Interfaces;
+using EmpregaNet.Application.Abstraction;
 using Microsoft.AspNetCore.Authorization;
 
 namespace EmpregaNet.Api.Controllers.Companies

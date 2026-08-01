@@ -2,7 +2,6 @@ using EmpregaNet.Application.Auth.Configuration;
 using EmpregaNet.Application.Abstraction;
 using EmpregaNet.Application.Users.Commands;
 using EmpregaNet.Domain.Entities;
-using EmpregaNet.Domain.Interfaces;
 using EmpregaNet.Infra.Persistence.Database;
 using FluentValidation;
 using Microsoft.AspNetCore.Identity;
