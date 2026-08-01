@@ -126,13 +126,14 @@ namespace EmpregaNet.Api.Configuration
             {
                 swaggerDoc.Tags = new HashSet<OpenApiTag>
                 {
-                    new() { Name = "Users", Description = "Conta do usuário: registro, login." },
-                    new() { Name = "Jobs", Description = "Oportunidades de emprego (leitura pública; mutações com política de recrutamento)." },
+                    new() { Name = "Admin", Description = "Superfície administrativa." },
+                    new() { Name = "Auth", Description = "Autenticação e credenciais: entrar, sair, registrar, renovar sessão e recuperar acesso." },
                     new() { Name = "Candidates", Description = "Listagem e detalhe de candidatos (equipe de recrutamento)." },
-                    new() { Name = "JobApplications", Description = "Candidaturas e pipeline (candidato e recrutamento)." },
                     new() { Name = "Companies", Description = "Endpoints para administração de cadastros corporativos" },
+                    new() { Name = "JobApplications", Description = "Candidaturas e pipeline (candidato e recrutamento)." },
+                    new() { Name = "Jobs", Description = "Oportunidades de emprego (leitura pública; mutações com política de recrutamento)." },
                     new() { Name = "Notifications", Description = "Alertas e comunicações (reservado)." },
-                    new() { Name = "Admin", Description = "Superfície administrativa." }
+                    new() { Name = "Users", Description = "Dados da própria conta (/me): perfil, senha e encerramento." }
                 };
             }
         }
@@ -151,6 +152,12 @@ namespace EmpregaNet.Api.Configuration
                 c.SwaggerEndpoint($"/swagger/{Constants.OpenApi.V1}/swagger.json", "EmpregaNet API");
                 c.DocExpansion(Swashbuckle.AspNetCore.SwaggerUI.DocExpansion.None);
                 c.DefaultModelsExpandDepth(-1);
+
+                // Ordena grupos e endpoints alfabeticamente na tela. Sem isto a ordem seguiria
+                // a declaração no documento, o que não é confiável (é um conjunto) e deixaria
+                // qualquer tag nova cair no fim da lista.
+                c.ConfigObject.AdditionalItems["tagsSorter"] = "alpha";
+                c.ConfigObject.AdditionalItems["operationsSorter"] = "alpha";
             });
 
             return app;
