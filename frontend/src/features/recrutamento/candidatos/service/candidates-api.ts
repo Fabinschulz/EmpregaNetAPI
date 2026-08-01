@@ -1,5 +1,5 @@
 import { axiosApi, createAxiosConfig } from '@/shared/api';
-import { userSchema } from '@/shared/auth';
+import { userSchema } from '@/shared/schema';
 import type { CandidatesListQueryParams } from '@/shared/schema';
 import { candidatesListResponseSchema, type CandidatesListResponseDto } from './candidates-schema';
 

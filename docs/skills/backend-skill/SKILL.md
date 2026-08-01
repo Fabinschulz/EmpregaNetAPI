@@ -77,6 +77,19 @@ antes de divergir; registar decisões pragmáticas nas *deviation notes* do `tas
 
 Se um módulo histórico tiver estrutura de pastas ligeiramente diferente à “ideal”: **preserve o padrão local** primeiro; refactor estrutural só com tarefa explícita ou ADR quando for transversal.
 
+### Auth ≠ dados do utilizador
+
+Duas responsabilidades separadas de propósito — não voltar a misturá-las ao adicionar endpoints:
+
+| Responsabilidade | Controller | Application |
+| ---------------- | ---------- | ----------- |
+| Credencial e sessão: login, logout, registo, refresh, Google, confirmação de e-mail, esqueci/redefinir senha | `AuthController` → `/api/auth/*` | `Application/Auth/Commands/` |
+| Dados da própria conta: ver/editar perfil, trocar senha (autenticado), encerrar conta | `UsersController` → `/api/users/me*` | `Application/Users/` |
+| Gestão de utilizadores por administrador | `AdminController` | `Application/Admin/Users/` |
+
+- **`AuthController` é `[AllowAnonymous]` na classe** (quem chama ainda não tem sessão); **`UsersController` é `[Authorize]` na classe**. Isso torna a autorização segura por omissão: um endpoint novo em `/api/users` nasce protegido, e abrir uma rota exige `[AllowAnonymous]` explícito. Enquanto os dois grupos coexistiam num controller só, cada método declarava o próprio atributo — esquecer um deixava a rota pública sem nada acusar.
+- **Trocar a senha autenticado fica em `Users`**, não em `Auth`: é operação sobre a própria conta com sessão ativa, diferente de "esqueci a senha", que é recuperação de acesso sem sessão.
+
 ---
 
 ## 6. EF Core

@@ -1,6 +1,6 @@
 using EmpregaNet.Application.Common.Exceptions;
 using EmpregaNet.Application.Abstraction;
-using EmpregaNet.Application.Users.Commands;
+using EmpregaNet.Application.Auth.Commands;
 using EmpregaNet.Application.Users.Identity;
 using EmpregaNet.Domain.Entities;
 using EmpregaNet.Domain.Enums;

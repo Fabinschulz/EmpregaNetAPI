@@ -1,7 +1,7 @@
 using FluentValidation;
 using EmpregaNet.Application.Users.Validation;
 
-namespace EmpregaNet.Application.Users.Commands;
+namespace EmpregaNet.Application.Auth.Commands;
 
 public sealed class ResetPasswordCommandValidator : AbstractValidator<ResetPasswordCommand>
 {

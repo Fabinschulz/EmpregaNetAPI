@@ -3,7 +3,7 @@ using EmpregaNet.Domain.Entities;
 using EmpregaNet.Domain.Enums;
 using Microsoft.AspNetCore.Identity;
 
-namespace EmpregaNet.Application.Users.Commands;
+namespace EmpregaNet.Application.Auth.Commands;
 
 public sealed record ConfirmEmailCommand(long UserId, string Token) : IRequest<bool>;
 

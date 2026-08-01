@@ -1,6 +1,6 @@
 using FluentValidation;
 
-namespace EmpregaNet.Application.Users.Commands;
+namespace EmpregaNet.Application.Auth.Commands;
 
 public sealed class RefreshTokenCommandValidator : AbstractValidator<RefreshTokenCommand>
 {

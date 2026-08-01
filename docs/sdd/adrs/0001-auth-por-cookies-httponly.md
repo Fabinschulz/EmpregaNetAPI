@@ -14,7 +14,7 @@ O backend já emite os tokens via `AuthCookieService` e o middleware JWT (`OnMes
 - O **access token** e o **refresh token** passam a viver exclusivamente em cookies `HttpOnly`, `Secure` (fora de Development) e `SameSite=Lax`, emitidos pelo backend (`AuthCookieService.AppendLoginCookies`).
 - O frontend nunca lê nem guarda o valor do token. `axios` autentica via `withCredentials: true`; o cookie viaja sozinho.
 - Para hidratar a UI sem round-trip ao servidor a cada carregamento, o cliente guarda apenas **metadados de exibição não sensíveis** (`roles`, `username`, `email`) em `localStorage`, lidos via `useSyncExternalStore`. Esses metadados nunca autorizam nada sozinhos — a decisão de autorização real é sempre do servidor, a partir do cookie.
-- Logout revoga o refresh token no servidor (`POST /api/users/logout`) e limpa os cookies.
+- Logout revoga o refresh token no servidor (`POST /api/auth/logout`) e limpa os cookies.
 
 ## Consequências
 

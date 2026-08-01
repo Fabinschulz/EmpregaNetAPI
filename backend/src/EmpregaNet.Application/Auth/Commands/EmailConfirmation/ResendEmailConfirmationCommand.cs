@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace EmpregaNet.Application.Users.Commands;
+namespace EmpregaNet.Application.Auth.Commands;
 
 public sealed record ResendEmailConfirmationCommand(string Email) : IRequest<ResendEmailConfirmationResponse>;
 

@@ -1,5 +1,6 @@
 using EmpregaNet.Application.Auth.Configuration;
 using EmpregaNet.Application.Abstraction;
+using EmpregaNet.Application.Auth.Commands;
 using EmpregaNet.Application.Users.Commands;
 using EmpregaNet.Domain.Entities;
 using EmpregaNet.Infra.Persistence.Database;

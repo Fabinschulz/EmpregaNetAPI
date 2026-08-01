@@ -1,4 +1,4 @@
-using EmpregaNet.Application.Users.Commands;
+using EmpregaNet.Application.Auth.Commands;
 using FluentAssertions;
 using FluentValidation;
 

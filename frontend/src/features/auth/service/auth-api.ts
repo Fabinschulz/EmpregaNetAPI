@@ -20,25 +20,25 @@ import {
 
 export async function register(dto: RegisterDto): Promise<string> {
   const body = registerSchema.parse(dto);
-  const res = await axiosApi.post<string>('/api/users/register', body);
+  const res = await axiosApi.post<string>('/api/auth/register', body);
   return res.data;
 }
 
 export async function login(dto: LoginDto): Promise<UserLoggedDto> {
   const body = loginSchema.parse(dto);
-  const res = await axiosApi.post<unknown>('/api/users/login', body);
+  const res = await axiosApi.post<unknown>('/api/auth/login', body);
   return userLoggedSchema.parse(res.data);
 }
 
 export async function loginWithGoogle(dto: LoginWithGoogleDto): Promise<UserLoggedDto> {
   const body = loginWithGoogleSchema.parse(dto);
-  const res = await axiosApi.post<unknown>('/api/users/login/google', body);
+  const res = await axiosApi.post<unknown>('/api/auth/login/google', body);
   return userLoggedSchema.parse(res.data);
 }
 
 export async function forgotPassword(dto: ForgotPasswordDto): Promise<string> {
   const body = forgotPasswordSchema.parse(dto);
-  const res = await axiosApi.post<unknown>('/api/users/forgot-password', body);
+  const res = await axiosApi.post<unknown>('/api/auth/forgot-password', body);
   const parsed = authMessageResponseSchema.safeParse(res.data);
   if (parsed.success) return parsed.data.message;
   return 'Se o e-mail existir, enviámos instruções para redefinir a senha.';
@@ -46,7 +46,7 @@ export async function forgotPassword(dto: ForgotPasswordDto): Promise<string> {
 
 export async function resetPassword(dto: ResetPasswordFormValues): Promise<string> {
   const body = resetPasswordFormSchema.parse(dto);
-  const res = await axiosApi.post<unknown>('/api/users/reset-password', body);
+  const res = await axiosApi.post<unknown>('/api/auth/reset-password', body);
   const parsed = authMessageResponseSchema.safeParse(res.data);
   if (parsed.success) return parsed.data.message;
   return 'Senha redefinida com sucesso.';
@@ -54,7 +54,7 @@ export async function resetPassword(dto: ResetPasswordFormValues): Promise<strin
 
 export async function confirmEmail(dto: ConfirmEmailDto): Promise<string> {
   const body = confirmEmailSchema.parse(dto);
-  const res = await axiosApi.post<unknown>('/api/users/confirm-email', body);
+  const res = await axiosApi.post<unknown>('/api/auth/confirm-email', body);
   const parsed = authMessageResponseSchema.safeParse(res.data);
   if (parsed.success) return parsed.data.message;
   return 'E-mail confirmado com sucesso.';
@@ -62,7 +62,7 @@ export async function confirmEmail(dto: ConfirmEmailDto): Promise<string> {
 
 export async function resendEmailConfirmation(dto: ResendEmailConfirmationDto): Promise<string> {
   const body = resendEmailConfirmationSchema.parse(dto);
-  const res = await axiosApi.post<unknown>('/api/users/resend-email-confirmation', body);
+  const res = await axiosApi.post<unknown>('/api/auth/resend-email-confirmation', body);
   const parsed = authMessageResponseSchema.safeParse(res.data);
   if (parsed.success) return parsed.data.message;
   return 'Se o e-mail existir e ainda não estiver confirmado, reenviámos o link.';

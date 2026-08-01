@@ -6,7 +6,7 @@ using EmpregaNet.Domain.Enums;
 using FluentValidation;
 using Microsoft.AspNetCore.Identity;
 
-namespace EmpregaNet.Application.Users.Commands;
+namespace EmpregaNet.Application.Auth.Commands;
 
 public sealed record LoginUserCommand(string Login, string Password) : IRequest<UserLoggedViewModel>;
 

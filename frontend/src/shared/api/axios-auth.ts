@@ -31,7 +31,7 @@ async function tryRefreshSession(): Promise<UserLoggedDto | null> {
 /** Endpoints de auth não devem disparar o fluxo de refresh (evita recursão em 401). */
 function isAuthEndpoint(url: string | undefined): boolean {
   if (!url) return false;
-  return url.includes('/users/refresh-token') || url.includes('/users/logout');
+  return url.includes('/auth/refresh-token') || url.includes('/auth/logout');
 }
 
 /** Configura o interceptor de autenticação do Axios,

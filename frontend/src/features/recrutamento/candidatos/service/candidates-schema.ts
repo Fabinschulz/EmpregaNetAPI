@@ -1,4 +1,4 @@
-import { userSchema } from '@/shared/auth';
+import { userSchema } from '@/shared/schema';
 import { LIST_ORDER_BY_VALUES, createPaginatedResponseSchema, type CandidatesListQueryParams } from '@/shared/schema';
 import { z } from 'zod';
 

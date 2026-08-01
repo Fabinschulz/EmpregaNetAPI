@@ -3,7 +3,7 @@ using EmpregaNet.Application.Common.Exceptions;
 using EmpregaNet.Application.Abstraction;
 using EmpregaNet.Domain.Enums;
 
-namespace EmpregaNet.Application.Users.Commands;
+namespace EmpregaNet.Application.Auth.Commands;
 
 public sealed record RefreshTokenCommand(string RefreshToken) : IRequest<UserLoggedViewModel>;
 

@@ -1,9 +1,8 @@
 using EmpregaNet.Application.Utils;
-using EmpregaNet.Application.Utils.Helpers;
 using EmpregaNet.Application.Users.Validation;
 using FluentValidation;
 
-namespace EmpregaNet.Application.Users.Commands;
+namespace EmpregaNet.Application.Auth.Commands;
 
 public sealed class RegisterUserCommandValidator : AbstractValidator<RegisterUserCommand>
 {

@@ -5,7 +5,7 @@ using EmpregaNet.Domain.Enums;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 
-namespace EmpregaNet.Application.Users.Commands;
+namespace EmpregaNet.Application.Auth.Commands;
 
 public sealed record ResetPasswordCommand(
     long UserId,

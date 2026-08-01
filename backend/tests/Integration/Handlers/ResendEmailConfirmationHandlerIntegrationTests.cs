@@ -1,4 +1,4 @@
-using EmpregaNet.Application.Users.Commands;
+using EmpregaNet.Application.Auth.Commands;
 using EmpregaNet.Tests.Support;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;

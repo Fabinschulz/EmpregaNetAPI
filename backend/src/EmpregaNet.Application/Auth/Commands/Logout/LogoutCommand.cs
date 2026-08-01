@@ -1,6 +1,6 @@
 using EmpregaNet.Application.Abstraction;
 
-namespace EmpregaNet.Application.Users.Commands;
+namespace EmpregaNet.Application.Auth.Commands;
 
 /// <summary>
 /// Encerra a sessão revogando o refresh token apresentado (cookie httpOnly ou corpo).

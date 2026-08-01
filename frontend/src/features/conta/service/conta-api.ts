@@ -1,5 +1,5 @@
 import { axiosApi, createAxiosConfig } from '@/shared/api';
-import { userSchema, type UserDto } from '@/shared/auth';
+import { userSchema, type UserDto } from '@/shared/schema';
 import { onlyDigits } from '@/utils';
 import { z } from 'zod';
 import {

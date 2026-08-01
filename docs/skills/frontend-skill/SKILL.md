@@ -114,6 +114,19 @@ Diagnóstico de erro de prerender: `pnpm exec next build --debug-prerender` most
 - **Capacidades** centralizadas; evitar *strings mágicas* espalhadas — extrair enums/helpers compartilhados.
 - UI condicional menus/ações sempre coerentes com papel real do backend (**nunca** apenas esconder link).
 
+### Auth ≠ dados do utilizador
+
+Duas responsabilidades distintas, em lugares distintos — respeitar ao adicionar código novo:
+
+| Responsabilidade | Onde | Endpoints |
+| ---------------- | ---- | --------- |
+| **Credencial e sessão** (entrar, sair, registar, renovar, recuperar acesso) | `features/auth/service/` e `shared/auth/` (sessão) | `/api/auth/*` |
+| **Dados do próprio utilizador** (ver/editar perfil, trocar senha, encerrar conta) | `features/conta/service/` | `/api/users/me*` |
+| **Utilizadores como dado de negócio** (gestão, listagens) | `features/admin/usuarios/`, `features/recrutamento/candidatos/` | `/api/users`, `/api/admin/*` |
+
+- O schema do utilizador (`userSchema`/`UserDto`) vive em **`shared/schema/user-schema.ts`**, não em `shared/auth`: descreve o utilizador como *dado*, consumido por telas sem relação com autenticação. Em `shared/auth` ficam só os contratos de credencial (`userLoggedSchema`, `refreshTokenSchema`).
+- O interceptor de 401 (`shared/api/axios-auth.ts`) identifica as rotas de sessão **por caminho literal** (`/auth/refresh-token`, `/auth/logout`) para não tentar renovar a sessão em cima da própria renovação. Ao mover essas rotas, atualizar esse guard — senão a falha é silenciosa.
+
 ---
 
 ## 8. UX, estética e acessibilidade

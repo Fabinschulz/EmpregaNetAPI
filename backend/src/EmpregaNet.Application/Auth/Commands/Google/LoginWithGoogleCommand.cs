@@ -9,7 +9,7 @@ using EmpregaNet.Domain.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 
-namespace EmpregaNet.Application.Users.Commands;
+namespace EmpregaNet.Application.Auth.Commands;
 
 /// <summary>
 /// Autentica com Google a partir do <c>id_token</c> obtido no cliente.

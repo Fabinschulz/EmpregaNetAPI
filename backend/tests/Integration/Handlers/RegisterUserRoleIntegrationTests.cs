@@ -1,4 +1,4 @@
-using EmpregaNet.Application.Users.Commands;
+using EmpregaNet.Application.Auth.Commands;
 using EmpregaNet.Application.Users.Identity;
 using EmpregaNet.Domain.Entities;
 using EmpregaNet.Tests.Support;
