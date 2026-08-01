@@ -2,11 +2,14 @@
 
 import {
     ApiQueryBoundary,
+    ConfirmDialog,
     PageHeader,
     StatusBadge,
     TableContainer,
     TableFilters,
-    type DataTableColumn
+    useRowDeleteAction,
+    type DataTableColumn,
+    type RowAction
 } from '@/components';
 import { FormProvider } from '@/context';
 import { usePersistedTablePagination } from '@/hooks';
@@ -18,30 +21,12 @@ import {
     adminUsersFilterFormSchema,
     adminUsersFilterToParams,
     defaultAdminUsersFilter,
-    useAdminUsersListQuery
+    useAdminUsersListQuery,
+    useDeleteAdminUserMutation
 } from '../service';
 import { AdminUsersFilterFields } from './admin-users-filter-fields';
 
 type AdminUsersFilterParams = Pick<AdminUsersListQueryParams, 'search' | 'isDeleted' | 'orderBy'>;
-
-const USERS_COLUMNS: DataTableColumn<UserDto>[] = [
-  { key: 'username', header: 'Usuário', render: (user) => <strong>{user.username}</strong> },
-  { key: 'email', header: 'E-mail', render: (user) => user.email },
-  { key: 'userType', header: 'Tipo', render: (user) => userTypeLabel(user.userType) },
-  {
-    key: 'situation',
-    header: 'Situação',
-    render: (user) => (
-      <StatusBadge label={user.isDeleted ? 'Excluído' : 'Ativo'} tone={user.isDeleted ? 'negative' : 'positive'} />
-    )
-  },
-  { key: 'createdAt', header: 'Criado em', render: (user) => formatDate(user.createdAt) },
-  {
-    key: 'actions',
-    type: 'actions',
-    getActions: (user) => [{ key: 'detail', label: 'Detalhes', icon: Eye, href: `/admin/usuarios/${user.id}` }]
-  }
-];
 
 export function AdminUsersPage() {
   const pagination = usePersistedTablePagination({ storageKey: 'admin-usuarios' });
@@ -69,6 +54,49 @@ export function AdminUsersPage() {
     [data]
   );
 
+  const { mutate: deleteUser, isPending: isDeleting } = useDeleteAdminUserMutation();
+  const { getDeleteAction, confirmDialogProps } = useRowDeleteAction<UserDto>({
+    permission: 'user.delete',
+    resource: 'usuário',
+    getId: (user) => user.id,
+    getLabel: (user) => user.username,
+    deleteById: deleteUser,
+    isDeleting,
+    getDescription: (user) =>
+      `O usuário "${user.username}" será marcado como excluído e perderá o acesso. O registro permanece para auditoria.`
+  });
+
+  const columns = useMemo<DataTableColumn<UserDto>[]>(
+    () => [
+      { key: 'username', header: 'Usuário', render: (user) => <strong>{user.username}</strong> },
+      { key: 'email', header: 'E-mail', render: (user) => user.email },
+      { key: 'userType', header: 'Tipo', render: (user) => userTypeLabel(user.userType) },
+      {
+        key: 'situation',
+        header: 'Situação',
+        render: (user) => (
+          <StatusBadge label={user.isDeleted ? 'Excluído' : 'Ativo'} tone={user.isDeleted ? 'negative' : 'positive'} />
+        )
+      },
+      { key: 'createdAt', header: 'Criado em', render: (user) => formatDate(user.createdAt) },
+      {
+        key: 'actions',
+        type: 'actions',
+        getActions: (user) => {
+          const actions: RowAction[] = [
+            { key: 'detail', label: 'Detalhes', icon: Eye, href: `/admin/usuarios/${user.id}` }
+          ];
+
+          const deleteAction = user.isDeleted ? null : getDeleteAction(user);
+          if (deleteAction) actions.push(deleteAction);
+
+          return actions;
+        }
+      }
+    ],
+    [getDeleteAction]
+  );
+
   return (
     <ApiQueryBoundary
       fallback="usuários"
@@ -82,7 +110,7 @@ export function AdminUsersPage() {
         <PageHeader title="Usuários" description="Gestão de usuários (Admin)." />
 
         <TableContainer
-          columns={USERS_COLUMNS}
+          columns={columns}
           items={data?.data ?? []}
           getRowKey={(user) => user.id}
           pagination={pagination}
@@ -108,6 +136,8 @@ export function AdminUsersPage() {
             </TableFilters>
           }
         />
+
+        <ConfirmDialog {...confirmDialogProps} />
       </section>
     </ApiQueryBoundary>
   );

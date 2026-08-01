@@ -6,6 +6,7 @@ import {
     PageHeader,
     TableContainer,
     TableFilters,
+    useRowDeleteAction,
     type DataTableColumn,
     type RowAction
 } from '@/components';
@@ -19,6 +20,7 @@ import {
     recruitmentApplicationsFilterFormSchema,
     useAllJobApplicationsQuery,
     useChangeApplicationStatusMutation,
+    useDeleteApplicationMutation,
     type ApplicationStatus,
     type JobApplicationDto
 } from '@/features/candidaturas/service';
@@ -57,6 +59,18 @@ export function RecruitmentApplicationsPage() {
     orderBy
   });
   const { mutate: changeApplicationStatus, isPending: isChangingStatus } = useChangeApplicationStatusMutation();
+  const { mutate: deleteApplication, isPending: isDeleting } = useDeleteApplicationMutation();
+
+  const { getDeleteAction, confirmDialogProps: deleteDialogProps } = useRowDeleteAction<JobApplicationDto>({
+    permission: 'jobApplication.delete',
+    resource: 'candidatura',
+    getId: (application) => application.id,
+    getLabel: (application) => `#${application.id}`,
+    deleteById: deleteApplication,
+    isDeleting,
+    getDescription: (application) =>
+      `A candidatura #${application.id} será removida permanentemente. Esta ação não pode ser desfeita.`
+  });
 
   const handleOrderByChange = useCallback(
     (next: ListOrderByValue) => {
@@ -98,7 +112,7 @@ export function RecruitmentApplicationsPage() {
                 ? () => setPendingTransition({ id: application.id, status: target })
                 : () => changeApplicationStatus({ id: application.id, status: target }),
               variant: isDestructive ? 'destructive' : 'default',
-              disabled: isChangingStatus
+              disabled: isChangingStatus || isDeleting
             };
           });
 
@@ -106,11 +120,14 @@ export function RecruitmentApplicationsPage() {
             actions.push({ key: 'view-job', label: 'Ver vaga', icon: Eye, href: `/vagas/${application.jobId}` });
           }
 
+          const deleteAction = getDeleteAction(application);
+          if (deleteAction) actions.push(deleteAction);
+
           return actions;
         }
       }
     ],
-    [changeApplicationStatus, isChangingStatus]
+    [changeApplicationStatus, isChangingStatus, isDeleting, getDeleteAction]
   );
 
   const pendingLabel = pendingTransition ? applicationTransitionLabels[pendingTransition.status] : '';
@@ -167,6 +184,8 @@ export function RecruitmentApplicationsPage() {
           loading={isChangingStatus}
           onConfirm={handleConfirmTransition}
         />
+
+        <ConfirmDialog {...deleteDialogProps} />
       </section>
     </ApiQueryBoundary>
   );

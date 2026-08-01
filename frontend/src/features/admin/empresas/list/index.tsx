@@ -1,6 +1,16 @@
 'use client';
 
-import { ApiQueryBoundary, Button, PageHeader, TableContainer, TableFilters, type DataTableColumn } from '@/components';
+import {
+    ApiQueryBoundary,
+    Button,
+    ConfirmDialog,
+    PageHeader,
+    TableContainer,
+    TableFilters,
+    useRowDeleteAction,
+    type DataTableColumn,
+    type RowAction
+} from '@/components';
 import { FormProvider } from '@/context';
 import { usePersistedTablePagination } from '@/hooks';
 import type { CompaniesListQueryParams } from '@/shared';
@@ -13,24 +23,12 @@ import {
     companiesFilterToParams,
     defaultCompaniesFilter,
     useCompaniesListQuery,
+    useDeleteCompanyMutation,
     type CompanyDto
 } from '../service';
 import { CompaniesFilterFields } from './companies-filter-fields';
 
 type CompaniesFilterParams = Pick<CompaniesListQueryParams, 'search' | 'isDeleted' | 'orderBy'>;
-
-const COMPANIES_COLUMNS: DataTableColumn<CompanyDto>[] = [
-  { key: 'name', header: 'Nome', render: (company) => <strong>{company.name}</strong> },
-  { key: 'email', header: 'E-mail', render: (company) => company.email ?? '—' },
-  { key: 'phone', header: 'Telefone', render: (company) => company.phone ?? '—' },
-  { key: 'documentNo', header: 'CNPJ', render: (company) => company.documentNo ?? '—' },
-  { key: 'createdAt', header: 'Criado em', render: (company) => formatDate(company.createdAt) },
-  {
-    key: 'actions',
-    type: 'actions',
-    getActions: (company) => [{ key: 'edit', label: 'Editar', icon: Pencil, href: `/admin/empresas/${company.id}` }]
-  }
-];
 
 export function AdminCompaniesPage() {
   const pagination = usePersistedTablePagination({ storageKey: 'admin-empresas' });
@@ -54,6 +52,41 @@ export function AdminCompaniesPage() {
   const searchOptions = useMemo(
     () => (data?.data ?? []).map((company) => ({ label: company.name, value: String(company.id) })),
     [data]
+  );
+
+  const { mutate: deleteCompany, isPending: isDeleting } = useDeleteCompanyMutation();
+  const { getDeleteAction, confirmDialogProps } = useRowDeleteAction<CompanyDto>({
+    permission: 'company.delete',
+    resource: 'empresa',
+    getId: (company) => company.id,
+    getLabel: (company) => company.name,
+    deleteById: deleteCompany,
+    isDeleting
+  });
+
+  const columns = useMemo<DataTableColumn<CompanyDto>[]>(
+    () => [
+      { key: 'name', header: 'Nome', render: (company) => <strong>{company.name}</strong> },
+      { key: 'email', header: 'E-mail', render: (company) => company.email ?? '-' },
+      { key: 'phone', header: 'Telefone', render: (company) => company.phone ?? '-' },
+      { key: 'documentNo', header: 'CNPJ', render: (company) => company.documentNo ?? '-' },
+      { key: 'createdAt', header: 'Criado em', render: (company) => formatDate(company.createdAt) },
+      {
+        key: 'actions',
+        type: 'actions',
+        getActions: (company) => {
+          const actions: RowAction[] = [
+            { key: 'edit', label: 'Editar', icon: Pencil, href: `/admin/empresas/${company.id}` }
+          ];
+
+          const deleteAction = getDeleteAction(company);
+          if (deleteAction) actions.push(deleteAction);
+
+          return actions;
+        }
+      }
+    ],
+    [getDeleteAction]
   );
 
   return (
@@ -80,7 +113,7 @@ export function AdminCompaniesPage() {
         />
 
         <TableContainer
-          columns={COMPANIES_COLUMNS}
+          columns={columns}
           items={data?.data ?? []}
           getRowKey={(company) => company.id}
           pagination={pagination}
@@ -106,6 +139,8 @@ export function AdminCompaniesPage() {
             </TableFilters>
           }
         />
+
+        <ConfirmDialog {...confirmDialogProps} />
       </section>
     </ApiQueryBoundary>
   );

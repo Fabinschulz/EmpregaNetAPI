@@ -7,6 +7,7 @@ import {
     PageHeader,
     TableContainer,
     TableFilters,
+    useRowDeleteAction,
     type DataTableColumn,
     type RowAction
 } from '@/components';
@@ -24,7 +25,7 @@ import {
 } from '@/features/candidaturas/service';
 import { usePersistedTablePagination } from '@/hooks';
 import { formatDate } from '@/shared';
-import { Ban, CheckCircle2, Flag, Pencil, PlayCircle, RotateCcw, Trash2, XCircle, type LucideIcon } from 'lucide-react';
+import { Ban, CheckCircle2, Flag, Pencil, PlayCircle, RotateCcw, XCircle, type LucideIcon } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useMemo, useState } from 'react';
@@ -52,16 +53,14 @@ const TRANSITION_ICON: Record<ApplicationStatus, LucideIcon> = {
 /** Transições que exigem confirmação por serem terminais/negativas. */
 const DESTRUCTIVE_TRANSITIONS: ReadonlySet<ApplicationStatus> = new Set<ApplicationStatus>(['Rejected', 'Canceled']);
 
-type PendingAction =
-  | { type: 'status'; application: JobApplicationDto; target: ApplicationStatus }
-  | { type: 'delete'; application: JobApplicationDto };
+type PendingTransition = { application: JobApplicationDto; target: ApplicationStatus };
 
 export function CandidatesByJobPage() {
   const params = useParams<{ id: string }>();
   const jobId = useMemo(() => Number(params.id), [params.id]);
   const pagination = usePersistedTablePagination({ storageKey: `recrutamento-vaga-${jobId}-candidatos` });
   const [filters, setFilters] = useState<CandidatesFilterParams>({});
-  const [pending, setPending] = useState<PendingAction | null>(null);
+  const [pending, setPending] = useState<PendingTransition | null>(null);
 
   const { data: job } = useJobQuery(jobId);
   const { data, isPending, isError, error, refetch } = useApplicationsByJobQuery(jobId, {
@@ -72,6 +71,17 @@ export function CandidatesByJobPage() {
 
   const { mutate: changeStatus, isPending: isChangingStatus } = useChangeApplicationStatusMutation();
   const { mutate: deleteApplication, isPending: isDeleting } = useDeleteApplicationMutation();
+
+  const { getDeleteAction, confirmDialogProps: deleteDialogProps } = useRowDeleteAction<JobApplicationDto>({
+    permission: 'jobApplication.delete',
+    resource: 'candidatura',
+    getId: (application) => application.id,
+    getLabel: (application) => `#${application.id}`,
+    deleteById: deleteApplication,
+    isDeleting,
+    getDescription: (application) =>
+      `A candidatura #${application.id} será removida permanentemente. Esta ação não pode ser desfeita.`
+  });
 
   const handleFilterChange = (next: CandidatesFilterParams) => {
     setFilters(next);
@@ -104,54 +114,25 @@ export function CandidatesByJobPage() {
               variant: destructive ? 'destructive' : 'default',
               disabled: isChangingStatus || isDeleting,
               onSelect: destructive
-                ? () => setPending({ type: 'status', application, target })
+                ? () => setPending({ application, target })
                 : () => changeStatus({ id: application.id, status: target })
             };
           });
 
-          actions.push({
-            key: 'delete',
-            label: 'Excluir',
-            icon: Trash2,
-            variant: 'destructive',
-            disabled: isChangingStatus || isDeleting,
-            onSelect: () => setPending({ type: 'delete', application })
-          });
+          const deleteAction = getDeleteAction(application);
+          if (deleteAction) actions.push(deleteAction);
 
           return actions;
         }
       }
     ],
-    [changeStatus, isChangingStatus, isDeleting]
+    [changeStatus, isChangingStatus, isDeleting, getDeleteAction]
   );
 
-  const confirmProps = useMemo(() => {
-    if (!pending) return null;
-    if (pending.type === 'delete') {
-      return {
-        title: 'Excluir candidatura',
-        description: `A candidatura #${pending.application.id} será removida permanentemente. Esta ação não pode ser desfeita.`,
-        confirmLabel: 'Excluir',
-        cancelLabel: 'Cancelar',
-        loading: isDeleting
-      };
-    }
-    const label = applicationTransitionLabels[pending.target];
-    return {
-      title: `${label} candidatura`,
-      description: `Confirmar "${label}" para a candidatura #${pending.application.id}?`,
-      confirmLabel: label,
-      cancelLabel: 'Voltar',
-      loading: isChangingStatus
-    };
-  }, [pending, isDeleting, isChangingStatus]);
+  const pendingLabel = pending ? applicationTransitionLabels[pending.target] : '';
 
-  const handleConfirm = () => {
+  const handleConfirmTransition = () => {
     if (!pending) return;
-    if (pending.type === 'delete') {
-      deleteApplication(pending.application.id, { onSuccess: () => setPending(null) });
-      return;
-    }
     changeStatus({ id: pending.application.id, status: pending.target }, { onSuccess: () => setPending(null) });
   };
 
@@ -205,21 +186,23 @@ export function CandidatesByJobPage() {
           }
         />
 
-        {confirmProps ? (
-          <ConfirmDialog
-            open={pending !== null}
-            onOpenChange={(open) => {
-              if (!open) setPending(null);
-            }}
-            title={confirmProps.title}
-            description={confirmProps.description}
-            confirmLabel={confirmProps.confirmLabel}
-            cancelLabel={confirmProps.cancelLabel}
-            tone="destructive"
-            loading={confirmProps.loading}
-            onConfirm={handleConfirm}
-          />
-        ) : null}
+        <ConfirmDialog
+          open={pending !== null}
+          onOpenChange={(open) => {
+            if (!open) setPending(null);
+          }}
+          title={`${pendingLabel} candidatura`}
+          description={
+            pending ? `Confirmar "${pendingLabel}" para a candidatura #${pending.application.id}?` : undefined
+          }
+          confirmLabel={pendingLabel}
+          cancelLabel="Voltar"
+          tone="destructive"
+          loading={isChangingStatus}
+          onConfirm={handleConfirmTransition}
+        />
+
+        <ConfirmDialog {...deleteDialogProps} />
       </section>
     </ApiQueryBoundary>
   );

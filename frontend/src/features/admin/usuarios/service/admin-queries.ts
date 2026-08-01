@@ -2,13 +2,13 @@
 
 import { useAuth } from '@/context';
 import { withDefaultListParams, type AdminUsersListQueryParams } from '@/shared/schema';
-import { reportMutationApiError, startRouterTransition } from '@/utils';
+import { reportMutationApiError, startRouterTransition, toastSuccess } from '@/utils';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { adminUsersKeys } from './admin-users-keys';
 import { deleteAdminUser, getAdminUser, listAdminUsers, updateAdminUser } from './admin-api';
 import type { AdminUserUpdateFormValues } from './admin-schema';
+import { adminUsersKeys } from './admin-users-keys';
 
 export function useAdminUsersListQuery(params?: AdminUsersListQueryParams) {
   const { isAuthenticated } = useAuth();
@@ -54,16 +54,16 @@ export function useUpdateAdminUserMutation(userId: number) {
   return { ...ctx, apiError };
 }
 
-export function useDeleteAdminUserMutation(userId: number) {
+
+export function useDeleteAdminUserMutation() {
   const queryClient = useQueryClient();
   const [apiError, setApiError] = useState<string | null>(null);
-  const router = useRouter();
 
   const ctx = useMutation({
-    mutationFn: () => deleteAdminUser(userId),
+    mutationFn: (id: number) => deleteAdminUser(id),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: adminUsersKeys.all });
-      startRouterTransition(() => router.push('/admin/usuarios'));
+      toastSuccess('Usuário excluído', 'O usuário foi marcado como excluído.');
     },
     onError: (err) => {
       reportMutationApiError({ err, actionLabel: 'excluir usuário', resource: 'usuário', setApiError });

@@ -2,12 +2,12 @@
 
 import { useAuth } from '@/context';
 import { withDefaultListParams, type CompaniesListQueryParams } from '@/shared/schema';
-import { reportMutationApiError, startRouterTransition } from '@/utils';
+import { reportMutationApiError, startRouterTransition, toastSuccess } from '@/utils';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { companiesKeys } from './companies-keys';
 import { createCompany, deleteCompany, getCompany, listCompanies, updateCompany } from './companies-api';
+import { companiesKeys } from './companies-keys';
 import type { CompanyFormValues } from './companies-schema';
 
 export function useCompaniesListQuery(params?: CompaniesListQueryParams) {
@@ -70,16 +70,15 @@ export function useUpdateCompanyMutation(companyId: number) {
   return { ...ctx, apiError };
 }
 
-export function useDeleteCompanyMutation(companyId: number) {
+export function useDeleteCompanyMutation() {
   const queryClient = useQueryClient();
   const [apiError, setApiError] = useState<string | null>(null);
-  const router = useRouter();
 
   const ctx = useMutation({
-    mutationFn: () => deleteCompany(companyId),
+    mutationFn: (id: number) => deleteCompany(id),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: companiesKeys.all });
-      startRouterTransition(() => router.push('/admin/empresas'));
+      toastSuccess('Empresa excluída', 'A empresa foi removida.');
     },
     onError: (err) => {
       reportMutationApiError({ err, actionLabel: 'excluir empresa', resource: 'empresa', setApiError });

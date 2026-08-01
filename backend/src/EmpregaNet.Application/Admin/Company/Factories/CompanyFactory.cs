@@ -1,5 +1,5 @@
 using EmpregaNet.Application.Admin.Company.Commands;
-using EmpregaNet.Application.Utils.Helpers;
+using EmpregaNet.Application.Utils.CustomValidation;
 using EmpregaNet.Domain.Enums;
 using DomainCompany = EmpregaNet.Domain.Entities.Company;
 
@@ -13,7 +13,7 @@ public abstract record CompanyFactory
         {
             CompanyName = command.CompanyName,
             Address = command.Address,
-            RegistrationNumber = command.Cnpj.OnlyNumbers().Trim(),
+            RegistrationNumber = BrazilianDocument.NormalizeCnpj(command.Cnpj),
             Email = command.Email,
             Phone = command.Phone,
             TypeOfActivity = Enum.TryParse<TypeOfActivityEnum>(command.TypeOfActivity, out var typeOfActivity) ? typeOfActivity : TypeOfActivityEnum.NaoSelecionado

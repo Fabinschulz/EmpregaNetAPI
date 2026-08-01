@@ -23,6 +23,13 @@ namespace EmpregaNet.Infra.Extensions
 
         public static WebApplicationBuilder AddIdentityConfiguration(this WebApplicationBuilder builder)
         {
+            // O handler traduz claims curtas de entrada (sub, email) para os URIs longos
+            // do WS-Federation. O 'sub' acabava também como ClaimTypes.NameIdentifier, convivendo
+            // com o NameIdentifier que o JwtBuilder emite explicitamente, duas claims do mesmo
+            // tipo com valores diferentes (id e nome de usuário), e quem lesse por
+            // FindFirstValue pegava a que viesse primeiro.
+            System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
+
             builder.AddJwtSupport()
                    .AddIdentityApiSupport();
 
@@ -95,7 +102,7 @@ namespace EmpregaNet.Infra.Extensions
             if (jwtSettings == null || string.IsNullOrEmpty(jwtSettings.SecretKey))
                 throw new InvalidOperationException("JwtSettings ou SecretKey não configurado(s) no appsettings.json ou variáveis de ambiente.");
 
-            var key = Encoding.ASCII.GetBytes(jwtSettings.SecretKey);
+            var key = Encoding.UTF8.GetBytes(jwtSettings.SecretKey);
 
             builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                             .AddJwtBearer((options =>
@@ -171,6 +178,7 @@ namespace EmpregaNet.Infra.Extensions
                                             ValidateIssuer = true,
                                             ValidateAudience = true,
                                             ValidateLifetime = true,
+                                            ClockSkew = TimeSpan.Zero,
                                             ValidAudience = jwtSettings.Audience,
                                             ValidIssuer = jwtSettings.Issuer,
                                             NameClaimType = ClaimTypes.NameIdentifier

@@ -6,6 +6,16 @@ namespace EmpregaNet.Application.Utils
 {
     public static class FluentValidationExtensions
     {
+        /// <summary>CNPJ com dígito verificador conferido, não apenas contagem de dígitos.</summary>
+        public static IRuleBuilderOptions<T, string> IsCnpj<T>(this IRuleBuilder<T, string> ruleBuilder) =>
+            ruleBuilder.Must(CustomValidation.BrazilianDocument.IsValidCnpj)
+                       .WithMessage("CNPJ inválido: verifique os dígitos informados.");
+
+        /// <summary>CPF com dígito verificador conferido.</summary>
+        public static IRuleBuilderOptions<T, string> IsCpf<T>(this IRuleBuilder<T, string> ruleBuilder) =>
+            ruleBuilder.Must(CustomValidation.BrazilianDocument.IsValidCpf)
+                       .WithMessage("CPF inválido: verifique os dígitos informados.");
+
         public static IRuleBuilderOptions<T, string> IsBrazilianCellPhone<T>(
         this IRuleBuilder<T, string> ruleBuilder)
         {

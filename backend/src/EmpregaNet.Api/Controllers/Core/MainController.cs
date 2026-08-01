@@ -67,7 +67,7 @@ namespace EmpregaNet.Api.Controllers.Core
         }
 
         /// <summary>
-        /// Endpoint para criar um novo recurso.
+        /// Cria um novo recurso.
         /// </summary>
         [HttpPost]
         [ProducesResponseType(typeof(string), StatusCodes.Status201Created)]
@@ -86,7 +86,7 @@ namespace EmpregaNet.Api.Controllers.Core
         }
 
         /// <summary>
-        /// Endpoint para atualizar um recurso existente.
+        /// Atualiza um recurso existente.
         /// </summary>
         [HttpPut("{id:long}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -102,7 +102,7 @@ namespace EmpregaNet.Api.Controllers.Core
         }
 
         /// <summary>
-        /// Endpoint para excluir um recurso.
+        /// Excluir um recurso.
         /// </summary>
         [HttpDelete("{id:long}")]
         [ProducesResponseType(typeof(string), StatusCodes.Status204NoContent)]

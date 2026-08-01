@@ -25,6 +25,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\src\EmpregaNet.Api\EmpregaNet.Api.csproj" />
     <ProjectReference Include="..\src\EmpregaNet.Application\EmpregaNet.Application.csproj" />
     <ProjectReference Include="..\src\EmpregaNet.Domain\EmpregaNet.Domain.csproj" />
     <ProjectReference Include="..\src\EmpregaNet.Infra\EmpregaNet.Infra.csproj" />

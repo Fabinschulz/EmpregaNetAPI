@@ -2,8 +2,7 @@ using FluentValidation;
 using EmpregaNet.Domain.Entities;
 using EmpregaNet.Application.Common.Base;
 using EmpregaNet.Domain.Enums;
-using EmpregaNet.Application.Utils.Helpers;
-using System.Text.RegularExpressions;
+using EmpregaNet.Application.Utils;
 
 namespace EmpregaNet.Application.Admin.Company.Commands;
 
@@ -33,12 +32,7 @@ public sealed class CompanyDataValidator<T> : AbstractValidator<T> where T : ICo
         RuleFor(x => x.Cnpj)
             .NotEmpty()
             .WithMessage("O CNPJ é obrigatório.")
-            .Must(cnpj =>
-            {
-                var cleanedCnpj = cnpj.OnlyNumbers().Trim();
-                return Regex.IsMatch(cleanedCnpj, @"^\d{14}$");
-            })
-            .WithMessage("O campo 'CNPJ' deve conter exatamente 14 dígitos numéricos.");
+            .IsCnpj();
 
         RuleFor(x => x.Email)
             .NotEmpty()

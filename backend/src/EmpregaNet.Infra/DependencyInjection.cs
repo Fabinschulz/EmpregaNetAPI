@@ -21,6 +21,7 @@ public static class DependencyInjection
 
     public static void RegisterCoreDependencies(this WebApplicationBuilder builder)
     {
+        EnsureJwtKeyIsStrongEnough(builder.Configuration);
         builder.AddIdentityConfiguration();
         builder.SetupSentryLogging();
         builder.SetupDatabaseConnection();
@@ -56,6 +57,38 @@ public static class DependencyInjection
                 : (IEmailThrottleService)new InMemoryEmailThrottleService(maxEmailsPerDay));
     }
 
+    /// <summary>
+    /// Recusa subir com uma chave de assinatura curta demais.
+    /// </summary>
+    /// <remarks>
+    /// A validação existente cobria apenas a presença da <c>SecretKey</c>. Uma chave curta passa
+    /// nessa checagem e o HMAC-SHA256 assina com ela normalmente, o token continua válido, só que
+    /// viável de quebrar por força bruta. Como essa chave é o único segredo entre um anônimo e um
+    /// administrador, o comprimento precisa falhar no boot, não numa auditoria.
+    /// </remarks>
+    /// <exception cref="InvalidOperationException">Chave ausente ou com menos de 32 bytes.</exception>
+    private static void EnsureJwtKeyIsStrongEnough(IConfiguration configuration)
+    {
+        const int minimumSecretKeyBytes = 32;
+
+        var secretKey = configuration["JwtSettings:SecretKey"];
+
+        if (string.IsNullOrWhiteSpace(secretKey))
+        {
+            throw new InvalidOperationException(
+                "'JwtSettings:SecretKey' não configurada. Defina via variável de ambiente (JwtSettings__SecretKey) ou user-secrets.");
+        }
+
+        var keyBytes = System.Text.Encoding.UTF8.GetByteCount(secretKey);
+
+        if (keyBytes < minimumSecretKeyBytes)
+        {
+            throw new InvalidOperationException(
+                $"'JwtSettings:SecretKey' tem {keyBytes} bytes; HMAC-SHA256 exige no mínimo {minimumSecretKeyBytes} " +
+                "para que a chave não seja o elo fraco da assinatura.");
+        }
+    }
+
     private static void EnsureSmtpConfiguredForProduction(IHostEnvironment env, SmtpEmailOptions smtp)
     {
         if (!env.IsProduction())
@@ -86,11 +119,9 @@ public static class DependencyInjection
 
     private static void SetupDependencyInjection(this IServiceCollection services)
     {
-        // Behaviors executam na ordem de registro: o primeiro registrado é o mais externo (executa antes dos demais).
-        // Ordem atual: Validation → Transaction → Handler
+        services.AddScoped(typeof(IPipelineBehavior<,>), typeof(PerformanceBehaviour<,>));
         services.AddScoped(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
         services.AddScoped(typeof(IPipelineBehavior<,>), typeof(TransactionBehavior<,>));
-        // services.AddScoped(typeof(IPipelineBehavior<,>), typeof(PerformanceBehaviour<,>));
         services.AddScoped<IUnityOfWork, UnityOfWork>();
 
         #region Repositories

@@ -12,7 +12,7 @@ builderServices.AddMediator("EmpregaNet");
 builderServices.AddExceptionHandler<GlobalExceptionHandler>();
 
 // Register dependencies
-builderServices.RegisterApiDependencies(builder.Configuration);
+builderServices.RegisterApiDependencies(builder.Configuration, builder.Environment);
 builderServices.RegisterApplicationDependencies();
 builderServices.RegisterAIDependencies(builder.Configuration);
 builder.RegisterCoreDependencies();

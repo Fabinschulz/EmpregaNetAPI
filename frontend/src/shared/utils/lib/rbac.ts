@@ -20,12 +20,49 @@ export function hasRole(userRoles: readonly string[] | null | undefined, role: s
   return userRoles.some((r) => r.toLowerCase() === role.toLowerCase());
 }
 
+export const AUTH_POLICIES = {
+  administrador: 'Administrador',
+  recrutamento: 'Recrutamento'
+} as const;
+
+export type AuthPolicy = (typeof AUTH_POLICIES)[keyof typeof AUTH_POLICIES];
+
+const POLICY_ROLES: Record<AuthPolicy, readonly string[]> = {
+  Administrador: ['Admin'],
+  Recrutamento: ['Admin', 'Recruiter', 'Manager']
+};
+
+export function satisfiesPolicy(
+  userRoles: readonly string[] | null | undefined,
+  policy: AuthPolicy
+): boolean {
+  return POLICY_ROLES[policy].some((role) => hasRole(userRoles, role));
+}
+
 export function isAdmin(userRoles: readonly string[] | null | undefined): boolean {
-  return hasRole(userRoles, 'Admin');
+  return satisfiesPolicy(userRoles, AUTH_POLICIES.administrador);
 }
 
 export function isRecruitmentStaff(userRoles: readonly string[] | null | undefined): boolean {
-  return hasRole(userRoles, 'Admin') || hasRole(userRoles, 'Recruiter') || hasRole(userRoles, 'Manager');
+  return satisfiesPolicy(userRoles, AUTH_POLICIES.recrutamento);
+}
+
+
+export const PERMISSION_POLICIES = {
+  /** `DELETE /api/companies/{id}` */
+  'company.delete': AUTH_POLICIES.administrador,
+  /** `DELETE /api/admin/{id}` (exclusão lógica do usuário) */
+  'user.delete': AUTH_POLICIES.administrador,
+  /** `DELETE /api/jobs/{id}` */
+  'job.delete': AUTH_POLICIES.recrutamento,
+  /** `DELETE /api/jobapplications/{id}` */
+  'jobApplication.delete': AUTH_POLICIES.recrutamento
+} as const;
+
+export type Permission = keyof typeof PERMISSION_POLICIES;
+
+export function can(userRoles: readonly string[] | null | undefined, permission: Permission): boolean {
+  return satisfiesPolicy(userRoles, PERMISSION_POLICIES[permission]);
 }
 
 export function canAccessPath(pathname: string, roles: readonly string[] | null | undefined): boolean {

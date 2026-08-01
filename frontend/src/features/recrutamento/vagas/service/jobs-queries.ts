@@ -1,12 +1,12 @@
 'use client';
 
 import { withDefaultListParams, type JobsListQueryParams } from '@/shared/schema';
-import { reportMutationApiError, startRouterTransition } from '@/utils';
+import { reportMutationApiError, startRouterTransition, toastSuccess } from '@/utils';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { jobsKeys } from './jobs-keys';
 import { closeJob, createJob, deleteJob, getJob, listJobs, listSelectableCompanies, updateJob } from './jobs-api';
+import { jobsKeys } from './jobs-keys';
 import type { JobFormValues } from './jobs-schema';
 
 export function useJobsListQuery(params?: JobsListQueryParams) {
@@ -92,16 +92,15 @@ export function useCloseJobMutation(jobId: number) {
   return { ...ctx, apiError };
 }
 
-export function useDeleteJobMutation(jobId: number) {
+export function useDeleteJobMutation() {
   const queryClient = useQueryClient();
   const [apiError, setApiError] = useState<string | null>(null);
-  const router = useRouter();
 
   const ctx = useMutation({
-    mutationFn: () => deleteJob(jobId),
+    mutationFn: (id: number) => deleteJob(id),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: jobsKeys.all });
-      startRouterTransition(() => router.push('/recrutamento/vagas'));
+      toastSuccess('Vaga excluída', 'A vaga foi removida.');
     },
     onError: (err) => {
       reportMutationApiError({ err, actionLabel: 'excluir vaga', resource: 'vaga', setApiError });
