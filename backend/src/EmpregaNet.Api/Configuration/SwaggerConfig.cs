@@ -32,29 +32,9 @@ namespace EmpregaNet.Api.Configuration
                     License = new OpenApiLicense { Name = "MIT" }
                 });
 
-                // s.SwaggerDoc(Constants.OpenApi.Admin, new OpenApiInfo
-                // {
-                //     Version = "v1",
-                //     Title = "EmpregaNet — Administração",
-                //     Description = "Somente endpoints privilegiados (políticas Administrador e fluxos de recrutamento alinhados ao grupo OpenAPI admin).",
-                //     Contact = new OpenApiContact { Name = "Freetech", Email = "freetech@outlook.com.br", Url = new Uri("https://freetech.vercel.app/") },
-                //     License = new OpenApiLicense { Name = "MIT" }
-                // });
-
-                // v1: superfície geral (conta, vagas, candidaturas, etc.). admin: somente [ApiExplorerSettings(GroupName = admin)].
-                // Server para ocultar endpoints administrativos do documento público (v1) e vice-versa, usando o GroupName definido nos controllers e ações.
-                // s.DocInclusionPredicate((docName, apiDesc) =>
-                // {
-                //     var isAdminSurface = string.Equals(apiDesc.GroupName, Constants.OpenApi.Admin, StringComparison.OrdinalIgnoreCase);
-
-                //     if (string.Equals(docName, Constants.OpenApi.V1, StringComparison.OrdinalIgnoreCase))
-                //         return !isAdminSurface;
-
-                //     if (string.Equals(docName, Constants.OpenApi.Admin, StringComparison.OrdinalIgnoreCase))
-                //         return isAdminSurface;
-
-                //     return false;
-                // });
+                // Documento único por enquanto. Um documento "admin" separado exigiria
+                // [ApiExplorerSettings(GroupName = ...)] nos controllers privilegiados, que
+                // hoje nenhum declara. sem isso, o filtro de inclusão esvaziaria os dois.
 
                 // Configura autenticação JWT Bearer no Swagger
                 s.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
@@ -72,49 +52,33 @@ namespace EmpregaNet.Api.Configuration
                     [new OpenApiSecuritySchemeReference("Bearer", document)] = []
                 });
 
-                // Excluding ASP.NET Identity endpoints
-                // s.DocInclusionPredicate((docName, apiDesc) =>
-                //  {
-                //      var relativePath = apiDesc.RelativePath;
-
-                //      return !(relativePath?.StartsWith("Identity", StringComparison.OrdinalIgnoreCase) ?? false);
-                //  });
-
                 // Suporte a polimorfismo em schemas usando oneOf
                 s.UseOneOfForPolymorphism();
 
-                var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-                var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
-
-                if (File.Exists(xmlPath))
-                {
-                    s.IncludeXmlComments(xmlPath);
-                    var xmlDoc = XDocument.Load(xmlPath);
-                    s.SchemaFilter<DescribeEnumMembers>(xmlDoc);
-                }
-
                 s.DocumentFilter<TagDescriptionsDocumentFilter>();
+
+                // Registrado uma única vez: o filtro é global ao documento, e repeti-lo por
+                // assembly de comentários (como estava) só o executava três vezes sem efeito extra.
                 s.SchemaFilter<IgnoreEnumSchemaFilter>();
 
-                var appName = "EmpregaNet";
-                xmlPath = Path.Combine(AppContext.BaseDirectory, $"{appName}.Application.xml");
-                if (File.Exists(xmlPath))
+                // Comentários XML dos três assemblies que contribuem com tipos para o contrato.
+                // O da própria API vem primeiro (nome resolvido em runtime); os demais são fixos.
+                var xmlFileNames = new[]
                 {
-                    s.IncludeXmlComments(xmlPath);
-                    var xmlDoc = XDocument.Load(xmlPath);
-                    s.SchemaFilter<DescribeEnumMembers>(xmlDoc);
-                }
-                s.SchemaFilter<IgnoreEnumSchemaFilter>();
+                    $"{Assembly.GetExecutingAssembly().GetName().Name}.xml",
+                    "EmpregaNet.Application.xml",
+                    "EmpregaNet.Domain.xml"
+                };
 
-                xmlPath = Path.Combine(AppContext.BaseDirectory, $"{appName}.Domain.xml");
-                if (File.Exists(xmlPath))
+                foreach (var xmlFileName in xmlFileNames)
                 {
-                    s.IncludeXmlComments(xmlPath);
-                    var xmlDoc = XDocument.Load(xmlPath);
-                    s.SchemaFilter<DescribeEnumMembers>(xmlDoc);
-                }
-                s.SchemaFilter<IgnoreEnumSchemaFilter>();
+                    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFileName);
+                    if (!File.Exists(xmlPath))
+                        continue;
 
+                    s.IncludeXmlComments(xmlPath);
+                    s.SchemaFilter<DescribeEnumMembers>(XDocument.Load(xmlPath));
+                }
             });
 
             return services;

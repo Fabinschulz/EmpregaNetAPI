@@ -32,11 +32,10 @@ export const jobSchema = z.object({
   id: z.number().int(),
   title: z.string().min(1),
   description: z.string().nullable().optional(),
-  location: z.string().nullable().optional(),
   companyId: z.number().int().nullable().optional(),
   salary: z.number().nullable().optional(),
   jobType: z.union([z.string(), z.number()]).nullable().optional(),
-  isActive: z.boolean().optional(),
+  isActive: z.boolean(),
   createdAt: z.string().nullable().optional()
 });
 

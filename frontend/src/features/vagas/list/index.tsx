@@ -102,7 +102,6 @@ export function JobsPage() {
                     <div className={styles.cardRow}>
                       <div>
                         <div className={styles.cardTitle}>{job.title}</div>
-                        <div className={styles.cardLocation}>{job.location ?? '—'}</div>
                       </div>
                       <Button variant="primary" asChild>
                         <Link href={`/vagas/${job.id}`}>

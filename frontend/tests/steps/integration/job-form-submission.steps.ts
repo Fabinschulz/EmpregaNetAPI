@@ -41,3 +41,24 @@ Then(
     expect(getByPath(payload, campo), `campo "${campo}"`).to.be.a('number');
   }
 );
+
+When('eu valido esses dados contra o contrato de leitura de vaga', function (this: BusinessRulesWorld) {
+  this.data.jobParseResult = jobSchema.safeParse(this.data.rawJob);
+});
+
+Then('a validação do contrato de vaga deve falhar no campo {string}', function (
+  this: BusinessRulesWorld,
+  campo: string
+) {
+  const parsed = this.data.jobParseResult as ReturnType<typeof jobSchema.safeParse>;
+  expect(parsed.success, 'esperava que o contrato rejeitasse a resposta').to.equal(false);
+
+  const paths = parsed.success ? [] : parsed.error.issues.map((issue) => issue.path.join('.'));
+  expect(paths, `campos com erro: ${paths.join(', ')}`).to.include(campo);
+});
+
+Then('o rótulo de situação da vaga deve ser {string}', function (this: BusinessRulesWorld, esperado: string) {
+  const dto = jobSchema.parse(this.data.rawJob);
+  // Mesma expressão usada na listagem de recrutamento e no detalhe público.
+  expect(dto.isActive ? 'Ativa' : 'Encerrada').to.equal(esperado);
+});

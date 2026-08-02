@@ -23,9 +23,11 @@ function serverApiBaseUrl(): string {
  * mantendo o contrato único com a API .NET.
  *
  * `'use cache'` + `cacheLife('minutes')` dão comportamento tipo ISR (Incremental Static Regeneration): a resposta é memoizada
- * por `id` e revalidada por tempo. `cacheTag(`job:${id}`)` prepara invalidação dirigida via
- * `revalidateTag(`job:${id}`)`, ainda SEM chamador (mutações de vaga são client -> .NET),
- * então hoje a atualização acontece apenas por expiração do `cacheLife`.
+ * por `id` e revalidada por tempo. `cacheTag(`job:${id}`)` permite invalidação dirigida:
+ * as mutações de vaga vão do cliente direto para a API .NET, então quem fecha o ciclo é a
+ * Server Action `revalidateJobCache` (ver `jobs-actions.ts`), chamada no `onSuccess` das
+ * mutations de editar/encerrar/excluir. A expiração por `cacheLife` continua sendo a rede
+ * de segurança para qualquer caminho que não passe por lá.
  *
  * Distingue os casos: `404 -> null` (vira `notFound()`); resposta inválida ao `jobSchema`
  * LANÇA (como o resto da camada de serviço), para não mascarar drift de contrato como 404.

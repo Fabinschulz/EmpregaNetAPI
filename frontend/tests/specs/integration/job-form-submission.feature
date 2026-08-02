@@ -14,7 +14,8 @@ Funcionalidade: Fluxo completo do formulário de vaga (leitura da API até reenv
         "description": "Vaga para atuar no time de plataforma.",
         "companyId": 42,
         "salary": 5000,
-        "jobType": "FullTime"
+        "jobType": "FullTime",
+        "isActive": true
       }
       """
     Quando eu carrego esses dados no formulário de edição de vaga
@@ -39,7 +40,8 @@ Funcionalidade: Fluxo completo do formulário de vaga (leitura da API até reenv
         "description": "Vaga para o time de RH.",
         "companyId": 10,
         "salary": 3000,
-        "jobType": 3
+        "jobType": 3,
+        "isActive": true
       }
       """
     Quando eu carrego esses dados no formulário de edição de vaga
@@ -47,3 +49,51 @@ Funcionalidade: Fluxo completo do formulário de vaga (leitura da API até reenv
     Então o payload de reenvio da vaga deve conter:
       | campo   | valor      |
       | jobType | Internship |
+
+  # Regressão: enquanto isActive era opcional no contrato, a API não o expunha, o parse
+  # passava com undefined e a UI mostrava "Ativa" até para vaga encerrada. O campo
+  # obrigatório faz esse drift falhar no parse em vez de virar um badge errado.
+  Cenário: resposta de vaga sem isActive deve ser rejeitada pelo contrato de leitura
+    Dado que a API devolveu os dados desta vaga cadastrada:
+      """
+      {
+        "id": 5,
+        "title": "Analista de Dados",
+        "description": "Vaga sem o campo de situação.",
+        "companyId": 7,
+        "salary": 7000,
+        "jobType": "FullTime"
+      }
+      """
+    Quando eu valido esses dados contra o contrato de leitura de vaga
+    Então a validação do contrato de vaga deve falhar no campo "isActive"
+
+  Cenário: vaga encerrada deve ser rotulada como Encerrada
+    Dado que a API devolveu os dados desta vaga cadastrada:
+      """
+      {
+        "id": 6,
+        "title": "Vaga já preenchida",
+        "description": "Encerrada pela empresa.",
+        "companyId": 7,
+        "salary": 4200,
+        "jobType": "FullTime",
+        "isActive": false
+      }
+      """
+    Então o rótulo de situação da vaga deve ser "Encerrada"
+
+  Cenário: vaga aberta deve ser rotulada como Ativa
+    Dado que a API devolveu os dados desta vaga cadastrada:
+      """
+      {
+        "id": 7,
+        "title": "Vaga aberta",
+        "description": "Recebendo candidaturas.",
+        "companyId": 7,
+        "salary": 4200,
+        "jobType": "FullTime",
+        "isActive": true
+      }
+      """
+    Então o rótulo de situação da vaga deve ser "Ativa"

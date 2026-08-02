@@ -50,7 +50,7 @@ Orquestração mínima: um especialista quando bastar; cadeias curtas só quando
 - **SDD first:** para features novas ou refactors com contrato negócio/técnico, seguir o fluxo SDD (PRD → design → spec/tasks) antes de gerar código.
 - **Human-in-the-loop:** merge e decisões de risco ficam com o humano. Sem secrets no repo.
 - **Segurança:** autorização (RBAC) explícita onde o SDD e a feature exigirem; validar inputs na fronteira.
-- **Clean Architecture:** dependências apontam para dentro (Domain ← Application ← Infra/Api). Domain não referencia EF nem ASP.NET.
+- **Clean Architecture:** dependências apontam para dentro (Domain ← Application ← Infra/Api). No Domain são proibidos `Microsoft.EntityFrameworkCore` (DbContext, DbSet, migrations), `Microsoft.AspNetCore.Mvc` e tipos de HTTP. **Exceção registada:** `User`/`Role` herdam do ASP.NET Core Identity — ver [ADR 0005](docs/sdd/adrs/0005-identity-no-dominio.md).
 - **Mediator interno:** usar `IRequest` / `IRequestHandler` de `EmpregaNet.Domain.Libs.Mediator`; não introduzir MediatR nem outro barramento sem alinhamento.
 - **Frontend:** TypeScript `strict`, sem `any`, SCSS — não expandir Tailwind.
 - **Idioma:** respostas e artefactos em **português (Brasil)**; identificadores de código em inglês.

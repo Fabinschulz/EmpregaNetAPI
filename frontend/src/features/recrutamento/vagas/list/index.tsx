@@ -62,15 +62,11 @@ export function RecruitmentJobsPage() {
   const columns = useMemo<DataTableColumn<JobDto>[]>(
     () => [
       { key: 'title', header: 'Título', render: (job) => <strong>{job.title}</strong> },
-      { key: 'location', header: 'Localização', render: (job) => job.location ?? '—' },
       {
         key: 'status',
         header: 'Status',
         render: (job) => (
-          <StatusBadge
-            label={job.isActive === false ? 'Encerrada' : 'Ativa'}
-            tone={job.isActive === false ? 'negative' : 'positive'}
-          />
+          <StatusBadge label={job.isActive ? 'Ativa' : 'Encerrada'} tone={job.isActive ? 'positive' : 'negative'} />
         )
       },
       { key: 'createdAt', header: 'Criado em', render: (job) => formatDate(job.createdAt) },

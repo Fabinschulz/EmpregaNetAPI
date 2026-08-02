@@ -169,7 +169,10 @@ namespace EmpregaNet.Infra.Extensions
                                             }
                                         };
 
-                                        options.RequireHttpsMetadata = true;
+                                        // Exigir metadados por HTTPS é o certo em qualquer ambiente
+                                        // publicado; em Development travaria a introdução de um IdP
+                                        // externo servido por HTTP local.
+                                        options.RequireHttpsMetadata = !builder.Environment.IsDevelopment();
                                         options.SaveToken = true;
                                         options.TokenValidationParameters = new TokenValidationParameters
                                         {

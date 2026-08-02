@@ -7,7 +7,15 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.1" />
+    <!-- Alinhado à versão usada em EmpregaNet.Api. -->
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.8" />
+
+    <!-- Referência direta só para elevar a transitiva: Microsoft.AspNetCore.OpenApi resolve
+         Microsoft.OpenApi 2.0.0, que tem vulnerabilidade de severidade alta
+         (GHSA-v5pm-xwqc-g5wc). Na API isso não aparece porque o Swashbuckle já puxa a 2.7.5;
+         o BFF não tem Swashbuckle, então precisa fixar. Remover quando o pacote pai
+         passar a resolver uma versão corrigida por conta própria. -->
+    <PackageReference Include="Microsoft.OpenApi" Version="2.7.5" />
   </ItemGroup>
 
   <ItemGroup>

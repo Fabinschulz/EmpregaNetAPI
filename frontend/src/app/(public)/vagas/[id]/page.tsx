@@ -5,6 +5,14 @@ import { notFound } from 'next/navigation';
 
 const SITE_NAME = 'EmpregaUAI';
 
+/**
+ * Região do produto, usada no fallback da descrição de SEO.
+ *
+ * A vaga não carrega localização própria: o domínio (`Job`) não tem esse conceito.
+ * Enquanto não tiver, a região é a do produto, não a do registro.
+ */
+const DEFAULT_REGION = 'Extrema/MG';
+
 type JobDetailRouteProps = {
   params: Promise<{ id: string }>;
 };
@@ -22,11 +30,10 @@ export async function generateMetadata({ params }: JobDetailRouteProps): Promise
     return { title: `Vaga não encontrada • ${SITE_NAME}` };
   }
 
-  const location = job.location?.trim() || 'Extrema/MG';
   const rawDescription = job.description?.trim();
   const description = rawDescription
     ? rawDescription.slice(0, 160)
-    : `Vaga de ${job.title} em ${location}. Candidate-se pela ${SITE_NAME}.`;
+    : `Vaga de ${job.title} em ${DEFAULT_REGION}. Candidate-se pela ${SITE_NAME}.`;
   const title = `${job.title} • ${SITE_NAME}`;
 
   return {

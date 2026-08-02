@@ -4,7 +4,7 @@ import { Alert, Button, Card, CardContent, CardFooter, CardHeader, CardTitle, St
 import { useAuth } from '@/context';
 import { useApplyToJobMutation } from '@/features/candidaturas/service';
 import type { JobDto } from '@/features/recrutamento/vagas/service';
-import { Building2, MapPin } from 'lucide-react';
+import { Building2 } from 'lucide-react';
 import styles from './job-detail.module.scss';
 
 type JobDetailPageProps = {
@@ -33,10 +33,7 @@ export function JobDetailPage({ job }: JobDetailPageProps) {
         <CardHeader>
           <div className={styles.headerRow}>
             <CardTitle>{job.title}</CardTitle>
-            <StatusBadge
-              label={job.isActive === false ? 'Encerrada' : 'Ativa'}
-              tone={job.isActive === false ? 'negative' : 'positive'}
-            />
+            <StatusBadge label={job.isActive ? 'Ativa' : 'Encerrada'} tone={job.isActive ? 'positive' : 'negative'} />
           </div>
           <ul className={styles.meta}>
             {job.companyId != null ? (
@@ -45,10 +42,6 @@ export function JobDetailPage({ job }: JobDetailPageProps) {
                 <span>Empresa #{job.companyId}</span>
               </li>
             ) : null}
-            <li className={styles.metaItem}>
-              <MapPin aria-hidden />
-              <span>{job.location?.trim() ? job.location : 'Local não informado'}</span>
-            </li>
           </ul>
         </CardHeader>
 

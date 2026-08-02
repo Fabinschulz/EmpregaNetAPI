@@ -161,7 +161,7 @@ Os prompts em `docs/agents/` são **perfis cognitivos** especializados. Use-os p
 | Performance com números ou suspeita forte | `performance-optimizer` |
 | Pedido vago ou multi-domínio | `meta-agent` |
 
-O ficheiro [`.cursor/rules/empreganet-docs-context.mdc`](../../.cursor/rules/empreganet-docs-context.mdc) garante que este SDD e as skills façam parte do contexto em sessões de edição.
+O ficheiro [`CLAUDE.md`](../../CLAUDE.md) na raiz garante que este SDD e as skills façam parte do contexto em sessões de edição.
 
 Índice geral dos documentos desta pasta: [`../README.md`](../README.md).
 
@@ -190,7 +190,8 @@ O ficheiro [`.cursor/rules/empreganet-docs-context.mdc`](../../.cursor/rules/emp
 | Recurso | Path |
 | --------- | ------ |
 | Índice `docs/` (mapa repo + comandos) | [`../README.md`](../README.md) |
-| Regras Cursor (sempre aplicável) | [`.cursor/rules/empreganet-docs-context.mdc`](../../.cursor/rules/empreganet-docs-context.mdc) |
+| Contexto sempre aplicável | [`CLAUDE.md`](../../CLAUDE.md) (raiz do repositório) |
+| Guia de onboarding (arquitectura, setup, fluxos) | [`README.md`](../../README.md) (raiz do repositório) |
 | Agentes | `docs/agents/*.md` |
 | Skills | `docs/skills/*/SKILL.md` (backend, frontend, orquestrador SDD) |
 | SDD (este documento) | `docs/sdd/EMPREGANET-SDD.md` |

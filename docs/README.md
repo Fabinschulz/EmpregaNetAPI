@@ -1,6 +1,8 @@
 # Documentação EmpregaNet (`docs/`)
 
-Índice **canónico** para IA e equipe alinharem ao produto neste monorepo. O contexto sempre aplicável no Cursor está em [`.cursor/rules/empreganet-docs-context.mdc`](../.cursor/rules/empreganet-docs-context.mdc).
+Índice **canónico** para IA e equipe alinharem ao produto neste monorepo. O contexto sempre aplicável está em [`../CLAUDE.md`](../CLAUDE.md), na raiz do repositório.
+
+> O guia de onboarding completo (arquitectura, diagramas, fluxos, setup, convenções) é o [`README.md`](../README.md) da raiz. Esta pasta cobre **processo** (SDD, ADRs, agentes, skills).
 
 ---
 
@@ -35,10 +37,10 @@ Dominó técnico comum neste codebase: PostgreSQL via EF Core, cache Redis opcio
 | --------- | ----------- |
 | [`sdd/SDD-ORCHESTRATOR.md`](sdd/SDD-ORCHESTRATOR.md) | Fluxo PRD → design → spec/tasks; gate antes de código |
 | [`sdd/SDD-USAGE-GUIDE.md`](sdd/SDD-USAGE-GUIDE.md) | Templates de prompt, versões em frontmatter, `state.md` |
-| [`skills/sdd-orchestrator/SKILL.md`](skills/sdd-orchestrator/SKILL.md) | Atalho Cursor para esse fluxo |
-| [`features/README.md`](features/README.md) | Convenção `docs/features/<feature-id>/` |
-| [`sdd/FEATURES-BACKLOG.md`](sdd/FEATURES-BACKLOG.md) | Índice opcional no Git (issue tracker pode ser a fonte de verdade) |
-| [`sdd/adrs/README.md`](sdd/adrs/README.md) | ADRs transversais |
+| [`skills/sdd-orchestrator/SKILL.md`](skills/sdd-orchestrator/SKILL.md) | Atalho de IA para esse fluxo |
+| [`sdd/adrs/README.md`](sdd/adrs/README.md) | ADRs transversais (índice dos 5 existentes) |
+
+`docs/features/<feature-id>/` é a convenção para specs por feature (`prd.md`, `design.md`, `spec.md`, `tasks.md`). A pasta **ainda não existe** no repositório — crie-a na primeira feature que passar pelo fluxo completo. Um `sdd/FEATURES-BACKLOG.md` é opcional: o issue tracker pode ser a fonte de verdade.
 
 ---
 
@@ -65,10 +67,10 @@ Na raiz do repositório (ajusta se o CI usar outra ordem):
 dotnet build backend/EmpregaNet.sln
 dotnet build Bff/EmpregaNet.Bff.sln
 dotnet test backend/tests/tests.csproj
-cd frontend && pnpm lint && pnpm build
+cd frontend && pnpm lint && pnpm test && pnpm build
 ```
 
-Sem secrets no repo: usar apenas `.env.example` e variáveis de ambiente reais localmente ou no pipeline.
+Sem secrets no repo. Os templates versionados são `backend/src/EmpregaNet.Api/appsettings.example.json`, `backend/.env.example`, `Bff/.env.example` e `frontend/.env.example` — copie-os e preencha localmente; em produção, use variáveis de ambiente.
 
 ---
 

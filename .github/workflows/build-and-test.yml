@@ -9,6 +9,11 @@ on:
       tests_project_path:
         required: true
         type: string
+      bff_solution_file:
+        description: "Solução do BFF. Vazio pula o build do BFF."
+        required: false
+        type: string
+        default: ""
 
 jobs:
   build:
@@ -28,6 +33,10 @@ jobs:
 
       - name: Build solution
         run: dotnet build ${{ inputs.solution_file }} --configuration Release --no-restore
+
+      - name: Build BFF solution
+        if: inputs.bff_solution_file != ''
+        run: dotnet build ${{ inputs.bff_solution_file }} --configuration Release
 
       - name: Run tests
         run: dotnet test ${{ inputs.tests_project_path }} --configuration Release --verbosity normal

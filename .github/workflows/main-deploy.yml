@@ -12,6 +12,13 @@ jobs:
     with:
       solution_file: backend/EmpregaNet.sln
       tests_project_path: backend/tests/tests.csproj
+      bff_solution_file: Bff/EmpregaNet.Bff.sln
+
+  frontend:
+    name: CI - Frontend
+    uses: ./.github/workflows/frontend-ci.yml
+    with:
+      working_directory: frontend
 
   docker-ecr:
     name: CD - Publish ECR

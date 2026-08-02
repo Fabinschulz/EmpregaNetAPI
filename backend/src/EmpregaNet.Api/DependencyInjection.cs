@@ -60,8 +60,6 @@ public static class DependencyInjection
 
         app.MapControllers();
         app.MapHealthCheckEndpoints();
-        // app.MapIdentityApi<Usuario>();
-
     }
 
     public static IServiceCollection RegisterApiDependencies(

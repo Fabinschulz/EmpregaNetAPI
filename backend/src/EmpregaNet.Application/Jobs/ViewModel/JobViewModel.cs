@@ -15,7 +15,11 @@ public sealed class JobViewModel : BaseViewModel
     public JobTypeEnum JobType { get; set; }
     public required string PublicationDate { get; set; }
     public long CompanyId { get; set; }
-    public ICollection<JobApplication> Applications { get; set; } = new List<JobApplication>(); // toDo: substituir para JobApplicationViewModel
+
+    /// <summary>
+    /// Vaga aberta a candidaturas. <c>false</c> após <c>PUT /api/jobs/{id}/close</c>.
+    /// </summary>
+    public bool IsActive { get; set; }
 }
 
 [ExcludeFromCodeCoverage]
@@ -31,6 +35,7 @@ public static class JobMapper
             Description = entity.Description,
             Salary = entity.Salary,
             JobType = entity.JobType,
+            IsActive = entity.IsActive,
             PublicationDate =  RandomHelpers.FormatToBrasiliaTime(entity.PublishedAt),
             CreatedAtUtc = entity.CreatedAt,
             UpdatedAtUtc = entity.UpdatedAt,

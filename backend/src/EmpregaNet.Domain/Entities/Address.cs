@@ -1,6 +1,5 @@
 using System.ComponentModel.DataAnnotations;
 using EmpregaNet.Domain.Enums;
-using EmpregaNet.Domain.Interfaces;
 
 namespace EmpregaNet.Domain.Entities
 {
@@ -8,7 +7,7 @@ namespace EmpregaNet.Domain.Entities
     /// Entidade que representa um endereço
     /// Obs: Não é uma tabela no banco, mas um objeto de valor (Value Object).
     /// </summary>
-    public class Address : IAggregateRoot
+    public class Address
     {
         public required string Street { get; set; }
 

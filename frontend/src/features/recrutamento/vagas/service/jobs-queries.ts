@@ -5,6 +5,7 @@ import { reportMutationApiError, startRouterTransition, toastSuccess } from '@/u
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { revalidateJobCache } from './jobs-actions';
 import { closeJob, createJob, deleteJob, getJob, listJobs, listSelectableCompanies, updateJob } from './jobs-api';
 import { jobsKeys } from './jobs-keys';
 import type { JobFormValues } from './jobs-schema';
@@ -62,6 +63,7 @@ export function useUpdateJobMutation(jobId: number) {
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: jobsKeys.detail(jobId) });
       await queryClient.invalidateQueries({ queryKey: jobsKeys.lists() });
+      await revalidateJobCache(jobId);
       startRouterTransition(() => router.push('/recrutamento/vagas'));
     },
     onError: (err) => {
@@ -82,6 +84,9 @@ export function useCloseJobMutation(jobId: number) {
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: jobsKeys.detail(jobId) });
       await queryClient.invalidateQueries({ queryKey: jobsKeys.lists() });
+      // Encerrar é o caso mais crítico: sem revalidar, a vaga segue anunciada como
+      // aberta na página pública até o cache expirar.
+      await revalidateJobCache(jobId);
       startRouterTransition(() => router.push('/recrutamento/vagas'));
     },
     onError: (err) => {
@@ -98,8 +103,9 @@ export function useDeleteJobMutation() {
 
   const ctx = useMutation({
     mutationFn: (id: number) => deleteJob(id),
-    onSuccess: async () => {
+    onSuccess: async (_data, id) => {
       await queryClient.invalidateQueries({ queryKey: jobsKeys.all });
+      await revalidateJobCache(id);
       toastSuccess('Vaga excluída', 'A vaga foi removida.');
     },
     onError: (err) => {
