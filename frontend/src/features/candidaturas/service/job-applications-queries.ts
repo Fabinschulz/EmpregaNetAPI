@@ -3,9 +3,9 @@
 import { useAuth } from '@/context';
 import { jobsFeedKeys } from '@/features/vagas/service';
 import {
-    withDefaultListParams,
-    type JobApplicationsAdminListQueryParams,
-    type JobApplicationsListQueryParams
+  withDefaultListParams,
+  type JobApplicationsAdminListQueryParams,
+  type JobApplicationsListQueryParams
 } from '@/shared/schema';
 import { reportMutationApiError, toastSuccess } from '@/utils';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';

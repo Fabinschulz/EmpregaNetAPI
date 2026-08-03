@@ -1,11 +1,11 @@
 'use client';
 
 import {
-    countActiveJobsFeedFilters,
-    defaultJobsFeedFilters,
-    jobsFeedFiltersToSearchParams,
-    parseJobsFeedFilters,
-    type JobsFeedFilters
+  countActiveJobsFeedFilters,
+  defaultJobsFeedFilters,
+  jobsFeedFiltersToSearchParams,
+  parseJobsFeedFilters,
+  type JobsFeedFilters
 } from '@/features/vagas/service';
 import { useDebouncedDraft } from '@/hooks';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';

@@ -2,13 +2,13 @@
 
 import { Alert, Button, PageHeader } from '@/components';
 import {
-    emptyJobVocabulary,
-    useJobFeedInteractionsQuery,
-    useJobVocabularyQuery,
-    useJobsFeedQuery,
-    type JobVocabularyDto,
-    type JobsFeedFilters,
-    type JobsFeedResponseDto
+  emptyJobVocabulary,
+  useJobFeedInteractionsQuery,
+  useJobVocabularyQuery,
+  useJobsFeedQuery,
+  type JobVocabularyDto,
+  type JobsFeedFilters,
+  type JobsFeedResponseDto
 } from '@/features/vagas/service';
 import { useInfiniteScroll } from '@/hooks';
 import { RefreshCw } from 'lucide-react';

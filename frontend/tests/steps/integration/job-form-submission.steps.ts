@@ -42,13 +42,10 @@ Then(
   }
 );
 
-Then(
-  'o campo {string} do payload de reenvio deve estar ausente',
-  function (this: BusinessRulesWorld, campo: string) {
-    const payload = this.result as Record<string, unknown>;
-    expect(getByPath(payload, campo), `campo "${campo}"`).to.equal(undefined);
-  }
-);
+Then('o campo {string} do payload de reenvio deve estar ausente', function (this: BusinessRulesWorld, campo: string) {
+  const payload = this.result as Record<string, unknown>;
+  expect(getByPath(payload, campo), `campo "${campo}"`).to.equal(undefined);
+});
 
 When('eu valido os dados carregados no formulário de vaga', function (this: BusinessRulesWorld) {
   this.result = jobFormSchema.safeParse(this.data.jobFormValues).success;
@@ -62,16 +59,16 @@ When('eu valido esses dados contra o contrato de leitura de vaga', function (thi
   this.data.jobParseResult = jobSchema.safeParse(this.data.rawJob);
 });
 
-Then('a validação do contrato de vaga deve falhar no campo {string}', function (
-  this: BusinessRulesWorld,
-  campo: string
-) {
-  const parsed = this.data.jobParseResult as ReturnType<typeof jobSchema.safeParse>;
-  expect(parsed.success, 'esperava que o contrato rejeitasse a resposta').to.equal(false);
+Then(
+  'a validação do contrato de vaga deve falhar no campo {string}',
+  function (this: BusinessRulesWorld, campo: string) {
+    const parsed = this.data.jobParseResult as ReturnType<typeof jobSchema.safeParse>;
+    expect(parsed.success, 'esperava que o contrato rejeitasse a resposta').to.equal(false);
 
-  const paths = parsed.success ? [] : parsed.error.issues.map((issue) => issue.path.join('.'));
-  expect(paths, `campos com erro: ${paths.join(', ')}`).to.include(campo);
-});
+    const paths = parsed.success ? [] : parsed.error.issues.map((issue) => issue.path.join('.'));
+    expect(paths, `campos com erro: ${paths.join(', ')}`).to.include(campo);
+  }
+);
 
 Then('o rótulo de situação da vaga deve ser {string}', function (this: BusinessRulesWorld, esperado: string) {
   const dto = jobSchema.parse(this.data.rawJob);

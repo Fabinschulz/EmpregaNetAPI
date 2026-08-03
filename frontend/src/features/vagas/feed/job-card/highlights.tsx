@@ -1,10 +1,10 @@
 import type { JobFeedItemDto } from '@/features/vagas/service';
 import {
-    experienceLevelVocabulary,
-    jobTypeVocabulary,
-    NO_EXPERIENCE_REQUIRED,
-    workModelVocabulary,
-    workShiftVocabulary
+  experienceLevelVocabulary,
+  jobTypeVocabulary,
+  NO_EXPERIENCE_REQUIRED,
+  workModelVocabulary,
+  workShiftVocabulary
 } from '@/shared/schema';
 import { cn } from '@/utils';
 import type { LucideIcon } from 'lucide-react';

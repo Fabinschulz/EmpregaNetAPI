@@ -22,7 +22,6 @@ export type DebouncedDraft = {
   isPending: boolean;
 };
 
-
 export function useDebouncedDraft({ value, onCommit, delayMs = 350 }: DebouncedDraftOptions): DebouncedDraft {
   const [draft, setDraft] = useState(value);
   const debounced = useDebouncedValue(draft, delayMs);

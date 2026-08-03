@@ -52,15 +52,12 @@ Given(
   }
 );
 
-Given(
-  'que a lista {string} do formulário de vaga está vazia',
-  function (this: BusinessRulesWorld, campo: string) {
-    if (!this.data.job) {
-      this.data.job = validJobFormData();
-    }
-    setByPath(this.data.job as Record<string, unknown>, campo, []);
+Given('que a lista {string} do formulário de vaga está vazia', function (this: BusinessRulesWorld, campo: string) {
+  if (!this.data.job) {
+    this.data.job = validJobFormData();
   }
-);
+  setByPath(this.data.job as Record<string, unknown>, campo, []);
+});
 
 Given(
   'que a lista {string} do formulário de vaga excede o teto por vaga',

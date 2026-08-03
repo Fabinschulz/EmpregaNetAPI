@@ -1,16 +1,16 @@
 'use client';
 
 import {
-    Button,
-    FormActions,
-    FormGrid,
-    FormRow,
-    FormSection,
-    FormSubmitButton,
-    InputField,
-    MultiSelectField,
-    SelectField,
-    TextareaField
+  Button,
+  FormActions,
+  FormGrid,
+  FormRow,
+  FormSection,
+  FormSubmitButton,
+  InputField,
+  MultiSelectField,
+  SelectField,
+  TextareaField
 } from '@/components';
 import { useFormContext } from '@/context';
 import { useJobVocabularyQuery } from '@/features/vagas/service';
@@ -18,15 +18,15 @@ import { UF_SELECT_OPTIONS } from '@/shared/schema';
 import { Archive, Save } from 'lucide-react';
 import { useMemo } from 'react';
 import {
-    PCD_OPTIONS,
-    SALARY_DISCLOSURE_OPTIONS,
-    experienceLevelVocabulary,
-    jobAreaVocabulary,
-    jobTypeVocabulary,
-    useSelectableCompaniesQuery,
-    workModelVocabulary,
-    workShiftVocabulary,
-    type JobFormValues
+  PCD_OPTIONS,
+  SALARY_DISCLOSURE_OPTIONS,
+  experienceLevelVocabulary,
+  jobAreaVocabulary,
+  jobTypeVocabulary,
+  useSelectableCompaniesQuery,
+  workModelVocabulary,
+  workShiftVocabulary,
+  type JobFormValues
 } from './service';
 
 type JobFormFieldsProps = {
@@ -46,9 +46,7 @@ export function JobFormFields({ submitLabel, onClose, closeDisabled }: JobFormFi
   );
 
   const flatten = (groups: { label: string; items: readonly string[] }[] | undefined) =>
-    (groups ?? []).flatMap((group) =>
-      group.items.map((item) => ({ value: item, label: `${group.label} · ${item}` }))
-    );
+    (groups ?? []).flatMap((group) => group.items.map((item) => ({ value: item, label: `${group.label} · ${item}` })));
 
   const requirementOptions = useMemo(() => flatten(vocabulary?.requirements), [vocabulary]);
   const benefitOptions = useMemo(() => flatten(vocabulary?.benefits), [vocabulary]);

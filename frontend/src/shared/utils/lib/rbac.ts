@@ -32,10 +32,7 @@ const POLICY_ROLES: Record<AuthPolicy, readonly string[]> = {
   Recrutamento: ['Admin', 'Recruiter', 'Manager']
 };
 
-export function satisfiesPolicy(
-  userRoles: readonly string[] | null | undefined,
-  policy: AuthPolicy
-): boolean {
+export function satisfiesPolicy(userRoles: readonly string[] | null | undefined, policy: AuthPolicy): boolean {
   return POLICY_ROLES[policy].some((role) => hasRole(userRoles, role));
 }
 
@@ -46,7 +43,6 @@ export function isAdmin(userRoles: readonly string[] | null | undefined): boolea
 export function isRecruitmentStaff(userRoles: readonly string[] | null | undefined): boolean {
   return satisfiesPolicy(userRoles, AUTH_POLICIES.recrutamento);
 }
-
 
 export const PERMISSION_POLICIES = {
   /** `DELETE /api/companies/{id}` */

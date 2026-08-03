@@ -1,12 +1,12 @@
 import { axiosApi, createAxiosConfig } from '@/shared/api';
 import {
-    jobFeedInteractionsSchema,
-    jobVocabularySchema,
-    jobsFeedResponseSchema,
-    type JobFeedInteractionsDto,
-    type JobVocabularyDto,
-    type JobsFeedQueryParams,
-    type JobsFeedResponseDto
+  jobFeedInteractionsSchema,
+  jobVocabularySchema,
+  jobsFeedResponseSchema,
+  type JobFeedInteractionsDto,
+  type JobVocabularyDto,
+  type JobsFeedQueryParams,
+  type JobsFeedResponseDto
 } from './jobs-feed-schema';
 
 export const MAX_INTERACTION_IDS = 100;

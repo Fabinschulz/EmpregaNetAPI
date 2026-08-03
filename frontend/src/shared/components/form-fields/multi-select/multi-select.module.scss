@@ -16,6 +16,16 @@
   @include field.control-trigger;
 }
 
+.trigger[aria-disabled='true'] {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.trigger[aria-disabled='true']:hover {
+  border-color: var(--control-border, var(--border));
+  background: var(--control-bg, var(--input-bg));
+}
+
 .badges {
   display: flex;
   flex-wrap: wrap;

@@ -15,12 +15,9 @@ When('eu valido o telefone {string}', function (this: BusinessRulesWorld, telefo
   this.result = isValidBrazilPhone(telefone);
 });
 
-When(
-  'eu valido o celular {string} para cadastro de usuário',
-  function (this: BusinessRulesWorld, telefone: string) {
-    this.result = isValidBrazilCellPhone(telefone);
-  }
-);
+When('eu valido o celular {string} para cadastro de usuário', function (this: BusinessRulesWorld, telefone: string) {
+  this.result = isValidBrazilCellPhone(telefone);
+});
 
 Then('o telefone deve ser considerado {string}', function (this: BusinessRulesWorld, validade: string) {
   expect(this.result).to.equal(validade === 'válido');

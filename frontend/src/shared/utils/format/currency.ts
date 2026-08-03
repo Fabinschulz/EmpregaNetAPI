@@ -26,9 +26,7 @@ export function formatSalaryRange(
   const hasMax = typeof max === 'number';
 
   if (hasMin && hasMax) {
-    return min === max
-      ? formatCurrencyCompact(min)
-      : `${formatCurrencyCompact(min)} – ${formatCurrencyCompact(max)}`;
+    return min === max ? formatCurrencyCompact(min) : `${formatCurrencyCompact(min)} - ${formatCurrencyCompact(max)}`;
   }
 
   if (hasMin) return `A partir de ${formatCurrencyCompact(min)}`;

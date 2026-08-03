@@ -1,28 +1,28 @@
 'use client';
 
 import {
-    ApiQueryBoundary,
-    ConfirmDialog,
-    PageHeader,
-    TableContainer,
-    TableFilters,
-    useRowDeleteAction,
-    type DataTableColumn,
-    type RowAction
+  ApiQueryBoundary,
+  ConfirmDialog,
+  PageHeader,
+  TableContainer,
+  TableFilters,
+  useRowDeleteAction,
+  type DataTableColumn,
+  type RowAction
 } from '@/components';
 import { FormProvider } from '@/context';
 import { ApplicationStatusBadge } from '@/features/candidaturas/application-status-badge';
 import {
-    applicationStatusTransitions,
-    applicationTransitionLabels,
-    defaultRecruitmentApplicationsFilter,
-    parseApplicationStatus,
-    recruitmentApplicationsFilterFormSchema,
-    useAllJobApplicationsQuery,
-    useChangeApplicationStatusMutation,
-    useDeleteApplicationMutation,
-    type ApplicationStatus,
-    type JobApplicationDto
+  applicationStatusTransitions,
+  applicationTransitionLabels,
+  defaultRecruitmentApplicationsFilter,
+  parseApplicationStatus,
+  recruitmentApplicationsFilterFormSchema,
+  useAllJobApplicationsQuery,
+  useChangeApplicationStatusMutation,
+  useDeleteApplicationMutation,
+  type ApplicationStatus,
+  type JobApplicationDto
 } from '@/features/candidaturas/service';
 import { usePersistedTablePagination } from '@/hooks';
 import { formatDate, type ListOrderByValue } from '@/shared';

@@ -6,25 +6,25 @@ import { useApplyToJobMutation } from '@/features/candidaturas/service';
 import type { JobDto } from '@/features/recrutamento/vagas/service';
 import { useRelativeTime } from '@/hooks';
 import {
-    experienceLevelVocabulary,
-    jobAreaVocabulary,
-    jobTypeVocabulary,
-    normalizeUf,
-    workModelVocabulary,
-    workShiftVocabulary
+  experienceLevelVocabulary,
+  jobAreaVocabulary,
+  jobTypeVocabulary,
+  normalizeUf,
+  workModelVocabulary,
+  workShiftVocabulary
 } from '@/shared/schema';
 import { formatSalaryRange } from '@/utils';
 import type { LucideIcon } from 'lucide-react';
 import {
-    Accessibility,
-    Banknote,
-    Briefcase,
-    Building2,
-    CalendarDays,
-    Clock,
-    GraduationCap,
-    LayoutGrid,
-    MapPin
+  Accessibility,
+  Banknote,
+  Briefcase,
+  Building2,
+  CalendarDays,
+  Clock,
+  GraduationCap,
+  LayoutGrid,
+  MapPin
 } from 'lucide-react';
 import styles from './job-detail.module.scss';
 
@@ -38,7 +38,6 @@ type MetaItem = {
   icon: LucideIcon;
   label: string;
 };
-
 
 export function JobDetailPage({ job }: JobDetailPageProps) {
   const { isAuthenticated } = useAuth();

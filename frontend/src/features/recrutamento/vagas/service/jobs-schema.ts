@@ -1,23 +1,23 @@
 import {
-    MAX_VOCABULARY_ITEMS_PER_JOB,
-    UF_VALUE_SET,
-    createPaginatedResponseSchema,
-    experienceLevelVocabulary,
-    jobAreaVocabulary,
-    jobTypeVocabulary,
-    normalizeUf,
-    workModelVocabulary,
-    workShiftVocabulary,
-    type JobsListQueryParams
+  MAX_VOCABULARY_ITEMS_PER_JOB,
+  UF_VALUE_SET,
+  createPaginatedResponseSchema,
+  experienceLevelVocabulary,
+  jobAreaVocabulary,
+  jobTypeVocabulary,
+  normalizeUf,
+  workModelVocabulary,
+  workShiftVocabulary,
+  type JobsListQueryParams
 } from '@/shared/schema';
 import { z } from 'zod';
 
 export {
-    experienceLevelVocabulary,
-    jobAreaVocabulary,
-    jobTypeVocabulary,
-    workModelVocabulary,
-    workShiftVocabulary
+  experienceLevelVocabulary,
+  jobAreaVocabulary,
+  jobTypeVocabulary,
+  workModelVocabulary,
+  workShiftVocabulary
 } from '@/shared/schema';
 
 export const jobSchema = z.object({

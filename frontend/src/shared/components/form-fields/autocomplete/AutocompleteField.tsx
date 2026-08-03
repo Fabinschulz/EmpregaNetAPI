@@ -1,14 +1,14 @@
 'use client';
 
 import {
-    Command,
-    CommandEmpty,
-    CommandInput,
-    CommandItem,
-    CommandList,
-    Popover,
-    PopoverContent,
-    PopoverTrigger
+  Command,
+  CommandEmpty,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  Popover,
+  PopoverContent,
+  PopoverTrigger
 } from '@/components/ui';
 import { useFormContext } from '@/context';
 import { useDebouncedDraft } from '@/hooks';
@@ -46,10 +46,7 @@ export const AutocompleteField: React.FC<AutocompleteFieldProps> = ({
 
   const [open, setOpen] = React.useState(false);
 
-  const commit = React.useCallback(
-    (value: string) => setValue(name, value, { shouldDirty: true }),
-    [name, setValue]
-  );
+  const commit = React.useCallback((value: string) => setValue(name, value, { shouldDirty: true }), [name, setValue]);
 
   const {
     draft: input,

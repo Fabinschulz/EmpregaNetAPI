@@ -1,25 +1,24 @@
 import {
-    DEFAULT_JOB_SORT,
-    createPaginatedResponseSchema,
-    experienceLevelVocabulary,
-    findSalaryRange,
-    isJobSortValue,
-    isPublishedWithinValue,
-    isUfValue,
-    jobAreaVocabulary,
-    jobTypeVocabulary,
-    workModelVocabulary,
-    workShiftVocabulary,
-    type ExperienceLevelValue,
-    type JobAreaValue,
-    type JobSortValue,
-    type JobTypeValue,
-    type PublishedWithinValue,
-    type WorkModelValue,
-    type WorkShiftValue
+  DEFAULT_JOB_SORT,
+  createPaginatedResponseSchema,
+  experienceLevelVocabulary,
+  findSalaryRange,
+  isJobSortValue,
+  isPublishedWithinValue,
+  isUfValue,
+  jobAreaVocabulary,
+  jobTypeVocabulary,
+  workModelVocabulary,
+  workShiftVocabulary,
+  type ExperienceLevelValue,
+  type JobAreaValue,
+  type JobSortValue,
+  type JobTypeValue,
+  type PublishedWithinValue,
+  type WorkModelValue,
+  type WorkShiftValue
 } from '@/shared/schema';
 import { z } from 'zod';
-
 
 export const jobFeedCompanySchema = z.object({
   id: z.number().int(),
@@ -38,7 +37,6 @@ export const jobFeedSalarySchema = z.object({
   max: z.number().nullable().optional(),
   disclosed: z.boolean()
 });
-
 
 export const jobFeedItemSchema = z.object({
   id: z.number().int(),
@@ -128,7 +126,6 @@ export const defaultJobsFeedFilters: JobsFeedFilters = {
 
 export const JOBS_FEED_PAGE_SIZE = 20;
 
-
 export const JOBS_FEED_PARAM_KEYS = {
   search: 'q',
   city: 'city',
@@ -147,12 +144,9 @@ export const JOBS_FEED_PARAM_KEYS = {
   sort: 'sort'
 } as const;
 
-
 type ReadableParams = Pick<URLSearchParams, 'get' | 'getAll'>;
 
-export function searchParamsFromRecord(
-  input: Record<string, string | string[] | undefined>
-): URLSearchParams {
+export function searchParamsFromRecord(input: Record<string, string | string[] | undefined>): URLSearchParams {
   const params = new URLSearchParams();
 
   Object.entries(input).forEach(([key, value]) => {
@@ -201,15 +195,15 @@ export function parseJobsFeedFilters(params: ReadableParams): JobsFeedFilters {
   return {
     search: params.get(JOBS_FEED_PARAM_KEYS.search)?.trim() ?? '',
     cities: unique(readAll(params, JOBS_FEED_PARAM_KEYS.city)),
-    states: unique(readAll(params, JOBS_FEED_PARAM_KEYS.state).map((v) => v.toUpperCase()).filter(isUfValue)),
+    states: unique(
+      readAll(params, JOBS_FEED_PARAM_KEYS.state)
+        .map((v) => v.toUpperCase())
+        .filter(isUfValue)
+    ),
     workModels: readVocabulary(params, JOBS_FEED_PARAM_KEYS.workModel, workModelVocabulary.normalize),
     workShifts: readVocabulary(params, JOBS_FEED_PARAM_KEYS.workShift, workShiftVocabulary.normalize),
     jobTypes: readVocabulary(params, JOBS_FEED_PARAM_KEYS.jobType, jobTypeVocabulary.normalize),
-    experienceLevels: readVocabulary(
-      params,
-      JOBS_FEED_PARAM_KEYS.experienceLevel,
-      experienceLevelVocabulary.normalize
-    ),
+    experienceLevels: readVocabulary(params, JOBS_FEED_PARAM_KEYS.experienceLevel, experienceLevelVocabulary.normalize),
     areas: readVocabulary(params, JOBS_FEED_PARAM_KEYS.area, jobAreaVocabulary.normalize),
     requirements: unique(readAll(params, JOBS_FEED_PARAM_KEYS.requirement)),
     benefits: unique(readAll(params, JOBS_FEED_PARAM_KEYS.benefit)),
@@ -285,7 +279,6 @@ export function countActiveJobsFeedFilters(filters: JobsFeedFilters): number {
     (filters.onlyPcd ? 1 : 0)
   );
 }
-
 
 export type JobsFeedQueryParams = {
   page: number;

@@ -1,15 +1,15 @@
 'use client';
 
 import {
-    ApiQueryBoundary,
-    Button,
-    ConfirmDialog,
-    PageHeader,
-    TableContainer,
-    TableFilters,
-    useRowDeleteAction,
-    type DataTableColumn,
-    type RowAction
+  ApiQueryBoundary,
+  Button,
+  ConfirmDialog,
+  PageHeader,
+  TableContainer,
+  TableFilters,
+  useRowDeleteAction,
+  type DataTableColumn,
+  type RowAction
 } from '@/components';
 import { FormProvider } from '@/context';
 import { usePersistedTablePagination } from '@/hooks';
@@ -19,12 +19,12 @@ import { Pencil, Plus } from 'lucide-react';
 import Link from 'next/link';
 import { useCallback, useMemo, useState } from 'react';
 import {
-    companiesFilterFormSchema,
-    companiesFilterToParams,
-    defaultCompaniesFilter,
-    useCompaniesListQuery,
-    useDeleteCompanyMutation,
-    type CompanyDto
+  companiesFilterFormSchema,
+  companiesFilterToParams,
+  defaultCompaniesFilter,
+  useCompaniesListQuery,
+  useDeleteCompanyMutation,
+  type CompanyDto
 } from '../service';
 import { CompaniesFilterFields } from './companies-filter-fields';
 

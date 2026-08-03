@@ -1,31 +1,23 @@
-using System.Collections.Concurrent;
-using System.Collections.Frozen;
 using System.ComponentModel;
 using System.Reflection;
 
 namespace EmpregaNet.Application.Utils.Helpers;
 
 /// <summary>
-/// Rótulos de apresentação dos enums do domínio, declarados via <see cref="DescriptionAttribute"/>.
+/// Classe auxiliar para operações com tipos Enum.
+/// Fornece métodos de extensão para facilitar a manipulação e exibição de enums, especialmente para obter descrições amigáveis.
 /// </summary>
 public static class EnumHelper
 {
     /// <summary>
-    /// Mapa nome para rótulo por tipo de enum.
+    /// Obtém a descrição definida pelo atributo <see cref="DescriptionAttribute"/> de um valor Enum.
+    /// Caso o atributo não esteja presente, retorna o nome do valor Enum.
+    /// Se ocorrer algum erro ou o valor for nulo, retorna uma string vazia.
     /// </summary>
-    /// <remarks>
-    /// A leitura dos atributos é feita uma vez por tipo. Sem o cache, cada item de lista mapeado
-    /// para ViewModel pagaria reflexão por campo, no caminho quente do feed e das listagens.
-    /// </remarks>
-    private static readonly ConcurrentDictionary<Type, FrozenDictionary<string, string>> LabelsByType = new();
-
-    /// <summary>
-    /// Obtém a descrição do valor definida pelo <see cref="DescriptionAttribute"/>.
-    /// </summary>
-    /// <param name="value">Valor do enum.</param>
+    /// <param name="value">Valor do Enum para o qual se deseja obter a descrição.</param>
     /// <returns>
-    /// A descrição do atributo; na ausência dele, o nome do membro. String vazia quando o valor é
-    /// nulo ou não corresponde a nenhum membro declarado.
+    /// A descrição definida pelo <see cref="DescriptionAttribute"/> ou, se não houver, o nome do valor Enum.
+    /// Retorna string vazia em caso de erro ou valor nulo.
     /// </returns>
     /// <example>
     /// <code>
@@ -34,27 +26,129 @@ public static class EnumHelper
     ///     [Description("Ativo")] Active,
     ///     [Description("Inativo")] Inactive
     /// }
-    ///
-    /// Status.Active.ToDescription(); // "Ativo"
+    /// 
+    /// var status = Status.Active;
+    /// string descricao = status.ToDescription(); // "Ativo"
     /// </code>
     /// </example>
     public static string ToDescription(this Enum value)
+    {
+        if (value == null)
+        {
+            return "";
+        }
+
+        try
+        {
+            // Obtém o FieldInfo correspondente ao valor do Enum
+            FieldInfo fi = value.GetType()!.GetField(value.ToString())!;
+            // Busca o atributo DescriptionAttribute, se existir
+            DescriptionAttribute[]? attributes = fi!.GetCustomAttributes(typeof(DescriptionAttribute), false) as DescriptionAttribute[];
+
+            if (attributes != null && attributes.Any())
+            {
+                // Retorna a descrição definida no atributo
+                return attributes.First().Description;
+            }
+
+            // Se não houver atributo, retorna o nome do Enum
+            return value.ToString();
+        }
+        catch
+        {
+            // Em caso de erro, retorna string vazia
+            return string.Empty;
+        }
+    }
+
+    public static int GetEnumFromDescription(string description, Type enumType)
+    {
+        foreach (var field in enumType.GetFields())
+        {
+            DescriptionAttribute attribute
+                = Attribute.GetCustomAttribute(field, typeof(DescriptionAttribute)) as DescriptionAttribute ?? null!;
+            if (attribute == null)
+                continue;
+            if (description != null && (attribute.Description?.ToLower()?.Contains(description.ToLower())) == true)
+            {
+                return (int)(field.GetValue(null) ?? 0);
+            }
+        }
+        return 0;
+    }
+
+    public static List<EnumValue> GetValues(Type enumType)
+    {
+        List<EnumValue> values = new List<EnumValue>();
+        foreach (var itemType in Enum.GetValues(enumType))
+        {
+            string description = string.Empty;
+
+            try
+            {
+                var itemName = itemType?.ToString();
+                var fieldInfo = itemName != null ? enumType.GetField(itemName) : null;
+                var attributes = fieldInfo?.GetCustomAttributes(
+                typeof(DescriptionAttribute),
+                false);
+                description = attributes != null && attributes.Length > 0
+                    ? ((DescriptionAttribute)attributes[0]).Description
+                    : itemType?.ToString() ?? string.Empty;
+            }
+            catch
+            {
+                description = itemType?.ToString() ?? string.Empty;
+            }
+            values.Add(new EnumValue()
+            {
+                Name = description,
+                Value = itemType?.ToString() ?? string.Empty,
+                ValueAsInt = itemType != null ? (int)itemType : 0
+            });
+        }
+        return values;
+    }
+
+    public static string GetEnumDescription(Enum value)
+    {
+        return GetEnumDescription(value, "");
+    }
+
+    public static string GetEnumDescription(Enum value, string enumPrefix)
     {
         if (value is null)
         {
             return string.Empty;
         }
+        try
+        {
+            FieldInfo? fi = value.GetType().GetField(string.Format("{1}{0}", value.ToString(), enumPrefix));
 
-        var labels = LabelsByType.GetOrAdd(value.GetType(), BuildLabels);
+            if (fi == null)
+            {
+                return value.ToString();
+            }
 
-        return labels.GetValueOrDefault(value.ToString(), string.Empty);
+            DescriptionAttribute[] attributes =
+                (DescriptionAttribute[])fi.GetCustomAttributes(
+                typeof(DescriptionAttribute),
+                false);
+
+            if (attributes != null &&
+                attributes.Length > 0)
+                return attributes[0].Description;
+            return value.ToString();
+        }
+        catch
+        {
+            return string.Empty;
+        }
     }
 
-    private static FrozenDictionary<string, string> BuildLabels(Type enumType)
-        => enumType
-            .GetFields(BindingFlags.Public | BindingFlags.Static)
-            .ToFrozenDictionary(
-                field => field.Name,
-                field => field.GetCustomAttribute<DescriptionAttribute>()?.Description ?? field.Name,
-                StringComparer.Ordinal);
+    public class EnumValue
+    {
+        public string? Name { get; set; }
+        public string? Value { get; set; }
+        public int ValueAsInt { get; set; }
+    }
 }

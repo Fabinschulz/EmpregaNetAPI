@@ -1,40 +1,40 @@
 'use client';
 
 import {
-    ApiQueryBoundary,
-    Button,
-    ConfirmDialog,
-    PageHeader,
-    TableContainer,
-    TableFilters,
-    useRowDeleteAction,
-    type DataTableColumn,
-    type RowAction
+  ApiQueryBoundary,
+  Button,
+  ConfirmDialog,
+  PageHeader,
+  TableContainer,
+  TableFilters,
+  useRowDeleteAction,
+  type DataTableColumn,
+  type RowAction
 } from '@/components';
 import { FormProvider } from '@/context';
 import { ApplicationStatusBadge } from '@/features/candidaturas/application-status-badge';
 import {
-    applicationStatusTransitions,
-    applicationTransitionLabels,
-    parseApplicationStatus,
-    useApplicationsByJobQuery,
-    useChangeApplicationStatusMutation,
-    useDeleteApplicationMutation,
-    type ApplicationStatus,
-    type JobApplicationDto
+  applicationStatusTransitions,
+  applicationTransitionLabels,
+  parseApplicationStatus,
+  useApplicationsByJobQuery,
+  useChangeApplicationStatusMutation,
+  useDeleteApplicationMutation,
+  type ApplicationStatus,
+  type JobApplicationDto
 } from '@/features/candidaturas/service';
 import { usePersistedTablePagination } from '@/hooks';
 import { formatDate } from '@/shared';
 import { Ban, CheckCircle2, Flag, Pencil, PlayCircle, RotateCcw, XCircle, type LucideIcon } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useJobQuery } from '../service';
 import {
-    CandidatesFilterFields,
-    candidatesFilterSchema,
-    defaultCandidatesFilter,
-    type CandidatesFilterParams
+  CandidatesFilterFields,
+  candidatesFilterSchema,
+  defaultCandidatesFilter,
+  type CandidatesFilterParams
 } from './candidates-filter-fields';
 import styles from './candidates.module.scss';
 
@@ -59,6 +59,7 @@ export function CandidatesByJobPage() {
   const params = useParams<{ id: string }>();
   const jobId = useMemo(() => Number(params.id), [params.id]);
   const pagination = usePersistedTablePagination({ storageKey: `recrutamento-vaga-${jobId}-candidatos` });
+  const { setPage } = pagination;
   const [filters, setFilters] = useState<CandidatesFilterParams>({});
   const [pending, setPending] = useState<PendingTransition | null>(null);
 
@@ -83,10 +84,13 @@ export function CandidatesByJobPage() {
       `A candidatura #${application.id} será removida permanentemente. Esta ação não pode ser desfeita.`
   });
 
-  const handleFilterChange = (next: CandidatesFilterParams) => {
-    setFilters(next);
-    pagination.setPage(1);
-  };
+  const handleFilterChange = useCallback(
+    (next: CandidatesFilterParams) => {
+      setFilters(next);
+      setPage(1);
+    },
+    [setPage]
+  );
 
   const columns = useMemo<DataTableColumn<JobApplicationDto>[]>(
     () => [

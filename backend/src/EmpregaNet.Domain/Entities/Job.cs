@@ -1,4 +1,4 @@
-using System.Collections.ObjectModel;
+using System.Diagnostics.CodeAnalysis;
 using EmpregaNet.Domain.Common;
 using EmpregaNet.Domain.Enums;
 using EmpregaNet.Domain.Interfaces;
@@ -10,10 +10,8 @@ namespace EmpregaNet.Domain.Entities
     /// </summary>
     public class Job : BaseEntity, IAggregateRoot
     {
-        private readonly List<string> _requirements = [];
-        private readonly List<string> _benefits = [];
-        private readonly ReadOnlyCollection<string> _requirementsView;
-        private readonly ReadOnlyCollection<string> _benefitsView;
+        private List<string> _requirements = [];
+        private List<string> _benefits = [];
         public long CompanyId { get; private set; }
         public string Title { get; private set; }
 
@@ -44,8 +42,8 @@ namespace EmpregaNet.Domain.Entities
         /// Persistido como <c>text[]</c> com índice GIN: o filtro usa sobreposição de arrays,
         /// sem join.
         /// </summary>
-        public IReadOnlyList<string> Requirements => _requirementsView;
-        public IReadOnlyList<string> Benefits => _benefitsView;
+        public IReadOnlyList<string> Requirements => _requirements.AsReadOnly();
+        public IReadOnlyList<string> Benefits => _benefits.AsReadOnly();
         public DateTimeOffset PublishedAt { get; private set; }
         public bool IsActive { get; private set; }
 
@@ -55,8 +53,6 @@ namespace EmpregaNet.Domain.Entities
             Title = null!;
             Description = null!;
             Location = null!;
-            _requirementsView = _requirements.AsReadOnly();
-            _benefitsView = _benefits.AsReadOnly();
         }
 
         public Job(
@@ -80,8 +76,6 @@ namespace EmpregaNet.Domain.Entities
             CompanyId = companyId;
             PublishedAt = DateTimeOffset.UtcNow;
             IsActive = true;
-            _requirementsView = _requirements.AsReadOnly();
-            _benefitsView = _benefits.AsReadOnly();
 
             ApplyDetails(
                 title, description, jobType, workModel, workShift, experienceLevel, area, location,
@@ -110,6 +104,10 @@ namespace EmpregaNet.Domain.Entities
 
         public void Close() => IsActive = false;
 
+        /// <summary>
+        /// Aplica os dados da vaga, validando o par salarial e normalizando as coleções.
+        /// </summary>
+        [MemberNotNull(nameof(Title), nameof(Description), nameof(Location))]
         private void ApplyDetails(
             string title,
             string description,

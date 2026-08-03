@@ -3,8 +3,8 @@
 import { SelectField, type SelectOption } from '@/components';
 import { useFormContext } from '@/context';
 import { APPLICATION_STATUSES, applicationStatusLabels } from '@/features/candidaturas/service';
+import { useFilterFormSync } from '@/hooks';
 import { DATE_ORDER_BY_OPTIONS, LIST_ORDER_BY_VALUES } from '@/shared';
-import { useEffect, useRef } from 'react';
 import { z } from 'zod';
 
 /** Valores do filtro de status: os status do processo seletivo + "Todas". */
@@ -50,14 +50,7 @@ export function CandidatesFilterFields({ onChange }: CandidatesFilterFieldsProps
   const status = watch('status');
   const orderBy = watch('orderBy');
 
-  const isFirstRun = useRef(true);
-  useEffect(() => {
-    if (isFirstRun.current) {
-      isFirstRun.current = false;
-      return;
-    }
-    onChange(candidatesFilterToParams({ status, orderBy }));
-  }, [status, orderBy, onChange]);
+  useFilterFormSync(candidatesFilterToParams({ status, orderBy }), onChange);
 
   return (
     <>

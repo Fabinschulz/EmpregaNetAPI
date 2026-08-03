@@ -18,13 +18,10 @@ When('eu carrego esses dados no formulário de edição de empresa', function (t
   this.data.companyFormValues = companyFormValuesFromDto(dto);
 });
 
-When(
-  'eu monto o payload de reenvio a partir do formulário, sem alterar nada',
-  function (this: BusinessRulesWorld) {
-    const formValues = companyFormSchema.parse(this.data.companyFormValues);
-    this.result = companyFormToApiPayload(formValues);
-  }
-);
+When('eu monto o payload de reenvio a partir do formulário, sem alterar nada', function (this: BusinessRulesWorld) {
+  const formValues = companyFormSchema.parse(this.data.companyFormValues);
+  this.result = companyFormToApiPayload(formValues);
+});
 
 Then('o payload de reenvio deve conter:', function (this: BusinessRulesWorld, table: DataTable) {
   const payload = this.result as Record<string, unknown>;

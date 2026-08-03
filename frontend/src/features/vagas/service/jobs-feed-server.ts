@@ -3,13 +3,12 @@ import 'server-only';
 import { getPublicEnv } from '@/utils/lib/env';
 import { cacheLife } from 'next/cache';
 import {
-    jobVocabularySchema,
-    jobsFeedResponseSchema,
-    type JobVocabularyDto,
-    type JobsFeedQueryParams,
-    type JobsFeedResponseDto
+  jobVocabularySchema,
+  jobsFeedResponseSchema,
+  type JobVocabularyDto,
+  type JobsFeedQueryParams,
+  type JobsFeedResponseDto
 } from './jobs-feed-schema';
-
 
 function serverApiBaseUrl(): string {
   return process.env.API_INTERNAL_BASE_URL?.trim() || getPublicEnv().NEXT_PUBLIC_API_BASE_URL;

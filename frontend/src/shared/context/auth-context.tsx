@@ -2,12 +2,12 @@
 
 import { registerAxiosAuthHandlers } from '@/shared/api';
 import {
-    logout as apiLogout,
-    clearSessionMetadata,
-    getSessionMetadataSnapshot,
-    saveSessionMetadata,
-    subscribeSessionMetadata,
-    type UserLoggedDto
+  logout as apiLogout,
+  clearSessionMetadata,
+  getSessionMetadataSnapshot,
+  saveSessionMetadata,
+  subscribeSessionMetadata,
+  type UserLoggedDto
 } from '@/shared/auth';
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useSyncExternalStore } from 'react';
 

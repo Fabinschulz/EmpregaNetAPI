@@ -6,13 +6,13 @@ import { useMemo } from 'react';
 import { fetchJobFeedInteractions, fetchJobVocabulary, fetchJobsFeed } from './jobs-feed-api';
 import { jobsFeedKeys } from './jobs-feed-keys';
 import {
-    JOBS_FEED_PAGE_SIZE,
-    jobsFeedFiltersToApiParams,
-    jobsFeedFiltersToQueryString,
-    type JobFeedItemDto,
-    type JobVocabularyDto,
-    type JobsFeedFilters,
-    type JobsFeedResponseDto
+  JOBS_FEED_PAGE_SIZE,
+  jobsFeedFiltersToApiParams,
+  jobsFeedFiltersToQueryString,
+  type JobFeedItemDto,
+  type JobVocabularyDto,
+  type JobsFeedFilters,
+  type JobsFeedResponseDto
 } from './jobs-feed-schema';
 
 type UseJobsFeedQueryOptions = {
@@ -43,10 +43,7 @@ export function useJobsFeedQuery(
     initialData: seedsCurrentFilters ? { pages: [initialPage], pageParams: [1] } : undefined
   });
 
-  const jobs = useMemo<JobFeedItemDto[]>(
-    () => query.data?.pages.flatMap((page) => page.data) ?? [],
-    [query.data]
-  );
+  const jobs = useMemo<JobFeedItemDto[]>(() => query.data?.pages.flatMap((page) => page.data) ?? [], [query.data]);
 
   const totalItems = query.data?.pages[0]?.totalItems ?? 0;
 

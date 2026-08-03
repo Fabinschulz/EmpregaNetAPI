@@ -1,29 +1,29 @@
 'use client';
 
 import {
-    Alert,
-    ApiQueryBoundary,
-    Badge,
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
-    FormFieldsSkeleton,
-    PageHeader,
-    StatusBadge
+  Alert,
+  ApiQueryBoundary,
+  Badge,
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  FormFieldsSkeleton,
+  PageHeader,
+  StatusBadge
 } from '@/components';
 import { FormProvider } from '@/context';
 import { formatDateTime, userTypeLabel } from '@/shared';
 import { useParams } from 'next/navigation';
 import { useMemo, type ReactNode } from 'react';
 import {
-    adminUserFormValuesFromDto,
-    adminUserUpdateFormSchema,
-    defaultAdminUserUpdateForm,
-    useAdminUserQuery,
-    useUpdateAdminUserMutation,
-    type AdminUserUpdateFormValues
+  adminUserFormValuesFromDto,
+  adminUserUpdateFormSchema,
+  defaultAdminUserUpdateForm,
+  useAdminUserQuery,
+  useUpdateAdminUserMutation,
+  type AdminUserUpdateFormValues
 } from '../service';
 import styles from './admin-user-detail.module.scss';
 import { AdminUserFormFields } from './admin-user-form';

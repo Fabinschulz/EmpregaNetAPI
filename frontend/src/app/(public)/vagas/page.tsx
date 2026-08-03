@@ -1,9 +1,9 @@
 import { JobsFeed } from '@/features/vagas/feed';
 import {
-    JOBS_FEED_PAGE_SIZE,
-    jobsFeedFiltersToApiParams,
-    parseJobsFeedFilters,
-    searchParamsFromRecord
+  JOBS_FEED_PAGE_SIZE,
+  jobsFeedFiltersToApiParams,
+  parseJobsFeedFilters,
+  searchParamsFromRecord
 } from '@/features/vagas/service';
 import { getJobVocabularyCached, getJobsFeedCached } from '@/features/vagas/service/jobs-feed-server';
 import type { Metadata } from 'next';

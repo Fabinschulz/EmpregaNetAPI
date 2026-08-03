@@ -8,11 +8,11 @@ import { Eye } from 'lucide-react';
 import { useCallback, useState } from 'react';
 import { ApplicationStatusBadge } from '../application-status-badge';
 import {
-    defaultMyApplicationsFilter,
-    myApplicationsFilterFormSchema,
-    myApplicationsFilterToParams,
-    useMyJobApplicationsQuery,
-    type JobApplicationDto
+  defaultMyApplicationsFilter,
+  myApplicationsFilterFormSchema,
+  myApplicationsFilterToParams,
+  useMyJobApplicationsQuery,
+  type JobApplicationDto
 } from '../service';
 import { MyApplicationsFilterFields } from './my-applications-filter-fields';
 

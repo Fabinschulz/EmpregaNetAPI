@@ -1,16 +1,16 @@
 'use client';
 
 import {
-    ApiQueryBoundary,
-    Button,
-    ConfirmDialog,
-    PageHeader,
-    StatusBadge,
-    TableContainer,
-    TableFilters,
-    useRowDeleteAction,
-    type DataTableColumn,
-    type RowAction
+  ApiQueryBoundary,
+  Button,
+  ConfirmDialog,
+  PageHeader,
+  StatusBadge,
+  TableContainer,
+  TableFilters,
+  useRowDeleteAction,
+  type DataTableColumn,
+  type RowAction
 } from '@/components';
 import { FormProvider } from '@/context';
 import { usePersistedTablePagination } from '@/hooks';
@@ -18,7 +18,13 @@ import { formatDate, type JobsListQueryParams } from '@/shared';
 import { Pencil, Plus } from 'lucide-react';
 import Link from 'next/link';
 import { useCallback, useMemo, useState } from 'react';
-import { defaultJobsFilter, jobsFilterFormSchema, useDeleteJobMutation, useJobsListQuery, type JobDto } from '../service';
+import {
+  defaultJobsFilter,
+  jobsFilterFormSchema,
+  useDeleteJobMutation,
+  useJobsListQuery,
+  type JobDto
+} from '../service';
 import { JobsFilterFields } from './jobs-filter-fields';
 
 type JobsFilterParams = Pick<JobsListQueryParams, 'search' | 'isActive'>;

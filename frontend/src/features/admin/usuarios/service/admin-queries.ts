@@ -54,7 +54,6 @@ export function useUpdateAdminUserMutation(userId: number) {
   return { ...ctx, apiError };
 }
 
-
 export function useDeleteAdminUserMutation() {
   const queryClient = useQueryClient();
   const [apiError, setApiError] = useState<string | null>(null);

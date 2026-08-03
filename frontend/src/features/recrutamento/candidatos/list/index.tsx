@@ -7,10 +7,10 @@ import { formatDate, type CandidatesListQueryParams, type UserDto } from '@/shar
 import { Eye } from 'lucide-react';
 import { useCallback, useMemo, useState } from 'react';
 import {
-    candidatesFilterFormSchema,
-    candidatesFilterToParams,
-    defaultCandidatesFilter,
-    useCandidatesListQuery
+  candidatesFilterFormSchema,
+  candidatesFilterToParams,
+  defaultCandidatesFilter,
+  useCandidatesListQuery
 } from '../service';
 import { CandidatesFilterFields } from './candidates-filter-fields';
 

@@ -1,10 +1,10 @@
 import {
-    SALARY_RANGE_OPTIONS,
-    experienceLevelVocabulary,
-    jobAreaVocabulary,
-    jobTypeVocabulary,
-    workModelVocabulary,
-    workShiftVocabulary
+  SALARY_RANGE_OPTIONS,
+  experienceLevelVocabulary,
+  jobAreaVocabulary,
+  jobTypeVocabulary,
+  workModelVocabulary,
+  workShiftVocabulary
 } from '@/shared/schema/job-vocabulary';
 import { Then, When } from '@cucumber/cucumber';
 import { expect } from 'chai';
@@ -42,17 +42,14 @@ When('eu inspeciono o vocabulário {string}', function (this: BusinessRulesWorld
   vocabularyData(this).vocabulary = vocabularyByName(nome);
 });
 
-When(
-  'eu normalizo {string} no vocabulário {string}',
-  function (this: BusinessRulesWorld, valor: string, nome: string) {
-    const vocabulary = vocabularyByName(nome);
+When('eu normalizo {string} no vocabulário {string}', function (this: BusinessRulesWorld, valor: string, nome: string) {
+  const vocabulary = vocabularyByName(nome);
 
-    // O Gherkin só carrega texto; um valor puramente numérico representa o inteiro que os
-    // endpoints antigos devolvem.
-    const input = /^\d+$/.test(valor) ? Number(valor) : valor;
-    vocabularyData(this).normalized = vocabulary.normalize(input);
-  }
-);
+  // O Gherkin só carrega texto; um valor puramente numérico representa o inteiro que os
+  // endpoints antigos devolvem.
+  const input = /^\d+$/.test(valor) ? Number(valor) : valor;
+  vocabularyData(this).normalized = vocabulary.normalize(input);
+});
 
 Then('todos os valores devem ter rótulo', function (this: BusinessRulesWorld) {
   const { vocabulary } = vocabularyData(this);

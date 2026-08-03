@@ -1,9 +1,9 @@
 import {
-    LIST_ORDER_BY_VALUES,
-    UF_VALUE_SET,
-    createPaginatedResponseSchema,
-    normalizeUf,
-    type CompaniesListQueryParams
+  LIST_ORDER_BY_VALUES,
+  UF_VALUE_SET,
+  createPaginatedResponseSchema,
+  normalizeUf,
+  type CompaniesListQueryParams
 } from '@/shared/schema';
 import { maskBrazilPhone, onlyDigits } from '@/utils';
 import { z } from 'zod';

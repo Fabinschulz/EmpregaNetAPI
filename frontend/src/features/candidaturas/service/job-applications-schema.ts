@@ -1,7 +1,7 @@
 import {
-    LIST_ORDER_BY_VALUES,
-    createPaginatedResponseSchema,
-    type JobApplicationsListQueryParams
+  LIST_ORDER_BY_VALUES,
+  createPaginatedResponseSchema,
+  type JobApplicationsListQueryParams
 } from '@/shared/schema';
 import { z } from 'zod';
 

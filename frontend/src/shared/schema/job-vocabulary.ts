@@ -105,14 +105,7 @@ export const experienceLevelVocabulary = createVocabulary(
     { value: 'DeTresACincoAnos', label: 'De 3 a 5 anos' },
     { value: 'MaisDeCincoAnos', label: 'Mais de 5 anos' }
   ] as const,
-  [
-    'NaoSelecionado',
-    'SemExperiencia',
-    'AteUmAno',
-    'DeUmATresAnos',
-    'DeTresACincoAnos',
-    'MaisDeCincoAnos'
-  ]
+  ['NaoSelecionado', 'SemExperiencia', 'AteUmAno', 'DeUmATresAnos', 'DeTresACincoAnos', 'MaisDeCincoAnos']
 );
 
 export type ExperienceLevelValue = (typeof experienceLevelVocabulary.options)[number]['value'];
@@ -213,8 +206,7 @@ export type PublishedWithinValue = (typeof PUBLISHED_WITHIN_OPTIONS)[number]['va
 
 const PUBLISHED_WITHIN_SET = new Set<string>(PUBLISHED_WITHIN_OPTIONS.map((o) => o.value));
 
-export const isPublishedWithinValue = (value: string): value is PublishedWithinValue =>
-  PUBLISHED_WITHIN_SET.has(value);
+export const isPublishedWithinValue = (value: string): value is PublishedWithinValue => PUBLISHED_WITHIN_SET.has(value);
 
 export const publishedWithinLabel = (value: string | null | undefined): string =>
   PUBLISHED_WITHIN_OPTIONS.find((o) => o.value === value)?.label ?? '';

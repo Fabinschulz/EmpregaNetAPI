@@ -45,13 +45,10 @@ When('eu converto os filtros em parâmetros da API', function (this: BusinessRul
   feedData(this).apiParams = jobsFeedFiltersToApiParams(currentFilters(this), 1);
 });
 
-Then(
-  'o filtro {string} deve ser {string}',
-  function (this: BusinessRulesWorld, campo: string, esperado: string) {
-    const actual = getByPath(currentFilters(this) as unknown as Record<string, unknown>, campo);
-    expect(String(actual ?? '')).to.equal(esperado);
-  }
-);
+Then('o filtro {string} deve ser {string}', function (this: BusinessRulesWorld, campo: string, esperado: string) {
+  const actual = getByPath(currentFilters(this) as unknown as Record<string, unknown>, campo);
+  expect(String(actual ?? '')).to.equal(esperado);
+});
 
 Then('a lista {string} deve conter {int} itens', function (this: BusinessRulesWorld, campo: string, total: number) {
   const actual = getByPath(currentFilters(this) as unknown as Record<string, unknown>, campo);

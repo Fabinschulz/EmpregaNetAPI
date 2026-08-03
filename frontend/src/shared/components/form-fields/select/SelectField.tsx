@@ -22,14 +22,7 @@ export type SelectFieldProps = {
  * Select ligado ao `react-hook-form`: rótulo, erro de validação e escrita no formulário.
  * A composição do Radix vive em {@link SelectInput}, partilhada com superfícies sem formulário.
  */
-export const SelectField: React.FC<SelectFieldProps> = ({
-  name,
-  options,
-  required,
-  label,
-  placeholder,
-  className
-}) => {
+export const SelectField: React.FC<SelectFieldProps> = ({ name, options, required, label, placeholder, className }) => {
   const { validationErrors, setValue, watch, readOnly } = useFormContext();
   const errorMessage = getFieldErrorMessage(name, validationErrors);
   const labelText = required && label ? `${label} *` : label;

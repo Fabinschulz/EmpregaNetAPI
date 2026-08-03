@@ -16,9 +16,9 @@ import {
   TooltipTrigger
 } from '@/components';
 import { useFormContext } from '@/context';
+import { cn, getFieldErrorMessage, truncateText } from '@/utils';
 import { ChevronDown, X } from 'lucide-react';
 import * as React from 'react';
-import { cn, getFieldErrorMessage, truncateText } from '@/utils';
 import styles from './multi-select.module.scss';
 
 export interface MultiSelectOption {
@@ -56,11 +56,15 @@ export const MultiSelectField: React.FC<MultiSelectFieldProps> = ({
       ? [String(currentValues)]
       : [];
 
-  const selectedOptions = options.filter((option) => selectedValues.includes(option.value));
+  const selectedOptions: MultiSelectOption[] = selectedValues.map(
+    (value) => options.find((option) => option.value === value) ?? { value, label: value }
+  );
+
   const labelText = required && label ? `${label} *` : label;
 
   const labelId = `${name}-label`;
   const errorId = `${name}-error`;
+  const listboxId = `${React.useId()}-listbox`;
 
   const handleSelect = (value: string) => {
     const isSelected = selectedValues.includes(value);
@@ -84,6 +88,15 @@ export const MultiSelectField: React.FC<MultiSelectFieldProps> = ({
     );
   };
 
+  const handleTriggerKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    if (readOnly || (event.key !== 'Enter' && event.key !== ' ')) {
+      return;
+    }
+
+    event.preventDefault();
+    setOpen((isOpen) => !isOpen);
+  };
+
   const filteredOptions = options.filter(
     (o) => o.label.toLowerCase().includes(query.toLowerCase()) || o.value.toLowerCase().includes(query.toLowerCase())
   );
@@ -99,16 +112,19 @@ export const MultiSelectField: React.FC<MultiSelectFieldProps> = ({
       <TooltipProvider delayDuration={200}>
         <Popover open={open} onOpenChange={setOpen}>
           <PopoverTrigger asChild>
-            <button
-              type="button"
-              disabled={!!readOnly}
+            <div
+              role="combobox"
+              tabIndex={readOnly ? -1 : 0}
+              aria-disabled={readOnly ? true : undefined}
               data-testid={`select-${name}-id`}
               className={styles.trigger}
               aria-expanded={open}
               aria-haspopup="listbox"
+              aria-controls={listboxId}
               aria-labelledby={labelText ? labelId : undefined}
               aria-describedby={errorsMessage ? errorId : undefined}
               data-invalid={errorsMessage ? 'true' : undefined}
+              onKeyDown={handleTriggerKeyDown}
             >
               {selectedValues.length > 0 ? (
                 <div className={styles.badges}>
@@ -132,9 +148,9 @@ export const MultiSelectField: React.FC<MultiSelectFieldProps> = ({
                 <span className={styles.placeholder}>{placeholder}</span>
               )}
               <ChevronDown className={styles.chevron} size={16} aria-hidden />
-            </button>
+            </div>
           </PopoverTrigger>
-          <PopoverContent align="start" className={styles.popoverContent}>
+          <PopoverContent id={listboxId} align="start" className={styles.popoverContent}>
             <Command shouldFilter={false}>
               <CommandInput placeholder="Pesquisar opção..." value={query} onValueChange={setQuery} />
               <CommandList>

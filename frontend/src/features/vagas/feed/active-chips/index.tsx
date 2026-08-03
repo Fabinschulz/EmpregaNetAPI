@@ -2,14 +2,14 @@
 
 import type { JobsFeedFilters } from '@/features/vagas/service';
 import {
-    experienceLevelVocabulary,
-    findSalaryRange,
-    jobAreaVocabulary,
-    jobTypeVocabulary,
-    publishedWithinLabel,
-    ufFullLabel,
-    workModelVocabulary,
-    workShiftVocabulary
+  experienceLevelVocabulary,
+  findSalaryRange,
+  jobAreaVocabulary,
+  jobTypeVocabulary,
+  publishedWithinLabel,
+  ufFullLabel,
+  workModelVocabulary,
+  workShiftVocabulary
 } from '@/shared/schema';
 import { X } from 'lucide-react';
 import styles from './active-chips.module.scss';
@@ -29,7 +29,6 @@ type ActiveChip = {
   label: string;
   onRemove: () => void;
 };
-
 
 export function FeedActiveChips({ controller }: FeedActiveChipsProps) {
   const { filters, toggleFilterValue, updateFilters, clearAll, activeCount } = controller;

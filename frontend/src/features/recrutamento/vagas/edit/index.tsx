@@ -2,6 +2,11 @@
 
 import { Alert, ApiQueryBoundary, Button, FormFieldsSkeleton, PageHeader } from '@/components';
 import { FormProvider } from '@/context';
+import { Users } from 'lucide-react';
+import Link from 'next/link';
+import { useParams } from 'next/navigation';
+import { useMemo } from 'react';
+import { JobFormFields } from '../job-form';
 import {
   defaultFormJob,
   jobFormSchema,
@@ -11,18 +16,13 @@ import {
   useUpdateJobMutation,
   type JobFormValues
 } from '../service';
-import { Users } from 'lucide-react';
-import Link from 'next/link';
-import { useParams } from 'next/navigation';
-import { useMemo } from 'react';
-import { JobFormFields } from '../job-form';
 
 export function RecruitmentEditJobPage() {
   const params = useParams<{ id: string }>();
   const jobId = useMemo(() => Number(params.id), [params.id]);
   const { data: job, isPending, isError, error, refetch } = useJobQuery(jobId);
-  const { apiError: updateApiError, mutateAsync: updateAsync, isPending: isUpdating } = useUpdateJobMutation(jobId);
-  const { apiError: closeApiError, mutateAsync: closeAsync, isPending: isClosing } = useCloseJobMutation(jobId);
+  const { apiError: updateApiError, mutate: update, isPending: isUpdating } = useUpdateJobMutation(jobId);
+  const { apiError: closeApiError, mutate: close, isPending: isClosing } = useCloseJobMutation(jobId);
   const apiError = updateApiError ?? closeApiError;
 
   const initial = useMemo<JobFormValues>(() => {
@@ -30,8 +30,7 @@ export function RecruitmentEditJobPage() {
     return jobFormValuesFromDto(job);
   }, [job]);
 
-  const handleSubmit = async (formValue: JobFormValues) => await updateAsync(formValue);
-  const onClose = () => void closeAsync();
+  const handleSubmit = (formValue: JobFormValues) => update(formValue);
 
   return (
     <ApiQueryBoundary
@@ -56,7 +55,7 @@ export function RecruitmentEditJobPage() {
           }
         />
         {apiError ? (
-          <Alert variant="destructive" title="Erro">
+          <Alert variant="destructive" title="Erro" style={{ margin: '1rem 0' }}>
             {apiError}
           </Alert>
         ) : null}
@@ -69,7 +68,7 @@ export function RecruitmentEditJobPage() {
             defaultValues={initial}
             onSubmit={handleSubmit}
           >
-            <JobFormFields submitLabel="Salvar" onClose={onClose} closeDisabled={isUpdating || isClosing} />
+            <JobFormFields submitLabel="Salvar" onClose={close} closeDisabled={isUpdating || isClosing} />
           </FormProvider>
         )}
       </section>

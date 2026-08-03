@@ -15,10 +15,15 @@ import { useEffect, useRef } from 'react';
  *
  * @param params Parâmetros de consulta já traduzidos. Recriar o objeto a cada render é esperado,
  *   a comparação é por valor, não por identidade, e por isso não há lista de dependências a esquecer.
- * @param onChange Notificado com os parâmetros novos. Deve ser estável (`useCallback`).
+ * @param onChange Notificado com os parâmetros novos.
  */
 export function useFilterFormSync<TParams>(params: TParams, onChange: (params: TParams) => void): void {
   const isFirstRun = useRef(true);
+
+  const onChangeRef = useRef(onChange);
+  useEffect(() => {
+    onChangeRef.current = onChange;
+  });
 
   const paramsRef = useRef(params);
   useEffect(() => {
@@ -33,6 +38,6 @@ export function useFilterFormSync<TParams>(params: TParams, onChange: (params: T
       return;
     }
 
-    onChange(paramsRef.current);
-  }, [paramsKey, onChange]);
+    onChangeRef.current(paramsRef.current);
+  }, [paramsKey]);
 }

@@ -13,7 +13,6 @@ const isoTimeFormatter = new Intl.DateTimeFormat('pt-BR', { timeStyle: 'short' }
 
 type DateTimeParts = { date: string; time?: string };
 
-
 function parseApiDateTime(value?: string | null): DateTimeParts | null {
   const raw = value?.trim();
   if (!raw) return null;

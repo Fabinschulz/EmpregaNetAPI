@@ -5,7 +5,6 @@ import { lookupAddressByZipCode } from '@/shared/api';
 import { isCompleteZipCode, maskZipCode } from '@/utils';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-
 export type ZipCodeAutofillFields = {
   zipCode: string;
   street: string;
