@@ -1,5 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using EmpregaNet.Application.Common.Base;
+using EmpregaNet.Application.Utils.CustomValidation;
 using EmpregaNet.Application.Utils.Helpers;
 using EmpregaNet.Domain.Entities;
 using DomainCompany = EmpregaNet.Domain.Entities.Company;
@@ -28,7 +29,7 @@ public static class CompanyMapper
             CompanyName = entity.CompanyName,
             TypeOfActivity = entity.TypeOfActivity!.ToDescription(),
             Address = entity.Address,
-            RegistrationNumber = entity.RegistrationNumber.FormatCNPJ(),
+            RegistrationNumber = BrazilianDocument.FormatCnpj(entity.RegistrationNumber),
             Email = entity.Email,
             Phone = entity.Phone,
             CreatedAtUtc = entity.CreatedAt,

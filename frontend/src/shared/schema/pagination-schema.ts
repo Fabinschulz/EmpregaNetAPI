@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 /**
  * Parâmetros de paginação/ordenação enviados à API, alinhados a `ListQueryParams` do backend
- * (`page`, `size`, `orderBy`). Schema Zod validável (com defaults), em vez de um tipo TS solto —
+ * (`page`, `size`, `orderBy`). Schema Zod validável (com defaults), em vez de um tipo TS solto -
  * permite validar entradas vindas de UI (ex.: um seletor de itens por página) antes de
  * repassar à camada de serviços.
  */

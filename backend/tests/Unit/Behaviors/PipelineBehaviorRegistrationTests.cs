@@ -73,8 +73,8 @@ public sealed class PipelineBehaviorRegistrationTests
     /// </summary>
     /// <remarks>
     /// Ele lia o utilizador por <c>IHttpCurrentUser.GetContextUser()</c>, que termina em
-    /// <c>?? throw</c>. Como o limiar só é avaliado depois do handler, uma requisição anónima lenta
-    /// — o catálogo público de vagas, ou o próprio login, que faz hash de senha — deixava de
+    /// <c>?? throw</c>. Como o limiar só é avaliado depois do handler, uma requisição anónima lenta,
+    /// o catálogo público de vagas, ou o próprio login, que faz hash de senha, deixava de
     /// devolver a sua resposta e virava 500. O diagnóstico não pode derrubar o pedido observado.
     /// </remarks>
     [Fact]

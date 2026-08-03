@@ -8,6 +8,11 @@ public interface IJobApplicationRepository : IBaseRepository<JobApplication>
 {
     Task<bool> ExistsAsync(long jobId, long userId, CancellationToken cancellationToken);
 
+    Task<IReadOnlyList<long>> GetAppliedJobIdsAsync(
+        long userId,
+        IReadOnlyCollection<long> jobIds,
+        CancellationToken cancellationToken);
+
     Task<ListDataPagination<JobApplication>> GetByJobIdAsync(
         long jobId,
         CancellationToken cancellationToken,

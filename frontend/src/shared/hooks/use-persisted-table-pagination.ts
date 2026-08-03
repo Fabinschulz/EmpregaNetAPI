@@ -35,7 +35,7 @@ function clearPersistedState(stgKey: string) {
 }
 
 export type UseTablePaginationOptions = {
-  /** Identificador único da tabela — chave de persistência (ex.: "recrutamento-vagas"). */
+  /** Identificador único da tabela - chave de persistência (ex.: "recrutamento-vagas"). */
   storageKey: string;
   /** Página inicial (1-based) quando não há estado persistido. Padrão: 1. */
   defaultPage?: number;
@@ -61,7 +61,7 @@ export type UseTablePaginationResult = {
 
 /**
  * Estado de paginação de tabela (página + itens por página) persistido em `localStorage`
- * por `storageKey` — o usuário volta à tela na página em que parou.
+ * por `storageKey` - o usuário volta à tela na página em que parou.
  *
  * Não busca dados nem conhece totais: o estado alimenta a query (server-side: `{ page, size }`)
  * ou o fatiamento em memória (client-side), e o `<TablePagination totalItems={...}>` deriva

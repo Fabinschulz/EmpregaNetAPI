@@ -1,4 +1,4 @@
-# ADRs — Architecture Decision Records
+# ADRs - Architecture Decision Records
 
 Registos curtos de decisões **estruturais e duradouras** (stack, limites entre serviços, políticas de cache, BFF vs chamada directa, etc.).
 
@@ -11,6 +11,8 @@ Registos curtos de decisões **estruturais e duradouras** (stack, limites entre 
 | [0003](0003-teto-diario-de-emails-por-destinatario.md) | Teto diário de e-mails transacionais por destinatário | Aceite |
 | [0004](0004-proxy-confiavel-explicito.md) | Headers de proxy só de proxies explicitamente confiáveis | Aceite |
 | [0005](0005-identity-no-dominio.md) | `User`/`Role` herdam de ASP.NET Core Identity dentro do Domain | Aceite |
+| [0006](0006-agregado-job-enriquecido.md) | Agregado `Job` enriquecido; vínculo e modalidade em enums separados | Aceite |
+| [0007](0007-endpoint-de-feed-dedicado.md) | Endpoint de feed dedicado, separado do CRUD genérico e do estado por utilizador | Aceite |
 
 ## Como criar
 

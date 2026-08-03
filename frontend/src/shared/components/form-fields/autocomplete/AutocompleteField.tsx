@@ -1,17 +1,17 @@
 'use client';
 
 import {
-  Command,
-  CommandEmpty,
-  CommandInput,
-  CommandItem,
-  CommandList,
-  Popover,
-  PopoverContent,
-  PopoverTrigger
+    Command,
+    CommandEmpty,
+    CommandInput,
+    CommandItem,
+    CommandList,
+    Popover,
+    PopoverContent,
+    PopoverTrigger
 } from '@/components/ui';
 import { useFormContext } from '@/context';
-import { useDebouncedValue } from '@/hooks';
+import { useDebouncedDraft } from '@/hooks';
 import { cn, getFieldErrorMessage } from '@/utils';
 import { Loader2, Search } from 'lucide-react';
 import * as React from 'react';
@@ -45,40 +45,24 @@ export const AutocompleteField: React.FC<AutocompleteFieldProps> = ({
   const committed = ((watch(name) as string | undefined) ?? '').toString();
 
   const [open, setOpen] = React.useState(false);
-  const [input, setInput] = React.useState(committed);
-  const debouncedInput = useDebouncedValue(input, debounceMs);
-  const lastCommittedRef = React.useRef(committed);
+
+  const commit = React.useCallback(
+    (value: string) => setValue(name, value, { shouldDirty: true }),
+    [name, setValue]
+  );
+
+  const {
+    draft: input,
+    setDraft: setInput,
+    commitNow
+  } = useDebouncedDraft({ value: committed, onCommit: commit, delayMs: debounceMs });
 
   const error = getFieldErrorMessage(name, validationErrors);
   const labelId = `${name}-label`;
   const errorId = `${name}-error`;
 
-  /** Escreve o termo no formulário -> muda o param do useQuery -> busca no servidor. */
-  const commit = React.useCallback(
-    (raw: string) => {
-      const value = raw.trim();
-      lastCommittedRef.current = value;
-      setValue(name, value, { shouldDirty: true });
-    },
-    [name, setValue]
-  );
-
-  React.useEffect(() => {
-    if (debouncedInput.trim() !== lastCommittedRef.current) {
-      commit(debouncedInput);
-    }
-  }, [debouncedInput, commit]);
-
-  React.useEffect(() => {
-    if (committed !== lastCommittedRef.current) {
-      lastCommittedRef.current = committed;
-      setInput(committed);
-    }
-  }, [committed]);
-
   const handleSelect = (option: AutocompleteOption) => {
-    setInput(option.label);
-    commit(option.label);
+    commitNow(option.label);
     setOpen(false);
   };
 

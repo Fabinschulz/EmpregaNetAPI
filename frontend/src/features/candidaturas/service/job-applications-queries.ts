@@ -1,16 +1,17 @@
 'use client';
 
 import { useAuth } from '@/context';
+import { jobsFeedKeys } from '@/features/vagas/service';
 import {
-  withDefaultListParams,
-  type JobApplicationsAdminListQueryParams,
-  type JobApplicationsListQueryParams
+    withDefaultListParams,
+    type JobApplicationsAdminListQueryParams,
+    type JobApplicationsListQueryParams
 } from '@/shared/schema';
 import { reportMutationApiError, toastSuccess } from '@/utils';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
-import { jobApplicationsKeys } from './job-applications-keys';
 import { applyToJob, changeStatus, deleteApplication, listAll, listByJob, listMine } from './job-applications-api';
+import { jobApplicationsKeys } from './job-applications-keys';
 import { applicationStatusLabels, type ApplicationStatus } from './job-applications-schema';
 
 export function useMyJobApplicationsQuery(params?: JobApplicationsListQueryParams) {
@@ -74,6 +75,7 @@ export function useApplyToJobMutation(jobId: number) {
     mutationFn: () => applyToJob({ jobId }),
     onSuccess: async (res) => {
       await queryClient.invalidateQueries({ queryKey: jobApplicationsKeys.all });
+      await queryClient.invalidateQueries({ queryKey: jobsFeedKeys.all });
       const message = typeof res === 'string' ? res : 'Candidatura enviada.';
       toastSuccess('Candidatura enviada', message);
     },

@@ -3,6 +3,7 @@ using EmpregaNet.Application.Common.Base;
 using EmpregaNet.Application.Utils;
 using EmpregaNet.Domain.Common;
 using EmpregaNet.Application.Jobs.Commands;
+using EmpregaNet.Application.Jobs.Queries;
 using EmpregaNet.Application.Jobs.ViewModel;
 using EmpregaNet.Application.Admin.Company.Queries;
 using EmpregaNet.Application.Admin.Company.ViewModel;
@@ -47,6 +48,52 @@ public class JobsController : MainController<CreateJobCommand, UpdateJobCommand,
         [FromQuery] string? search = null)
     {
         var result = await _mediator.Send(new GetAllQuery<JobViewModel>(page, size, orderBy, isDeleted, isActive, search));
+        return Ok(result);
+    }
+
+    /// <summary>
+    /// Feed público de descoberta de vagas: busca textual, filtros combináveis (localização,
+    /// modalidade, vínculo, senioridade, área, tecnologias, benefícios, empresa, faixa salarial,
+    /// janela de publicação) e ordenação. Devolve apenas vagas ativas.
+    /// </summary>
+    [AllowAnonymous]
+    [HttpGet("feed")]
+    [OutputCache(PolicyName = OutputCachePolicies.PublicCatalog)]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ListDataPagination<JobFeedItemViewModel>))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(DomainError))]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(DomainError))]
+    public async Task<IActionResult> GetFeed([FromQuery] JobsFeedRequest request)
+    {
+        var result = await _mediator.Send(request.ToQuery());
+        return Ok(result);
+    }
+
+    /// <summary>
+    /// Retorna o vocabulário de filtros e opções disponíveis para o feed de vagas, incluindo modalidades, vínculos, senioridades, áreas, tecnologias, benefícios e empresas.
+    /// </summary>
+    [AllowAnonymous]
+    [HttpGet("vocabulary")]
+    [OutputCache(PolicyName = OutputCachePolicies.PublicCatalog)]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(JobVocabularyViewModel))]
+    public async Task<IActionResult> GetVocabulary()
+    {
+        var result = await _mediator.Send(new GetJobVocabularyQuery());
+        return Ok(result);
+    }
+
+    /// <summary>
+    /// Estado do utilizador autenticado sobre as vagas informadas: quais já receberam candidatura
+    /// dele. Complementa o feed, que é anónimo e cacheado.
+    /// </summary>
+    /// <param name="ids">Ids das vagas exibidas. Máximo 100 por chamada.</param>
+    [Authorize]
+    [HttpGet("feed/interactions")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(JobFeedInteractionsViewModel))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(DomainError))]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(DomainError))]
+    public async Task<IActionResult> GetFeedInteractions([FromQuery(Name = "ids")] long[]? ids)
+    {
+        var result = await _mediator.Send(new GetJobFeedInteractionsQuery(ids ?? []));
         return Ok(result);
     }
 

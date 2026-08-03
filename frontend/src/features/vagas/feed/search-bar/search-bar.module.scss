@@ -1,0 +1,80 @@
+/* A largura vem do `flex` como filho da barra superior do feed. */
+.searchBar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1 1 320px;
+  min-width: 0;
+  padding: 0 12px;
+  min-height: var(--control-min-height);
+  background: var(--control-bg);
+  border: 1px solid var(--control-border);
+  border-radius: var(--radius-pill);
+  transition:
+    border-color 140ms ease,
+    box-shadow 140ms ease;
+}
+
+.searchBar:focus-within {
+  border-color: var(--control-border-focus);
+  box-shadow: var(--control-focus-shadow);
+}
+
+.searchIcon {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 auto;
+  color: var(--muted);
+}
+
+.searchInput {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  outline: none;
+  background: transparent;
+  color: var(--text);
+  font-size: var(--control-font-size);
+}
+
+.searchInput::placeholder {
+  color: var(--muted);
+}
+
+/* Esconde o "x" nativo do WebKit: já existe um botão acessível com rótulo próprio. */
+.searchInput::-webkit-search-cancel-button {
+  appearance: none;
+}
+
+.searchStatus {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex: 0 0 auto;
+}
+
+.searchClear {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  transition:
+    background 140ms ease,
+    color 140ms ease;
+}
+
+.searchClear:hover {
+  background: var(--surface-hover);
+  color: var(--text);
+}
+
+.searchClear svg {
+  width: 15px;
+  height: 15px;
+}

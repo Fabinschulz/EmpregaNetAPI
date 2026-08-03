@@ -1,7 +1,7 @@
 /// <summary>
 /// Interface de marcação utilizada para definir objetos de notificação no padrão CQRS.
 /// 
-/// ✅ Não possui membros — serve apenas para identificar tipos que representam notificações.
+/// ✅ Não possui membros - serve apenas para identificar tipos que representam notificações.
 /// 
 /// Exemplo de uso:
 /// public class CreateProductEvent : INotification { }

@@ -88,7 +88,7 @@ export function RecruitmentApplicationsPage() {
   const columns = useMemo<DataTableColumn<JobApplicationDto>[]>(
     () => [
       { key: 'id', header: 'Candidatura', render: (application) => <strong>#{application.id}</strong> },
-      { key: 'jobId', header: 'Vaga', render: (application) => application.jobId ?? '—' },
+      { key: 'jobId', header: 'Vaga', render: (application) => application.jobId ?? '-' },
       {
         key: 'status',
         header: 'Status',

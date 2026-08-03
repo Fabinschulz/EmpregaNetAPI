@@ -38,7 +38,7 @@ function MetricCard({ icon: Icon, title, value, isPending, isError = false, hint
         {isPending ? (
           <Skeleton className={styles.metricSkeleton} aria-hidden />
         ) : (
-          <p className={styles.metric}>{isError || value === undefined ? '—' : numberFormatter.format(value)}</p>
+          <p className={styles.metric}>{isError || value === undefined ? '-' : numberFormatter.format(value)}</p>
         )}
         {hint ? <p className={styles.metricHint}>{hint}</p> : null}
         {links && links.length > 0 ? (

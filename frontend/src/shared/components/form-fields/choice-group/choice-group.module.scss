@@ -1,0 +1,61 @@
+/* Grupo de escolha (checkbox/radio) usado em painéis de filtro e formulários simples.
+   Migrado de `features/vagas/feed/feed-filters.module.scss` ao virar componente compartilhado. */
+
+.group {
+  margin: 0;
+  padding: 12px 0;
+  border: 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.group:last-child {
+  border-bottom: 0;
+}
+
+.legend {
+  padding: 0 0 6px;
+  font-size: 0.8125rem;
+  font-weight: 650;
+  color: var(--text);
+}
+
+/* Grupos longos (áreas, estados) rolam em vez de esticar o painel até o infinito. */
+.scroll {
+  max-height: 196px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding-right: 4px;
+}
+
+.subGroup + .subGroup {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px dashed var(--border);
+}
+
+.subGroupLabel {
+  margin: 0 0 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+
+.option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 0;
+  font-size: 0.875rem;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.control {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 auto;
+  accent-color: var(--brand);
+  cursor: pointer;
+}

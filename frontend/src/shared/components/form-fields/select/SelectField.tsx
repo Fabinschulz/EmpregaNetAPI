@@ -1,56 +1,45 @@
 'use client';
 
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger
-} from '@/components';
 import { useFormContext } from '@/context';
+import { cn, getFieldErrorMessage } from '@/utils';
 import type React from 'react';
-import { cn, getFieldErrorMessage, truncateText } from '@/utils';
+import { SelectInput, type SelectOption } from './SelectInput';
 import styles from './select.module.scss';
 
-export interface SelectOption {
-  label: string;
-  value: string;
-}
+export type { SelectOption };
 
 export type SelectFieldProps = {
   name: string;
-  options: SelectOption[];
+  /** `readonly` para aceitar direto as listas `as const` do vocabulário, sem cópia intermediária. */
+  options: readonly SelectOption[];
   label?: string;
   required?: boolean;
   placeholder?: string;
   className?: string;
 };
 
+/**
+ * Select ligado ao `react-hook-form`: rótulo, erro de validação e escrita no formulário.
+ * A composição do Radix vive em {@link SelectInput}, partilhada com superfícies sem formulário.
+ */
 export const SelectField: React.FC<SelectFieldProps> = ({
   name,
   options,
   required,
   label,
-  placeholder = 'Selecione',
+  placeholder,
   className
 }) => {
   const { validationErrors, setValue, watch, readOnly } = useFormContext();
-  const errorsMessage = getFieldErrorMessage(name, validationErrors);
-  const currentValue = watch(name) as string | undefined;
+  const errorMessage = getFieldErrorMessage(name, validationErrors);
   const labelText = required && label ? `${label} *` : label;
 
   const labelId = `${name}-label`;
   const errorId = `${name}-error`;
 
-  const onChange = (value: string) => {
-    const found = options.find((o) => o.value === value);
-    if (found) {
-      setValue(name, found.value, { shouldDirty: true });
+  const handleChange = (value: string) => {
+    if (options.some((option) => option.value === value)) {
+      setValue(name, value, { shouldDirty: true });
     }
   };
 
@@ -62,50 +51,24 @@ export const SelectField: React.FC<SelectFieldProps> = ({
         </span>
       ) : null}
 
-      <TooltipProvider delayDuration={200}>
-        <Select
-          value={currentValue != null && currentValue !== '' ? String(currentValue) : undefined}
-          onValueChange={onChange}
-          disabled={!!readOnly}
-          name={name}
-        >
-          <SelectTrigger
-            aria-invalid={!!errorsMessage}
-            aria-labelledby={labelText ? labelId : undefined}
-            aria-describedby={errorsMessage ? errorId : undefined}
-            data-testid={`select-${name}-id`}
-          >
-            <SelectValue placeholder={placeholder} />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectGroup>
-              {options.map((option) => {
-                const isLong = option.label.length > 215;
-                const displayText = truncateText(option.label, 210);
+      <SelectInput
+        value={watch(name) as string | undefined}
+        onChange={handleChange}
+        options={options}
+        placeholder={placeholder}
+        disabled={!!readOnly}
+        triggerProps={{
+          name,
+          'aria-invalid': !!errorMessage,
+          'aria-labelledby': labelText ? labelId : undefined,
+          'aria-describedby': errorMessage ? errorId : undefined,
+          'data-testid': `select-${name}-id`
+        }}
+      />
 
-                return (
-                  <SelectItem key={option.value} value={option.value}>
-                    {isLong ? (
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <span>{displayText}</span>
-                        </TooltipTrigger>
-                        <TooltipContent>{option.label}</TooltipContent>
-                      </Tooltip>
-                    ) : (
-                      <span>{option.label}</span>
-                    )}
-                  </SelectItem>
-                );
-              })}
-            </SelectGroup>
-          </SelectContent>
-        </Select>
-      </TooltipProvider>
-
-      {errorsMessage ? (
+      {errorMessage ? (
         <span id={errorId} className={styles.error} role="alert">
-          {errorsMessage}
+          {errorMessage}
         </span>
       ) : null}
     </div>

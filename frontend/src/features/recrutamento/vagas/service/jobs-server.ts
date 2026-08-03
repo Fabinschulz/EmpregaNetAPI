@@ -10,7 +10,7 @@ import { jobSchema, type JobDto } from './jobs-schema';
 /**
  * Base URL usada pelo processo Next (server-side) para alcançar a API. Em produção o
  * servidor pode precisar de um host interno diferente do `NEXT_PUBLIC_*` (a URL vista pelo
- * browser) — ex.: rede de containers/k8s. Cai de volta para a pública quando não definida.
+ * browser). ex.: rede de containers/k8s. Cai de volta para a pública quando não definida.
  */
 function serverApiBaseUrl(): string {
   return process.env.API_INTERNAL_BASE_URL?.trim() || getPublicEnv().NEXT_PUBLIC_API_BASE_URL;

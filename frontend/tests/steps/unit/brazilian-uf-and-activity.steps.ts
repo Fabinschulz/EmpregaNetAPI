@@ -3,7 +3,7 @@ import { expect } from 'chai';
 import { normalizeTypeOfActivity, normalizeUf } from '@/features/admin/empresas/service/companies-schema';
 import type { BusinessRulesWorld } from '../../support/world';
 
-/** "(vazio)" na tabela do Gherkin representa string vazia — mais legível que uma célula em branco. */
+/** "(vazio)" na tabela do Gherkin representa string vazia - mais legível que uma célula em branco. */
 function resolveExpected(esperado: string): string {
   return esperado === '(vazio)' ? '' : esperado;
 }

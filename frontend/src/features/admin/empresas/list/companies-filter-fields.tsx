@@ -2,10 +2,10 @@
 
 import { AutocompleteField, Button, FilterBar, FilterField, SelectField, type AutocompleteOption } from '@/components';
 import { useFormContext } from '@/context';
+import { useFilterFormSync } from '@/hooks';
 import { companiesFilterToParams, defaultCompaniesFilter, type CompaniesFilterFormValues } from '../service';
 import { LIST_ORDER_BY_OPTIONS, type CompaniesListQueryParams } from '@/shared';
 import { X } from 'lucide-react';
-import { useEffect, useRef } from 'react';
 
 const SITUATION_OPTIONS = [
   { label: 'Todas', value: 'all' },
@@ -28,14 +28,7 @@ export function CompaniesFilterFields({ onChange, searchOptions, searchLoading }
   const situation = watch('situation');
   const orderBy = watch('orderBy');
 
-  const isFirstRun = useRef(true);
-  useEffect(() => {
-    if (isFirstRun.current) {
-      isFirstRun.current = false;
-      return;
-    }
-    onChange(companiesFilterToParams({ search, situation, orderBy }));
-  }, [search, situation, orderBy, onChange]);
+  useFilterFormSync(companiesFilterToParams({ search, situation, orderBy }), onChange);
 
   return (
     <FilterBar
@@ -56,7 +49,7 @@ export function CompaniesFilterFields({ onChange, searchOptions, searchLoading }
         />
       </FilterField>
       <SelectField name="situation" label="Situação" options={SITUATION_OPTIONS} />
-      <SelectField name="orderBy" label="Ordenar por" options={[...LIST_ORDER_BY_OPTIONS]} />
+      <SelectField name="orderBy" label="Ordenar por" options={LIST_ORDER_BY_OPTIONS} />
     </FilterBar>
   );
 }

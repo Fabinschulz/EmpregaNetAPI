@@ -108,7 +108,7 @@ export function AdminUserDetailPage() {
               <CardContent>
                 <dl className={styles.meta}>
                   <MetaItem label="ID" value={user.id} />
-                  <MetaItem label="Telefone" value={user.phoneNumber?.trim() ? user.phoneNumber : '—'} />
+                  <MetaItem label="Telefone" value={user.phoneNumber?.trim() ? user.phoneNumber : '-'} />
                   <MetaItem label="Criado em" value={formatDateTime(user.createdAt)} />
                   <MetaItem label="Atualizado em" value={formatDateTime(user.updatedAt)} />
                   {user.isDeleted ? <MetaItem label="Excluído em" value={formatDateTime(user.deletedAt)} /> : null}

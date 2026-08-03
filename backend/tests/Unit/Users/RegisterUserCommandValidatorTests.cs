@@ -56,7 +56,7 @@ public sealed class RegisterUserCommandValidatorTests
     [Fact]
     public void Validate_CelularBrasilFormatoInvalido_DeveFalhar()
     {
-        // Arrange — DDD + número sem o 9 inicial exigido pela regra BR do projeto
+        // Arrange - DDD + número sem o 9 inicial exigido pela regra BR do projeto
         var cmd = CreateValidCommand() with { PhoneNumber = "551198765432" };
 
         // Act
@@ -70,7 +70,7 @@ public sealed class RegisterUserCommandValidatorTests
     [Fact]
     public void Validate_CelularBrasilValido_DevePassar()
     {
-        // Arrange — 55 + DDD + 9 + 8 dígitos (regra em FluentValidationExtensions)
+        // Arrange - 55 + DDD + 9 + 8 dígitos (regra em FluentValidationExtensions)
         var cmd = CreateValidCommand() with { PhoneNumber = "5511987654321" };
 
         // Act

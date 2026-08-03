@@ -20,6 +20,26 @@ public class JobApplicationRepository : BaseRepository<JobApplication>, IJobAppl
             .AnyAsync(a => a.JobId == jobId && a.UserId == userId && !a.IsDeleted, cancellationToken);
     }
 
+    public async Task<IReadOnlyList<long>> GetAppliedJobIdsAsync(
+        long userId,
+        IReadOnlyCollection<long> jobIds,
+        CancellationToken cancellationToken)
+    {
+        if (jobIds.Count == 0)
+        {
+            return Array.Empty<long>();
+        }
+
+        var ids = jobIds.Distinct().ToArray();
+
+        return await _context.JobApplications
+            .AsNoTracking()
+            .Where(a => a.UserId == userId && !a.IsDeleted && ids.Contains(a.JobId))
+            .Select(a => a.JobId)
+            .Distinct()
+            .ToListAsync(cancellationToken);
+    }
+
     public async Task<ListDataPagination<JobApplication>> GetByJobIdAsync(
         long jobId,
         CancellationToken cancellationToken,

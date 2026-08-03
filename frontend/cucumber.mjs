@@ -1,6 +1,6 @@
 /**
  * Configuração do Cucumber.js (BDD). Executado via `tsx` (ver package.json:scripts),
- * que registra o loader TS/ESM antes do Cucumber importar specs e steps —
+ * que registra o loader TS/ESM antes do Cucumber importar specs e steps
  * por isso nenhuma etapa de build/transpile é necessária aqui.
  *
  * Perfis do Cucumber = exports nomeados deste módulo (não chaves aninhadas

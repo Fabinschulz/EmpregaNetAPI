@@ -1,10 +1,11 @@
-using EmpregaNet.Application.Auth;
 using EmpregaNet.Application.Auth.ViewModel;
 using EmpregaNet.Domain.Entities;
 using Microsoft.AspNetCore.Http;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+
+namespace EmpregaNet.Application.Auth.UseCase;
 
 /// <summary>
 /// Contexto do usuário em uma requisição HTTP.
@@ -143,8 +144,6 @@ public class HttpUserContext
         }
         catch (Exception ex)
         {
-            var erro = ex;
-
 #if DEBUG
             //OBS: Em ambiente de desenvolvimento, propaga a exceção original para facilitar o diagnóstico
             throw new Exception(ex.Message, ex);

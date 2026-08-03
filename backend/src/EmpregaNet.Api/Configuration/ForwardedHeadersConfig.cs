@@ -8,7 +8,7 @@ namespace EmpregaNet.Api.Configuration;
 ///
 /// Sem proxies configurados, o middleware NÃO é registrado e todo header X-Forwarded-* é ignorado
 /// (comportamento correto para execução direta, ex.: localhost). No deploy atrás de proxy/load
-/// balancer, preencha <c>ForwardedHeaders:KnownProxies</c> ou <c>KnownNetworks</c> no appsettings —
+/// balancer, preencha <c>ForwardedHeaders:KnownProxies</c> ou <c>KnownNetworks</c> no appsettings
 /// só os proxies listados são confiáveis, impedindo spoofing de IP via X-Forwarded-For
 /// (que burlaria o rate limiter por IP). Nunca use ASPNETCORE_FORWARDEDHEADERS_ENABLED=true:
 /// essa env vai limpa as listas e passa a confiar em qualquer origem.

@@ -5,7 +5,7 @@ using OpenAI;
 namespace EmpregaNet.AI.Services.OpenAi;
 
 /// <summary>
-/// Equivalente DI de <c>new OpenAIClient(Configuration.OpenAI.ApiKey)</c> — cliente reutilizado por request scope da app.
+/// Equivalente DI de <c>new OpenAIClient(Configuration.OpenAI.ApiKey)</c> cliente reutilizado por request scope da app.
 /// </summary>
 public sealed class OpenAiClientProvider(IOptions<OpenAiOptions> options) : IOpenAiClientProvider
 {

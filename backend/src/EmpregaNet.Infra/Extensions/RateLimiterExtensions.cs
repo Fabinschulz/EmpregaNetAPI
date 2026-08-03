@@ -211,7 +211,7 @@ internal sealed class BoundedEvictingRateLimiter : PartitionedRateLimiter<HttpCo
     ///
     /// <para>Usar <c>_limiters.Count</c> aqui seria uma armadilha: no
     /// <see cref="ConcurrentDictionary{TKey,TValue}"/> essa propriedade tranca o dicionário
-    /// inteiro para contar. E ela só seria consultada quando a identidade é nova — exatamente
+    /// inteiro para contar. E ela só seria consultada quando a identidade é nova - exatamente
     /// o que acontece a cada requisição num ataque com muitos endereços. A verificação ficaria
     /// mais lenta justamente na hora em que ela mais importa.</para>
     /// </summary>

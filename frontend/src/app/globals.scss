@@ -1,7 +1,7 @@
 html {
   color-scheme: dark;
 
-  /* Primitivos — modern dark (camadas tipo painel flutuante) */
+  /* Primitivos - modern dark (camadas tipo painel flutuante) */
   --gray-950: #000000;
   --gray-900: #0a0a0a;
   --gray-850: #121212;
@@ -13,7 +13,7 @@ html {
   --gray-400: #a0a0a0;
   --gray-100: #e0e0e0;
 
-  /* Semânticos — dark */
+  /* Semânticos - dark */
   --bg: var(--gray-950);
   --bg-overlay: rgba(0, 0, 0, 0.9);
   --surface: var(--gray-850);
@@ -130,7 +130,7 @@ html {
   --google-btn-border: transparent;
   --google-btn-border-hover: transparent;
 
-  /* Auth (login, registo, etc.) — respeita data-theme */
+  /* Auth (login, registo, etc.) - respeita data-theme */
   --auth-shell-bg: var(--gray-850);
   --auth-outline-btn-bg: transparent;
 
@@ -187,7 +187,7 @@ html[data-theme='light'] {
   --success-soft: rgba(34, 197, 94, 0.12);
   --warning: #b45309;
 
-  /* Estados de erro (ErrorFallback) — light */
+  /* Estados de erro (ErrorFallback) - light */
   --error-page-bg: var(--bg);
   --error-card-bg: #ffffff;
   --error-card-max-width: 28rem;

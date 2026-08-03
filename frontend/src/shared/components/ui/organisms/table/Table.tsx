@@ -6,7 +6,7 @@ import styles from './Table.module.scss';
 
 /**
  * Primitivos de tabela (API do shadcn/ui, estilizados com SCSS modules + design tokens).
- * O wrapper rola horizontalmente em telas estreitas — a página nunca ganha scroll lateral.
+ * O wrapper rola horizontalmente em telas estreitas - a página nunca ganha scroll lateral.
  */
 const Table = React.forwardRef<HTMLTableElement, React.HTMLAttributes<HTMLTableElement> & { flush?: boolean }>(
   ({ className, flush, ...props }, ref) => (

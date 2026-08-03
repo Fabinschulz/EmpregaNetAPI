@@ -2,10 +2,10 @@
 
 import { AutocompleteField, Button, FilterBar, FilterField, SelectField, type AutocompleteOption } from '@/components';
 import { useFormContext } from '@/context';
+import { useFilterFormSync } from '@/hooks';
 import { candidatesFilterToParams, defaultCandidatesFilter, type CandidatesFilterFormValues } from '../service';
 import { LIST_ORDER_BY_OPTIONS, type CandidatesListQueryParams } from '@/shared';
 import { X } from 'lucide-react';
-import { useEffect, useRef } from 'react';
 
 type CandidatesFilterParams = Pick<CandidatesListQueryParams, 'search' | 'orderBy'>;
 
@@ -21,14 +21,7 @@ export function CandidatesFilterFields({ onChange, searchOptions, searchLoading 
   const search = watch('search');
   const orderBy = watch('orderBy');
 
-  const isFirstRun = useRef(true);
-  useEffect(() => {
-    if (isFirstRun.current) {
-      isFirstRun.current = false;
-      return;
-    }
-    onChange(candidatesFilterToParams({ search, orderBy }));
-  }, [search, orderBy, onChange]);
+  useFilterFormSync(candidatesFilterToParams({ search, orderBy }), onChange);
 
   return (
     <FilterBar
@@ -48,7 +41,7 @@ export function CandidatesFilterFields({ onChange, searchOptions, searchLoading 
           loading={searchLoading}
         />
       </FilterField>
-      <SelectField name="orderBy" label="Ordenar por" options={[...LIST_ORDER_BY_OPTIONS]} />
+      <SelectField name="orderBy" label="Ordenar por" options={LIST_ORDER_BY_OPTIONS} />
     </FilterBar>
   );
 }

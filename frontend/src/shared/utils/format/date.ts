@@ -44,3 +44,46 @@ export function formatDateTime(value?: string | null): string {
   if (!parts) return EMPTY;
   return parts.time ? `${parts.date} ${parts.time}` : parts.date;
 }
+
+const MINUTE = 60_000;
+const HOUR = 60 * MINUTE;
+const DAY = 24 * HOUR;
+
+/**
+ * Tempo decorrido em linguagem natural ("há 3 dias"), como no cartão do feed.
+ *
+ * `now` é **parâmetro**, não `Date.now()` interno: a função é chamada durante a renderização e
+ * ler o relógio aqui congelaria o valor no build (`cacheComponents`) além de tornar o resultado
+ * impossível de testar. Quem chama decide qual instante usar - ver `useRelativeTime`.
+ *
+ * Acima de 30 dias devolve a data absoluta: "há 87 dias" não ajuda ninguém a situar-se.
+ */
+export function formatRelativeTime(value: string | null | undefined, now: number): string {
+  const raw = value?.trim();
+  if (!raw) return EMPTY;
+
+  const timestamp = new Date(raw).getTime();
+  if (Number.isNaN(timestamp)) return EMPTY;
+
+  const elapsed = now - timestamp;
+
+  // Relógio do cliente adiantado em relação ao servidor é comum; tratar como "agora" evita
+  // exibir "há -2 minutos".
+  if (elapsed < MINUTE) return 'agora mesmo';
+
+  if (elapsed < HOUR) {
+    const minutes = Math.floor(elapsed / MINUTE);
+    return `há ${minutes} ${minutes === 1 ? 'minuto' : 'minutos'}`;
+  }
+
+  if (elapsed < DAY) {
+    const hours = Math.floor(elapsed / HOUR);
+    return `há ${hours} ${hours === 1 ? 'hora' : 'horas'}`;
+  }
+
+  const days = Math.floor(elapsed / DAY);
+  if (days === 1) return 'ontem';
+  if (days <= 30) return `há ${days} dias`;
+
+  return formatDate(raw);
+}

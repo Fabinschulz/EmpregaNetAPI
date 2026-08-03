@@ -42,6 +42,22 @@ Then(
   }
 );
 
+Then(
+  'o campo {string} do payload de reenvio deve estar ausente',
+  function (this: BusinessRulesWorld, campo: string) {
+    const payload = this.result as Record<string, unknown>;
+    expect(getByPath(payload, campo), `campo "${campo}"`).to.equal(undefined);
+  }
+);
+
+When('eu valido os dados carregados no formulário de vaga', function (this: BusinessRulesWorld) {
+  this.result = jobFormSchema.safeParse(this.data.jobFormValues).success;
+});
+
+Then('os dados carregados devem ser rejeitados pelo formulário', function (this: BusinessRulesWorld) {
+  expect(this.result, 'esperava que o formulário rejeitasse a vaga legada incompleta').to.equal(false);
+});
+
 When('eu valido esses dados contra o contrato de leitura de vaga', function (this: BusinessRulesWorld) {
   this.data.jobParseResult = jobSchema.safeParse(this.data.rawJob);
 });

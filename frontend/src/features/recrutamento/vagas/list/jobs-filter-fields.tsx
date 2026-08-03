@@ -2,10 +2,10 @@
 
 import { AutocompleteField, Button, FilterBar, FilterField, SelectField, type AutocompleteOption } from '@/components';
 import { useFormContext } from '@/context';
+import { useFilterFormSync } from '@/hooks';
 import { defaultJobsFilter, jobsFilterToParams, type JobsFilterFormValues } from '../service';
 import type { JobsListQueryParams } from '@/shared/schema';
 import { X } from 'lucide-react';
-import { useEffect, useRef } from 'react';
 
 const STATUS_OPTIONS = [
   { label: 'Todas', value: 'all' },
@@ -27,14 +27,7 @@ export function JobsFilterFields({ onChange, searchOptions, searchLoading }: Job
   const search = watch('search');
   const status = watch('status');
 
-  const isFirstRun = useRef(true);
-  useEffect(() => {
-    if (isFirstRun.current) {
-      isFirstRun.current = false;
-      return;
-    }
-    onChange(jobsFilterToParams({ search, status }));
-  }, [search, status, onChange]);
+  useFilterFormSync(jobsFilterToParams({ search, status }), onChange);
 
   return (
     <FilterBar

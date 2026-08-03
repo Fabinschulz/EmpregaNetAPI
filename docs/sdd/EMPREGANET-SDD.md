@@ -1,6 +1,6 @@
-# EmpregaNet — Spec-Driven Development (SDD)
+# EmpregaNet - Spec-Driven Development (SDD)
 
-Documento vivo: descreve **como** especificação, implementação e validação se alinham no monorepo **EmpregaNet**, com ênfase em contratos claros, gates de qualidade e uso disciplinado de **agentes de IA** como aceleradores—not substitutos de julgamento humano.
+Documento vivo: descreve **como** especificação, implementação e validação se alinham no monorepo **EmpregaNet**, com ênfase em contratos claros, gates de qualidade e uso disciplinado de **agentes de IA** como aceleradores-not substitutos de julgamento humano.
 
 **Audiência**: equipe de produto e engenharia, arquitetos, e quem orquestra trabalho com IA (Cursor, reviews automatizados, etc.).
 
@@ -22,7 +22,7 @@ Documento vivo: descreve **como** especificação, implementação e validação
 | **Traceability** | Cada PR liga-se a uma spec ou ticket com critérios de aceitação mensuráveis. |
 | **Defence in depth** | Validação na API, saneamento na fronteira do cliente, autorização explícita (RBAC) em caminhos sensíveis. |
 
-### 1.3 Visão do sistema (C4 model — nível contentor)
+### 1.3 Visão do sistema (C4 model - nível contentor)
 
 ```mermaid
 flowchart LR
@@ -43,7 +43,7 @@ flowchart LR
   API --> CACHE
 ```
 
-- **`frontend/`**: experiência utilizador, sessão/cookies, RBAC de UI, chamadas ao BFF ou API conforme configuração (Next.js na raiz; ver `frontend/package.json` — gestor **pnpm**).
+- **`frontend/`**: experiência utilizador, sessão/cookies, RBAC de UI, chamadas ao BFF ou API conforme configuração (Next.js na raiz; ver `frontend/package.json` - gestor **pnpm**).
 - **`Bff/`**: projeto .NET de agregação/orquestração HTTP para o cliente (`Bff/EmpregaNet.Bff.sln`).
 - **`backend/`**: domínio, casos de uso, persistência (EF Core, PostgreSQL), cache Redis opcional, autenticação/autorização da API (`backend/EmpregaNet.sln`; testes em `backend/tests/`).
 
@@ -53,7 +53,7 @@ Referência rápida alinhada ao **estado actual** do repo; detalhes e comandos e
 
 | Local | Função principal |
 | ----- | ----------------- |
-| `backend/src/EmpregaNet.*` | Camadas Domain, Application, Infra, Api (.NET — target conforme `.csproj` do projeto) |
+| `backend/src/EmpregaNet.*` | Camadas Domain, Application, Infra, Api (.NET - target conforme `.csproj` do projeto) |
 | `backend/tests/` | Testes automatizados (xUnit + FluentAssertions + Moq, integração com fixtures partilhadas quando aplicável) |
 | `Bff/` | BFF .NET com solução dedicada |
 | `frontend/` | UI Next.js (App Router), TypeScript, SCSS, Zod, RBAC em UI |
@@ -72,14 +72,14 @@ Ordem sugerida de riqueza vs custo de manutenção:
 
 **Regra de ouro**: alterar contrato sem actualizar consumidor + spec + testes relevantes é **deriva intencional**, deve ser explícita no changelog do PR.
 
-### 2.1 Especificação por feature (orquestrador — *best of both worlds*)
+### 2.1 Especificação por feature (orquestrador - *best of both worlds*)
 
 Para trabalho com **artefactos dedicados por pasta** (como em projectos SDD com `prd` / `design` / `spec` / `tasks`):
 
 | Fase global (acima) | Artefactos em `docs/features/<feature-id>/` |
 | ------------------- | --------------------------------------------- |
-| A — Descoberta e especificação | `prd.md` (negócio e CA; **sem** pormenor técnico) |
-| B — Desenho técnico | `design.md` (contratos, HTTP, diagramas, infra relevante) |
+| A - Descoberta e especificação | `prd.md` (negócio e CA; **sem** pormenor técnico) |
+| B - Desenho técnico | `design.md` (contratos, HTTP, diagramas, infra relevante) |
 | Preparação da implementação | `spec.md` (matriz CA → cobertura), `tasks.md` (plano + *deviation notes*) |
 | Congelamento opcional | `state.md` quando a spec estiver aprovada para desenvolvimento |
 
@@ -89,25 +89,25 @@ Regras operacionais, versionamento em frontmatter e **gate** “sem código até
 
 ## 3. Fluxo de trabalho SDD (operacional)
 
-### Fase A — Descoberta e especificação
+### Fase A - Descoberta e especificação
 
 1. **Problema e não-objectivos**: o que não será feito neste incremento.
 2. **Personas e permissões**: que papéis (RBAC) afectam a feature.
 3. **Casos de uso** e **estados** (vazio, erro, loading, sucesso).
 4. **Decisões de arquitectura leves**: se a decisão tiver trade-offs duradouros, registe **ADR** curto em `docs/sdd/adrs/` (template abaixo).
 
-### Fase B — Desenho técnico (quando necessário)
+### Fase B - Desenho técnico (quando necessário)
 
 - Backend: (Clean arch) Domain / Application / Infra / Api; comandos e queries com mediator interno do projecto.
 - Frontend: pastas por feature, serviços e schemas por domínio.
 - Orquestração IA: consultar `docs/agents/meta-agent.md` para pedidos amplos; `dotnet-architect` para novas fronteiras; `frontend-engineer` para UI.
 
-### Fase C — Implementação
+### Fase C - Implementação
 
 - Seguir `docs/skills/backend-skill/SKILL.md` e `docs/skills/frontend-skill/SKILL.md`.
 - Commits pequenos, mensagens que referenciam o ticket/spec.
 
-### Fase D — Verificação (gates)
+### Fase D - Verificação (gates)
 
 | Gate | Mínimo esperado |
 | --------- | ----------------- |
@@ -116,14 +116,14 @@ Regras operacionais, versionamento em frontmatter e **gate** “sem código até
 | **Segurança** | Sem secrets no repo; validação de input; autorização nos endpoints sensíveis. |
 | **Revisão** | Humano + opcional passagem mental alinhada a [`docs/agents/code-reviewer.md`](../agents/code-reviewer.md). |
 
-### Fase E — Entrega e observabilidade
+### Fase E - Entrega e observabilidade
 
 - Métricas/logs para erros 5xx e latência em endpoints alterados.
 - Feature flags apenas se o processo de release do projecto as usar.
 
 ---
 
-## 4. ADR (Architecture Decision Record) — template
+## 4. ADR (Architecture Decision Record) - template
 
 Criar ficheiro `docs/sdd/adrs/NNNN-titulo-curto.md`:
 
@@ -203,4 +203,4 @@ O ficheiro [`CLAUDE.md`](../../CLAUDE.md) na raiz garante que este SDD e as skil
 
 ---
 
-*Última revisão conceitual: monorepo EmpregaNet (`backend/` + `Bff/` + `frontend/`) — backend .NET Clean Architecture, mediator interno (`EmpregaNet.Domain.Libs.Mediator`), PostgreSQL + Redis opcional, frontend Next.js 16 + React 19 (pnpm).*
+*Última revisão conceitual: monorepo EmpregaNet (`backend/` + `Bff/` + `frontend/`) - backend .NET Clean Architecture, mediator interno (`EmpregaNet.Domain.Libs.Mediator`), PostgreSQL + Redis opcional, frontend Next.js 16 + React 19 (pnpm).*

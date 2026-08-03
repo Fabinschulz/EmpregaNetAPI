@@ -14,6 +14,11 @@ namespace EmpregaNet.Infra.Persistence.Database
             modelBuilder.AddIdentityUserExtensions();
             //ApplyConfigurationsFromAssembly: aplica TODAS as configurações no assembly. (FluentAPI)
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(PostgreSqlContext).Assembly);
+
+            if (Database.IsNpgsql())
+            {
+                JobSearchVector.Apply(modelBuilder);
+            }
         }
 
         public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)

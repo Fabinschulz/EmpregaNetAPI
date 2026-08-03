@@ -3,7 +3,7 @@ import { paginationParamsSchema } from './pagination-schema';
 
 /**
  * Termo de busca livre (ex.: campo "Buscar por título"), normalizado e limitado em tamanho.
- * String vazia/só espaços vira `undefined` — evita enviar `search=""` à API.
+ * String vazia/só espaços vira `undefined` - evita enviar `search=""` à API.
  */
 export const searchTermSchema = z
   .string()
@@ -32,7 +32,7 @@ export type TableSearchErrors = Partial<Record<string, string>>;
 
 /**
  * Converte um `ZodError` de filtros de tabela num mapa `{ campo: mensagem }`, no mesmo
- * espírito dos erros exibidos pelo `FormProvider` — pronto para renderizar ao lado de
+ * espírito dos erros exibidos pelo `FormProvider` - pronto para renderizar ao lado de
  * cada campo de filtro.
  */
 export function extractTableSearchErrors(error: z.ZodError): TableSearchErrors {

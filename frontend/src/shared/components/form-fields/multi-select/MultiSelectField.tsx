@@ -28,7 +28,7 @@ export interface MultiSelectOption {
 
 export type MultiSelectFieldProps = {
   name: string;
-  options: MultiSelectOption[];
+  options: readonly MultiSelectOption[];
   label?: string;
   required?: boolean;
   placeholder?: string;

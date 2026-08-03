@@ -22,7 +22,7 @@ export function normalizeUserTypeValue(input: string | null | undefined): UserTy
 }
 
 export function userTypeLabel(input: string | null | undefined): string {
-  if (!input) return '—';
+  if (!input) return '-';
   const value = normalizeUserTypeValue(input);
   return USER_TYPES.find((t) => t.value === value)?.label ?? input;
 }

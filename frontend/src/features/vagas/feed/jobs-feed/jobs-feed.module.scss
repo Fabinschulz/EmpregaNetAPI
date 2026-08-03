@@ -1,0 +1,114 @@
+/* Estrutura da tela do feed. Os controles e cartões trazem os seus próprios estilos:
+   ver `search-bar/`, `sort-select/`, `active-chips/`, `empty-state/` e `job-card/`. */
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* ---- Barra superior --------------------------------------------------------------------- */
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+
+  /* Fica visível durante o scroll: num feed infinito, ter de voltar ao topo para refinar a
+     busca é o atrito que faz o utilizador desistir. */
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  padding: 12px 0;
+  background: var(--content-bg);
+}
+
+.toolbarControls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 0 0 auto;
+}
+
+/* ---- Layout ----------------------------------------------------------------------------- */
+
+.layout {
+  display: grid;
+  grid-template-columns: 272px minmax(0, 1fr);
+  gap: 20px;
+  align-items: start;
+}
+
+.results {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+
+.resultsCount {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--muted);
+}
+
+/* ---- Lista ------------------------------------------------------------------------------- */
+
+.feed {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.feedItem {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 280px;
+
+  animation: card-enter 220ms ease-out both;
+}
+
+@keyframes card-enter {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.sentinel {
+  height: 1px;
+}
+
+.feedEnd {
+  margin: 8px 0 24px;
+  text-align: center;
+  font-size: 0.875rem;
+  color: var(--muted);
+}
+
+/* ---- Responsivo -------------------------------------------------------------------------- */
+
+@media (max-width: 1024px) {
+  /* Abaixo do desktop o painel lateral sai e os filtros passam a viver na gaveta. */
+  .layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .toolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .toolbarControls {
+    justify-content: space-between;
+  }
+}

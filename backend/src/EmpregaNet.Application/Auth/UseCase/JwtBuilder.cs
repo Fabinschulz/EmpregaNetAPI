@@ -130,7 +130,7 @@ public class JwtBuilder : IJwtBuilder
                 }
                 catch (FormatException)
                 {
-                    // claim malformada no banco — ignora
+                    // claim malformada no banco é ignorada, não deve impedir a geração do token. O erro é registrado para análise futura.
                 }
             }
         }

@@ -1,6 +1,7 @@
 using System.Text;
 using EmpregaNet.Application.Auth.ViewModel;
 using EmpregaNet.Domain.Enums;
+using EmpregaNet.Application.Auth.UseCase;
 
 namespace EmpregaNet.Application.Auth;
 

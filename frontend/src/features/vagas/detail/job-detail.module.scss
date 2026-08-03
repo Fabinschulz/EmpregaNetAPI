@@ -33,6 +33,13 @@
   }
 }
 
+.summary {
+  margin: 6px 0 0;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: var(--text);
+}
+
 .sectionLabel {
   margin: 0 0 6px;
   font-size: 0.8125rem;
@@ -42,11 +49,35 @@
   color: var(--muted);
 }
 
+.sectionLabel + .tags,
+.description + .sectionLabel,
+.tags + .sectionLabel {
+  margin-top: 20px;
+}
+
 .description {
   margin: 0;
   color: var(--text);
   line-height: 1.6;
   white-space: pre-wrap;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tag {
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  background: var(--brand-soft);
+  font-size: 0.8125rem;
+  font-weight: 550;
+  color: var(--text);
 }
 
 .footer {

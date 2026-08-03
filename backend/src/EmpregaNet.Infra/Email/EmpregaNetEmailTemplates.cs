@@ -24,7 +24,7 @@ internal static class EmpregaNetEmailTemplates
             accent: "#1c1c1e",
             accentSoft: "#f2f2f4",
             iconGlyph: "&#128274;",
-            footerHint: "Se não solicitou esta alteração, ignore este e-mail — a sua senha permanece inalterada.");
+            footerHint: "Se não solicitou esta alteração, ignore este e-mail - a sua senha permanece inalterada.");
     }
 
     public static (string Subject, string HtmlBody) EmailConfirmation(string confirmationLink)
@@ -56,7 +56,7 @@ internal static class EmpregaNetEmailTemplates
         string iconGlyph,
         string footerHint)
     {
-        var subject = $"{ProductName} — {subjectSuffix}";
+        var subject = $"{ProductName} - {subjectSuffix}";
         var year = DateTime.UtcNow.Year;
 
         var html = $"""

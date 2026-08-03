@@ -5,7 +5,7 @@ import type { CSSProperties, ReactNode } from 'react';
 import styles from './filter-bar.module.scss';
 
 export type FilterBarProps = {
-  /** Campos do filtro. Filhos diretos viram células do grid automaticamente — nenhum wrapper é necessário. */
+  /** Campos do filtro. Filhos diretos viram células do grid automaticamente - nenhum wrapper é necessário. */
   children: ReactNode;
   /** Ações ancoradas à direita (ex.: botão Limpar). */
   actions?: ReactNode;
@@ -17,7 +17,7 @@ export type FilterBarProps = {
  * (`auto-fill`), então cada campo colocado como filho direto já se encaixa sozinho,
  * com a mesma largura em todas as telas.
  * Para dar mais peso a um campo (ex.: busca), envolva-o em `<FilterField span={2}>`
- * ou `<FilterField span="full">` (linha inteira) — uso opcional, apenas para ênfase.
+ * ou `<FilterField span="full">` (linha inteira) - uso opcional, apenas para ênfase.
  */
 export function FilterBar({ children, actions, className }: FilterBarProps) {
   return (

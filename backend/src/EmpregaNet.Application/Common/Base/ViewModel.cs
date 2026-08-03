@@ -10,9 +10,9 @@ public class BaseViewModel
     private DateTimeOffset? _updatedAt;
     private DateTimeOffset? _deletedAt;
 
-    public string CreatedAt => RandomHelpers.FormatToBrasiliaTime(_createdAt);
-    public string? UpdatedAt => RandomHelpers.FormatToBrasiliaTime(_updatedAt);
-    public string? DeletedAt => RandomHelpers.FormatToBrasiliaTime(_deletedAt);
+    public string CreatedAt => BrasiliaTime.Format(_createdAt);
+    public string? UpdatedAt => BrasiliaTime.Format(_updatedAt);
+    public string? DeletedAt => BrasiliaTime.Format(_deletedAt);
 
 
     public DateTimeOffset CreatedAtUtc { set => _createdAt = value; }

@@ -29,6 +29,25 @@ public sealed class CreateCompanyCommandHandlerTests
         _repo.Verify(x => x.CreateAsync(It.IsAny<Company>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 
+    /// <summary>
+    /// O CNPJ alfanumérico tem letras na forma canónica. Normalizar a busca de duplicata com
+    /// apenas-dígitos procuraria uma chave que nunca foi gravada, e a duplicata passaria.
+    /// </summary>
+    [Fact]
+    public async Task Handle_CnpjAlfanumericoJaCadastrado_DeveLancarValidationAppException()
+    {
+        var entity = CompanyTestData.ValidCreateCommand() with { Cnpj = "12.ABC.345/01DE-35" };
+        _repo.Setup(x => x.ExistsByCnpjAsync("12ABC34501DE35")).ReturnsAsync(true);
+        var sut = new CreateCompanyCommandHandler(_repo.Object, NullLogger<CreateCompanyCommandHandler>.Instance);
+        var cmd = new CreateCommand<CreateCompanyCommand>(entity);
+
+        var act = async () => await sut.Handle(cmd, CancellationToken.None);
+
+        await act.Should().ThrowAsync<ValidationAppException>()
+            .Where(e => e.Code == DomainErrorEnum.RESOURCE_ALREADY_EXISTS);
+        _repo.Verify(x => x.CreateAsync(It.IsAny<Company>(), It.IsAny<CancellationToken>()), Times.Never);
+    }
+
     [Fact]
     public async Task Handle_CnpjNovo_DevePersistirERetornarId()
     {

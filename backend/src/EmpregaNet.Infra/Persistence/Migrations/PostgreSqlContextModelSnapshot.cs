@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
+using NpgsqlTypes;
 
 #nullable disable
 
@@ -75,6 +76,11 @@ namespace EmpregaNet.Infra.Persistence.Migrations
                         .IsUnique()
                         .HasDatabaseName("IX_Companies_Cnpj");
 
+                    b.HasIndex(new[] { "CompanyName" }, "IX_Companies_Name_Trgm");
+
+                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex(new[] { "CompanyName" }, "IX_Companies_Name_Trgm"), "gin");
+                    NpgsqlIndexBuilderExtensions.HasOperators(b.HasIndex(new[] { "CompanyName" }, "IX_Companies_Name_Trgm"), new[] { "gin_trgm_ops" });
+
                     b.ToTable("Companies", (string)null);
                 });
 
@@ -85,6 +91,15 @@ namespace EmpregaNet.Infra.Persistence.Migrations
                         .HasColumnType("bigint");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<int>("Area")
+                        .HasColumnType("integer");
+
+                    b.PrimitiveCollection<string[]>("Benefits")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("text[]")
+                        .HasDefaultValueSql("'{}'::text[]");
 
                     b.Property<long>("CompanyId")
                         .HasColumnType("bigint");
@@ -100,11 +115,19 @@ namespace EmpregaNet.Infra.Persistence.Migrations
                         .HasMaxLength(2000)
                         .HasColumnType("character varying(2000)");
 
+                    b.Property<int>("ExperienceLevel")
+                        .HasColumnType("integer");
+
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
+
+                    b.Property<bool>("IsPcdFriendly")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
 
                     b.Property<int>("JobType")
                         .HasColumnType("integer");
@@ -112,9 +135,33 @@ namespace EmpregaNet.Infra.Persistence.Migrations
                     b.Property<DateTimeOffset>("PublishedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<decimal>("Salary")
+                    b.PrimitiveCollection<string[]>("Requirements")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("text[]")
+                        .HasDefaultValueSql("'{}'::text[]");
+
+                    b.Property<bool>("SalaryDisclosed")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true);
+
+                    b.Property<decimal?>("SalaryMax")
                         .HasPrecision(10, 2)
                         .HasColumnType("numeric(10,2)");
+
+                    b.Property<decimal?>("SalaryMin")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("numeric(10,2)");
+
+                    b.Property<NpgsqlTsVector>("SearchVector")
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("tsvector")
+                        .HasComputedColumnSql("setweight(to_tsvector('pt_unaccent', coalesce(\"Title\", '')), 'A') ||\nsetweight(to_tsvector('pt_unaccent', coalesce(\"Summary\", '')), 'B') ||\nsetweight(to_tsvector('pt_unaccent', empreganet_array_to_text(\"Requirements\")), 'B') ||\nsetweight(to_tsvector('pt_unaccent', empreganet_array_to_text(\"Benefits\")), 'C') ||\nsetweight(to_tsvector('pt_unaccent', coalesce(\"Description\", '')), 'D')", true);
+
+                    b.Property<string>("Summary")
+                        .HasMaxLength(280)
+                        .HasColumnType("character varying(280)");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -124,13 +171,46 @@ namespace EmpregaNet.Infra.Persistence.Migrations
                     b.Property<DateTimeOffset?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<int>("WorkModel")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("WorkShift")
+                        .HasColumnType("integer");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("Benefits")
+                        .HasDatabaseName("IX_Jobs_Benefits");
+
+                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("Benefits"), "gin");
 
                     b.HasIndex("CompanyId")
                         .HasDatabaseName("IX_Jobs_CompanyId");
 
                     b.HasIndex("IsActive")
                         .HasDatabaseName("IX_Jobs_IsActive");
+
+                    b.HasIndex("IsPcdFriendly")
+                        .HasDatabaseName("IX_Jobs_PcdFriendly")
+                        .HasFilter("\"IsPcdFriendly\"");
+
+                    b.HasIndex("Requirements")
+                        .HasDatabaseName("IX_Jobs_Requirements");
+
+                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("Requirements"), "gin");
+
+                    b.HasIndex("SalaryMax")
+                        .IsDescending()
+                        .HasDatabaseName("IX_Jobs_SalaryMax");
+
+                    b.HasIndex("SearchVector")
+                        .HasDatabaseName("IX_Jobs_SearchVector");
+
+                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("SearchVector"), "gin");
+
+                    b.HasIndex("IsDeleted", "IsActive", "PublishedAt")
+                        .IsDescending(false, false, true)
+                        .HasDatabaseName("IX_Jobs_Feed");
 
                     b.ToTable("Jobs", (string)null);
                 });
@@ -527,6 +607,46 @@ namespace EmpregaNet.Infra.Persistence.Migrations
                         });
 
                     b.Navigation("Address")
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("EmpregaNet.Domain.Entities.Job", b =>
+                {
+                    b.OwnsOne("EmpregaNet.Domain.Entities.JobLocation", "Location", b1 =>
+                        {
+                            b1.Property<long>("JobId")
+                                .HasColumnType("bigint");
+
+                            b1.Property<string>("City")
+                                .IsRequired()
+                                .HasMaxLength(100)
+                                .HasColumnType("character varying(100)")
+                                .HasColumnName("City");
+
+                            b1.Property<string>("Country")
+                                .IsRequired()
+                                .ValueGeneratedOnAdd()
+                                .HasMaxLength(2)
+                                .HasColumnType("character varying(2)")
+                                .HasDefaultValue("BR")
+                                .HasColumnName("Country");
+
+                            b1.Property<int>("State")
+                                .HasColumnType("integer")
+                                .HasColumnName("State");
+
+                            b1.HasKey("JobId");
+
+                            b1.HasIndex("State", "City")
+                                .HasDatabaseName("IX_Jobs_Location");
+
+                            b1.ToTable("Jobs");
+
+                            b1.WithOwner()
+                                .HasForeignKey("JobId");
+                        });
+
+                    b.Navigation("Location")
                         .IsRequired();
                 });
 

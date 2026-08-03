@@ -1,0 +1,26 @@
+.sort {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sortLabel {
+  font-size: 0.8125rem;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.sortTrigger {
+  min-width: 176px;
+}
+
+@media (max-width: 640px) {
+  /* No telemóvel o rótulo sai: o ícone e o valor já dizem que aquilo ordena. */
+  .sortLabel {
+    display: none;
+  }
+
+  .sortTrigger {
+    min-width: 148px;
+  }
+}

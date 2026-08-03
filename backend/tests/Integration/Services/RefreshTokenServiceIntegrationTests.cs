@@ -6,7 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 namespace EmpregaNet.Tests.Integration.Services;
 
 /// <summary>
-/// Objetivo: validar a rotação de refresh tokens e a detecção de reuso —
+/// Objetivo: validar a rotação de refresh tokens e a detecção de reuso,
 /// garantindo que a segurança da conta do usuário seja mantida.
 /// </summary>
 /// <remarks>

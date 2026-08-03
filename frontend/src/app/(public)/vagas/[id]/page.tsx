@@ -1,17 +1,21 @@
 import { getJobCached } from '@/features/recrutamento/vagas/service/jobs-server';
 import { JobDetailPage } from '@/features/vagas/detail';
+import { normalizeUf } from '@/shared/schema';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 
 const SITE_NAME = 'EmpregaUAI';
 
-/**
- * Região do produto, usada no fallback da descrição de SEO.
- *
- * A vaga não carrega localização própria: o domínio (`Job`) não tem esse conceito.
- * Enquanto não tiver, a região é a do produto, não a do registro.
- */
 const DEFAULT_REGION = 'Extrema/MG';
+
+/** Cidade e UF da vaga, com recuo para a região do produto. */
+function regionOf(job: { city?: string | null; state?: string | number | null }): string {
+  const city = job.city?.trim();
+  const state = normalizeUf(job.state);
+
+  if (city && state) return `${city}/${state}`;
+  return city || state || DEFAULT_REGION;
+}
 
 type JobDetailRouteProps = {
   params: Promise<{ id: string }>;
@@ -30,10 +34,10 @@ export async function generateMetadata({ params }: JobDetailRouteProps): Promise
     return { title: `Vaga não encontrada • ${SITE_NAME}` };
   }
 
-  const rawDescription = job.description?.trim();
+  const rawDescription = job.summary?.trim() || job.description?.trim();
   const description = rawDescription
     ? rawDescription.slice(0, 160)
-    : `Vaga de ${job.title} em ${DEFAULT_REGION}. Candidate-se pela ${SITE_NAME}.`;
+    : `Vaga de ${job.title} em ${regionOf(job)}. Candidate-se pela ${SITE_NAME}.`;
   const title = `${job.title} • ${SITE_NAME}`;
 
   return {

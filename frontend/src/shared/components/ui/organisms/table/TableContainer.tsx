@@ -12,7 +12,7 @@ import styles from './TableContainer.module.scss';
 import { TablePagination } from './TablePagination';
 
 export type TableContainerProps<TItem> = {
-  /** Definição das colunas — de dados ou de ações (`type: 'actions'`, como no MUI). */
+  /** Definição das colunas - de dados ou de ações (`type: 'actions'`, como no MUI). */
   columns: ReadonlyArray<DataTableColumn<TItem>>;
   /** Itens da página atual. */
   items: readonly TItem[];
@@ -22,7 +22,7 @@ export type TableContainerProps<TItem> = {
   filters?: React.ReactNode;
   /** Estado de paginação (de `usePersistedTablePagination`). Omitido = sem barra de paginação. */
   pagination?: UseTablePaginationResult;
-  /** Total de itens da API — alimenta o intervalo/limites da paginação. */
+  /** Total de itens da API - alimenta o intervalo/limites da paginação. */
   totalItems?: number;
   /** Primeira busca em andamento: exibe skeleton no lugar da tabela. */
   isPending?: boolean;
@@ -46,7 +46,7 @@ export type TableContainerProps<TItem> = {
 /**
  * Container completo de listagem em tabela: filtros em cima, tabela declarativa
  * no meio (com estados de carregamento e vazio já tratados) e paginação embaixo.
- * As telas informam apenas dados e definições — sem markup de tabela.
+ * As telas informam apenas dados e definições - sem markup de tabela.
  */
 export function TableContainer<TItem>({
   columns,

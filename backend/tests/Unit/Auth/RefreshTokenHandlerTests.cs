@@ -10,7 +10,7 @@ using Moq;
 namespace EmpregaNet.Tests.Unit;
 
 /// <summary>
-/// Objetivo: validar a regra de negócio do refresh — rotação delegada ao serviço, rejeição se token
+/// Objetivo: validar a regra de negócio do refresh - rotação delegada ao serviço, rejeição se token
 /// inválido ou utilizador apagado logicamente, e anexação do novo refresh ao view model.
 /// </summary>
 public sealed class RefreshTokenHandlerTests

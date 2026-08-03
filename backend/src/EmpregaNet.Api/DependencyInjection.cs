@@ -3,6 +3,7 @@ using EmpregaNet.Api.Controllers.HealthChecks;
 using EmpregaNet.Api.Configuration;
 using EmpregaNet.Api.Middleware;
 using EmpregaNet.Application.Auth;
+using EmpregaNet.Application.Auth.UseCase;
 using EmpregaNet.Infra.Cache;
 using Microsoft.AspNetCore.ResponseCompression;
 using Newtonsoft.Json;

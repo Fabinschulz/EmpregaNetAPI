@@ -1,0 +1,153 @@
+/* ---- Painel lateral (desktop) ------------------------------------------------------------ */
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 16px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+
+  /* Acompanha o scroll do feed: os filtros continuam ao alcance depois de descer a lista.
+     O `top` desce o suficiente para não ficar sob a barra de busca fixa. */
+  position: sticky;
+  top: 84px;
+  max-height: calc(100vh - 104px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.panelHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+.panelTitle {
+  margin: 0;
+  font-size: 0.9375rem;
+  font-weight: 650;
+  color: var(--text);
+}
+
+@media (max-width: 1024px) {
+  .panel {
+    display: none;
+  }
+}
+
+/* ---- Campos ------------------------------------------------------------------------------ */
+
+.form {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Grupos, legendas e opções vivem agora em `shared/components/form-fields/choice-group`. */
+
+/* ---- Gaveta (mobile) --------------------------------------------------------------------- */
+
+.drawerTrigger {
+  display: none;
+  gap: 6px;
+}
+
+@media (max-width: 1024px) {
+  .drawerTrigger {
+    display: inline-flex;
+  }
+}
+
+.drawerCount {
+  display: grid;
+  place-items: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: var(--radius-pill);
+  background: var(--brand);
+  color: var(--brand-on);
+  font-size: 0.6875rem;
+  font-weight: 700;
+}
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: var(--bg-overlay);
+  animation: overlay-in 160ms ease-out;
+}
+
+.drawer {
+  position: fixed;
+  z-index: 51;
+  inset: auto 0 0 0;
+  display: flex;
+  flex-direction: column;
+
+  /* Não ocupa a tela toda de propósito: a faixa de conteúdo visível acima da gaveta lembra
+     que os resultados estão a atualizar enquanto os filtros mudam. */
+  max-height: 86vh;
+
+  background: var(--panel);
+  border-top-left-radius: var(--radius-xl);
+  border-top-right-radius: var(--radius-xl);
+  border-top: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  animation: drawer-in 220ms cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+.drawerHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.drawerBody {
+  flex: 1;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 0 16px;
+}
+
+.drawerFooter {
+  display: flex;
+  gap: 8px;
+  padding: 12px 16px;
+
+  /* Respeita a área segura do iOS: sem isto o botão fica sob a barra de gestos. */
+  padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+
+  border-top: 1px solid var(--border);
+  background: var(--panel);
+}
+
+.drawerFooter > * {
+  flex: 1;
+}
+
+@keyframes overlay-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes drawer-in {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: none;
+  }
+}

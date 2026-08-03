@@ -4,7 +4,6 @@ using EmpregaNet.Application.Jobs.ViewModel;
 using EmpregaNet.Application.Common.Base;
 using EmpregaNet.Domain.Interfaces;
 using EmpregaNet.Application.Common.Exceptions;
-using EmpregaNet.Domain.Enums;
 using Microsoft.AspNetCore.Http;
 
 namespace EmpregaNet.Application.Jobs.Queries;
@@ -35,24 +34,25 @@ public sealed class GetJobByIdHandler : IRequestHandler<GetByIdQuery<JobViewMode
             if (entity is null)
             {
                 _logger.LogWarning("Vaga de emprego com ID {Id} não encontrada.", request.Id);
-                throw new ValidationAppException(
-                            nameof(request.Id),
-                            $"Vaga de emprego com ID '{request.Id}' não encontrada.",
-                            DomainErrorEnum.RECORD_NOT_EXISTS_OR_MISSING_PERMISSION);
+                throw new NotFoundException($"Vaga de emprego com ID '{request.Id}' não encontrada.");
             }
+
 
             var staff = RecruitmentRoleNames.IsRecruitmentStaff(_httpContextAccessor.HttpContext?.User);
             if (!staff && (entity.IsDeleted || !entity.IsActive))
             {
-                throw new ValidationAppException(
-                    nameof(request.Id),
-                    $"Vaga de emprego com ID '{request.Id}' não encontrada.",
-                    DomainErrorEnum.RECORD_NOT_EXISTS_OR_MISSING_PERMISSION);
+                throw new NotFoundException($"Vaga de emprego com ID '{request.Id}' não encontrada.");
             }
 
             var viewModel = entity.ToViewModel();
             _logger.LogInformation("Vaga de emprego encontrada: {Id}, Título: {Title}", request.Id, viewModel.Title);
             return viewModel;
+        }
+
+        catch (NotFoundException ex)
+        {
+            _logger.LogWarning("Vaga de emprego não encontrada. ID: {Id}. {Message}", request.Id, ex.Message);
+            throw;
         }
         catch (ValidationAppException ex)
         {

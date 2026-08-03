@@ -5,7 +5,7 @@ using EmpregaNet.Application.Common.Exceptions;
 using EmpregaNet.Application.Common.Base;
 using EmpregaNet.Application.Admin.Company.Factories;
 using EmpregaNet.Domain.Interfaces;
-using EmpregaNet.Application.Utils.Helpers;
+using EmpregaNet.Application.Utils.CustomValidation;
 using System.ComponentModel.DataAnnotations;
 
 namespace EmpregaNet.Application.Admin.Company.Commands;
@@ -37,7 +37,7 @@ public sealed class CreateCompanyCommandHandler : IRequestHandler<CreateCommand<
     {
         _logger.LogInformation("Iniciando o processo de criação da empresa: {CompanyName}", request.entity.CompanyName);
 
-        var cnpjCleaned = request.entity.Cnpj.OnlyNumbers().Trim();
+        var cnpjCleaned = BrazilianDocument.NormalizeCnpj(request.entity.Cnpj);
         var existingCompany = await _companyRepository.ExistsByCnpjAsync(cnpjCleaned);
         if (existingCompany)
         {

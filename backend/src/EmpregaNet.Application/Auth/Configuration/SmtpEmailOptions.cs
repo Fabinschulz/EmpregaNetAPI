@@ -22,9 +22,9 @@ public sealed class SmtpEmailOptions
     public int Port { get; set; } = 587;
 
     /// <summary>
-    /// <c>StartTls</c> — ligação começa em texto e negocia TLS (típico na porta 587).<br/>
-    /// <c>SslOnConnect</c> — TLS desde o primeiro byte (típico na 465).<br/>
-    /// <c>None</c> — sem encriptação (evitar em produção; só redes fechadas/lab).
+    /// <c>StartTls</c> ligação começa em texto e negocia TLS (típico na porta 587).<br/>
+    /// <c>SslOnConnect</c> TLS desde o primeiro byte (típico na 465).<br/>
+    /// <c>None</c> sem encriptação (evitar em produção; só redes fechadas/lab).
     /// </summary>
     public string Security { get; set; } = "StartTls";
 

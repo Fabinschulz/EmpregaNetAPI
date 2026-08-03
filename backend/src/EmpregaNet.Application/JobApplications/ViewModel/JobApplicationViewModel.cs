@@ -26,7 +26,7 @@ public static class JobApplicationMapper
             JobId = entity.JobId,
             UserId = entity.UserId,
             Status = entity.Status,
-            AppliedAt = RandomHelpers.FormatToBrasiliaTime(entity.AppliedAt),
+            AppliedAt = BrasiliaTime.Format(entity.AppliedAt),
             CreatedAtUtc = entity.CreatedAt,
             UpdatedAtUtc = entity.UpdatedAt,
             DeletedAtUtc = entity.DeletedAt,

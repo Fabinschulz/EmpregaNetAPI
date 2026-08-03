@@ -65,7 +65,7 @@ export type StatusBadgeProps = {
   label: string | null | undefined;
   /** Tom explícito; se omitido, é inferido a partir de `label`. */
   tone?: StatusTone;
-  /** Texto exibido quando `label` é vazio. Padrão: "—". */
+  /** Texto exibido quando `label` é vazio. Padrão: "-". */
   emptyText?: string;
 };
 
@@ -74,7 +74,7 @@ export type StatusBadgeProps = {
  * cinza=neutro). Genérico para qualquer coluna de situação/status; o tom pode ser
  * informado ou inferido do próprio texto.
  */
-export function StatusBadge({ label, tone, emptyText = '—' }: StatusBadgeProps) {
+export function StatusBadge({ label, tone, emptyText = '-' }: StatusBadgeProps) {
   const text = label?.trim();
   if (!text) return <Badge variant="secondary">{emptyText}</Badge>;
   const resolvedTone = tone ?? inferStatusTone(text);

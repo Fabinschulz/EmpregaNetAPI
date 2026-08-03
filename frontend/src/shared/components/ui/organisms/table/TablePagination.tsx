@@ -14,7 +14,7 @@ export type TablePaginationProps = {
   pagination: UseTablePaginationResult;
   /**
    * Total de itens: `totalItems` da API (server-side) ou `items.length` (client-side).
-   * `undefined` enquanto a primeira busca não terminou — a navegação avante fica desabilitada.
+   * `undefined` enquanto a primeira busca não terminou - a navegação avante fica desabilitada.
    */
   totalItems?: number;
   className?: string;

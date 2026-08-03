@@ -17,7 +17,24 @@ public sealed record CreateJobCommand(
     string Description,
     [EnumDataType(typeof(JobTypeEnum))]
     string JobType,
-    decimal Salary
+    [EnumDataType(typeof(WorkModelEnum))]
+    string WorkModel,
+    [EnumDataType(typeof(WorkShiftEnum))]
+    string WorkShift,
+    [EnumDataType(typeof(ExperienceLevelEnum))]
+    string ExperienceLevel,
+    [EnumDataType(typeof(JobAreaEnum))]
+    string Area,
+    string City,
+    [EnumDataType(typeof(UF))]
+    string State,
+    string? Summary = null,
+    decimal? SalaryMin = null,
+    decimal? SalaryMax = null,
+    bool SalaryDisclosed = true,
+    bool IsPcdFriendly = false,
+    IReadOnlyList<string>? Requirements = null,
+    IReadOnlyList<string>? Benefits = null
 ) : IJobCommand;
 
 public sealed class CreateJobHandler : IRequestHandler<CreateCommand<CreateJobCommand>, long>

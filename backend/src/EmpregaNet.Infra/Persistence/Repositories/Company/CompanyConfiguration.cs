@@ -34,6 +34,10 @@ internal class CompanyConfiguration : IEntityTypeConfiguration<Company>
         builder.HasIndex(e => e.Email)
                 .IsUnique()
                 .HasDatabaseName("IX_Companies_Email");
+
+        builder.HasIndex(x => x.CompanyName, "IX_Companies_Name_Trgm")
+               .HasMethod("gin")
+               .HasOperators("gin_trgm_ops");
     }
 
 }

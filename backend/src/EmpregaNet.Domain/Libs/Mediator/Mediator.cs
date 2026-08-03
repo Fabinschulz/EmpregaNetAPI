@@ -8,7 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 /// Pipeline behaviors são resolvidos via DI e executados na ordem de registro:
 /// o primeiro behavior registrado é o mais externo (executa antes dos demais).
 ///
-/// O wrapper por tipo é cacheado estaticamente — sem reflexão no caminho quente.
+/// O wrapper por tipo é cacheado estaticamente - sem reflexão no caminho quente.
 /// </summary>
 internal sealed class Mediator : IMediator
 {

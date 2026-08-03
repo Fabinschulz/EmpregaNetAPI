@@ -36,8 +36,6 @@
   }
 }
 
-// Sem rotação para quem pede menos movimento. Em vez de congelar o anel (que pareceria
-// quebrado), pulsa a opacidade — ainda comunica "em andamento", sem movimento vestibular.
 @media (prefers-reduced-motion: reduce) {
   .ring {
     animation: spinner-pulse 1.4s ease-in-out infinite;

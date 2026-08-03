@@ -47,7 +47,7 @@ public sealed class ForgotPasswordHandler : IRequestHandler<ForgotPasswordComman
         }
 
         // Teto diário por destinatário: quando excedido, omite o envio mantendo a resposta
-        // uniforme (o chamador não descobre que foi limitado — anti-abuso e anti-enumeração).
+        // uniforme (o chamador não descobre que foi limitado, anti-abuso e anti-enumeração).
         if (!await _emailThrottle.TryAcquireAsync(user.Email, cancellationToken))
         {
             _logger.LogWarning("Limite diário de e-mails atingido para o usuário {UserId}; reset omitido.", user.Id);
