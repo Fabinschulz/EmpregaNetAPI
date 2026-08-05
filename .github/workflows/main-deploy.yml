@@ -20,84 +20,11 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
-  changes:
-    name: Escopo das mudanças
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    permissions:
-      contents: read
-    outputs:
-      backend: ${{ steps.filter.outputs.backend }}
-      frontend: ${{ steps.filter.outputs.frontend }}
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Detectar áreas afetadas
-        id: filter
-        env:
-          EVENT: ${{ github.event_name }}
-          BEFORE: ${{ github.event.before }}
-          BASE_REF: ${{ github.base_ref }}
-        run: |
-          set -euo pipefail
-
-          emit() {
-            {
-              echo "backend=$1"
-              echo "frontend=$2"
-            } >> "$GITHUB_OUTPUT"
-            echo "backend=$1 frontend=$2"
-          }
-
-          if [ "$EVENT" = "workflow_dispatch" ]; then
-            echo "Disparo manual: nenhum filtro aplicado."
-            emit true true
-            exit 0
-          fi
-
-          if [ "$EVENT" = "pull_request" ]; then
-            git fetch --no-tags origin "$BASE_REF" --depth=50 || true
-            MERGE_BASE="$(git merge-base "origin/$BASE_REF" HEAD 2>/dev/null || true)"
-            RANGE="${MERGE_BASE:+$MERGE_BASE..HEAD}"
-          else
-            if [ -n "$BEFORE" ] && git cat-file -e "${BEFORE}^{commit}" 2>/dev/null; then
-              RANGE="$BEFORE..$GITHUB_SHA"
-            else
-              RANGE=""
-            fi
-          fi
-
-          if [ -z "$RANGE" ]; then
-            echo "Não foi possível determinar o intervalo de diff; assumindo tudo."
-            emit true true
-            exit 0
-          fi
-
-          echo "Intervalo: $RANGE"
-          CHANGED="$(git diff --name-only "$RANGE")"
-          echo "::group::Arquivos alterados"
-          echo "$CHANGED"
-          echo "::endgroup::"
-
-          hit() { echo "$CHANGED" | grep -qE "$1" && echo true || echo false; }
-
-          PIPELINE="$(hit '^\.github/(workflows|actions|scripts)/')"
-          if [ "$PIPELINE" = "true" ]; then
-            emit true true
-            exit 0
-          fi
-
-          emit "$(hit '^backend/')" "$(hit '^frontend/')"
-
   ci-backend:
     name: CI - Backend
-    needs: changes
-    if: needs.changes.outputs.backend == 'true'
     uses: ./.github/workflows/ci-backend.yml
+    permissions:
+      contents: read
     with:
       solution_file: backend/EmpregaNet.sln
       api_project: backend/src/EmpregaNet.Api/EmpregaNet.Api.csproj
@@ -106,16 +33,15 @@ jobs:
 
   ci-frontend:
     name: CI - Frontend
-    needs: changes
-    if: needs.changes.outputs.frontend == 'true'
     uses: ./.github/workflows/ci-frontend.yml
+    permissions:
+      contents: read
     with:
       working_directory: frontend
       api_base_url: ${{ vars.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5225' }}
 
   target:
     name: Resolver alvo
-    needs: changes
     if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     timeout-minutes: 5
@@ -148,9 +74,11 @@ jobs:
 
   image:
     name: CD - Imagem
-    needs: [changes, ci-backend, target]
-    if: needs.changes.outputs.backend == 'true'
+    needs: [ci-backend, target]
     uses: ./.github/workflows/cd-image.yml
+    permissions:
+      contents: read
+      id-token: write
     with:
       environment: ${{ needs.target.outputs.environment }}
       publish_artifact_name: ${{ needs.ci-backend.outputs.publish_artifact_name }}
@@ -164,6 +92,9 @@ jobs:
     name: CD - Deploy EC2
     needs: [image, target]
     uses: ./.github/workflows/cd-ec2.yml
+    permissions:
+      contents: read
+      id-token: write # OIDC para a AWS
     with:
       environment: ${{ needs.target.outputs.environment }}
       aspnetcore_environment: ${{ needs.target.outputs.aspnetcore_environment }}
