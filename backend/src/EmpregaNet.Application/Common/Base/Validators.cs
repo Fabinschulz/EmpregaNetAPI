@@ -47,6 +47,9 @@ public interface IPaginatedQuery
 public abstract class BasePaginatedQueryValidator<TQuery> : AbstractValidator<TQuery>
     where TQuery : class, IPaginatedQuery
 {
+    public const int MinSize = 1;
+    public const int MaxSize = 500;
+
     protected BasePaginatedQueryValidator()
     {
         RuleFor(x => x.Page)
@@ -55,7 +58,8 @@ public abstract class BasePaginatedQueryValidator<TQuery> : AbstractValidator<TQ
 
         RuleFor(x => x.Size)
             .NotEmpty().WithMessage("Size é obrigatório")
-            .InclusiveBetween(1, 500).WithMessage("Size precisa ser maior ou igual a 100");
+            .InclusiveBetween(MinSize, MaxSize)
+            .WithMessage($"Size precisa estar entre {MinSize} e {MaxSize}");
 
         RuleFor(x => x.OrderBy)
             .MaximumLength(50).WithMessage("Ordenação deve ter no máximo 50 caracteres.");

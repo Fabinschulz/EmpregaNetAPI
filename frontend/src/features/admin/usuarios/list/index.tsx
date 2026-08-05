@@ -1,15 +1,15 @@
 'use client';
 
 import {
-  ApiQueryBoundary,
-  ConfirmDialog,
-  PageHeader,
-  StatusBadge,
-  TableContainer,
-  TableFilters,
-  useRowDeleteAction,
-  type DataTableColumn,
-  type RowAction
+    ApiQueryBoundary,
+    ConfirmDialog,
+    PageHeader,
+    StatusBadge,
+    TableContainer,
+    TableFilters,
+    useRowDeleteAction,
+    type DataTableColumn,
+    type RowAction
 } from '@/components';
 import { FormProvider } from '@/context';
 import { usePersistedTablePagination } from '@/hooks';
@@ -18,11 +18,11 @@ import { formatDate, userTypeLabel, type AdminUsersListQueryParams } from '@/sha
 import { Eye } from 'lucide-react';
 import { useCallback, useMemo, useState } from 'react';
 import {
-  adminUsersFilterFormSchema,
-  adminUsersFilterToParams,
-  defaultAdminUsersFilter,
-  useAdminUsersListQuery,
-  useDeleteAdminUserMutation
+    adminUsersFilterFormSchema,
+    adminUsersFilterToParams,
+    defaultAdminUsersFilter,
+    useAdminUsersListQuery,
+    useDeleteAdminUserMutation
 } from '../service';
 import { AdminUsersFilterFields } from './admin-users-filter-fields';
 
@@ -107,7 +107,7 @@ export function AdminUsersPage() {
       onRetry={refetch}
     >
       <section>
-        <PageHeader title="Usuários" description="Gestão de usuários (Admin)." />
+        <PageHeader title="Usuários" description="Gestão de usuários." />
 
         <TableContainer
           columns={columns}

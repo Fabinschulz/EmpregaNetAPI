@@ -24,21 +24,16 @@ public sealed class GetMyJobApplicationsQueryValidator : BasePaginatedQueryValid
     }
 }
 
-public sealed class GetJobApplicationsByJobIdQueryValidator : AbstractValidator<GetJobApplicationsByJobIdQuery>
+/// <summary>
+/// Herda as regras de paginação da base, como os validadores irmãos. Reescrevê-las aqui foi o que
+/// permitiu a divergência: o limite de <c>Size</c> ficou como mínimo de 100, e a consulta rejeitava
+/// qualquer página menor do que isso.
+/// </summary>
+public sealed class GetJobApplicationsByJobIdQueryValidator
+    : BasePaginatedQueryValidator<GetJobApplicationsByJobIdQuery>
 {
-    public GetJobApplicationsByJobIdQueryValidator()
+    public GetJobApplicationsByJobIdQueryValidator() : base()
     {
-        RuleFor(x => x.Page)
-            .NotEmpty().WithMessage("Page é obrigatório")
-            .GreaterThanOrEqualTo(1).WithMessage("A página precisa ser maior ou igual a 1");
-
-        RuleFor(x => x.Size)
-            .NotEmpty().WithMessage("Size é obrigatório")
-            .GreaterThanOrEqualTo(100).WithMessage("Size precisa ser maior ou igual a 100");
-
-        RuleFor(x => x.OrderBy)
-            .MaximumLength(50).WithMessage("Ordenação deve ter no máximo 50 caracteres.");
-
         RuleFor(x => x.JobId)
             .GreaterThan(0)
             .WithMessage("Id da vaga inválido.");

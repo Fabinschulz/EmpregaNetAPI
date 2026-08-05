@@ -2,20 +2,20 @@
 
 import { Alert, Button, PageHeader } from '@/components';
 import {
-  emptyJobVocabulary,
-  useJobFeedInteractionsQuery,
-  useJobVocabularyQuery,
-  useJobsFeedQuery,
-  type JobVocabularyDto,
-  type JobsFeedFilters,
-  type JobsFeedResponseDto
+    emptyJobVocabulary,
+    useJobFeedInteractionsQuery,
+    useJobVocabularyQuery,
+    useJobsFeedQuery,
+    type JobVocabularyDto,
+    type JobsFeedFilters,
+    type JobsFeedResponseDto
 } from '@/features/vagas/service';
 import { useInfiniteScroll } from '@/hooks';
 import { RefreshCw } from 'lucide-react';
 import { useMemo } from 'react';
 import { FeedActiveChips } from '../active-chips';
 import { FeedEmptyState } from '../empty-state';
-import { FeedFiltersDrawer, FeedFiltersPanel, useJobsFeedFilters } from '../filters';
+import { FeedFilterPills, useJobsFeedFilters } from '../filters';
 import { JobCard, JobCardSkeletonList } from '../job-card';
 import { FeedSearchBar } from '../search-bar';
 import { FeedSortSelect } from '../sort-select';
@@ -56,28 +56,26 @@ export function JobsFeed({ initialPage, initialFilters, initialVocabulary }: Job
 
       <div className={styles.toolbar}>
         <FeedSearchBar value={searchDraft} onChange={onSearchChange} isPending={isSearchPending} />
-
-        <div className={styles.toolbarControls}>
-          <FeedFiltersDrawer controller={controller} vocabulary={resolvedVocabulary} totalItems={totalItems} />
-          <FeedSortSelect
-            value={filters.sort}
-            onChange={(sort) => updateFilters({ sort })}
-            hasSearch={Boolean(filters.search.trim())}
-          />
-        </div>
+        <FeedFilterPills controller={controller} vocabulary={resolvedVocabulary} totalItems={totalItems} />
       </div>
 
       <FeedActiveChips controller={controller} />
 
       <div className={styles.layout}>
-        <FeedFiltersPanel controller={controller} vocabulary={resolvedVocabulary} />
-
         <section className={styles.results} aria-label="Resultados de vagas">
-          <p className={styles.resultsCount} role="status" aria-live="polite">
-            {isPending
-              ? 'Carregando vagas...'
-              : `${totalItems} ${totalItems === 1 ? 'vaga encontrada' : 'vagas encontradas'}`}
-          </p>
+          <div className={styles.resultsHeader}>
+            <p className={styles.resultsCount} role="status" aria-live="polite">
+              {isPending
+                ? 'Carregando vagas...'
+                : `${totalItems} ${totalItems === 1 ? 'vaga encontrada' : 'vagas encontradas'}`}
+            </p>
+
+            <FeedSortSelect
+              value={filters.sort}
+              onChange={(sort) => updateFilters({ sort })}
+              hasSearch={Boolean(filters.search.trim())}
+            />
+          </div>
 
           {isError ? (
             <Alert variant="destructive" title="Não foi possível carregar as vagas">

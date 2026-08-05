@@ -24,7 +24,7 @@ export function FeedFiltersDrawer({ controller, vocabulary, totalItems }: FeedFi
       <Dialog.Trigger asChild>
         <Button type="button" variant="outline" size="sm" className={styles.drawerTrigger}>
           <SlidersHorizontal aria-hidden />
-          Filtros
+          Todos os filtros
           {activeCount > 0 ? <span className={styles.drawerCount}>{activeCount}</span> : null}
         </Button>
       </Dialog.Trigger>

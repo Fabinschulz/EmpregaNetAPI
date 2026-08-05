@@ -39,18 +39,7 @@ export function JobCard({ job, hasApplied, position, totalItems, className }: Jo
     >
       <header className={styles.header}>
         <CompanyAvatar name={job.company.name} logoUrl={job.company.logoUrl} />
-
-        <div className={styles.headerText}>
-          <p className={styles.company}>{job.company.name}</p>
-          <p className={styles.location}>
-            <MapPin className={styles.chipIcon} aria-hidden />
-            {job.location.city}, {job.location.state}
-          </p>
-        </div>
-
-        <time className={styles.published} dateTime={job.publishedAt}>
-          {publishedLabel}
-        </time>
+        <p className={styles.company}>{job.company.name}</p>
       </header>
 
       <h2 className={styles.title} id={titleId}>
@@ -59,13 +48,22 @@ export function JobCard({ job, hasApplied, position, totalItems, className }: Jo
         </Link>
       </h2>
 
-      <p className={styles.salary} data-disclosed={job.salary.disclosed}>
-        {salary}
+      <p className={styles.facts}>
+        <span className={styles.location}>
+          <MapPin className={styles.chipIcon} aria-hidden />
+          {job.location.city}, {job.location.state}
+        </span>
+
+        <span className={styles.factSeparator} aria-hidden>
+          ·
+        </span>
+
+        <span className={styles.salary} data-disclosed={job.salary.disclosed}>
+          {salary}
+        </span>
       </p>
 
       <JobCardHighlights job={job} />
-
-      {job.summary?.trim() ? <p className={styles.summary}>{job.summary}</p> : null}
 
       <JobCardTags requirements={job.requirements} benefits={job.benefits} />
 
@@ -79,6 +77,10 @@ export function JobCard({ job, hasApplied, position, totalItems, className }: Jo
               {job.applicationsCount} {job.applicationsCount === 1 ? 'candidato' : 'candidatos'}
             </span>
           ) : null}
+
+          <time className={styles.published} dateTime={job.publishedAt}>
+            {publishedLabel}
+          </time>
         </div>
 
         <JobCardActions jobId={job.id} jobTitle={job.title} hasApplied={hasApplied} />

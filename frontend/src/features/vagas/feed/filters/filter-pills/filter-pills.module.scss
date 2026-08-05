@@ -1,0 +1,24 @@
+.bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  /* Em telas estreitas a barra rola na horizontal em vez de quebrar em três linhas e empurrar
+     os resultados para fora da primeira dobra. */
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+
+  padding: 3px 0;
+}
+
+.bar::-webkit-scrollbar {
+  display: none;
+}
+
+@media (min-width: 900px) {
+  .bar {
+    flex-wrap: wrap;
+    overflow-x: visible;
+  }
+}

@@ -1,5 +1,3 @@
-/* Estrutura da tela do feed. Os controles e cartões trazem os seus próprios estilos:
-   ver `search-bar/`, `sort-select/`, `active-chips/`, `empty-state/` e `job-card/`. */
 
 .page {
   display: flex;
@@ -11,33 +9,28 @@
 
 .toolbar {
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 12px;
+  flex-direction: column;
+  gap: 10px;
 
-  /* Fica visível durante o scroll: num feed infinito, ter de voltar ao topo para refinar a
-     busca é o atrito que faz o utilizador desistir. */
   position: sticky;
   top: 0;
   z-index: 5;
-  padding: 12px 0;
+  padding: 12px 0 10px;
   background: var(--content-bg);
-}
-
-.toolbarControls {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex: 0 0 auto;
 }
 
 /* ---- Layout ----------------------------------------------------------------------------- */
 
 .layout {
-  display: grid;
-  grid-template-columns: 272px minmax(0, 1fr);
-  gap: 20px;
-  align-items: start;
+  display: block;
+}
+
+.resultsHeader {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
 }
 
 .results {
@@ -58,7 +51,8 @@
 .feed {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+
+  gap: 8px;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -66,7 +60,11 @@
 
 .feedItem {
   content-visibility: auto;
-  contain-intrinsic-size: auto 280px;
+
+  /* Palpite inicial de altura para o `content-visibility` (o `auto` faz o browser passar a usar a
+     altura real depois do primeiro render). Medido no browser: 244px no desktop. Subestimar faz a
+     barra de scroll saltar ao renderizar o item. */
+  contain-intrinsic-size: auto 244px;
 
   animation: card-enter 220ms ease-out both;
 }
@@ -95,20 +93,14 @@
 
 /* ---- Responsivo -------------------------------------------------------------------------- */
 
-@media (max-width: 1024px) {
-  /* Abaixo do desktop o painel lateral sai e os filtros passam a viver na gaveta. */
-  .layout {
-    grid-template-columns: minmax(0, 1fr);
-  }
-}
-
 @media (max-width: 640px) {
-  .toolbar {
+  .resultsHeader {
     align-items: stretch;
     flex-direction: column;
+    gap: 8px;
   }
 
-  .toolbarControls {
-    justify-content: space-between;
+  .feedItem {
+    contain-intrinsic-size: auto 278px;
   }
 }

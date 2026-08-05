@@ -93,7 +93,7 @@ enviada" e a ação não se repete. O anónimo vê o convite para entrar.
 | CA-09 | Cada filtro ativo aparece como chip removível; remover o chip atualiza o feed. |
 | CA-10 | Recarregar a página preserva busca, filtros e ordenação. |
 | CA-11 | Abrir a URL noutro navegador reproduz o mesmo conjunto de resultados. |
-| CA-12 | No mobile os filtros abrem em gaveta; no desktop ficam em painel lateral. Os campos são os mesmos nos dois. |
+| CA-12 | Os filtros de primeira ordem (turno, faixa salarial, experiência, área, benefícios, publicação e PcD) ficam em pills no topo, iguais em mobile e desktop; os restantes abrem na gaveta "Todos os filtros", disponível em qualquer largura. Os campos da gaveta são os mesmos do vocabulário usado pelas pills. |
 | CA-13 | Sem resultados, o feed explica o motivo e oferece limpar os filtros. |
 | CA-14 | Utilizador autenticado vê "Candidatura enviada" nas vagas a que já se candidatou; a ação de candidatar-se não fica disponível de novo. |
 | CA-15 | Utilizador anónimo vê convite para entrar em vez da ação de candidatura, e o feed continua totalmente navegável sem sessão. |

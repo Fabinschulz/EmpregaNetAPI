@@ -1,9 +1,8 @@
-/* A largura vem do `flex` como filho da barra superior do feed. */
 .searchBar {
   display: flex;
   align-items: center;
   gap: 8px;
-  flex: 1 1 320px;
+  flex: 0 0 auto;
   min-width: 0;
   padding: 0 12px;
   min-height: var(--control-min-height);
@@ -41,7 +40,6 @@
   color: var(--muted);
 }
 
-/* Esconde o "x" nativo do WebKit: já existe um botão acessível com rótulo próprio. */
 .searchInput::-webkit-search-cancel-button {
   appearance: none;
 }

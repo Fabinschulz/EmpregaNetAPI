@@ -1,0 +1,48 @@
+name: AWS Auth
+description: >
+  Autentica na AWS preferindo OIDC, mas com fallback para chave estática. 
+  A role OIDC precisa existir antes do workflow ser chamado.
+
+inputs:
+  aws-region:
+    description: Região alvo.
+    required: true
+  role-arn:
+    required: false
+    default: ""
+  access-key-id:
+    required: false
+    default: ""
+  secret-access-key:
+    required: false
+    default: ""
+
+runs:
+  using: composite
+  steps:
+    - name: Assumir role via OIDC
+      if: inputs.role-arn != ''
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        role-to-assume: ${{ inputs.role-arn }}
+        role-session-name: gha-${{ github.run_id }}-${{ github.run_attempt }}
+        aws-region: ${{ inputs.aws-region }}
+
+    - name: Autenticar por chave estática
+      if: inputs.role-arn == ''
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ inputs.access-key-id }}
+        aws-secret-access-key: ${{ inputs.secret-access-key }}
+        aws-region: ${{ inputs.aws-region }}
+
+    - name: Avisar sobre credencial de longa duração
+      if: inputs.role-arn == ''
+      shell: bash
+      run: |
+        echo "::warning title=Credencial estática em uso::Defina a variável AWS_ROLE_ARN no Environment para migrar a autenticação para OIDC e revogar AWS_ACCESS_KEY_ID/AWS_SECRET_ACCESS_KEY."
+
+    - name: Confirmar identidade efetiva
+      shell: bash
+      run: |
+        aws sts get-caller-identity --output table

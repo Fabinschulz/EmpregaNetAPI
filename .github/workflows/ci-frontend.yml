@@ -1,0 +1,70 @@
+name: CI - Frontend
+
+on:
+  workflow_call:
+    inputs:
+      working_directory:
+        required: false
+        type: string
+        default: frontend
+      node_version:
+        required: false
+        type: string
+        default: "22"
+      api_base_url:
+        description: >
+          Valor de NEXT_PUBLIC_API_BASE_URL no build. Deixou de ser fixo no
+          workflow: sendo NEXT_PUBLIC_*, o valor é inlinado no bundle em tempo de
+          build e não há como corrigi-lo depois sem reconstruir.
+        required: false
+        type: string
+        default: http://localhost:5225
+
+permissions: {}
+
+jobs:
+  verify:
+    name: Lint, testes e build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+    defaults:
+      run:
+        working-directory: ${{ inputs.working_directory }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ inputs.node_version }}
+          cache: pnpm
+          cache-dependency-path: ${{ inputs.working_directory }}/pnpm-lock.yaml
+
+      - name: Instalar dependências
+        run: pnpm install --frozen-lockfile
+
+      - name: Verificações estáticas
+        run: |
+          pnpm lint &
+          LINT=$!
+          pnpm format:check &
+          FMT=$!
+          FAIL=0
+          wait $LINT || FAIL=1
+          wait $FMT  || FAIL=1
+          exit $FAIL
+
+      - name: Testes (Cucumber)
+        run: pnpm test
+        
+      - name: Build
+        run: pnpm build
+        env:
+          NEXT_PUBLIC_API_BASE_URL: ${{ inputs.api_base_url }}

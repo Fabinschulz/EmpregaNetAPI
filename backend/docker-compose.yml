@@ -70,11 +70,13 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      target: local
     env_file:
       - .env
     ports:
       - "${API_PORT}:8080"
     environment:
+      ASPNETCORE_ENVIRONMENT: Development
       ConnectionStrings__PostgreSQLConnection: "Host=postgres;Port=5432;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};"
       Redis__Enabled: "true"
       Redis__ConnectionString: "redis:6379"

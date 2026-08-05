@@ -2,8 +2,9 @@
   position: relative;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  padding: 20px;
+
+  gap: 8px;
+  padding: 16px 18px;
   background: var(--card-bg);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
@@ -28,20 +29,23 @@
 .header {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
+  min-width: 0;
 }
 
 .avatar {
   display: grid;
   place-items: center;
   flex: 0 0 auto;
-  width: 44px;
-  height: 44px;
-  border-radius: var(--radius);
+
+  /* Menor que antes: é contexto, não o elemento que decide o clique. */
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
   background: var(--surface-hover);
   border: 1px solid var(--border);
-  color: var(--text);
-  font-size: 0.9375rem;
+  color: var(--muted);
+  font-size: 0.6875rem;
   font-weight: 650;
   letter-spacing: 0.02em;
 }
@@ -50,24 +54,38 @@
   object-fit: cover;
 }
 
-.headerText {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  min-width: 0;
-}
-
 .company {
   margin: 0;
-  font-size: 0.9375rem;
-  font-weight: 600;
-  color: var(--text);
+  min-width: 0;
+  font-size: 0.8125rem;
+  font-weight: 550;
+  color: var(--muted);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.location,
+/* Local e salário numa linha só, separados por ponto médio. */
+.facts {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px;
+  margin: 0;
+}
+
+.location {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.875rem;
+  color: var(--muted);
+}
+
+.factSeparator {
+  color: var(--border-strong);
+}
+
 .published {
   display: inline-flex;
   align-items: center;
@@ -75,26 +93,30 @@
   margin: 0;
   font-size: 0.8125rem;
   color: var(--muted);
-}
-
-.published {
-  margin-left: auto;
-  flex: 0 0 auto;
-  align-self: flex-start;
   white-space: nowrap;
 }
 
+/* O elemento mais forte do cartão: é por ele que se decide abrir a vaga. */
 .title {
-  margin: 2px 0 0;
-  font-size: 1.125rem;
-  line-height: 1.3;
+  margin: 0;
+  font-size: 1.0625rem;
+  line-height: 1.35;
   font-weight: 680;
   letter-spacing: -0.01em;
-  color: var(--text);
 }
 
+/* O design system é de acento neutro (`--brand` é fundo, não cor de link), por isso a hierarquia
+   do título vem de tamanho e peso, e não de cor como nos agregadores. O sublinhado no hover dá a
+   pista de que é navegável. */
 .titleLink {
-  color: inherit;
+  color: var(--text);
+  text-decoration: none;
+}
+
+.titleLink:hover {
+  text-decoration: underline;
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 2px;
 }
 
 /* Estende a área clicável do título a todo o cartão sem aninhar os botões do rodapé dentro de
@@ -112,15 +134,13 @@
 }
 
 .salary {
-  margin: 0;
-  font-size: 1rem;
-  font-weight: 640;
+  font-size: 0.9375rem;
+  font-weight: 650;
   color: var(--text);
 }
 
 /* Salário a combinar tem peso menor: é ausência de informação, não um destaque. */
 .salary[data-disclosed='false'] {
-  font-size: 0.9375rem;
   font-weight: 500;
   color: var(--muted);
 }
@@ -155,20 +175,6 @@
   opacity: 0.75;
 }
 
-.summary {
-  margin: 2px 0;
-  font-size: 0.9375rem;
-  line-height: 1.5;
-  color: var(--muted);
-
-  /* Duas linhas mantêm todos os cartões com altura próxima, o que dá ritmo ao scroll. */
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
 .tag,
 .tagMore {
   padding: 3px 9px;
@@ -187,15 +193,14 @@
   cursor: default;
 }
 
+/* Sem separador: a borda somava peso visual a cada cartão numa lista longa. */
 .footer {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
-  margin-top: 4px;
-  padding-top: 12px;
-  border-top: 1px solid var(--border);
+  gap: 10px;
+  margin-top: 2px;
 }
 
 .meta {
@@ -248,14 +253,7 @@
 .skeletonHeader {
   display: flex;
   align-items: center;
-  gap: 12px;
-}
-
-.skeletonHeaderText {
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  gap: 6px;
+  gap: 8px;
 }
 
 .skeletonChips {
@@ -270,10 +268,6 @@
   .card {
     padding: 16px;
     border-radius: var(--radius);
-  }
-
-  .title {
-    font-size: 1.0625rem;
   }
 
   .footer {

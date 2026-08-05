@@ -41,6 +41,26 @@ When('eu serializo os filtros de volta para a URL', function (this: BusinessRule
   feedData(this).serialized = jobsFeedFiltersToSearchParams(currentFilters(this)).toString();
 });
 
+/**
+ * Reproduz o que uma pill de filtro faz ao ser clicada: alterna um valor numa lista de filtro.
+ *
+ * O componente em si não é coberto aqui - a suite não tem renderizador de React -, mas este é o
+ * contrato de que ele depende: alternar, refletir na URL e contar como filtro ativo.
+ */
+When(
+  'eu alterno o valor {string} no filtro {string}',
+  function (this: BusinessRulesWorld, valor: string, campo: string) {
+    const filters = currentFilters(this);
+    const current = filters[campo as keyof JobsFeedFilters] as readonly string[];
+
+    expect(Array.isArray(current), `o filtro "${campo}" não é uma lista`).to.equal(true);
+
+    const next = current.includes(valor) ? current.filter((item) => item !== valor) : [...current, valor];
+
+    feedData(this).filters = { ...filters, [campo]: next } as JobsFeedFilters;
+  }
+);
+
 When('eu converto os filtros em parâmetros da API', function (this: BusinessRulesWorld) {
   feedData(this).apiParams = jobsFeedFiltersToApiParams(currentFilters(this), 1);
 });

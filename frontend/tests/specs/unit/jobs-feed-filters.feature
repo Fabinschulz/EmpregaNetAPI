@@ -146,3 +146,29 @@ Funcionalidade: Filtros do feed de vagas na URL
     Então o parâmetro "city" da API deve estar ausente
     E o parâmetro "search" da API deve estar ausente
     E o parâmetro "pcd" da API deve estar ausente
+
+  # Contrato que as pills de filtro accionam. O componente não é coberto aqui (a suite não
+  # renderiza React), mas alternar → URL → contagem de ativos é o que ele depende.
+  Cenário: escolher um valor na pill entra na URL e conta como filtro ativo
+    Dado que a URL do feed é ""
+    Quando eu interpreto os filtros do feed
+    E eu alterno o valor "SegundoTurno" no filtro "workShifts"
+    E eu serializo os filtros de volta para a URL
+    Então a URL serializada deve ser "shift=SegundoTurno"
+    E devem estar ativos 1 filtros
+
+  Cenário: clicar de novo no mesmo valor da pill remove o filtro
+    Dado que a URL do feed é "?shift=SegundoTurno"
+    Quando eu interpreto os filtros do feed
+    E eu alterno o valor "SegundoTurno" no filtro "workShifts"
+    E eu serializo os filtros de volta para a URL
+    Então a URL serializada deve ser ""
+    E nenhum filtro deve estar ativo
+
+  Cenário: pills diferentes acumulam em vez de se substituírem
+    Dado que a URL do feed é ""
+    Quando eu interpreto os filtros do feed
+    E eu alterno o valor "SegundoTurno" no filtro "workShifts"
+    E eu alterno o valor "Producao" no filtro "areas"
+    E eu alterno o valor "Fretado" no filtro "benefits"
+    Então devem estar ativos 3 filtros

@@ -1,0 +1,60 @@
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex: 0 0 auto;
+  padding: 7px 12px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-pill);
+  background: var(--card-bg);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 0.8125rem;
+  font-weight: 550;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    border-color 140ms ease,
+    background 140ms ease;
+}
+
+.pill:hover {
+  background: var(--surface-hover);
+}
+
+.pill:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+/* Filtro em uso ganha contorno e fundo próprios: o utilizador tem de saber o que está a estreitar
+   o resultado sem abrir cada pill. */
+.pill[data-active] {
+  border-color: var(--brand);
+  background: var(--brand-soft);
+}
+
+.count {
+  display: grid;
+  place-items: center;
+  min-width: 17px;
+  height: 17px;
+  padding: 0 5px;
+  border-radius: var(--radius-pill);
+  background: var(--brand);
+  color: var(--brand-on);
+  font-size: 0.6875rem;
+  font-weight: 700;
+}
+
+.chevron {
+  width: 14px;
+  height: 14px;
+  opacity: 0.6;
+}
+
+.panel {
+  /* O grupo de opções traz o seu próprio espaçamento interno. */
+  width: min(19rem, calc(100vw - 32px));
+  padding: 4px 14px;
+}

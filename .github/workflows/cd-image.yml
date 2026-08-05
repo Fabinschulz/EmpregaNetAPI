@@ -1,0 +1,136 @@
+name: CD - Imagem para ECR
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        description: GitHub Environment de onde vêm vars/secrets.
+        required: true
+        type: string
+      publish_artifact_name:
+        required: true
+        type: string
+      version:
+        required: true
+        type: string
+      ecr_repository:
+        required: false
+        type: string
+        default: empreganet-api
+    outputs:
+      image_uri:
+        value: ${{ jobs.push.outputs.image_uri }}
+      image_tag:
+        value: ${{ jobs.push.outputs.image_tag }}
+      ecr_registry:
+        value: ${{ jobs.push.outputs.ecr_registry }}
+    secrets:
+      AWS_ACCESS_KEY_ID:
+        required: false
+      AWS_SECRET_ACCESS_KEY:
+        required: false
+
+permissions: {}
+
+jobs:
+  push:
+    name: Build e push
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment: ${{ inputs.environment }}
+
+    permissions:
+      contents: read
+      id-token: write # necessário para o caminho OIDC do aws-auth
+
+    outputs:
+      image_uri: ${{ steps.meta.outputs.image_uri }}
+      image_tag: ${{ steps.meta.outputs.image_tag }}
+      ecr_registry: ${{ steps.login-ecr.outputs.registry }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Baixar publish do CI
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ inputs.publish_artifact_name }}
+          path: image-context/publish
+
+      - name: Autenticar na AWS
+        uses: ./.github/actions/aws-auth
+        with:
+          aws-region: ${{ vars.AWS_REGION }}
+          role-arn: ${{ vars.AWS_ROLE_ARN }}
+          access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - name: Login no ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Montar tags
+        id: meta
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          REPOSITORY: ${{ inputs.ecr_repository }}
+        run: |
+          TAG="sha-${GITHUB_SHA::12}"
+          {
+            echo "image_tag=$TAG"
+            echo "image_uri=$REGISTRY/$REPOSITORY:$TAG"
+            echo "image_uri_latest=$REGISTRY/$REPOSITORY:latest"
+            echo "image_uri_version=$REGISTRY/$REPOSITORY:v${{ inputs.version }}"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Setup Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build e push
+        uses: docker/build-push-action@v6
+        with:
+          context: image-context
+          file: backend/Dockerfile
+          target: prebuilt
+          platforms: linux/amd64
+          push: true
+          provenance: false
+          tags: |
+            ${{ steps.meta.outputs.image_uri }}
+            ${{ steps.meta.outputs.image_uri_version }}
+            ${{ steps.meta.outputs.image_uri_latest }}
+          labels: |
+            org.opencontainers.image.revision=${{ github.sha }}
+            org.opencontainers.image.version=${{ inputs.version }}
+            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+            org.opencontainers.image.created=${{ github.event.repository.updated_at }}
+          cache-from: type=gha,scope=empreganet-api
+          cache-to: type=gha,scope=empreganet-api,mode=max
+
+
+      - name: Verificar integridade no registro
+        env:
+          REPOSITORY: ${{ inputs.ecr_repository }}
+          TAG: ${{ steps.meta.outputs.image_tag }}
+        run: |
+          DIGEST="$(aws ecr describe-images \
+            --repository-name "$REPOSITORY" \
+            --image-ids imageTag="$TAG" \
+            --query 'imageDetails[0].imageDigest' \
+            --output text)"
+
+          if [ -z "$DIGEST" ] || [ "$DIGEST" = "None" ]; then
+            echo "::error title=Imagem ausente no ECR::Tag $TAG não encontrada após o push."
+            exit 1
+          fi
+
+          {
+            echo "### Imagem publicada"
+            echo ""
+            echo "| Campo | Valor |"
+            echo "| --- | --- |"
+            echo "| Tag imutável | \`$TAG\` |"
+            echo "| Digest | \`$DIGEST\` |"
+            echo "| Versão | \`${{ inputs.version }}\` |"
+          } >> "$GITHUB_STEP_SUMMARY"

@@ -1,0 +1,324 @@
+name: CD - Deploy EC2
+
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        description: GitHub Environment (Develop / Homolog / Production).
+        required: true
+        type: string
+      aspnetcore_environment:
+        description: Valor de ASPNETCORE_ENVIRONMENT dentro do container.
+        required: true
+        type: string
+      image_uri:
+        description: URI com tag imutável.
+        required: true
+        type: string
+      image_tag:
+        required: true
+        type: string
+      ecr_registry:
+        required: true
+        type: string
+    secrets:
+      AWS_ACCESS_KEY_ID:
+        required: false
+      AWS_SECRET_ACCESS_KEY:
+        required: false
+      DB_USERNAME:
+        required: true
+      DB_PASSWORD:
+        required: true
+      JWT_SECRET_KEY:
+        required: true
+      SEED_ADMIN_PASSWORD:
+        required: false
+      SMTP_USERNAME:
+        required: false
+      SMTP_PASSWORD:
+        required: false
+      SENTRY_DSN:
+        required: false
+      REDIS_HOST:
+        required: false
+      OPENAI_API_KEY:
+        required: false
+
+permissions: {}
+
+jobs:
+  config:
+    name: Publicar configuração cifrada
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: ${{ inputs.environment }}
+    permissions:
+      contents: read
+      id-token: write
+
+    outputs:
+      api_env_param: ${{ steps.params.outputs.api_env_param }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Definir nomes dos parâmetros
+        id: params
+        run: |
+          PREFIX="/empreganet/${{ inputs.environment }}"
+          echo "api_env_param=$PREFIX/api-env" >> "$GITHUB_OUTPUT"
+
+
+      - name: Validar configuração obrigatória
+        env:
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          DB_USERNAME: ${{ secrets.DB_USERNAME }}
+          JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
+          SMTP_USERNAME: ${{ secrets.SMTP_USERNAME }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+        run: |
+          FAIL=0
+          need_secret() {
+            if [ -z "${2:-}" ]; then
+              echo "::error title=Secret ausente::$1 não está definido no Environment '${{ inputs.environment }}'."
+              FAIL=1
+            fi
+          }
+          need_var() {
+            if [ -z "${2:-}" ]; then
+              echo "::error title=Variable ausente::$1 não está definida no Environment '${{ inputs.environment }}'."
+              FAIL=1
+            fi
+          }
+
+          need_var  AWS_REGION       "${{ vars.AWS_REGION }}"
+          need_var  EC2_INSTANCE_ID  "${{ vars.EC2_INSTANCE_ID }}"
+          need_var  DB_HOST          "${{ vars.DB_HOST }}"
+          need_var  DB_NAME          "${{ vars.DB_NAME }}"
+          need_secret DB_USERNAME    "$DB_USERNAME"
+          need_secret DB_PASSWORD    "$DB_PASSWORD"
+
+          need_secret JWT_SECRET_KEY "$JWT_SECRET_KEY"
+          if [ -n "$JWT_SECRET_KEY" ]; then
+            LEN=$(printf '%s' "$JWT_SECRET_KEY" | wc -c)
+            if [ "$LEN" -lt 32 ]; then
+              echo "::error title=JWT_SECRET_KEY curta::$LEN bytes; HMAC-SHA256 exige no mínimo 32."
+              FAIL=1
+            fi
+          fi
+
+          if [ "${{ inputs.aspnetcore_environment }}" != "Development" ]; then
+            need_var CORS_ALLOWED_ORIGINS "${{ vars.CORS_ALLOWED_ORIGINS }}"
+          fi
+
+          if [ "${{ inputs.aspnetcore_environment }}" = "Production" ]; then
+            need_var SMTP_HOST       "${{ vars.SMTP_HOST }}"
+            need_var SMTP_FROM_EMAIL "${{ vars.SMTP_FROM_EMAIL }}"
+            need_secret SMTP_USERNAME "$SMTP_USERNAME"
+            need_secret SMTP_PASSWORD "$SMTP_PASSWORD"
+          fi
+
+          [ "$FAIL" -eq 0 ] || exit 1
+          echo "Configuração obrigatória presente."
+
+      - name: Montar arquivos de configuração
+        id: build-config
+        env:
+          DB_USERNAME: ${{ secrets.DB_USERNAME }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
+          SEED_ADMIN_PASSWORD: ${{ secrets.SEED_ADMIN_PASSWORD }}
+          SMTP_USERNAME: ${{ secrets.SMTP_USERNAME }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+          SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+          REDIS_HOST: ${{ secrets.REDIS_HOST }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          umask 077
+          ENV_FILE="${{ runner.temp }}/api.env"
+          : > "$ENV_FILE"
+
+          put() {
+            [ -n "${2:-}" ] || return 0
+            printf '%s=%s\n' "$1" "$2" >> "$ENV_FILE"
+          }
+          put_list() {
+            local key="$1" csv="${2:-}" i=0 item
+            [ -n "$csv" ] || return 0
+            IFS=',' read -ra ITEMS <<< "$csv"
+            for item in "${ITEMS[@]}"; do
+              item="$(printf '%s' "$item" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')"
+              [ -n "$item" ] || continue
+              printf '%s__%d=%s\n' "$key" "$i" "$item" >> "$ENV_FILE"
+              i=$((i + 1))
+            done
+          }
+
+          put ASPNETCORE_ENVIRONMENT "${{ inputs.aspnetcore_environment }}"
+          put ASPNETCORE_HTTP_PORTS  "8080"
+
+          put ConnectionStrings__PostgreSQLConnection \
+            "Host=${{ vars.DB_HOST }};Port=${{ vars.DB_PORT || '5432' }};Database=${{ vars.DB_NAME }};Username=$DB_USERNAME;Password=$DB_PASSWORD;Pooling=true;Persist Security Info=true;"
+
+          put Redis__Enabled          "${{ vars.REDIS_ENABLED || 'true' }}"
+          put Redis__ConnectionString "$REDIS_HOST:${{ vars.REDIS_PORT || '6379' }}"
+          put Redis__InstanceName     "${{ vars.REDIS_INSTANCE_NAME || 'EmpregaNet:' }}"
+
+          put JwtSettings__SecretKey                  "$JWT_SECRET_KEY"
+          put JwtSettings__Issuer                     "${{ vars.JWT_ISSUER }}"
+          put JwtSettings__Audience                   "${{ vars.JWT_AUDIENCE }}"
+          put JwtSettings__ExpirationHours            "${{ vars.JWT_EXPIRATION_HOURS }}"
+          put JwtSettings__RefreshTokenExpirationDays "${{ vars.JWT_REFRESH_TOKEN_EXPIRATION_DAYS }}"
+
+          put      AppUrls__PublicAppBaseUrl      "${{ vars.PUBLIC_APP_BASE_URL }}"
+          put      AppUrls__PasswordResetPath     "${{ vars.PASSWORD_RESET_PATH }}"
+          put      AppUrls__EmailConfirmationPath "${{ vars.EMAIL_CONFIRMATION_PATH }}"
+          put_list AppUrls__CorsAllowedOrigins    "${{ vars.CORS_ALLOWED_ORIGINS }}"
+
+          put_list GoogleAuth__ClientIds "${{ vars.GOOGLE_CLIENT_IDS }}"
+
+          put Smtp__Enabled   "${{ vars.SMTP_ENABLED || 'true' }}"
+          put Smtp__Host      "${{ vars.SMTP_HOST }}"
+          put Smtp__Port      "${{ vars.SMTP_PORT }}"
+          put Smtp__Security  "${{ vars.SMTP_SECURITY }}"
+          put Smtp__FromEmail "${{ vars.SMTP_FROM_EMAIL }}"
+          put Smtp__FromName  "${{ vars.SMTP_FROM_NAME }}"
+          put Smtp__UserName  "$SMTP_USERNAME"
+          put Smtp__Password  "$SMTP_PASSWORD"
+
+          put Seed__AdminEmail    "${{ vars.SEED_ADMIN_EMAIL }}"
+          put Seed__AdminUserName "${{ vars.SEED_ADMIN_USERNAME }}"
+          put Seed__AdminPassword "$SEED_ADMIN_PASSWORD"
+
+          put      RateLimiting__Enabled                     "${{ vars.RATE_LIMITING_ENABLED }}"
+          put      RateLimiting__BurstCapacity               "${{ vars.RATE_LIMITING_BURST_CAPACITY }}"
+          put      RateLimiting__SustainedPerPeriod          "${{ vars.RATE_LIMITING_SUSTAINED_PER_PERIOD }}"
+          put      RateLimiting__ReplenishmentPeriodInSeconds "${{ vars.RATE_LIMITING_REPLENISHMENT_PERIOD_SECONDS }}"
+          put_list RateLimiting__BypassIps                   "${{ vars.RATE_LIMITING_BYPASS_IPS }}"
+
+          put_list ForwardedHeaders__KnownProxies  "${{ vars.FORWARDED_KNOWN_PROXIES }}"
+          put_list ForwardedHeaders__KnownNetworks "${{ vars.FORWARDED_KNOWN_NETWORKS }}"
+
+          put Sentry__Dsn                          "$SENTRY_DSN"
+          put Logging__LogLevel__Default            "${{ vars.LOG_LEVEL_DEFAULT }}"
+          put OutputCache__DefaultExpirationMinutes "${{ vars.OUTPUT_CACHE_EXPIRATION_MINUTES }}"
+          put OutputCache__SizeLimitMegabytes       "${{ vars.OUTPUT_CACHE_SIZE_LIMIT_MB }}"
+          put EmailThrottle__MaxPerDay              "${{ vars.EMAIL_THROTTLE_MAX_PER_DAY }}"
+          put AllowedHosts                          "${{ vars.ALLOWED_HOSTS }}"
+
+          put OpenAI__ApiKey "$OPENAI_API_KEY"
+
+          echo "Chaves geradas: $(wc -l < "$ENV_FILE")"
+          echo "::group::Chaves de configuração (sem valores)"
+          cut -d= -f1 "$ENV_FILE" | sort
+          echo "::endgroup::"
+
+      - name: Autenticar na AWS
+        uses: ./.github/actions/aws-auth
+        with:
+          aws-region: ${{ vars.AWS_REGION }}
+          role-arn: ${{ vars.AWS_ROLE_ARN }}
+          access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - name: Depositar no Parameter Store
+        run: |
+          aws ssm put-parameter \
+            --name "${{ steps.params.outputs.api_env_param }}" \
+            --description "Configuração da API EmpregaNet (${{ inputs.environment }}) - run ${{ github.run_id }}" \
+            --type SecureString \
+            --tier Intelligent-Tiering \
+            --overwrite \
+            --value "file://${{ runner.temp }}/api.env" \
+            --output text --query Version
+
+  deploy:
+    name: Promover imagem
+    needs: config
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    environment: ${{ inputs.environment }}
+    permissions:
+      contents: read
+      id-token: write
+
+    concurrency:
+      group: deploy-ec2-${{ inputs.environment }}
+      cancel-in-progress: false
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Autenticar na AWS
+        uses: ./.github/actions/aws-auth
+        with:
+          aws-region: ${{ vars.AWS_REGION }}
+          role-arn: ${{ vars.AWS_ROLE_ARN }}
+          access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - name: Deploy via SSM
+        id: ssm
+        env:
+          AWS_REGION: ${{ vars.AWS_REGION }}
+          INSTANCE_ID: ${{ vars.EC2_INSTANCE_ID }}
+        run: |
+          set -euo pipefail
+
+          cat > "$RUNNER_TEMP/head.sh" <<EOF
+          AWS_REGION='${{ vars.AWS_REGION }}'
+          API_ENV_PARAM='${{ needs.config.outputs.api_env_param }}'
+          IMAGE_URI='${{ inputs.image_uri }}'
+          ECR_REGISTRY='${{ inputs.ecr_registry }}'
+          CONTAINER='${{ vars.CONTAINER_NAME || 'empreganet-api' }}'
+          HOST_PORT='${{ vars.APP_HOST_PORT || '80' }}'
+          CANARY_PORT='${{ vars.CANARY_HOST_PORT || '8081' }}'
+          CANARY_TIMEOUT='${{ vars.CANARY_TIMEOUT_SECONDS || '300' }}'
+          PROMOTE_TIMEOUT='${{ vars.PROMOTE_TIMEOUT_SECONDS || '120' }}'
+          STOP_GRACE='${{ vars.STOP_GRACE_SECONDS || '30' }}'
+          EOF
+
+          cat "$RUNNER_TEMP/head.sh" .github/scripts/deploy-container.sh \
+            > "$RUNNER_TEMP/deploy.sh"
+
+          SSM_TIMEOUT=$(( ${{ vars.CANARY_TIMEOUT_SECONDS || '300' }} \
+                        + ${{ vars.PROMOTE_TIMEOUT_SECONDS || '120' }} * 2 \
+                        + 300 ))
+
+          jq -n --arg s "$(cat "$RUNNER_TEMP/deploy.sh")" \
+                --arg t "$SSM_TIMEOUT" \
+            '{commands: [$s], executionTimeout: [$t]}' > "$RUNNER_TEMP/params.json"
+
+          CMD_ID="$(aws ssm send-command \
+            --instance-ids "$INSTANCE_ID" \
+            --document-name AWS-RunShellScript \
+            --comment "Deploy ${{ inputs.image_tag }} (run ${{ github.run_id }})" \
+            --parameters "file://$RUNNER_TEMP/params.json" \
+            --query Command.CommandId --output text)"
+
+          echo "command_id=$CMD_ID" >> "$GITHUB_OUTPUT"
+          echo "CommandId: $CMD_ID"
+
+          bash .github/scripts/wait-ssm-command.sh "$CMD_ID" "$INSTANCE_ID" "$AWS_REGION" "$SSM_TIMEOUT"
+
+      - name: Resumo
+        if: always()
+        run: |
+          {
+            echo "### Deploy - ${{ inputs.environment }}"
+            echo ""
+            echo "| Campo | Valor |"
+            echo "| --- | --- |"
+            echo "| Resultado | \`${{ steps.ssm.outcome }}\` |"
+            echo "| Imagem | \`${{ inputs.image_uri }}\` |"
+            echo "| ASPNETCORE_ENVIRONMENT | \`${{ inputs.aspnetcore_environment }}\` |"
+            echo "| SSM CommandId | \`${{ steps.ssm.outputs.command_id }}\` |"
+            echo ""
+            echo "Migrações pendentes são aplicadas pelo canário, no boot da aplicação."
+            echo "Se este release contém rename ou drop de coluna, o rollback automático"
+            echo "não restaura o serviço, o schema fica à frente da imagem anterior."
+          } >> "$GITHUB_STEP_SUMMARY"

@@ -1,43 +1,9 @@
-/* ---- Painel lateral (desktop) ------------------------------------------------------------ */
-
-.panel {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  padding: 16px;
-  background: var(--card-bg);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-
-  /* Acompanha o scroll do feed: os filtros continuam ao alcance depois de descer a lista.
-     O `top` desce o suficiente para não ficar sob a barra de busca fixa. */
-  position: sticky;
-  top: 84px;
-  max-height: calc(100vh - 104px);
-  overflow-y: auto;
-  overscroll-behavior: contain;
-}
-
-.panelHeader {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  padding-bottom: 8px;
-  border-bottom: 1px solid var(--border);
-}
-
+/* Título da gaveta. O painel lateral saiu na migração para pills. */
 .panelTitle {
   margin: 0;
   font-size: 0.9375rem;
   font-weight: 650;
   color: var(--text);
-}
-
-@media (max-width: 1024px) {
-  .panel {
-    display: none;
-  }
 }
 
 /* ---- Campos ------------------------------------------------------------------------------ */
@@ -47,19 +13,10 @@
   flex-direction: column;
 }
 
-/* Grupos, legendas e opções vivem agora em `shared/components/form-fields/choice-group`. */
-
-/* ---- Gaveta (mobile) --------------------------------------------------------------------- */
-
 .drawerTrigger {
-  display: none;
+  display: inline-flex;
+  flex: 0 0 auto;
   gap: 6px;
-}
-
-@media (max-width: 1024px) {
-  .drawerTrigger {
-    display: inline-flex;
-  }
 }
 
 .drawerCount {

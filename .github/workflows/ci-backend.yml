@@ -1,0 +1,163 @@
+name: CI - Backend
+
+on:
+  workflow_call:
+    inputs:
+      solution_file:
+        required: true
+        type: string
+      api_project:
+        description: .csproj publicado na imagem.
+        required: true
+        type: string
+      tests_project:
+        required: true
+        type: string
+      migrations_project:
+        required: true
+        type: string
+      publish_artifact_name:
+        required: false
+        type: string
+        default: api-publish
+      dotnet_version:
+        required: false
+        type: string
+        default: "10.x"
+    outputs:
+      version:
+        value: ${{ jobs.build-test.outputs.version }}
+      publish_artifact_name:
+        value: ${{ inputs.publish_artifact_name }}
+
+permissions: {}
+
+jobs:
+  build-test:
+    name: Build, testes e publish
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: ./.github/actions/dotnet-setup
+        with:
+          dotnet-version: ${{ inputs.dotnet_version }}
+          cache-prefix: nuget-backend
+
+      - name: Calcular versão
+        id: version
+        run: |
+          VERSION="1.0.${{ github.run_number }}"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "Versão: $VERSION+${GITHUB_SHA::7}"
+
+      - name: Restore
+        run: dotnet restore "${{ inputs.solution_file }}"
+
+      - name: Build (Release)
+        run: |
+          dotnet build "${{ inputs.solution_file }}" \
+            --configuration Release \
+            --no-restore \
+            -p:UseAppHost=false \
+            -p:ContinuousIntegrationBuild=true \
+            -p:Version=${{ steps.version.outputs.version }} \
+            -p:InformationalVersion=${{ steps.version.outputs.version }}+${{ github.sha }}
+
+      - name: Testes
+        run: |
+          dotnet test "${{ inputs.tests_project }}" \
+            --configuration Release \
+            --no-build \
+            --logger "trx;LogFileName=test-results.trx" \
+            --logger "console;verbosity=minimal" \
+            --results-directory "${{ runner.temp }}/test-results" \
+            --collect:"XPlat Code Coverage"
+
+      - name: Publicar resultado dos testes
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-backend
+          path: ${{ runner.temp }}/test-results
+          retention-days: 7
+          if-no-files-found: warn
+
+      - name: Publish da API
+        run: |
+          dotnet publish "${{ inputs.api_project }}" \
+            --configuration Release \
+            --no-build \
+            -p:UseAppHost=false \
+            -o "${{ runner.temp }}/publish"
+
+      - name: Empacotar publish
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ inputs.publish_artifact_name }}
+          path: ${{ runner.temp }}/publish
+          retention-days: 5
+          if-no-files-found: error
+
+  migrations-script:
+    name: Script idempotente de migrações
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: ./.github/actions/dotnet-setup
+        with:
+          dotnet-version: ${{ inputs.dotnet_version }}
+          cache-prefix: nuget-backend
+
+      - name: Instalar dotnet-ef
+        run: dotnet tool install --global dotnet-ef --version 10.*
+
+      # `migrations script` é offline: não abre conexão, só precisa de uma
+      # connection string sintaticamente válida para instanciar o provider.
+      # O valor abaixo é descartável e não corresponde a banco nenhum.
+      - name: Gerar script
+        env:
+          ConnectionStrings__PostgreSQLConnection: "Host=localhost;Port=5432;Database=schema_only;Username=none;Password=none;"
+        run: |
+          dotnet ef migrations script \
+            --idempotent \
+            --configuration Release \
+            --project "${{ inputs.migrations_project }}" \
+            --startup-project "${{ inputs.api_project }}" \
+            --output "${{ runner.temp }}/migrations.sql"
+
+      - name: Resumir delta de schema
+        run: |
+          LINES=$(wc -l < "${{ runner.temp }}/migrations.sql")
+          {
+            echo "### Migrações"
+            echo ""
+            echo "Script idempotente gerado: **$LINES linhas**."
+            echo ""
+            echo "O script é seguro para reaplicar: cada migração é envolvida em"
+            echo "um teste contra \`__EFMigrationsHistory\`."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Empacotar script
+        uses: actions/upload-artifact@v4
+        with:
+          name: migrations-sql
+          path: ${{ runner.temp }}/migrations.sql
+          retention-days: 30
+          if-no-files-found: error

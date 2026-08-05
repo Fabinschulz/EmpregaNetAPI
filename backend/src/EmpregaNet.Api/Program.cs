@@ -19,10 +19,10 @@ builder.RegisterCoreDependencies();
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment() || app.Environment.IsStaging())
-{
-    app.ApplyPendingMigrations();
-}
+// if (app.Environment.IsDevelopment() || app.Environment.IsStaging())
+// {
+app.ApplyPendingMigrations();
+// }
 
 await IdentityDataSeeder.SeedAsync(app);
 

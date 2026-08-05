@@ -6,23 +6,21 @@ export function JobCardSkeleton() {
     <div className={styles.card} aria-hidden>
       <div className={styles.skeletonHeader}>
         <Skeleton className={styles.avatar} />
-        <div className={styles.skeletonHeaderText}>
-          <Skeleton className={styles.skeletonLine} style={{ height: 14, width: '38%' }} />
-          <Skeleton className={styles.skeletonLine} style={{ height: 12, width: '24%' }} />
-        </div>
+        <Skeleton className={styles.skeletonLine} style={{ height: 12, width: '28%' }} />
       </div>
 
-      <Skeleton className={styles.skeletonLine} style={{ height: 20, width: '70%' }} />
-      <Skeleton className={styles.skeletonLine} style={{ height: 16, width: '32%' }} />
+      <Skeleton className={styles.skeletonLine} style={{ height: 19, width: '62%' }} />
+      <Skeleton className={styles.skeletonLine} style={{ height: 14, width: '44%' }} />
 
       <div className={styles.skeletonChips}>
-        <Skeleton className={styles.skeletonLine} style={{ height: 24, width: 92 }} />
-        <Skeleton className={styles.skeletonLine} style={{ height: 24, width: 68 }} />
-        <Skeleton className={styles.skeletonLine} style={{ height: 24, width: 76 }} />
+        <Skeleton className={styles.skeletonLine} style={{ height: 22, width: 92 }} />
+        <Skeleton className={styles.skeletonLine} style={{ height: 22, width: 68 }} />
       </div>
 
-      <Skeleton className={styles.skeletonLine} style={{ height: 14, width: '100%' }} />
-      <Skeleton className={styles.skeletonLine} style={{ height: 14, width: '82%' }} />
+      <div className={styles.skeletonChips}>
+        <Skeleton className={styles.skeletonLine} style={{ height: 20, width: 76 }} />
+        <Skeleton className={styles.skeletonLine} style={{ height: 20, width: 58 }} />
+      </div>
     </div>
   );
 }

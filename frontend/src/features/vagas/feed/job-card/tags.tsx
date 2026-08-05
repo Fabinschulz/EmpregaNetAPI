@@ -5,7 +5,7 @@ type JobCardTagsProps = {
   benefits: readonly string[];
 };
 
-const MAX_VISIBLE = 5;
+const MAX_VISIBLE = 3;
 
 export function JobCardTags({ requirements, benefits }: JobCardTagsProps) {
   const all = [...benefits, ...requirements];

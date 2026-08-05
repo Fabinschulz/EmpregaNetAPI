@@ -16,13 +16,14 @@ export type ChoiceOptionGroup = {
 
 type FieldsetProps = {
   legend: string;
+  legendHidden?: boolean;
   children: ReactNode;
 };
 
-function Fieldset({ legend, children }: FieldsetProps) {
+function Fieldset({ legend, legendHidden, children }: FieldsetProps) {
   return (
     <fieldset className={styles.group}>
-      <legend className={styles.legend}>{legend}</legend>
+      <legend className={legendHidden ? 'sr-only' : styles.legend}>{legend}</legend>
       {children}
     </fieldset>
   );
@@ -62,6 +63,8 @@ export type CheckboxGroupProps<T extends string> = {
   onToggle: (value: T) => void;
   /** Acima deste número de opções a lista passa a rolar em vez de esticar o container. */
   scrollAfter?: number;
+  /** Ver {@link FieldsetProps.legendHidden}. */
+  legendHidden?: boolean;
 };
 
 /**
@@ -73,12 +76,13 @@ export function CheckboxGroup<T extends string>({
   options,
   selected,
   onToggle,
-  scrollAfter
+  scrollAfter,
+  legendHidden
 }: CheckboxGroupProps<T>) {
   const isScrollable = scrollAfter !== undefined && options.length > scrollAfter;
 
   return (
-    <Fieldset legend={legend}>
+    <Fieldset legend={legend} legendHidden={legendHidden}>
       <div className={isScrollable ? styles.scroll : undefined}>
         {options.map((option) => (
           <OptionRow
@@ -101,6 +105,8 @@ export type RadioGroupProps = {
   options: readonly ChoiceOption[];
   selected: string | null;
   onSelect: (value: string | null) => void;
+  /** Ver {@link FieldsetProps.legendHidden}. */
+  legendHidden?: boolean;
 };
 
 /**
@@ -109,9 +115,9 @@ export type RadioGroupProps = {
  * Um radio nativo não desmarca; sem isto o utilizador que escolhe uma faixa salarial por
  * engano fica preso a ela até recarregar a página.
  */
-export function RadioGroup({ legend, name, options, selected, onSelect }: RadioGroupProps) {
+export function RadioGroup({ legend, name, options, selected, onSelect, legendHidden }: RadioGroupProps) {
   return (
-    <Fieldset legend={legend}>
+    <Fieldset legend={legend} legendHidden={legendHidden}>
       {options.map((option) => (
         <OptionRow
           key={option.value}
@@ -132,17 +138,19 @@ export type GroupedCheckboxesProps = {
   groups: readonly ChoiceOptionGroup[];
   selected: readonly string[];
   onToggle: (value: string) => void;
+  /** Ver {@link FieldsetProps.legendHidden}. */
+  legendHidden?: boolean;
 };
 
 /**
  * Seleção múltipla em subgrupos nomeados. O agrupamento é o que torna navegável uma lista de
  * dezenas de itens (requisitos, benefícios) que corrida ninguém percorre.
  */
-export function GroupedCheckboxes({ legend, groups, selected, onToggle }: GroupedCheckboxesProps) {
+export function GroupedCheckboxes({ legend, groups, selected, onToggle, legendHidden }: GroupedCheckboxesProps) {
   if (groups.length === 0) return null;
 
   return (
-    <Fieldset legend={legend}>
+    <Fieldset legend={legend} legendHidden={legendHidden}>
       <div className={styles.scroll}>
         {groups.map((group) => (
           <div key={group.label} className={styles.subGroup}>
