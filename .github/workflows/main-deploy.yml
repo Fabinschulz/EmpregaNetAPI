@@ -40,47 +40,16 @@ jobs:
       working_directory: frontend
       api_base_url: ${{ vars.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5225' }}
 
-  target:
-    name: Resolver alvo
-    if: github.event_name != 'pull_request'
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    permissions: {}
-    outputs:
-      environment: ${{ steps.map.outputs.environment }}
-      aspnetcore_environment: ${{ steps.map.outputs.aspnetcore_environment }}
-
-    steps:
-      - name: Mapear ambiente
-        id: map
-        env:
-          CHOSEN: ${{ inputs.environment }}
-        run: |
-          set -euo pipefail
-          ENVIRONMENT="${CHOSEN:-Develop}"
-
-          if [ "$ENVIRONMENT" = "Production" ]; then
-            ASPNET_ENV=Production
-          else
-            ASPNET_ENV=Staging
-          fi
-
-          {
-            echo "environment=$ENVIRONMENT"
-            echo "aspnetcore_environment=$ASPNET_ENV"
-          } >> "$GITHUB_OUTPUT"
-
-          echo "Alvo: $ENVIRONMENT (ASPNETCORE_ENVIRONMENT=$ASPNET_ENV)"
-
   image:
     name: CD - Imagem
-    needs: [ci-backend, target]
+    needs: ci-backend
+    if: github.event_name != 'pull_request'
     uses: ./.github/workflows/cd-image.yml
     permissions:
       contents: read
       id-token: write
     with:
-      environment: ${{ needs.target.outputs.environment }}
+      environment: ${{ inputs.environment || 'Develop' }}
       publish_artifact_name: ${{ needs.ci-backend.outputs.publish_artifact_name }}
       version: ${{ needs.ci-backend.outputs.version }}
       ecr_repository: empreganet-api
@@ -90,14 +59,15 @@ jobs:
 
   deploy:
     name: CD - Deploy EC2
-    needs: [image, target]
+    needs: image
+    if: github.event_name != 'pull_request'
     uses: ./.github/workflows/cd-ec2.yml
     permissions:
       contents: read
       id-token: write # OIDC para a AWS
     with:
-      environment: ${{ needs.target.outputs.environment }}
-      aspnetcore_environment: ${{ needs.target.outputs.aspnetcore_environment }}
+      environment: ${{ inputs.environment || 'Develop' }}
+      aspnetcore_environment: ${{ inputs.environment == 'Production' && 'Production' || 'Staging' }}
       image_uri: ${{ needs.image.outputs.image_uri }}
       image_tag: ${{ needs.image.outputs.image_tag }}
       ecr_registry: ${{ needs.image.outputs.ecr_registry }}

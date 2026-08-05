@@ -125,12 +125,12 @@ jobs:
           dotnet-version: ${{ inputs.dotnet_version }}
           cache-prefix: nuget-backend
 
+      - name: Restore
+        run: dotnet restore "${{ inputs.solution_file }}"
+
       - name: Instalar dotnet-ef
         run: dotnet tool install --global dotnet-ef --version 10.*
 
-      # `migrations script` é offline: não abre conexão, só precisa de uma
-      # connection string sintaticamente válida para instanciar o provider.
-      # O valor abaixo é descartável e não corresponde a banco nenhum.
       - name: Gerar script
         env:
           ConnectionStrings__PostgreSQLConnection: "Host=localhost;Port=5432;Database=schema_only;Username=none;Password=none;"
