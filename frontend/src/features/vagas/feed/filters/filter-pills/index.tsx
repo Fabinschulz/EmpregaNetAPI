@@ -3,12 +3,12 @@
 import { CheckboxGroup, GroupedCheckboxes, RadioGroup } from '@/components';
 import type { JobVocabularyDto } from '@/features/vagas/service';
 import {
-    PUBLISHED_WITHIN_OPTIONS,
-    SALARY_RANGE_OPTIONS,
-    experienceLevelVocabulary,
-    jobAreaVocabulary,
-    workShiftVocabulary,
-    type PublishedWithinValue
+  PUBLISHED_WITHIN_OPTIONS,
+  SALARY_RANGE_OPTIONS,
+  experienceLevelVocabulary,
+  jobAreaVocabulary,
+  workShiftVocabulary,
+  type PublishedWithinValue
 } from '@/shared/schema';
 import { FilterPill, TogglePill } from '../filter-pill';
 import { FeedFiltersDrawer } from '../filters-drawer';
