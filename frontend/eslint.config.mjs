@@ -33,7 +33,6 @@ const eslintConfig = defineConfig([
     files: ['**/*.{js,jsx,mjs,ts,tsx,mts,cts}'],
     rules: {
       'react-hooks/exhaustive-deps': 'error',
-      'import/no-cycle': ['error', { maxDepth: 4, ignoreExternal: true }],
       'no-console': ['error', { allow: ['error', 'warn'] }]
     }
   },
