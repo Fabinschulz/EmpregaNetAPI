@@ -1,30 +1,28 @@
-/* Grupo de escolha (checkbox/radio) usado em painéis de filtro e formulários simples.
-   Migrado de `features/vagas/feed/feed-filters.module.scss` ao virar componente compartilhado. */
-
 .group {
   margin: 0;
-  padding: 12px 0;
+  padding: 0;
   border: 0;
-  border-bottom: 1px solid var(--border);
-}
-
-.group:last-child {
-  border-bottom: 0;
+  min-width: 0;
 }
 
 .legend {
-  padding: 0 0 6px;
+  padding: 0 0 8px;
   font-size: 0.8125rem;
   font-weight: 650;
   color: var(--text);
 }
 
-/* Grupos longos (áreas, estados) rolam em vez de esticar o painel até o infinito. */
 .scroll {
-  max-height: 196px;
+  max-height: 17rem;
   overflow-y: auto;
   overscroll-behavior: contain;
-  padding-right: 4px;
+  padding: 4px;
+}
+
+.columns {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(13rem, 1fr));
+  gap: 2px 10px;
 }
 
 .subGroup + .subGroup {
@@ -45,17 +43,98 @@
 .option {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 5px 0;
+  gap: 10px;
+  min-height: 44px;
+
+  padding: 6px 10px;
+  border-radius: var(--radius);
   font-size: 0.875rem;
+  line-height: 1.35;
   color: var(--text);
   cursor: pointer;
+  transition:
+    background 140ms ease,
+    color 140ms ease;
+}
+
+.option:hover {
+  background: var(--surface-hover);
+}
+
+.option:has(.control:checked) {
+  background: var(--brand-soft);
+  font-weight: 600;
+}
+
+.option:has(.control:focus-visible) {
+  box-shadow: var(--focus-ring);
+}
+
+.option:has(.control:focus-visible) .control {
+  outline: none;
+}
+
+.optionLabel {
+  min-width: 0;
 }
 
 .control {
-  width: 16px;
-  height: 16px;
+  width: 18px;
+  height: 18px;
   flex: 0 0 auto;
   accent-color: var(--brand);
   cursor: pointer;
+}
+
+.search {
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.searchIcon {
+  position: absolute;
+  left: 10px;
+  width: 15px;
+  height: 15px;
+  color: var(--muted);
+  pointer-events: none;
+}
+
+.searchInput {
+  width: 100%;
+  min-height: 40px;
+  padding: 0 10px 0 32px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 0.8125rem;
+}
+
+.searchInput::placeholder {
+  color: var(--muted);
+}
+
+.searchInput:focus-visible {
+  outline: none;
+  border-color: var(--brand);
+  box-shadow: var(--focus-ring);
+}
+
+.empty {
+  margin: 4px 0 8px;
+  padding: 12px;
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--muted);
+  font-size: 0.8125rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .option {
+    transition: none;
+  }
 }

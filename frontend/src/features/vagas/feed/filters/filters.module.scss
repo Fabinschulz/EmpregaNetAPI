@@ -1,12 +1,11 @@
-/* Título da gaveta. O painel lateral saiu na migração para pills. */
+/* Gaveta de filtros: folha inferior no telemóvel, diálogo centrado a partir do tablet. */
+
 .panelTitle {
   margin: 0;
-  font-size: 0.9375rem;
-  font-weight: 650;
+  font-size: 1.0625rem;
+  font-weight: 700;
   color: var(--text);
 }
-
-/* ---- Campos ------------------------------------------------------------------------------ */
 
 .form {
   display: flex;
@@ -40,16 +39,15 @@
   animation: overlay-in 160ms ease-out;
 }
 
+/* ---- Estrutura da gaveta ----------------------------------------------------------------- */
+
 .drawer {
   position: fixed;
   z-index: 51;
   inset: auto 0 0 0;
   display: flex;
   flex-direction: column;
-
-  /* Não ocupa a tela toda de propósito: a faixa de conteúdo visível acima da gaveta lembra
-     que os resultados estão a atualizar enquanto os filtros mudam. */
-  max-height: 86vh;
+  max-height: 88vh;
 
   background: var(--panel);
   border-top-left-radius: var(--radius-xl);
@@ -59,36 +57,177 @@
   animation: drawer-in 220ms cubic-bezier(0.32, 0.72, 0, 1);
 }
 
+.drawerGrabber {
+  width: 36px;
+  height: 4px;
+  margin: 8px auto 0;
+  border-radius: var(--radius-pill);
+  background: var(--border-strong);
+}
+
 .drawerHeader {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  padding: 14px 16px;
+  padding: 12px 16px 14px;
   border-bottom: 1px solid var(--border);
+}
+
+.drawerHeading {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.drawerSubtitle {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.8125rem;
 }
 
 .drawerBody {
   flex: 1;
   overflow-y: auto;
   overscroll-behavior: contain;
-  padding: 0 16px;
+  padding: 4px 12px;
 }
 
 .drawerFooter {
   display: flex;
   gap: 8px;
   padding: 12px 16px;
-
-  /* Respeita a área segura do iOS: sem isto o botão fica sob a barra de gestos. */
   padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
 
   border-top: 1px solid var(--border);
   background: var(--panel);
 }
 
-.drawerFooter > * {
+.drawerClear,
+.drawerSubmit {
   flex: 1;
+}
+
+.drawerLiveStatus {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+.pcdRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 44px;
+  margin: 8px 8px 4px;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  cursor: pointer;
+  transition:
+    background 140ms ease,
+    border-color 140ms ease;
+}
+
+.pcdRow:hover {
+  background: var(--surface-hover);
+}
+
+.pcdRow:has(.pcdControl:checked) {
+  border-color: var(--brand);
+  background: var(--brand-soft);
+}
+
+.pcdRow:has(.pcdControl:focus-visible) {
+  box-shadow: var(--focus-ring);
+}
+
+.pcdRow:has(.pcdControl:focus-visible) .pcdControl {
+  outline: none;
+}
+
+.pcdControl {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 auto;
+  accent-color: var(--brand);
+  cursor: pointer;
+}
+
+.pcdIcon {
+  width: 20px;
+  height: 20px;
+  flex: 0 0 auto;
+  color: var(--muted);
+}
+
+.pcdText {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.pcdTitle {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.pcdHint {
+  color: var(--muted);
+  font-size: 0.75rem;
+}
+
+/* ---- Diálogo centrado (tablet e desktop) ------------------------------------------------- */
+
+@media (min-width: 48rem) {
+  .drawer {
+    inset: auto;
+    top: 50%;
+    left: 50%;
+    width: min(46rem, calc(100vw - 3rem));
+    max-height: min(86vh, 46rem);
+
+    transform: translate(-50%, -50%);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
+    animation: dialog-in 180ms cubic-bezier(0.32, 0.72, 0, 1);
+  }
+
+  .drawerGrabber {
+    display: none;
+  }
+
+  .drawerBody {
+    padding: 4px 20px;
+  }
+
+  .drawerHeader,
+  .drawerFooter {
+    padding-inline: 20px;
+  }
+
+  .drawerFooter {
+    justify-content: space-between;
+  }
+
+  .drawerClear {
+    flex: 0 0 auto;
+  }
+
+  .drawerSubmit {
+    flex: 0 0 auto;
+    min-width: 12rem;
+  }
 }
 
 @keyframes overlay-in {
@@ -106,5 +245,29 @@
   }
   to {
     transform: none;
+  }
+}
+
+/* A entrada do diálogo tem de repor o translate de centragem, senão a animação
+   desloca o painel para fora do centro no primeiro frame. */
+@keyframes dialog-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .overlay,
+  .drawer {
+    animation: none;
+  }
+
+  .pcdRow {
+    transition: none;
   }
 }

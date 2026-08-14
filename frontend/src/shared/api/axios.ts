@@ -1,21 +1,11 @@
-import { getPublicEnv } from '@/utils';
 import axios, { type AxiosInstance, type AxiosRequestConfig } from 'axios';
-import * as Qs from 'qs';
 import { attachAxiosAuthInterceptor } from './axios-auth';
+import { buildAxiosParams } from './axios-base';
 
 let instance: AxiosInstance | null = null;
 
 const createAxiosInstance = async () => {
-  const { NEXT_PUBLIC_API_BASE_URL } = getPublicEnv();
-
-  const axiosParams: AxiosRequestConfig = {
-    baseURL: NEXT_PUBLIC_API_BASE_URL,
-    responseType: 'json' as const,
-    withCredentials: true,
-    paramsSerializer: (params: unknown) => Qs.stringify(params as Record<string, unknown>, { arrayFormat: 'repeat' })
-  };
-
-  const created = axios.create(axiosParams);
+  const created = axios.create(buildAxiosParams());
   attachAxiosAuthInterceptor(created);
   return created;
 };

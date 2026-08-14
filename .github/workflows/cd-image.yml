@@ -34,7 +34,7 @@ permissions: {}
 
 jobs:
   push:
-    name: Build e push
+    name: Deploy ECR
     runs-on: ubuntu-latest
     timeout-minutes: 20
     environment: ${{ inputs.environment }}

@@ -104,7 +104,7 @@ public static class DependencyInjection
             .AddCheck<DatabaseCheck>("Database", tags: [HealthCheckConfig.ReadinessTag]);
 
         if (RedisOptions.Resolve(configuration).IsActive)
-            healthChecks.AddCheck<RedisHealthCheck>("Redis", tags: [HealthCheckConfig.ReadinessTag]);
+            healthChecks.AddCheck<RedisHealthCheck>("Redis");
 
         return services;
     }

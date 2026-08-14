@@ -2,6 +2,8 @@
 
 .popoverContent {
   padding: 0;
+  width: var(--radix-popover-trigger-width);
+  min-width: 240px;
 }
 
 .field {

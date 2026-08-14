@@ -21,7 +21,8 @@ type FeedFilterPillsProps = {
   totalItems: number;
 };
 
-const SCROLL_AFTER = 8;
+const SCROLL_AFTER = 6;
+const SEARCH_AFTER = 10;
 
 export function FeedFilterPills({ controller, vocabulary, totalItems }: FeedFilterPillsProps) {
   const { filters, toggleFilterValue, updateFilters } = controller;
@@ -67,6 +68,7 @@ export function FeedFilterPills({ controller, vocabulary, totalItems }: FeedFilt
           selected={filters.areas}
           onToggle={(value) => toggleFilterValue('areas', value)}
           scrollAfter={SCROLL_AFTER}
+          searchAfter={SEARCH_AFTER}
         />
       </FilterPill>
 
@@ -77,6 +79,8 @@ export function FeedFilterPills({ controller, vocabulary, totalItems }: FeedFilt
           groups={vocabulary.benefits}
           selected={filters.benefits}
           onToggle={(value) => toggleFilterValue('benefits', value)}
+          scrollAfter={SCROLL_AFTER}
+          searchAfter={SEARCH_AFTER}
         />
       </FilterPill>
 

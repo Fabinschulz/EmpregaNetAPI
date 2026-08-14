@@ -54,7 +54,6 @@
 }
 
 .panel {
-  /* O grupo de opções traz o seu próprio espaçamento interno. */
-  width: min(19rem, calc(100vw - 32px));
+  width: min(22rem, calc(100vw - 2rem));
   padding: 4px 14px;
 }

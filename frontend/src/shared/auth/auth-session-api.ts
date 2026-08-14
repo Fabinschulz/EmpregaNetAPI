@@ -1,4 +1,4 @@
-import { axiosApi } from '@/shared/api';
+import { axiosBase } from '@/shared/api';
 import { refreshTokenSchema, userLoggedSchema, type RefreshTokenDto, type UserLoggedDto } from './auth-schema';
 
 /**
@@ -7,11 +7,11 @@ import { refreshTokenSchema, userLoggedSchema, type RefreshTokenDto, type UserLo
  */
 export async function refreshToken(dto?: RefreshTokenDto): Promise<UserLoggedDto> {
   const body = dto ? refreshTokenSchema.parse(dto) : undefined;
-  const res = await axiosApi.post<unknown>('/api/auth/refresh-token', body);
+  const res = await axiosBase.post<unknown>('/api/auth/refresh-token', body);
   return userLoggedSchema.parse(res.data);
 }
 
 /** Encerra a sessão no servidor (revoga o refresh token do cookie httpOnly e limpa os cookies de auth). */
 export async function logout(): Promise<void> {
-  await axiosApi.post<unknown>('/api/auth/logout', undefined);
+  await axiosBase.post<unknown>('/api/auth/logout', undefined);
 }

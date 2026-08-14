@@ -236,7 +236,7 @@ jobs:
             --output text --query Version
 
   deploy:
-    name: Promover imagem
+    name: Deploy EC2
     needs: config
     runs-on: ubuntu-latest
     timeout-minutes: 25
