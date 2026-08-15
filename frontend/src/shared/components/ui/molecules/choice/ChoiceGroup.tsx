@@ -3,7 +3,7 @@
 import { cn } from '@/utils';
 import { Search } from 'lucide-react';
 import { useId, useMemo, useState, type ReactNode } from 'react';
-import styles from './choice-group.module.scss';
+import styles from './ChoiceGroup.module.scss';
 
 export type ChoiceOption<T extends string = string> = {
   readonly value: T;

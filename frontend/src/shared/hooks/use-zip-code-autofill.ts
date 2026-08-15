@@ -26,7 +26,7 @@ const HINTS: Record<ZipCodeAutofillStatus, string | null> = {
 /**
  * Preenche logradouro, bairro, cidade e UF automaticamente a partir do CEP (ViaCEP).
  *
- * <para>Ligue o `onZipCodeChange` ao `onFieldChange` do campo de CEP e use `hint` para dar
+ * <para>Ligue o `onZipCodeChange` ao `onChange` do campo de CEP e use `hint` para dar
  * retorno ao usuário. A consulta dispara sozinha quando o CEP fica completo (8 dígitos).</para>
  *
  * <b>Decisões de comportamento:</b>

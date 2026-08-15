@@ -1,10 +1,2 @@
-export {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectSeparator,
-  SelectTrigger,
-  SelectValue
-} from './Select';
+export * from './Select';
+export { SelectInput, type SelectInputProps, type SelectOption } from './SelectInput';

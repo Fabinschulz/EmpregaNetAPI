@@ -1,122 +1,65 @@
 'use client';
 
-import {
-  Command,
-  CommandEmpty,
-  CommandInput,
-  CommandItem,
-  CommandList,
-  Popover,
-  PopoverContent,
-  PopoverTrigger
-} from '@/components/ui';
-import { useFormContext } from '@/context';
-import { useDebouncedDraft } from '@/hooks';
-import { cn, getFieldErrorMessage } from '@/utils';
-import { Loader2, Search } from 'lucide-react';
-import * as React from 'react';
-import styles from './autocomplete.module.scss';
+import { AutocompleteInput, type AutocompleteOption } from '@/components/ui';
+import type React from 'react';
+import { FormField, useFormField, type FormFieldBaseProps } from '../field';
 
-export interface AutocompleteOption {
-  label: string;
-  value: string;
-}
-
-export interface AutocompleteFieldProps {
-  name: string;
-  label?: string;
+export type AutocompleteFieldProps = FormFieldBaseProps & {
+  options: readonly AutocompleteOption[];
   placeholder?: string;
-  options: AutocompleteOption[];
   loading?: boolean;
   debounceMs?: number;
-  className?: string;
-}
+};
 
 export const AutocompleteField: React.FC<AutocompleteFieldProps> = ({
   name,
   label,
-  placeholder = 'Buscar...',
+  required,
+  hint,
+  placeholder,
   options,
-  loading = false,
-  debounceMs = 350,
+  loading,
+  debounceMs,
+  error: errorProp,
+  disabled,
   className
 }) => {
-  const { setValue, watch, validationErrors, readOnly } = useFormContext();
-  const committed = ((watch(name) as string | undefined) ?? '').toString();
-
-  const [open, setOpen] = React.useState(false);
-
-  const commit = React.useCallback((value: string) => setValue(name, value, { shouldDirty: true }), [name, setValue]);
-
-  const {
-    draft: input,
-    setDraft: setInput,
-    commitNow
-  } = useDebouncedDraft({ value: committed, onCommit: commit, delayMs: debounceMs });
-
-  const error = getFieldErrorMessage(name, validationErrors);
-  const labelId = `${name}-label`;
-  const errorId = `${name}-error`;
-
-  const handleSelect = (option: AutocompleteOption) => {
-    commitNow(option.label);
-    setOpen(false);
-  };
+  const { control, ref, value, setValue, error, ids } = useFormField<string | undefined>({
+    name,
+    error: errorProp,
+    disabled,
+    hint
+  });
 
   return (
-    <div className={cn(styles.field, className)}>
-      {label ? (
-        <span id={labelId} className={styles.label}>
-          {label}
-        </span>
-      ) : null}
-
-      <Popover open={open} onOpenChange={setOpen}>
-        <PopoverTrigger asChild>
-          <button
-            type="button"
-            disabled={!!readOnly}
-            className={styles.trigger}
-            aria-expanded={open}
-            aria-haspopup="listbox"
-            aria-labelledby={label ? labelId : undefined}
-            aria-describedby={error ? errorId : undefined}
-            data-invalid={error ? 'true' : undefined}
-          >
-            <Search className={styles.icon} size={16} aria-hidden />
-            <span className={cn(styles.triggerText, !committed && styles.triggerMuted)}>
-              {committed || placeholder}
-            </span>
-          </button>
-        </PopoverTrigger>
-        <PopoverContent align="start" className={styles.popoverContent}>
-          <Command shouldFilter={false}>
-            <CommandInput placeholder="Digite para buscar..." value={input} onValueChange={setInput} />
-            <CommandList>
-              {loading ? (
-                <div className={styles.status} role="status">
-                  <Loader2 className={styles.spinner} size={16} aria-hidden />
-                  Buscando...
-                </div>
-              ) : options.length === 0 ? (
-                <CommandEmpty>Nenhum resultado encontrado.</CommandEmpty>
-              ) : (
-                options.map((option) => (
-                  <CommandItem key={option.value} value={option.value} onSelect={() => handleSelect(option)}>
-                    {option.label}
-                  </CommandItem>
-                ))
-              )}
-            </CommandList>
-          </Command>
-        </PopoverContent>
-      </Popover>
-
-      {error ? (
-        <span id={errorId} className={styles.error} role="alert">
-          {error}
-        </span>
-      ) : null}
-    </div>
+    <FormField
+      ids={ids}
+      label={label}
+      required={required}
+      error={error}
+      hint={hint}
+      className={className}
+      labelFor={false}
+    >
+      <AutocompleteInput
+        value={value ?? ''}
+        onChange={setValue}
+        options={options}
+        placeholder={placeholder}
+        loading={loading}
+        debounceMs={debounceMs}
+        disabled={control.disabled}
+        onBlur={control.onBlur}
+        ref={ref}
+        triggerProps={{
+          id: ids.control,
+          name: control.name,
+          'aria-invalid': control.invalid,
+          'aria-labelledby': label ? ids.label : undefined,
+          'aria-describedby': control['aria-describedby'],
+          'data-testid': `autocomplete-${name}-id`
+        }}
+      />
+    </FormField>
   );
 };

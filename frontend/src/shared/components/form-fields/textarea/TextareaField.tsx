@@ -1,78 +1,44 @@
 'use client';
 
-import { Label } from '@/components';
-import { useFormContext } from '@/context';
+import { Textarea, type TextareaProps } from '@/components/ui';
 import type React from 'react';
-import { cn, getFieldErrorMessage } from '@/utils';
-import styles from './textarea.module.scss';
+import { FormField, useFormField, type FormFieldBaseProps } from '../field';
 
-export type TextareaFieldProps = Omit<React.ComponentProps<'textarea'>, 'className'> & {
-  name: string;
-  label?: string;
-  className?: string;
-  error?: string;
-  hint?: string | null;
-  onFieldChange?: (event: React.ChangeEvent<HTMLTextAreaElement>) => void;
-};
+export type TextareaFieldProps = FormFieldBaseProps &
+  Omit<TextareaProps, 'name' | 'value' | 'defaultValue' | 'invalid' | 'required'>;
 
+/** Campo multilinha ligado ao formulário. Toda a apresentação vem do {@link Textarea} da UI. */
 export const TextareaField: React.FC<TextareaFieldProps> = ({
   name,
   label,
   required,
-  placeholder,
-  rows = 4,
-  className,
-  error: errorProp,
   hint,
-  onFieldChange,
-  ...props
+  error: errorProp,
+  disabled,
+  className,
+  onChange,
+  ...textareaProps
 }) => {
-  const { register, validationErrors, readOnly } = useFormContext();
-  const fromForm = getFieldErrorMessage(name, validationErrors);
-  const errorsMessage = errorProp ?? fromForm;
-  const labelText = required && label ? `${label} *` : label;
-
-  const errorId = `${name}-error`;
-  const hintId = `${name}-hint`;
-  const describedBy = errorsMessage ? errorId : hint ? hintId : undefined;
-
-  const { ref, onChange: regOnChange, ...regRest } = register(name);
-  const { onChange: propOnChange, ...restProps } = props;
+  const { control, ref, value, setValue, error, ids } = useFormField<string | undefined>({
+    name,
+    error: errorProp,
+    disabled,
+    hint
+  });
 
   return (
-    <div className={cn(styles.field, className)}>
-      {labelText ? (
-        <Label htmlFor={name} className={styles.label}>
-          {labelText}
-        </Label>
-      ) : null}
-      <textarea
-        {...restProps}
-        {...regRest}
-        id={name}
+    <FormField ids={ids} label={label} required={required} error={error} hint={hint} className={className}>
+      <Textarea
+        {...textareaProps}
+        {...control}
         ref={ref}
-        rows={rows}
-        placeholder={placeholder}
-        disabled={!!readOnly}
-        aria-invalid={!!errorsMessage}
-        aria-describedby={describedBy}
-        className={styles.textarea}
-        required={required}
-        onChange={(e) => {
-          void regOnChange(e);
-          propOnChange?.(e);
-          onFieldChange?.(e);
+        id={ids.control}
+        value={value ?? ''}
+        onChange={(event) => {
+          setValue(event.target.value);
+          onChange?.(event);
         }}
       />
-      {errorsMessage ? (
-        <span id={errorId} className={styles.error} role="alert">
-          {errorsMessage}
-        </span>
-      ) : hint ? (
-        <span id={hintId} className={styles.hint}>
-          {hint}
-        </span>
-      ) : null}
-    </div>
+    </FormField>
   );
 };

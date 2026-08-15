@@ -5,18 +5,18 @@ import type { ReactNode } from 'react';
 import React, { createContext, useContext, useEffect, useRef, useTransition } from 'react';
 import type { DefaultValues, FieldErrors, FieldValues, FormState, Path, Resolver } from 'react-hook-form';
 import {
-  useForm,
-  useFormState,
-  type Control,
-  type FieldErrorsImpl,
-  type FieldNamesMarkedBoolean,
-  type SubmitErrorHandler,
-  type UseFormGetValues,
-  type UseFormRegister,
-  type UseFormReset,
-  type UseFormSetValue,
-  type UseFormTrigger,
-  type UseFormWatch
+    useForm,
+    useFormState,
+    type Control,
+    type FieldErrorsImpl,
+    type FieldNamesMarkedBoolean,
+    type SubmitErrorHandler,
+    type UseFormGetValues,
+    type UseFormRegister,
+    type UseFormReset,
+    type UseFormSetValue,
+    type UseFormTrigger,
+    type UseFormWatch
 } from 'react-hook-form';
 import type { ZodType } from 'zod';
 
@@ -30,7 +30,7 @@ export type FormContextProps<T extends FieldValues = FieldValues> = {
   getValues: UseFormGetValues<T>;
   formState?: FormState<T>;
   validationErrors: Partial<FieldErrorsImpl<T>> | undefined;
-  control?: Control<T>;
+  control: Control<T>;
   watch: UseFormWatch<T>;
   submitting: boolean;
   isDirty: boolean;

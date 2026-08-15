@@ -1,15 +1,7 @@
-@use '../field-base' as field;
-
-.field {
-  @include field.field-shell;
-}
-
-.label {
-  @include field.field-label;
-}
+@use '../../../../styles/control' as control;
 
 .trigger {
-  @include field.control-trigger;
+  @include control.control-trigger;
 
   justify-content: flex-start;
   gap: 8px;
@@ -60,8 +52,4 @@
   .spinner {
     animation: none;
   }
-}
-
-.error {
-  @include field.field-error;
 }

@@ -1,18 +1,28 @@
-@use '../../../form-fields/field-base' as field;
+@use '../../../../styles/control' as control;
 
-.field {
-  @include field.field-shell;
+.row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .input {
-  @include field.control-surface;
-  @include field.control-interaction;
+  @include control.control-surface;
+  @include control.control-interaction;
 }
 
-.hint {
-  @include field.field-hint;
+.adornment {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
 }
 
-.error {
-  @include field.field-error;
+.adornment:hover {
+  color: var(--text);
 }

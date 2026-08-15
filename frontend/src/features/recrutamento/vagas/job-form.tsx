@@ -59,7 +59,8 @@ export function JobFormFields({ submitLabel, onClose, closeDisabled }: JobFormFi
           name="companyId"
           label="Empresa"
           options={companyOptions}
-          placeholder={companiesLoading ? 'Carregando empresas...' : 'Selecione a empresa'}
+          placeholder="Selecione a empresa"
+          loading={companiesLoading}
           required
         />
         <InputField name="title" label="Título da vaga" required />
@@ -113,13 +114,15 @@ export function JobFormFields({ submitLabel, onClose, closeDisabled }: JobFormFi
           name="requirements"
           label="Requisitos"
           options={requirementOptions}
-          placeholder={vocabularyLoading ? 'Carregando requisitos...' : 'Escolaridade, CNH, NRs, equipamentos...'}
+          placeholder="Escolaridade, CNH, NRs, equipamentos..."
+          loading={vocabularyLoading}
         />
         <MultiSelectField
           name="benefits"
           label="Benefícios"
           options={benefitOptions}
-          placeholder={vocabularyLoading ? 'Carregando benefícios...' : 'Fretado, cesta básica, plano de saúde...'}
+          placeholder="Fretado, cesta básica, plano de saúde..."
+          loading={vocabularyLoading}
         />
       </FormSection>
 

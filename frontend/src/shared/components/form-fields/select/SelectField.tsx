@@ -1,69 +1,64 @@
 'use client';
 
-import { useFormContext } from '@/context';
-import { cn, getFieldErrorMessage } from '@/utils';
+import { SelectInput, type SelectOption } from '@/components/ui';
 import type React from 'react';
-import { SelectInput, type SelectOption } from './SelectInput';
-import styles from './select.module.scss';
+import { FormField, useFormField, type FormFieldBaseProps } from '../field';
 
-export type { SelectOption };
-
-export type SelectFieldProps = {
-  name: string;
-  /** `readonly` para aceitar direto as listas `as const` do vocabulário, sem cópia intermediária. */
+export type SelectFieldProps = FormFieldBaseProps & {
   options: readonly SelectOption[];
-  label?: string;
-  required?: boolean;
   placeholder?: string;
-  className?: string;
+  /** Ver {@link import('@/components/ui').SelectInputProps.loading}. */
+  loading?: boolean;
 };
 
-/**
- * Select ligado ao `react-hook-form`: rótulo, erro de validação e escrita no formulário.
- * A composição do Radix vive em {@link SelectInput}, partilhada com superfícies sem formulário.
- */
-export const SelectField: React.FC<SelectFieldProps> = ({ name, options, required, label, placeholder, className }) => {
-  const { validationErrors, setValue, watch, readOnly } = useFormContext();
-  const errorMessage = getFieldErrorMessage(name, validationErrors);
-  const labelText = required && label ? `${label} *` : label;
-
-  const labelId = `${name}-label`;
-  const errorId = `${name}-error`;
-
-  const handleChange = (value: string) => {
-    if (options.some((option) => option.value === value)) {
-      setValue(name, value, { shouldDirty: true });
-    }
-  };
+/** Escolha única ligada ao formulário. Toda a apresentação vem do `SelectInput` da UI. */
+export const SelectField: React.FC<SelectFieldProps> = ({
+  name,
+  options,
+  required,
+  label,
+  hint,
+  placeholder,
+  loading,
+  error: errorProp,
+  disabled,
+  className
+}) => {
+  const { control, ref, value, setValue, error, ids } = useFormField<string | undefined>({
+    name,
+    error: errorProp,
+    disabled,
+    hint
+  });
 
   return (
-    <div className={cn(styles.field, className)}>
-      {labelText ? (
-        <span id={labelId} className={styles.label}>
-          {labelText}
-        </span>
-      ) : null}
-
+    <FormField
+      ids={ids}
+      label={label}
+      required={required}
+      error={error}
+      hint={hint}
+      className={className}
+      labelFor={false}
+    >
       <SelectInput
-        value={watch(name) as string | undefined}
-        onChange={handleChange}
+        value={value}
+        onChange={setValue}
         options={options}
         placeholder={placeholder}
-        disabled={!!readOnly}
+        loading={loading}
+        disabled={control.disabled}
+        onBlur={control.onBlur}
+        ref={ref}
         triggerProps={{
-          name,
-          'aria-invalid': !!errorMessage,
-          'aria-labelledby': labelText ? labelId : undefined,
-          'aria-describedby': errorMessage ? errorId : undefined,
+          id: ids.control,
+          name: control.name,
+          'aria-invalid': control.invalid,
+          'aria-labelledby': label ? ids.label : undefined,
+          'aria-describedby': control['aria-describedby'],
           'data-testid': `select-${name}-id`
         }}
       />
-
-      {errorMessage ? (
-        <span id={errorId} className={styles.error} role="alert">
-          {errorMessage}
-        </span>
-      ) : null}
-    </div>
+    </FormField>
   );
 };

@@ -1,24 +1,23 @@
 'use client';
 
 import {
-  FormActions,
-  FormGrid,
-  FormRow,
-  FormSection,
-  FormSubmitButton,
-  InputField,
-  PhoneField,
-  SelectField
+    FormActions,
+    FormGrid,
+    FormRow,
+    FormSection,
+    FormSubmitButton,
+    InputField,
+    PhoneField,
+    SelectField
 } from '@/components';
 import { useFormContext } from '@/context';
 import { useZipCodeAutofill } from '@/hooks';
-import { TYPE_OF_ACTIVITY_OPTIONS, UF_OPTIONS } from '../service';
 import { Save } from 'lucide-react';
+import { TYPE_OF_ACTIVITY_OPTIONS, UF_OPTIONS } from '../service';
 
 const ACTIVITY_OPTIONS = TYPE_OF_ACTIVITY_OPTIONS.map((o) => ({ value: o.value, label: o.label }));
 const STATE_OPTIONS = UF_OPTIONS.map((o) => ({ value: o.value, label: `${o.value} - ${o.label}` }));
 
-/** Campos de endereço deste formulário, para o preenchimento automático por CEP. */
 const ADDRESS_FIELDS = {
   zipCode: 'address.zipCode',
   street: 'address.street',
@@ -57,7 +56,7 @@ export function CompanyFormFields({ submitLabel }: CompanyFormFieldsProps) {
             autoComplete="postal-code"
             maxLength={9}
             hint={zipCodeHint}
-            onFieldChange={(event) => void onZipCodeChange(event.target.value)}
+            onChange={(event) => void onZipCodeChange(event.target.value)}
             required
           />
           <SelectField name="address.state" label="Estado (UF)" options={STATE_OPTIONS} required />

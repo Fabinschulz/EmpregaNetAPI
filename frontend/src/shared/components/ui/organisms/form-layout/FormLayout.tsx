@@ -2,7 +2,7 @@
 
 import { cn } from '@/utils';
 import type { ReactNode } from 'react';
-import styles from './form-layout.module.scss';
+import styles from './FormLayout.module.scss';
 
 type FormLayoutProps = {
   children: ReactNode;
