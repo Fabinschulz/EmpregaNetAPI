@@ -136,12 +136,12 @@ public static class RateLimiterExtensions
                 response.ContentType = "application/json";
 
     
+                // O tempo de espera legível por máquina vai no header `Retry-After`, acima.
                 var error = new DomainError
                 {
                     StatusCode = StatusCodes.Status429TooManyRequests,
                     Code = DomainErrorEnum.TOO_MANY_REQUESTS,
                     Message = $"Muitas requisições em pouco tempo. Tente novamente em {retryAfterSeconds} segundo(s).",
-                    Details = new { retryAfterSeconds },
                     CorrelationId = httpContext.Items["Correlation-ID"]?.ToString() ?? httpContext.TraceIdentifier
                 };
 

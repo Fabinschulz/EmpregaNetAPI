@@ -1,4 +1,4 @@
-import { jobsFeedFiltersToQueryString, type JobsFeedFilters } from './jobs-feed-schema';
+import { jobsFeedFiltersToQueryString, type JobsFeedFilters } from '../feed/filters/jobs-feed-filters';
 
 export const jobsFeedKeys = {
   all: ['jobs-feed'] as const,

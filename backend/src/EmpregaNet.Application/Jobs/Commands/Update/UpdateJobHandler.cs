@@ -1,7 +1,6 @@
 using EmpregaNet.Application.Auth;
 using EmpregaNet.Application.Abstraction;
 using EmpregaNet.Domain.Entities;
-using FluentValidation;
 using Microsoft.Extensions.Logging;
 using EmpregaNet.Domain.Enums;
 using EmpregaNet.Application.Jobs.ViewModel;
@@ -45,7 +44,6 @@ namespace EmpregaNet.Application.Jobs.Commands
     {
         private readonly IJobRepository _jobRepository;
         private readonly ICompanyRepository _companyRepository;
-        private readonly IValidator<UpdateCommand<UpdateJobCommand, JobViewModel>> _validator;
         private readonly ILogger<UpdateJobHandler> _logger;
         private readonly IHttpCurrentUser _httpCurrentUser;
         private readonly IJobEmployerAccess _jobEmployerAccess;
@@ -53,7 +51,6 @@ namespace EmpregaNet.Application.Jobs.Commands
 
         public UpdateJobHandler(IJobRepository jobRepository,
                                 ICompanyRepository companyRepository,
-                                IValidator<UpdateCommand<UpdateJobCommand, JobViewModel>> validator,
                                 ILogger<UpdateJobHandler> logger,
                                 IHttpCurrentUser httpCurrentUser,
                                 IJobEmployerAccess jobEmployerAccess,
@@ -61,7 +58,6 @@ namespace EmpregaNet.Application.Jobs.Commands
         {
             _jobRepository = jobRepository;
             _companyRepository = companyRepository;
-            _validator = validator;
             _logger = logger;
             _httpCurrentUser = httpCurrentUser;
             _jobEmployerAccess = jobEmployerAccess;

@@ -42,7 +42,7 @@ public sealed class CreateCompanyCommandHandler : IRequestHandler<CreateCommand<
         if (existingCompany)
         {
             throw new ValidationAppException(
-                nameof(cnpjCleaned),
+                nameof(CreateCompanyCommand.Cnpj),
                 $"Já existe uma empresa registrada com o CNPJ '{cnpjCleaned}'.",
                 DomainErrorEnum.RESOURCE_ALREADY_EXISTS);
         }

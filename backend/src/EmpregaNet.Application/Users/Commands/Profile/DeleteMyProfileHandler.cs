@@ -33,8 +33,7 @@ public sealed class DeleteMyProfileHandler : IRequestHandler<DeleteMyProfileComm
         var user = await _userManager.FindByIdAsync(_httpCurrentUser.UserId.ToString());
         if (user is null)
         {
-            throw new ValidationAppException(
-                nameof(_httpCurrentUser.UserId),
+            throw ValidationAppException.ForBusinessRule(
                 "Usuário não encontrado.",
                 DomainErrorEnum.USER_NOT_FOUND);
         }
@@ -54,7 +53,7 @@ public sealed class DeleteMyProfileHandler : IRequestHandler<DeleteMyProfileComm
         if (!result.Succeeded)
         {
             var msg = result.Errors.FirstOrDefault()?.Description ?? "Falha ao encerrar a conta.";
-            throw new ValidationAppException(nameof(request), msg, DomainErrorEnum.RESOURCE_ERROR);
+            throw ValidationAppException.ForBusinessRule(msg, DomainErrorEnum.RESOURCE_ERROR);
         }
 
         _logger.LogInformation("Usuário {UserId} solicitou exclusão da própria conta (delete).", user.Id);

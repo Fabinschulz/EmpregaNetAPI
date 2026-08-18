@@ -45,8 +45,7 @@ public sealed class GetSelectableCompaniesHandler
         var appUser = await _userManager.FindByIdAsync(_currentUser.UserId.ToString());
         if (appUser is null || appUser.IsDeleted)
         {
-            throw new ValidationAppException(
-                nameof(_currentUser.UserId),
+            throw ValidationAppException.ForBusinessRule(
                 "Usuário não encontrado.",
                 DomainErrorEnum.RESOURCE_ID_NOT_FOUND);
         }

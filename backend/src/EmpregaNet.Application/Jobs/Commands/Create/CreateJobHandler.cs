@@ -1,6 +1,5 @@
 using EmpregaNet.Application.Auth;
 using EmpregaNet.Application.Abstraction;
-using FluentValidation;
 using Microsoft.Extensions.Logging;
 using EmpregaNet.Domain.Enums;
 using EmpregaNet.Application.Common.Exceptions;
@@ -41,21 +40,18 @@ public sealed class CreateJobHandler : IRequestHandler<CreateCommand<CreateJobCo
 {
     private readonly IJobRepository _jobRepository;
     private readonly ICompanyRepository _companyRepository;
-    private readonly IValidator<CreateCommand<CreateJobCommand>> _validator;
     private readonly ILogger<CreateJobHandler> _logger;
     private readonly IHttpCurrentUser _httpCurrentUser;
     private readonly IJobEmployerAccess _jobEmployerAccess;
 
     public CreateJobHandler(IJobRepository jobRepository,
                             ICompanyRepository companyRepository,
-                            IValidator<CreateCommand<CreateJobCommand>> validator,
                             ILogger<CreateJobHandler> logger,
                             IHttpCurrentUser httpCurrentUser,
                             IJobEmployerAccess jobEmployerAccess)
     {
         _jobRepository = jobRepository;
         _companyRepository = companyRepository;
-        _validator = validator;
         _logger = logger;
         _httpCurrentUser = httpCurrentUser;
         _jobEmployerAccess = jobEmployerAccess;

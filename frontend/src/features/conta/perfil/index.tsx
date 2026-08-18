@@ -13,13 +13,8 @@ import {
   PageHeader
 } from '@/components';
 import { FormProvider } from '@/context';
-import {
-  profileFormSchema,
-  profileFormValuesFromDto,
-  useMeQuery,
-  useUpdateMyProfileMutation,
-  type ProfileFormValues
-} from '../service';
+import { useMeQuery, useUpdateMyProfileMutation } from '../service';
+import { profileFormSchema, profileFormValuesFromResponse, type ProfileFormValues } from './profile-form-schema';
 import styles from '../conta.module.scss';
 import { ProfileFormFields } from './profile-form-fields';
 
@@ -74,7 +69,7 @@ export function ProfilePage() {
                 <FormProvider
                   key={`profile-${user.id}`}
                   validationSchema={profileFormSchema}
-                  defaultValues={profileFormValuesFromDto(user)}
+                  defaultValues={profileFormValuesFromResponse(user)}
                   onSubmit={handleProfileSubmit}
                 >
                   <ProfileFormFields />

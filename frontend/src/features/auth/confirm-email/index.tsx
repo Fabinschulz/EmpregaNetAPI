@@ -5,7 +5,7 @@ import { useConfirmEmailMutation } from '../service';
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useMemo, useRef } from 'react';
 import { StandalonePageNavLink, StandalonePage } from '@/components';
-import type { ConfirmEmailDto } from './confirm-email-schema';
+import type { ConfirmEmailRequest } from '../service';
 
 export function ConfirmEmail() {
   const searchParams = useSearchParams();
@@ -13,7 +13,7 @@ export function ConfirmEmail() {
   const token = searchParams.get('token') ?? '';
   const submittedRef = useRef(false);
 
-  const payload = useMemo<ConfirmEmailDto | null>(() => {
+  const payload = useMemo<ConfirmEmailRequest | null>(() => {
     const userId = Number(userIdParam);
     if (!Number.isFinite(userId) || userId <= 0 || !token) return null;
     return { userId, token };

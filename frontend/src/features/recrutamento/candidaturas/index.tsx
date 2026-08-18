@@ -15,15 +15,19 @@ import { ApplicationStatusBadge } from '@/features/candidaturas/application-stat
 import {
   applicationStatusTransitions,
   applicationTransitionLabels,
-  defaultRecruitmentApplicationsFilter,
   parseApplicationStatus,
-  recruitmentApplicationsFilterFormSchema,
+  type ApplicationStatus
+} from '@/features/candidaturas/domain';
+import {
   useAllJobApplicationsQuery,
   useChangeApplicationStatusMutation,
   useDeleteApplicationMutation,
-  type ApplicationStatus,
-  type JobApplicationDto
+  type JobApplicationResponse
 } from '@/features/candidaturas/service';
+import {
+  defaultRecruitmentApplicationsFilter,
+  recruitmentApplicationsFilterFormSchema
+} from './recruitment-applications-filter-schema';
 import { usePersistedTablePagination } from '@/hooks';
 import { formatDate, type ListOrderByValue } from '@/shared';
 import { Ban, CheckCircle2, Eye, Flag, PlayCircle, RotateCcw, XCircle, type LucideIcon } from 'lucide-react';
@@ -61,7 +65,7 @@ export function RecruitmentApplicationsPage() {
   const { mutate: changeApplicationStatus, isPending: isChangingStatus } = useChangeApplicationStatusMutation();
   const { mutate: deleteApplication, isPending: isDeleting } = useDeleteApplicationMutation();
 
-  const { getDeleteAction, confirmDialogProps: deleteDialogProps } = useRowDeleteAction<JobApplicationDto>({
+  const { getDeleteAction, confirmDialogProps: deleteDialogProps } = useRowDeleteAction<JobApplicationResponse>({
     permission: 'jobApplication.delete',
     resource: 'candidatura',
     getId: (application) => application.id,
@@ -85,7 +89,7 @@ export function RecruitmentApplicationsPage() {
     changeApplicationStatus(pendingTransition, { onSettled: () => setPendingTransition(null) });
   }, [pendingTransition, changeApplicationStatus]);
 
-  const columns = useMemo<DataTableColumn<JobApplicationDto>[]>(
+  const columns = useMemo<DataTableColumn<JobApplicationResponse>[]>(
     () => [
       { key: 'id', header: 'Candidatura', render: (application) => <strong>#{application.id}</strong> },
       { key: 'jobId', header: 'Vaga', render: (application) => application.jobId ?? '-' },

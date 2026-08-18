@@ -3,7 +3,7 @@
 import { AutocompleteField, Button, FilterBar, FilterField, SelectField, type AutocompleteOption } from '@/components';
 import { useFormContext } from '@/context';
 import { useFilterFormSync } from '@/hooks';
-import { defaultJobsFilter, jobsFilterToParams, type JobsFilterFormValues } from '../service';
+import { defaultJobsFilter, jobsFilterToParams, type JobsFilterFormValues } from './jobs-filter-schema';
 import type { JobsListQueryParams } from '@/shared/schema';
 import { X } from 'lucide-react';
 

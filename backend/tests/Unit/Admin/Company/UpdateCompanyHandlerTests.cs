@@ -6,7 +6,6 @@ using EmpregaNet.Domain.Entities;
 using EmpregaNet.Domain.Enums;
 using EmpregaNet.Domain.Interfaces;
 using FluentAssertions;
-using FluentValidation;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 
@@ -15,13 +14,12 @@ namespace EmpregaNet.Tests.Unit.Application.Admin.CompanyHandlers;
 public sealed class UpdateCompanyHandlerTests
 {
     private readonly Mock<ICompanyRepository> _repo = new();
-    private readonly Mock<IValidator<UpdateCommand<UpdateCompanyCommand, CompanyViewModel>>> _validator = new();
 
     [Fact]
     public async Task Handle_EmpresaInexistente_DeveLancarValidationAppException()
     {
         _repo.Setup(x => x.GetByIdAsync(5L)).ReturnsAsync((Company?)null);
-        var sut = new UpdateCompanyHandler(_repo.Object, _validator.Object, NullLogger<UpdateCompanyHandler>.Instance);
+        var sut = new UpdateCompanyHandler(_repo.Object, NullLogger<UpdateCompanyHandler>.Instance);
         var cmd = new UpdateCommand<UpdateCompanyCommand, CompanyViewModel>(5, CompanyTestData.ValidUpdateCommand());
 
         var act = async () => await sut.Handle(cmd, CancellationToken.None);
@@ -46,7 +44,7 @@ public sealed class UpdateCompanyHandlerTests
         };
         EntityIdHelper.SetCompanyId(company, 5L);
         _repo.Setup(x => x.GetByIdAsync(5L)).ReturnsAsync(company);
-        var sut = new UpdateCompanyHandler(_repo.Object, _validator.Object, NullLogger<UpdateCompanyHandler>.Instance);
+        var sut = new UpdateCompanyHandler(_repo.Object, NullLogger<UpdateCompanyHandler>.Instance);
         var cmd = new UpdateCommand<UpdateCompanyCommand, CompanyViewModel>(5, CompanyTestData.ValidUpdateCommand());
 
         var act = async () => await sut.Handle(cmd, CancellationToken.None);
@@ -69,7 +67,7 @@ public sealed class UpdateCompanyHandlerTests
         };
         EntityIdHelper.SetCompanyId(company, 12L);
         _repo.Setup(x => x.GetByIdAsync(12L)).ReturnsAsync(company);
-        var sut = new UpdateCompanyHandler(_repo.Object, _validator.Object, NullLogger<UpdateCompanyHandler>.Instance);
+        var sut = new UpdateCompanyHandler(_repo.Object, NullLogger<UpdateCompanyHandler>.Instance);
         var update = CompanyTestData.ValidUpdateCommand();
         var cmd = new UpdateCommand<UpdateCompanyCommand, CompanyViewModel>(12, update);
 

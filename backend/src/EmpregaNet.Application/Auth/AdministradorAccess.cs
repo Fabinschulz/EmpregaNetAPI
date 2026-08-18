@@ -13,8 +13,7 @@ public static class AdministradorAccess
         var ctx = currentUser.GetContextUser();
         if (ctx is null)
         {
-            throw new ValidationAppException(
-                nameof(currentUser),
+            throw ValidationAppException.ForBusinessRule(
                 "Usuário autenticado não encontrado no contexto.",
                 DomainErrorEnum.MISSING_RESOURCE_PERMISSION);
         }
@@ -22,8 +21,7 @@ public static class AdministradorAccess
         var roles = ctx.UserToken.GetRoleNames();
         if (!roles.Contains(RecruitmentRoleNames.Admin, StringComparer.OrdinalIgnoreCase))
         {
-            throw new ValidationAppException(
-                nameof(currentUser),
+            throw ValidationAppException.ForBusinessRule(
                 "Apenas administradores podem executar esta operação.",
                 DomainErrorEnum.MISSING_RESOURCE_PERMISSION);
         }

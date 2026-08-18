@@ -226,10 +226,4 @@ const JOB_SORT_SET = new Set<string>(JOB_SORT_OPTIONS.map((o) => o.value));
 
 export const isJobSortValue = (value: string): value is JobSortValue => JOB_SORT_SET.has(value);
 
-/** Grupo nomeado de itens do vocabulário, na ordem em que a UI deve exibi-los. */
-export type VocabularyGroup = {
-  readonly label: string;
-  readonly items: readonly string[];
-};
-
 export const MAX_VOCABULARY_ITEMS_PER_JOB = 20;

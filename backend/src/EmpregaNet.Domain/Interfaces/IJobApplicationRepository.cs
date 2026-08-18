@@ -13,7 +13,15 @@ public interface IJobApplicationRepository : IBaseRepository<JobApplication>
         IReadOnlyCollection<long> jobIds,
         CancellationToken cancellationToken);
 
-    Task<ListDataPagination<JobApplication>> GetByJobIdAsync(
+    Task<JobApplicationProjection?> GetProjectionByIdAsync(long id, CancellationToken cancellationToken);
+
+    Task<ListDataPagination<JobApplicationProjection>> GetAllWithCandidateAsync(
+        CancellationToken cancellationToken,
+        int page,
+        int size,
+        string? orderBy = null);
+
+    Task<ListDataPagination<JobApplicationProjection>> GetByJobIdAsync(
         long jobId,
         CancellationToken cancellationToken,
         int page,
@@ -21,7 +29,7 @@ public interface IJobApplicationRepository : IBaseRepository<JobApplication>
         ApplicationStatusEnum? status = null,
         string? orderBy = null);
 
-    Task<ListDataPagination<JobApplication>> GetByUserIdAsync(
+    Task<ListDataPagination<JobApplicationProjection>> GetByUserIdAsync(
         long userId,
         CancellationToken cancellationToken,
         int page,

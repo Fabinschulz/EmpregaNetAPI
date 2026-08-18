@@ -18,14 +18,9 @@ import { formatDate } from '@/utils';
 import { Pencil, Plus } from 'lucide-react';
 import Link from 'next/link';
 import { useCallback, useMemo, useState } from 'react';
-import {
-  companiesFilterFormSchema,
-  companiesFilterToParams,
-  defaultCompaniesFilter,
-  useCompaniesListQuery,
-  useDeleteCompanyMutation,
-  type CompanyDto
-} from '../service';
+import { useCompaniesListQuery, useDeleteCompanyMutation, type CompanyResponse } from '../service';
+import { companiesFilterFormSchema, companiesFilterToParams, defaultCompaniesFilter } from './companies-filter-schema';
+import { companiesRoutes } from '../companies-routes';
 import { CompaniesFilterFields } from './companies-filter-fields';
 
 type CompaniesFilterParams = Pick<CompaniesListQueryParams, 'search' | 'isDeleted' | 'orderBy'>;
@@ -55,7 +50,7 @@ export function AdminCompaniesPage() {
   );
 
   const { mutate: deleteCompany, isPending: isDeleting } = useDeleteCompanyMutation();
-  const { getDeleteAction, confirmDialogProps } = useRowDeleteAction<CompanyDto>({
+  const { getDeleteAction, confirmDialogProps } = useRowDeleteAction<CompanyResponse>({
     permission: 'company.delete',
     resource: 'empresa',
     getId: (company) => company.id,
@@ -64,7 +59,7 @@ export function AdminCompaniesPage() {
     isDeleting
   });
 
-  const columns = useMemo<DataTableColumn<CompanyDto>[]>(
+  const columns = useMemo<DataTableColumn<CompanyResponse>[]>(
     () => [
       { key: 'name', header: 'Nome', render: (company) => <strong>{company.name}</strong> },
       { key: 'email', header: 'E-mail', render: (company) => company.email ?? '-' },
@@ -76,7 +71,7 @@ export function AdminCompaniesPage() {
         type: 'actions',
         getActions: (company) => {
           const actions: RowAction[] = [
-            { key: 'edit', label: 'Editar', icon: Pencil, href: `/admin/empresas/${company.id}` }
+            { key: 'edit', label: 'Editar', icon: Pencil, href: companiesRoutes.detail(company.id) }
           ];
 
           const deleteAction = getDeleteAction(company);
@@ -104,7 +99,7 @@ export function AdminCompaniesPage() {
           description="Gestão de empresas (Admin)."
           actions={
             <Button variant="primary" asChild>
-              <Link href="/admin/empresas/new">
+              <Link href={companiesRoutes.new}>
                 <Plus aria-hidden />
                 Nova empresa
               </Link>

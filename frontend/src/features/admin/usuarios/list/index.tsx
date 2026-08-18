@@ -13,17 +13,17 @@ import {
 } from '@/components';
 import { FormProvider } from '@/context';
 import { usePersistedTablePagination } from '@/hooks';
-import type { UserDto } from '@/shared';
+import type { UserResponse } from '@/shared';
 import { formatDate, userTypeLabel, type AdminUsersListQueryParams } from '@/shared';
 import { Eye } from 'lucide-react';
 import { useCallback, useMemo, useState } from 'react';
+import { useAdminUsersListQuery, useDeleteAdminUserMutation } from '../service';
 import {
   adminUsersFilterFormSchema,
   adminUsersFilterToParams,
-  defaultAdminUsersFilter,
-  useAdminUsersListQuery,
-  useDeleteAdminUserMutation
-} from '../service';
+  defaultAdminUsersFilter
+} from './admin-users-filter-schema';
+import { adminUsersRoutes } from '../admin-users-routes';
 import { AdminUsersFilterFields } from './admin-users-filter-fields';
 
 type AdminUsersFilterParams = Pick<AdminUsersListQueryParams, 'search' | 'isDeleted' | 'orderBy'>;
@@ -55,7 +55,7 @@ export function AdminUsersPage() {
   );
 
   const { mutate: deleteUser, isPending: isDeleting } = useDeleteAdminUserMutation();
-  const { getDeleteAction, confirmDialogProps } = useRowDeleteAction<UserDto>({
+  const { getDeleteAction, confirmDialogProps } = useRowDeleteAction<UserResponse>({
     permission: 'user.delete',
     resource: 'usuário',
     getId: (user) => user.id,
@@ -66,7 +66,7 @@ export function AdminUsersPage() {
       `O usuário "${user.username}" será marcado como excluído e perderá o acesso. O registro permanece para auditoria.`
   });
 
-  const columns = useMemo<DataTableColumn<UserDto>[]>(
+  const columns = useMemo<DataTableColumn<UserResponse>[]>(
     () => [
       { key: 'username', header: 'Usuário', render: (user) => <strong>{user.username}</strong> },
       { key: 'email', header: 'E-mail', render: (user) => user.email },
@@ -84,7 +84,7 @@ export function AdminUsersPage() {
         type: 'actions',
         getActions: (user) => {
           const actions: RowAction[] = [
-            { key: 'detail', label: 'Detalhes', icon: Eye, href: `/admin/usuarios/${user.id}` }
+            { key: 'detail', label: 'Detalhes', icon: Eye, href: adminUsersRoutes.detail(user.id) }
           ];
 
           const deleteAction = user.isDeleted ? null : getDeleteAction(user);

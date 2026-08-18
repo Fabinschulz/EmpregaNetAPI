@@ -5,7 +5,11 @@ import { useFormContext } from '@/context';
 import { USER_TYPE_OPTIONS } from '@/shared';
 import { Save } from 'lucide-react';
 
-export function AdminUserFormFields() {
+type AdminUserFormFieldsProps = {
+  backHref: string;
+};
+
+export function AdminUserFormFields({ backHref }: AdminUserFormFieldsProps) {
   const { submitting, readOnly } = useFormContext();
 
   return (
@@ -16,7 +20,7 @@ export function AdminUserFormFields() {
         options={[...USER_TYPE_OPTIONS]}
         placeholder="Selecione o tipo de usuário"
       />
-      <FormActions>
+      <FormActions backHref={backHref}>
         <FormSubmitButton variant="primary" disabled={readOnly}>
           <Save aria-hidden />
           {submitting ? 'Salvando...' : 'Salvar'}

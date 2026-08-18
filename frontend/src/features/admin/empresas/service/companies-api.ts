@@ -1,37 +1,35 @@
 import { axiosApi, createAxiosConfig } from '@/shared/api';
-import type { CompaniesListQueryParams } from '@/shared/schema';
+import { createdIdResponseSchema, type CompaniesListQueryParams, type CreatedId } from '@/shared/schema';
+import { companyRequestSchema, type CompanyRequest } from './companies-request-schema';
 import {
   companiesListResponseSchema,
-  CompanyDto,
-  companyFormSchema,
-  companyFormToApiPayload,
-  companySchema,
-  type CompaniesListResponseDto
-} from './companies-schema';
+  companyResponseSchema,
+  type CompaniesListResponse,
+  type CompanyResponse
+} from './companies-response-schema';
 
-export async function listCompanies(params?: CompaniesListQueryParams): Promise<CompaniesListResponseDto> {
+export async function listCompanies(params?: CompaniesListQueryParams): Promise<CompaniesListResponse> {
   const res = await axiosApi.get<unknown>('/api/companies', createAxiosConfig(params));
   return companiesListResponseSchema.parse(res.data);
 }
 
-export async function getCompany(id: number): Promise<CompanyDto> {
+export async function getCompany(id: number): Promise<CompanyResponse> {
   const res = await axiosApi.get<unknown>(`/api/companies/${id}`, createAxiosConfig());
-  return companySchema.parse(res.data);
+  return companyResponseSchema.parse(res.data);
 }
 
-export async function createCompany(dto: unknown): Promise<string> {
-  const body = companyFormToApiPayload(companyFormSchema.parse(dto));
-  const res = await axiosApi.post<string>('/api/companies', body, createAxiosConfig());
-  return res.data;
+export async function createCompany(request: CompanyRequest): Promise<CreatedId> {
+  const body = companyRequestSchema.parse(request);
+  const res = await axiosApi.post<unknown>('/api/companies', body, createAxiosConfig());
+  return createdIdResponseSchema.parse(res.data);
 }
 
-export async function updateCompany(id: number, dto: unknown) {
-  const body = companyFormToApiPayload(companyFormSchema.parse(dto));
+export async function updateCompany(id: number, request: CompanyRequest): Promise<CompanyResponse> {
+  const body = companyRequestSchema.parse(request);
   const res = await axiosApi.put<unknown>(`/api/companies/${id}`, body, createAxiosConfig());
-  return res.data;
+  return companyResponseSchema.parse(res.data);
 }
 
-export async function deleteCompany(id: number) {
-  const res = await axiosApi.delete<unknown>(`/api/companies/${id}`, createAxiosConfig());
-  return res.data;
+export async function deleteCompany(id: number): Promise<void> {
+  await axiosApi.delete<unknown>(`/api/companies/${id}`, createAxiosConfig());
 }

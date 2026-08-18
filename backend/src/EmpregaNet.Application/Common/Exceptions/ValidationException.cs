@@ -50,6 +50,19 @@ public class ValidationAppException : Exception
 
 
     /// <summary>
+    /// Falha que não pertence a nenhum campo do payload: regra de negócio, permissão, estado do
+    /// registo.
+    /// </summary>
+    /// <param name="errorMessage">Mensagem pronta para exibição.</param>
+    /// <param name="code">Código de erro de domínio (<see cref="DomainErrorEnum"/>).</param>
+    public static ValidationAppException ForBusinessRule(string errorMessage, DomainErrorEnum code) =>
+        new(errorMessage)
+        {
+            Code = code,
+            Errors = { [string.Empty] = [errorMessage] }
+        };
+
+    /// <summary>
     /// Inicializa uma nova instância de <see cref="ValidationAppException"/> a partir de uma lista de falhas de validação.
     /// </summary>
     /// <param name="failures">Coleção de falhas de validação (<see cref="ValidationFailure"/>).</param>

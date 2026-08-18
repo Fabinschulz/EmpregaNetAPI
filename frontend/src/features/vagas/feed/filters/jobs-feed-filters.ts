@@ -1,6 +1,5 @@
 import {
   DEFAULT_JOB_SORT,
-  createPaginatedResponseSchema,
   experienceLevelVocabulary,
   findSalaryRange,
   isJobSortValue,
@@ -18,75 +17,7 @@ import {
   type WorkModelValue,
   type WorkShiftValue
 } from '@/shared/schema';
-import { z } from 'zod';
-
-export const jobFeedCompanySchema = z.object({
-  id: z.number().int(),
-  name: z.string(),
-  logoUrl: z.string().nullable().optional()
-});
-
-export const jobFeedLocationSchema = z.object({
-  city: z.string(),
-  state: z.string(),
-  country: z.string()
-});
-
-export const jobFeedSalarySchema = z.object({
-  min: z.number().nullable().optional(),
-  max: z.number().nullable().optional(),
-  disclosed: z.boolean()
-});
-
-export const jobFeedItemSchema = z.object({
-  id: z.number().int(),
-  title: z.string().min(1),
-  summary: z.string().nullable().optional(),
-  company: jobFeedCompanySchema,
-  location: jobFeedLocationSchema,
-  salary: jobFeedSalarySchema,
-  jobType: z.string(),
-  workModel: z.string(),
-  workShift: z.string(),
-  experienceLevel: z.string(),
-  area: z.string(),
-  isPcdFriendly: z.boolean(),
-  requirements: z.array(z.string()),
-  benefits: z.array(z.string()),
-  publishedAt: z.string(),
-  applicationsCount: z.number().int().nonnegative(),
-  isActive: z.boolean()
-});
-
-export type JobFeedItemDto = z.infer<typeof jobFeedItemSchema>;
-
-export const jobsFeedResponseSchema = createPaginatedResponseSchema(jobFeedItemSchema);
-export type JobsFeedResponseDto = z.infer<typeof jobsFeedResponseSchema>;
-
-export const jobFeedInteractionsSchema = z.object({
-  appliedJobIds: z.array(z.number().int())
-});
-
-export type JobFeedInteractionsDto = z.infer<typeof jobFeedInteractionsSchema>;
-
-const vocabularyGroupSchema = z.object({
-  label: z.string(),
-  items: z.array(z.string())
-});
-
-export const jobVocabularySchema = z.object({
-  requirements: z.array(vocabularyGroupSchema),
-  benefits: z.array(vocabularyGroupSchema),
-  maxItemsPerJob: z.number().int().positive()
-});
-
-export type JobVocabularyDto = z.infer<typeof jobVocabularySchema>;
-
-export const emptyJobVocabulary: JobVocabularyDto = {
-  requirements: [],
-  benefits: [],
-  maxItemsPerJob: 20
-};
+import { JOBS_FEED_PAGE_SIZE, type JobsFeedQueryParams } from '../../service/jobs-feed-params';
 
 export type JobsFeedFilters = {
   search: string;
@@ -123,8 +54,6 @@ export const defaultJobsFeedFilters: JobsFeedFilters = {
   onlyPcd: false,
   sort: DEFAULT_JOB_SORT
 };
-
-export const JOBS_FEED_PAGE_SIZE = 20;
 
 export const JOBS_FEED_PARAM_KEYS = {
   search: 'q',
@@ -279,27 +208,6 @@ export function countActiveJobsFeedFilters(filters: JobsFeedFilters): number {
     (filters.onlyPcd ? 1 : 0)
   );
 }
-
-export type JobsFeedQueryParams = {
-  page: number;
-  size: number;
-  search?: string;
-  city?: string[];
-  state?: string[];
-  workModel?: string[];
-  shift?: string[];
-  jobType?: string[];
-  experience?: string[];
-  area?: string[];
-  requirement?: string[];
-  benefit?: string[];
-  companyId?: number[];
-  salaryMin?: number;
-  salaryMax?: number;
-  pcd?: boolean;
-  publishedWithin?: string;
-  sort?: string;
-};
 
 const omitEmpty = <T>(values: T[]): T[] | undefined => (values.length > 0 ? values : undefined);
 

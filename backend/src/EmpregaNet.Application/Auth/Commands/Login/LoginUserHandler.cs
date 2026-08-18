@@ -16,7 +16,6 @@ public sealed class LoginUserHandler : IRequestHandler<LoginUserCommand, UserLog
     private readonly SignInManager<User> _signInManager;
     private readonly IJwtBuilder _jwtBuilder;
     private readonly IRefreshTokenService _refreshTokens;
-    private readonly IValidator<LoginUserCommand> _validator;
 
     public LoginUserHandler(
         UserManager<User> userManager,
@@ -29,7 +28,6 @@ public sealed class LoginUserHandler : IRequestHandler<LoginUserCommand, UserLog
         _signInManager = signInManager;
         _jwtBuilder = jwtBuilder;
         _refreshTokens = refreshTokens;
-        _validator = validator;
     }
 
     public async Task<UserLoggedViewModel> Handle(LoginUserCommand request, CancellationToken cancellationToken)

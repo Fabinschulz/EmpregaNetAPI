@@ -73,8 +73,6 @@ O `UseOutputCache` fica depois do limitador, portanto uma resposta servida do ca
 
 Os 343 (em vez de exactamente 240) refletem a reposição de fichas a decorrer durante a janela de disparo da rajada — comportamento esperado do token bucket, não excesso de permissividade.
 
-A mesma correção foi aplicada ao projeto **OAuth** (`easymart/backend/OAuth`), que recebeu este limitador por transplante.
-
 ## Consequências
 
 **Positivas:**

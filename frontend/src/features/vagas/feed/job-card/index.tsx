@@ -1,6 +1,6 @@
 'use client';
 
-import type { JobFeedItemDto } from '@/features/vagas/service';
+import type { JobFeedItemResponse } from '@/features/vagas/service';
 import { useRelativeTime } from '@/hooks';
 import { jobAreaVocabulary } from '@/shared/schema';
 import { cn, formatSalaryRange } from '@/utils';
@@ -16,7 +16,7 @@ import { JobCardTags } from './tags';
 export { JobCardSkeleton, JobCardSkeletonList } from './skeleton';
 
 type JobCardProps = {
-  job: JobFeedItemDto;
+  job: JobFeedItemResponse;
   hasApplied?: boolean;
   position: number;
   totalItems: number;

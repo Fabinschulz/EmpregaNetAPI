@@ -28,7 +28,7 @@ public class JobApplicationsController : MainController<ApplyToJobCommand, Chang
 
     /// <summary>Candidata o utilizador autenticado a uma vaga.</summary>
     [HttpPost]
-    [ProducesResponseType(typeof(string), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(long), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(DomainError))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(DomainError))]
     [ProducesResponseType(StatusCodes.Status409Conflict, Type = typeof(DomainError))]
@@ -37,7 +37,7 @@ public class JobApplicationsController : MainController<ApplyToJobCommand, Chang
     {
         var id = await _mediator.Send(new CreateCommand<ApplyToJobCommand>(command));
         await InvalidateCacheForEntity(id);
-        return Created($"api/jobapplications/{id}", $"Candidatura criada com sucesso. ID: {id}");
+        return Created($"api/jobapplications/{id}", id);
     }
 
     /// <summary>Lista todas as candidaturas (paginação; apenas recrutamento).</summary>

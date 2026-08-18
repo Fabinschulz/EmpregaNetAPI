@@ -7,7 +7,7 @@ import {
   getSessionMetadataSnapshot,
   saveSessionMetadata,
   subscribeSessionMetadata,
-  type UserLoggedDto
+  type UserLoggedResponse
 } from '@/shared/auth';
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useSyncExternalStore } from 'react';
 
@@ -20,7 +20,7 @@ type AuthState = {
 };
 
 type AuthContextValue = AuthState & {
-  setLoggedUser: (logged: UserLoggedDto) => void;
+  setLoggedUser: (logged: UserLoggedResponse) => void;
   logout: () => Promise<void>;
 };
 
@@ -39,7 +39,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     () => false
   );
 
-  const setLoggedUser = useCallback((logged: UserLoggedDto) => {
+  const setLoggedUser = useCallback((logged: UserLoggedResponse) => {
     saveSessionMetadata({
       roles: logged.userToken.roles ?? [],
       username: logged.userToken.username ?? null,

@@ -6,16 +6,9 @@ import { Users } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useMemo } from 'react';
-import { JobFormFields } from '../job-form';
-import {
-  defaultFormJob,
-  jobFormSchema,
-  jobFormValuesFromDto,
-  useCloseJobMutation,
-  useJobQuery,
-  useUpdateJobMutation,
-  type JobFormValues
-} from '../service';
+import { JobFormFields, defaultFormJob, jobFormSchema, jobFormValuesFromResponse, type JobFormValues } from '../form';
+import { jobsRoutes } from '../jobs-routes';
+import { useCloseJobMutation, useJobQuery, useUpdateJobMutation } from '../service';
 
 export function RecruitmentEditJobPage() {
   const params = useParams<{ id: string }>();
@@ -27,7 +20,7 @@ export function RecruitmentEditJobPage() {
 
   const initial = useMemo<JobFormValues>(() => {
     if (!job) return defaultFormJob;
-    return jobFormValuesFromDto(job);
+    return jobFormValuesFromResponse(job);
   }, [job]);
 
   const handleSubmit = (formValue: JobFormValues) => update(formValue);
@@ -47,7 +40,7 @@ export function RecruitmentEditJobPage() {
           description="Atualize os dados ou encerre a vaga."
           actions={
             <Button variant="outline" asChild>
-              <Link href={`/recrutamento/vagas/${jobId}/candidatos`}>
+              <Link href={jobsRoutes.candidates(jobId)}>
                 <Users aria-hidden />
                 Ver candidatos
               </Link>
@@ -68,7 +61,12 @@ export function RecruitmentEditJobPage() {
             defaultValues={initial}
             onSubmit={handleSubmit}
           >
-            <JobFormFields submitLabel="Salvar" onClose={close} closeDisabled={isUpdating || isClosing} />
+            <JobFormFields
+              submitLabel="Salvar"
+              backHref={jobsRoutes.list}
+              onClose={close}
+              closeDisabled={isUpdating || isClosing}
+            />
           </FormProvider>
         )}
       </section>

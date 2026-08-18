@@ -1,7 +1,10 @@
 'use client';
 
 import { cn } from '@/utils';
+import { ArrowLeft } from 'lucide-react';
+import Link from 'next/link';
 import type { ReactNode } from 'react';
+import { Button } from '../../atoms/button/Button';
 import styles from './FormLayout.module.scss';
 
 type FormLayoutProps = {
@@ -34,7 +37,24 @@ export function FormSection({ title, children, className }: FormSectionProps) {
   );
 }
 
-/** Rodapé com as ações do formulário (ex.: salvar). */
-export function FormActions({ children, className }: FormLayoutProps) {
-  return <div className={cn(styles.actions, className)}>{children}</div>;
+type FormActionsProps = FormLayoutProps & {
+  backHref?: string;
+  backLabel?: string;
+};
+
+/** Rodapé com as ações do formulário. */
+export function FormActions({ children, className, backHref, backLabel = 'Voltar' }: FormActionsProps) {
+  return (
+    <div className={cn(styles.actions, className)}>
+      {backHref ? (
+        <Button type="button" variant="outline" className={styles.back} asChild>
+          <Link href={backHref}>
+            <ArrowLeft aria-hidden />
+            {backLabel}
+          </Link>
+        </Button>
+      ) : null}
+      {children}
+    </div>
+  );
 }

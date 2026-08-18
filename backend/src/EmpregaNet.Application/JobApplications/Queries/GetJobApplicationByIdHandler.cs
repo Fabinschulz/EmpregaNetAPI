@@ -31,7 +31,7 @@ public sealed class GetJobApplicationByIdHandler : IRequestHandler<GetByIdQuery<
 
         try
         {
-            var application = await _jobApplicationRepository.GetByIdAsync(request.Id, cancellationToken);
+            var application = await _jobApplicationRepository.GetProjectionByIdAsync(request.Id, cancellationToken);
             if (application is null || application.IsDeleted)
             {
                 throw new ValidationAppException(
@@ -40,10 +40,9 @@ public sealed class GetJobApplicationByIdHandler : IRequestHandler<GetByIdQuery<
                     DomainErrorEnum.RESOURCE_ID_NOT_FOUND);
             }
 
-            if (!CanSeeApplication(application.UserId))
+            if (!CanSeeApplication(application.Candidate.Id))
             {
-                throw new ValidationAppException(
-                    nameof(_httpCurrentUser.UserId),
+                throw ValidationAppException.ForBusinessRule(
                     "Você não possui permissão para visualizar esta candidatura.",
                     DomainErrorEnum.MISSING_RESOURCE_PERMISSION);
             }

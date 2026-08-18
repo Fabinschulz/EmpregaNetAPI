@@ -67,10 +67,10 @@ namespace EmpregaNet.Api.Controllers.Core
         }
 
         /// <summary>
-        /// Cria um novo recurso.
+        /// Cria um novo recurso e devolve o identificador gerado.
         /// </summary>
         [HttpPost]
-        [ProducesResponseType(typeof(string), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(long), StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(DomainError))]
         [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(DomainError))]
         [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(DomainError))]
@@ -80,9 +80,7 @@ namespace EmpregaNet.Api.Controllers.Core
         {
             var id = await _mediator.Send(new CreateCommand<TCreateCommand>(entity));
             await InvalidateCacheForEntity(id);
-            var successMessage = $"Recurso criado com sucesso. ID: {id}";
-
-            return Created($"api/{_entityName.ToLower()}/{id}", successMessage);
+            return Created($"api/{_entityName.ToLower()}/{id}", id);
         }
 
         /// <summary>

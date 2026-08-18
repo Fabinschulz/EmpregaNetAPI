@@ -1,22 +1,31 @@
 'use client';
 
+import { hasObjectPath, parseApiError, pickKnownFields } from '@/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import type { ReactNode } from 'react';
 import React, { createContext, useContext, useEffect, useRef, useTransition } from 'react';
-import type { DefaultValues, FieldErrors, FieldValues, FormState, Path, Resolver } from 'react-hook-form';
+import type {
+  DefaultValues,
+  FieldErrors,
+  FieldValues,
+  FormState,
+  Path,
+  Resolver,
+  UseFormSetError
+} from 'react-hook-form';
 import {
-    useForm,
-    useFormState,
-    type Control,
-    type FieldErrorsImpl,
-    type FieldNamesMarkedBoolean,
-    type SubmitErrorHandler,
-    type UseFormGetValues,
-    type UseFormRegister,
-    type UseFormReset,
-    type UseFormSetValue,
-    type UseFormTrigger,
-    type UseFormWatch
+  useForm,
+  useFormState,
+  type Control,
+  type FieldErrorsImpl,
+  type FieldNamesMarkedBoolean,
+  type SubmitErrorHandler,
+  type UseFormGetValues,
+  type UseFormRegister,
+  type UseFormReset,
+  type UseFormSetValue,
+  type UseFormTrigger,
+  type UseFormWatch
 } from 'react-hook-form';
 import type { ZodType } from 'zod';
 
@@ -89,6 +98,28 @@ function ChangeFieldHandlers<T extends FieldValues>({ handlers, children }: Chan
   return <>{current}</>;
 }
 
+/**
+ * Leva cada falha devolvida pela API ao campo a que pertence.
+ *
+ * <para>Só entra no `setError` o que este formulário sabe mostrar: um erro dirigido a um campo
+ * inexistente ficaria invisível ao utilizador. Esses, e os que já vêm sem campo (regra de
+ * negócio, permissão), continuam a chegar pela mensagem do topo, que a página exibe.</para>
+ */
+const applyServerFieldErrors = <T extends FieldValues>(
+  error: unknown,
+  getValues: UseFormGetValues<T>,
+  setError: UseFormSetError<T>
+) => {
+  const { fieldErrors } = parseApiError(error);
+  const values = getValues();
+
+  const known = pickKnownFields(fieldErrors, (field) => hasObjectPath(field, values));
+
+  for (const [field, message] of Object.entries(known)) {
+    setError(field as Path<T>, { type: 'server', message });
+  }
+};
+
 export interface FormProviderProps<T extends FieldValues = FieldValues> {
   children: ReactNode;
   validationSchema: ZodType<T>;
@@ -110,10 +141,12 @@ export function FormProvider<T extends FieldValues = FieldValues>({
 }: FormProviderProps<T>) {
   const [isSubmitPending, startSubmitTransition] = useTransition();
   const wasPendingRef = useRef(false);
+  const submitFailedRef = useRef(false);
 
   const {
     handleSubmit,
     setValue,
+    setError,
     getValues,
     control,
     reset,
@@ -128,7 +161,7 @@ export function FormProvider<T extends FieldValues = FieldValues>({
   });
 
   useEffect(() => {
-    if (wasPendingRef.current && !isSubmitPending) {
+    if (wasPendingRef.current && !isSubmitPending && !submitFailedRef.current) {
       reset(getValues());
     }
     wasPendingRef.current = isSubmitPending;
@@ -138,12 +171,16 @@ export function FormProvider<T extends FieldValues = FieldValues>({
   const validationErrors = Object.keys(errors ?? {}).length ? errors : undefined;
 
   const formSubmit = (values: T) => {
+    submitFailedRef.current = false;
+
     return new Promise<void>((resolve, reject) => {
       startSubmitTransition(async () => {
         try {
           await onSubmit(values);
           resolve();
         } catch (err) {
+          submitFailedRef.current = true;
+          applyServerFieldErrors(err, getValues, setError);
           reject(err);
         }
       });

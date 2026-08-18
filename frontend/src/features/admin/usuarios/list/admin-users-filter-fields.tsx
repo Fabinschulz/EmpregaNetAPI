@@ -3,7 +3,11 @@
 import { AutocompleteField, Button, FilterBar, FilterField, SelectField, type AutocompleteOption } from '@/components';
 import { useFormContext } from '@/context';
 import { useFilterFormSync } from '@/hooks';
-import { adminUsersFilterToParams, defaultAdminUsersFilter, type AdminUsersFilterFormValues } from '../service';
+import {
+  adminUsersFilterToParams,
+  defaultAdminUsersFilter,
+  type AdminUsersFilterFormValues
+} from './admin-users-filter-schema';
 import { LIST_ORDER_BY_OPTIONS, type AdminUsersListQueryParams } from '@/shared';
 import { X } from 'lucide-react';
 

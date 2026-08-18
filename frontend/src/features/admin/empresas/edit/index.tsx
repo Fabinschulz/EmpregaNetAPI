@@ -5,14 +5,14 @@ import { useParams } from 'next/navigation';
 import { Alert, ApiQueryBoundary, FormFieldsSkeleton, PageHeader } from '@/components';
 import { FormProvider } from '@/context';
 import {
+  CompanyFormFields,
   companyFormSchema,
-  companyFormValuesFromDto,
+  companyFormValuesFromResponse,
   defaultFormCompany,
-  useCompanyQuery,
-  useUpdateCompanyMutation,
   type CompanyFormValues
-} from '../service';
-import { CompanyFormFields } from '../form';
+} from '../form';
+import { companiesRoutes } from '../companies-routes';
+import { useCompanyQuery, useUpdateCompanyMutation } from '../service';
 
 export function AdminEditCompanyPage() {
   const params = useParams<{ id: string }>();
@@ -22,7 +22,7 @@ export function AdminEditCompanyPage() {
 
   const initial = useMemo<CompanyFormValues>(() => {
     if (!company) return defaultFormCompany;
-    return companyFormValuesFromDto(company);
+    return companyFormValuesFromResponse(company);
   }, [company]);
 
   const handleSubmit = async (formValue: CompanyFormValues) => await mutateAsync(formValue);
@@ -52,7 +52,7 @@ export function AdminEditCompanyPage() {
             defaultValues={initial}
             onSubmit={handleSubmit}
           >
-            <CompanyFormFields submitLabel="Salvar" />
+            <CompanyFormFields submitLabel="Salvar" backHref={companiesRoutes.list} />
           </FormProvider>
         )}
       </section>

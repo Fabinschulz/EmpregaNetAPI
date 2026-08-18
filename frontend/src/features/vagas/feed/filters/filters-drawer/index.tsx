@@ -1,7 +1,7 @@
 'use client';
 
 import { Button } from '@/components';
-import type { JobVocabularyDto } from '@/features/vagas/service';
+import type { JobVocabularyResponse } from '@/features/vagas/service';
 import * as Dialog from '@radix-ui/react-dialog';
 import { SlidersHorizontal, X } from 'lucide-react';
 import { useState } from 'react';
@@ -11,7 +11,7 @@ import type { JobsFeedFiltersController } from '../use-jobs-feed-filters';
 
 type FeedFiltersDrawerProps = {
   controller: JobsFeedFiltersController;
-  vocabulary: JobVocabularyDto;
+  vocabulary: JobVocabularyResponse;
   totalItems: number;
 };
 

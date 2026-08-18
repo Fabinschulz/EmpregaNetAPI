@@ -13,6 +13,8 @@ Registos curtos de decisões **estruturais e duradouras** (stack, limites entre 
 | [0005](0005-identity-no-dominio.md) | `User`/`Role` herdam de ASP.NET Core Identity dentro do Domain | Aceite |
 | [0006](0006-agregado-job-enriquecido.md) | Agregado `Job` enriquecido; vínculo e modalidade em enums separados | Aceite |
 | [0007](0007-endpoint-de-feed-dedicado.md) | Endpoint de feed dedicado, separado do CRUD genérico e do estado por utilizador | Aceite |
+| [0008](0008-formato-de-erro-da-api.md) | Erro da API com lista tipada de falhas por campo | Aceite |
+| [0009](0009-contratos-request-response-no-frontend.md) | Contratos do frontend nomeados por direção (Request / Response / FormValues) | Aceite |
 
 ## Como criar
 

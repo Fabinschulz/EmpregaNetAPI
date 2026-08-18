@@ -2,13 +2,12 @@
 
 import { Button, FilterBar, SelectField } from '@/components';
 import { useFormContext } from '@/context';
+import { APPLICATION_STATUSES, applicationStatusLabels } from '../domain';
 import {
-  APPLICATION_STATUSES,
-  applicationStatusLabels,
   defaultMyApplicationsFilter,
   myApplicationsFilterToParams,
   type MyApplicationsFilterFormValues
-} from '../service';
+} from './my-applications-filter-schema';
 import { DATE_ORDER_BY_OPTIONS, type JobApplicationsListQueryParams } from '@/shared';
 import { X } from 'lucide-react';
 import { useEffect, useRef } from 'react';

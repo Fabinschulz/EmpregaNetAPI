@@ -1,7 +1,7 @@
 'use client';
 
 import { CheckboxGroup, GroupedCheckboxes, RadioGroup } from '@/components';
-import type { JobVocabularyDto } from '@/features/vagas/service';
+import type { JobVocabularyResponse } from '@/features/vagas/service';
 import {
   PUBLISHED_WITHIN_OPTIONS,
   SALARY_RANGE_OPTIONS,
@@ -17,7 +17,7 @@ import styles from './filter-pills.module.scss';
 
 type FeedFilterPillsProps = {
   controller: JobsFeedFiltersController;
-  vocabulary: JobVocabularyDto;
+  vocabulary: JobVocabularyResponse;
   totalItems: number;
 };
 

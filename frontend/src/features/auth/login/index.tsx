@@ -13,8 +13,7 @@ import {
 } from '@/components';
 import { GoogleSignInButton } from '../shared';
 import { LoginFormFields } from './login-form';
-import type { LoginDto } from './login-schema';
-import { loginDefaultValues, loginSchema } from './login-schema';
+import { loginDefaultValues, loginFormSchema, type LoginFormValues } from './login-schema';
 
 export function Login() {
   const { apiError, mutateAsync, isPending, resetFeedback } = useLoginMutation();
@@ -29,7 +28,7 @@ export function Login() {
     resetGoogleFeedback();
   }, [resetFeedback, resetGoogleFeedback]);
 
-  const handleSubmit = async (formValue: LoginDto) => await mutateAsync(formValue);
+  const handleSubmit = async (formValue: LoginFormValues) => await mutateAsync(formValue);
   const handleGoogleCredential = (idToken: string) => {
     void googleMutation.mutateAsync({ idToken });
   };
@@ -47,7 +46,7 @@ export function Login() {
         </StandalonePageFooterPrompt>
       }
     >
-      <FormProvider validationSchema={loginSchema} defaultValues={loginDefaultValues} onSubmit={handleSubmit}>
+      <FormProvider validationSchema={loginFormSchema} defaultValues={loginDefaultValues} onSubmit={handleSubmit}>
         <LoginFormFields />
         <StandalonePageLinkRow>
           <StandalonePageNavLink href="/forgot-password" muted>

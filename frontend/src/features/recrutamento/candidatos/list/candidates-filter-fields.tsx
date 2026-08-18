@@ -3,7 +3,11 @@
 import { AutocompleteField, Button, FilterBar, FilterField, SelectField, type AutocompleteOption } from '@/components';
 import { useFormContext } from '@/context';
 import { useFilterFormSync } from '@/hooks';
-import { candidatesFilterToParams, defaultCandidatesFilter, type CandidatesFilterFormValues } from '../service';
+import {
+  candidatesFilterToParams,
+  defaultCandidatesFilter,
+  type CandidatesFilterFormValues
+} from './candidates-filter-schema';
 import { LIST_ORDER_BY_OPTIONS, type CandidatesListQueryParams } from '@/shared';
 import { X } from 'lucide-react';
 

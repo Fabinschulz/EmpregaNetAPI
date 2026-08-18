@@ -1,24 +1,5 @@
-import { userSchema, type UserDto } from '@/shared/schema';
-import { LIST_ORDER_BY_VALUES, createPaginatedResponseSchema, type AdminUsersListQueryParams } from '@/shared/schema';
-import { normalizeUserTypeValue } from '@/utils';
+import { LIST_ORDER_BY_VALUES, type AdminUsersListQueryParams } from '@/shared/schema';
 import { z } from 'zod';
-
-export const adminUsersListResponseSchema = createPaginatedResponseSchema(userSchema);
-export type AdminUsersListResponseDto = z.infer<typeof adminUsersListResponseSchema>;
-
-export const adminUserUpdateFormSchema = z.object({
-  userType: z.string()
-});
-
-export type AdminUserUpdateFormValues = z.infer<typeof adminUserUpdateFormSchema>;
-
-export const defaultAdminUserUpdateForm: AdminUserUpdateFormValues = {
-  userType: ''
-};
-
-export function adminUserFormValuesFromDto(user: UserDto): AdminUserUpdateFormValues {
-  return { userType: normalizeUserTypeValue(user.userType) };
-}
 
 export const adminUsersFilterFormSchema = z.object({
   search: z.string().trim().max(120, { message: 'A busca não pode exceder 120 caracteres.' }),

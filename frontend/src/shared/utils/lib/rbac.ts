@@ -1,5 +1,3 @@
-export type RoleName = 'Admin' | 'Recruiter' | 'Manager' | string;
-
 const PUBLIC_PATH_PREFIXES = [
   '/login',
   '/register',

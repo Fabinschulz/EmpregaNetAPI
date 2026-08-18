@@ -7,18 +7,17 @@ import { formatDate, type JobApplicationsListQueryParams } from '@/shared';
 import { Eye } from 'lucide-react';
 import { useCallback, useState } from 'react';
 import { ApplicationStatusBadge } from '../application-status-badge';
+import { useMyJobApplicationsQuery, type JobApplicationResponse } from '../service';
 import {
   defaultMyApplicationsFilter,
   myApplicationsFilterFormSchema,
-  myApplicationsFilterToParams,
-  useMyJobApplicationsQuery,
-  type JobApplicationDto
-} from '../service';
+  myApplicationsFilterToParams
+} from './my-applications-filter-schema';
 import { MyApplicationsFilterFields } from './my-applications-filter-fields';
 
 type MyApplicationsFilterParams = Pick<JobApplicationsListQueryParams, 'status' | 'orderBy'>;
 
-const MY_APPLICATIONS_COLUMNS: DataTableColumn<JobApplicationDto>[] = [
+const MY_APPLICATIONS_COLUMNS: DataTableColumn<JobApplicationResponse>[] = [
   { key: 'id', header: 'Candidatura', render: (application) => <strong>#{application.id}</strong> },
   { key: 'jobId', header: 'Vaga', render: (application) => application.jobId ?? '-' },
   {

@@ -3,9 +3,13 @@
 import { AutocompleteField, Button, FilterBar, FilterField, SelectField, type AutocompleteOption } from '@/components';
 import { useFormContext } from '@/context';
 import { useFilterFormSync } from '@/hooks';
-import { companiesFilterToParams, defaultCompaniesFilter, type CompaniesFilterFormValues } from '../service';
 import { LIST_ORDER_BY_OPTIONS, type CompaniesListQueryParams } from '@/shared';
 import { X } from 'lucide-react';
+import {
+  companiesFilterToParams,
+  defaultCompaniesFilter,
+  type CompaniesFilterFormValues
+} from './companies-filter-schema';
 
 const SITUATION_OPTIONS = [
   { label: 'Todas', value: 'all' },
@@ -24,9 +28,7 @@ type CompaniesFilterFieldsProps = {
 export function CompaniesFilterFields({ onChange, searchOptions, searchLoading }: CompaniesFilterFieldsProps) {
   const { watch, reset } = useFormContext<CompaniesFilterFormValues>();
 
-  const search = watch('search');
-  const situation = watch('situation');
-  const orderBy = watch('orderBy');
+  const [search, situation, orderBy] = watch(['search', 'situation', 'orderBy']);
 
   useFilterFormSync(companiesFilterToParams({ search, situation, orderBy }), onChange);
 

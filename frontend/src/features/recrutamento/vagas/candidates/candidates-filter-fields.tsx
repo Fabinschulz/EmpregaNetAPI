@@ -2,12 +2,11 @@
 
 import { SelectField, type SelectOption } from '@/components';
 import { useFormContext } from '@/context';
-import { APPLICATION_STATUSES, applicationStatusLabels } from '@/features/candidaturas/service';
+import { APPLICATION_STATUSES, applicationStatusLabels } from '@/features/candidaturas/domain';
 import { useFilterFormSync } from '@/hooks';
 import { DATE_ORDER_BY_OPTIONS, LIST_ORDER_BY_VALUES } from '@/shared';
 import { z } from 'zod';
 
-/** Valores do filtro de status: os status do processo seletivo + "Todas". */
 export const candidatesStatusFilterValues = ['all', ...APPLICATION_STATUSES] as const;
 
 export const candidatesFilterSchema = z.object({
@@ -22,7 +21,6 @@ export const defaultCandidatesFilter: CandidatesFilterFormValues = {
   orderBy: 'createdAt_DESC'
 };
 
-/** Parâmetros derivados aplicados à query de candidaturas da vaga. */
 export type CandidatesFilterParams = { status?: string; orderBy?: string };
 
 export function candidatesFilterToParams(values: CandidatesFilterFormValues): CandidatesFilterParams {

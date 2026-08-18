@@ -17,11 +17,14 @@ import {
   applicationStatusTransitions,
   applicationTransitionLabels,
   parseApplicationStatus,
+  type ApplicationStatus
+} from '@/features/candidaturas/domain';
+import {
   useApplicationsByJobQuery,
   useChangeApplicationStatusMutation,
   useDeleteApplicationMutation,
-  type ApplicationStatus,
-  type JobApplicationDto
+  candidateDisplayName,
+  type JobApplicationResponse
 } from '@/features/candidaturas/service';
 import { usePersistedTablePagination } from '@/hooks';
 import { formatDate } from '@/shared';
@@ -29,6 +32,7 @@ import { Ban, CheckCircle2, Flag, Pencil, PlayCircle, RotateCcw, XCircle, type L
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useCallback, useMemo, useState } from 'react';
+import { jobsRoutes } from '../jobs-routes';
 import { useJobQuery } from '../service';
 import {
   CandidatesFilterFields,
@@ -53,7 +57,7 @@ const TRANSITION_ICON: Record<ApplicationStatus, LucideIcon> = {
 /** Transições que exigem confirmação por serem terminais/negativas. */
 const DESTRUCTIVE_TRANSITIONS: ReadonlySet<ApplicationStatus> = new Set<ApplicationStatus>(['Rejected', 'Canceled']);
 
-type PendingTransition = { application: JobApplicationDto; target: ApplicationStatus };
+type PendingTransition = { application: JobApplicationResponse; target: ApplicationStatus };
 
 export function CandidatesByJobPage() {
   const params = useParams<{ id: string }>();
@@ -73,7 +77,7 @@ export function CandidatesByJobPage() {
   const { mutate: changeStatus, isPending: isChangingStatus } = useChangeApplicationStatusMutation();
   const { mutate: deleteApplication, isPending: isDeleting } = useDeleteApplicationMutation();
 
-  const { getDeleteAction, confirmDialogProps: deleteDialogProps } = useRowDeleteAction<JobApplicationDto>({
+  const { getDeleteAction, confirmDialogProps: deleteDialogProps } = useRowDeleteAction<JobApplicationResponse>({
     permission: 'jobApplication.delete',
     resource: 'candidatura',
     getId: (application) => application.id,
@@ -92,10 +96,19 @@ export function CandidatesByJobPage() {
     [setPage]
   );
 
-  const columns = useMemo<DataTableColumn<JobApplicationDto>[]>(
+  const columns = useMemo<DataTableColumn<JobApplicationResponse>[]>(
     () => [
       { key: 'id', header: 'Candidatura', render: (application) => <strong>#{application.id}</strong> },
-      { key: 'candidate', header: 'Candidato', render: (application) => application.candidateId ?? '-' },
+      {
+        key: 'candidate',
+        header: 'Candidato',
+        render: (application) => (
+          <Link href={`/recrutamento/candidatos/${application.candidate.id}`}>
+            {candidateDisplayName(application.candidate)}
+          </Link>
+        )
+      },
+      { key: 'candidateEmail', header: 'E-mail', render: (application) => application.candidate.email || '-' },
       {
         key: 'status',
         header: 'Status',
@@ -155,7 +168,7 @@ export function CandidatesByJobPage() {
           description="Acompanhe, avance e gerencie as candidaturas desta vaga."
           actions={
             <Button variant="outline" asChild>
-              <Link href={`/recrutamento/vagas/${jobId}`}>
+              <Link href={jobsRoutes.detail(jobId)}>
                 <Pencil aria-hidden />
                 Editar vaga
               </Link>

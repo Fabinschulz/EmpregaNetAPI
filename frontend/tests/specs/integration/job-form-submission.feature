@@ -50,44 +50,29 @@ Funcionalidade: Fluxo completo do formulário de vaga (leitura da API até reenv
     E o campo "companyId" do payload de reenvio deve ser do tipo número
     E o campo "salaryMin" do payload de reenvio deve ser do tipo número
     E o campo "salaryMax" do payload de reenvio deve ser do tipo número
+    E o payload de reenvio da vaga deve satisfazer o contrato de requisição
 
-  # Endpoints anteriores ao feed devolvem os enums como inteiro. Índice 3 de JobTypeEnum =
-  # Internship; 3 de WorkShiftEnum = SegundoTurno; 1 de ExperienceLevelEnum = SemExperiencia;
-  # 2 de JobAreaEnum = Logistica; UF 13 = MG.
-  Cenário: enums devolvidos como índice numérico devem virar o nome do enum no reenvio
+  # A API registra StringEnumConverter (ResponseJsonConfig), então enum sempre chega como nome.
+  # O contrato aceitava `string | number` "por precaução" e, com isso, deixava passar em silêncio
+  # exatamente o drift que ele existe para denunciar. A normalização por índice continua viva no
+  # carregamento do formulário e tem cobertura unitária em job-vocabulary.feature e
+  # brazilian-uf-and-activity.feature — o que não pode voltar é ela virar contrato de leitura.
+  Cenário: enum devolvido como índice numérico deve ser recusado pelo contrato de leitura
     Dado que a API devolveu os dados desta vaga cadastrada:
       """
       {
         "id": 4,
         "title": "Ajudante de Produção",
-        "description": "Apoio à linha de montagem.",
-        "companyId": 10,
-        "salaryMin": 1900,
-        "salaryDisclosed": true,
-        "jobType": 3,
-        "workModel": 1,
-        "workShift": 3,
-        "experienceLevel": 1,
-        "area": 2,
-        "city": "Extrema",
-        "state": 13,
-        "isActive": true
+        "jobType": 3
       }
       """
-    Quando eu carrego esses dados no formulário de edição de vaga
-    E eu monto o payload de reenvio da vaga a partir do formulário, sem alterar nada
-    Então o payload de reenvio da vaga deve conter:
-      | campo           | valor          |
-      | jobType         | Internship     |
-      | workModel       | OnSite         |
-      | workShift       | SegundoTurno   |
-      | experienceLevel | SemExperiencia |
-      | area            | Logistica      |
-      | state           | MG             |
+    Quando eu valido esses dados contra o contrato de leitura de vaga
+    Então a validação do contrato de vaga deve falhar no campo "jobType"
 
-  # Vaga anterior ao redesenho (ADR 0008): sem turno nem experiência. O contrato de leitura tem
-  # de aceitá-la — ela existe no banco —, mas o formulário não pode deixá-la ser reenviada
-  # incompleta, senão ela some dos filtros do feed em silêncio.
+  # Vaga anterior ao redesenho: gravada antes de turno/experiência/área existirem, o enum ficou
+  # em NaoSelecionado. O contrato de leitura tem de aceitá-la — ela existe no banco e a API a
+  # serializa assim —, mas o formulário não pode deixá-la ser reenviada incompleta, senão ela
+  # some dos filtros do feed em silêncio.
   Cenário: vaga legada sem turno é lida, mas barrada no reenvio
     Dado que a API devolveu os dados desta vaga cadastrada:
       """
@@ -98,6 +83,9 @@ Funcionalidade: Fluxo completo do formulário de vaga (leitura da API até reenv
         "companyId": 7,
         "salaryMin": 2100,
         "jobType": "Clt",
+        "workShift": "NaoSelecionado",
+        "experienceLevel": "NaoSelecionado",
+        "area": "NaoSelecionado",
         "isActive": true
       }
       """
@@ -131,6 +119,7 @@ Funcionalidade: Fluxo completo do formulário de vaga (leitura da API até reenv
     Então o payload de reenvio da vaga deve conter:
       | campo         | valor |
       | isPcdFriendly | true  |
+    E o payload de reenvio da vaga deve satisfazer o contrato de requisição
 
   Cenário: salário a combinar não envia faixa no payload
     Dado que a API devolveu os dados desta vaga cadastrada:
@@ -155,12 +144,13 @@ Funcionalidade: Fluxo completo do formulário de vaga (leitura da API até reenv
     E eu monto o payload de reenvio da vaga a partir do formulário, sem alterar nada
     Então o campo "salaryMin" do payload de reenvio deve estar ausente
     E o campo "salaryMax" do payload de reenvio deve estar ausente
+    E o payload de reenvio da vaga deve satisfazer o contrato de requisição
 
   # Regressão: enquanto isActive era opcional no contrato, a API não o expunha, o parse
   # passava com undefined e a UI mostrava "Ativa" até para vaga encerrada. O campo
   # obrigatório faz esse drift falhar no parse em vez de virar um badge errado.
   Cenário: resposta de vaga sem isActive deve ser rejeitada pelo contrato de leitura
-    Dado que a API devolveu os dados desta vaga cadastrada:
+    Dado que a API devolveu esta resposta de vaga, exatamente como está:
       """
       {
         "id": 5,

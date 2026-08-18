@@ -8,7 +8,8 @@ import { useState } from 'react';
 import { revalidateJobCache } from './jobs-actions';
 import { closeJob, createJob, deleteJob, getJob, listJobs, listSelectableCompanies, updateJob } from './jobs-api';
 import { jobsKeys } from './jobs-keys';
-import type { JobFormValues } from './jobs-schema';
+import { jobsRoutes } from '../jobs-routes';
+import { jobFormToRequest, type JobFormValues } from '../form/job-form-schema';
 
 export function useJobsListQuery(params?: JobsListQueryParams) {
   const listParams = withDefaultListParams(params);
@@ -40,10 +41,11 @@ export function useCreateJobMutation() {
   const router = useRouter();
 
   const ctx = useMutation({
-    mutationFn: (formValue: JobFormValues) => createJob(formValue),
-    onSuccess: async () => {
+    mutationFn: (formValue: JobFormValues) => createJob(jobFormToRequest(formValue)),
+    onSuccess: async (id) => {
       await queryClient.invalidateQueries({ queryKey: jobsKeys.lists() });
-      startRouterTransition(() => router.push('/recrutamento/vagas'));
+      toastSuccess('Vaga criada', 'Continue de onde parou para completar a publicação.');
+      startRouterTransition(() => router.replace(jobsRoutes.detail(id)));
     },
     onError: (err) => {
       reportMutationApiError({ err, actionLabel: 'criar vaga', resource: 'vaga', setApiError });
@@ -56,15 +58,14 @@ export function useCreateJobMutation() {
 export function useUpdateJobMutation(jobId: number) {
   const queryClient = useQueryClient();
   const [apiError, setApiError] = useState<string | null>(null);
-  const router = useRouter();
 
   const ctx = useMutation({
-    mutationFn: (formValue: JobFormValues) => updateJob(jobId, formValue),
+    mutationFn: (formValue: JobFormValues) => updateJob(jobId, jobFormToRequest(formValue)),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: jobsKeys.detail(jobId) });
       await queryClient.invalidateQueries({ queryKey: jobsKeys.lists() });
       await revalidateJobCache(jobId);
-      startRouterTransition(() => router.push('/recrutamento/vagas'));
+      toastSuccess('Vaga atualizada', 'As alterações foram gravadas.');
     },
     onError: (err) => {
       reportMutationApiError({ err, actionLabel: 'atualizar vaga', resource: 'vaga', setApiError });
@@ -77,7 +78,6 @@ export function useUpdateJobMutation(jobId: number) {
 export function useCloseJobMutation(jobId: number) {
   const queryClient = useQueryClient();
   const [apiError, setApiError] = useState<string | null>(null);
-  const router = useRouter();
 
   const ctx = useMutation({
     mutationFn: () => closeJob(jobId),
@@ -87,7 +87,7 @@ export function useCloseJobMutation(jobId: number) {
       // Encerrar é o caso mais crítico: sem revalidar, a vaga segue anunciada como
       // aberta na página pública até o cache expirar.
       await revalidateJobCache(jobId);
-      startRouterTransition(() => router.push('/recrutamento/vagas'));
+      toastSuccess('Vaga encerrada', 'A vaga saiu do feed público e deixou de receber candidaturas.');
     },
     onError: (err) => {
       reportMutationApiError({ err, actionLabel: 'encerrar vaga', resource: 'vaga', setApiError });

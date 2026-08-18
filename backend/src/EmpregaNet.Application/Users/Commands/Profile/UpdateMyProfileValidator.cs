@@ -9,7 +9,7 @@ public sealed class UpdateMyProfileCommandValidator : AbstractValidator<UpdateMy
     {
         RuleFor(x => x)
             .Must(c => HasAtLeastOneField(c))
-            .WithMessage("Informe ao menos um campo para atualizar (email, userName ou phoneNumber).");
+            .WithMessage("Informe ao menos um campo para atualizar (email, username ou phoneNumber).");
 
         When(x => !string.IsNullOrWhiteSpace(x.Email), () =>
         {
@@ -18,9 +18,9 @@ public sealed class UpdateMyProfileCommandValidator : AbstractValidator<UpdateMy
                 .WithMessage("E-mail inválido.");
         });
 
-        When(x => !string.IsNullOrWhiteSpace(x.UserName), () =>
+        When(x => !string.IsNullOrWhiteSpace(x.Username), () =>
         {
-            RuleFor(x => x.UserName!)
+            RuleFor(x => x.Username!)
                 .MinimumLength(3)
                 .MaximumLength(256)
                 .WithMessage("O nome de usuário deve ter entre 3 e 256 caracteres.");
@@ -35,6 +35,6 @@ public sealed class UpdateMyProfileCommandValidator : AbstractValidator<UpdateMy
 
     private static bool HasAtLeastOneField(UpdateMyProfileCommand c) =>
         !string.IsNullOrWhiteSpace(c.Email)
-        || !string.IsNullOrWhiteSpace(c.UserName)
+        || !string.IsNullOrWhiteSpace(c.Username)
         || c.PhoneNumber is not null;
 }

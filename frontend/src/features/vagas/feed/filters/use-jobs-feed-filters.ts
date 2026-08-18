@@ -6,7 +6,7 @@ import {
   jobsFeedFiltersToSearchParams,
   parseJobsFeedFilters,
   type JobsFeedFilters
-} from '@/features/vagas/service';
+} from './jobs-feed-filters';
 import { useDebouncedDraft } from '@/hooks';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useMemo } from 'react';

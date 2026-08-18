@@ -1,4 +1,3 @@
-using FluentValidation;
 using Microsoft.Extensions.Logging;
 using EmpregaNet.Domain.Enums;
 using System.ComponentModel.DataAnnotations;
@@ -24,15 +23,12 @@ public sealed record UpdateCompanyCommand(
 public sealed class UpdateCompanyHandler : IRequestHandler<UpdateCommand<UpdateCompanyCommand, CompanyViewModel>, CompanyViewModel>
 {
     private readonly ICompanyRepository _companyRepository;
-    private readonly IValidator<UpdateCommand<UpdateCompanyCommand, CompanyViewModel>> _validator;
     private readonly ILogger<UpdateCompanyHandler> _logger;
 
     public UpdateCompanyHandler(ICompanyRepository companyRepository,
-        IValidator<UpdateCommand<UpdateCompanyCommand, CompanyViewModel>> validator,
         ILogger<UpdateCompanyHandler> logger)
     {
         _companyRepository = companyRepository;
-        _validator = validator;
         _logger = logger;
     }
 

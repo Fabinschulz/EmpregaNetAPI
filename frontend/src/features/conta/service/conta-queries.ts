@@ -6,9 +6,13 @@ import { reportMutationApiError, startRouterTransition, toastSuccess } from '@/u
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { profileFormToRequest, type ProfileFormValues } from '../perfil/profile-form-schema';
+import {
+  changeMyPasswordFormToRequest,
+  type ChangeMyPasswordFormValues
+} from '../seguranca/change-password-form-schema';
 import { changeMyPassword, deleteMyAccount, me, updateMyProfile } from './conta-api';
 import { contaKeys } from './conta-keys';
-import type { ChangeMyPasswordFormValues, ProfileFormValues } from './conta-schema';
 
 export function useMeQuery() {
   const { isAuthenticated } = useAuth();
@@ -20,14 +24,13 @@ export function useMeQuery() {
   });
 }
 
-/** Atualiza os dados da própria conta e mantém o cache/menu coerentes com o novo perfil. */
 export function useUpdateMyProfileMutation() {
   const queryClient = useQueryClient();
   const { roles } = useAuth();
   const [apiError, setApiError] = useState<string | null>(null);
 
   const ctx = useMutation({
-    mutationFn: (formValue: ProfileFormValues) => updateMyProfile(formValue),
+    mutationFn: (formValue: ProfileFormValues) => updateMyProfile(profileFormToRequest(formValue)),
     onSuccess: async (user) => {
       setApiError(null);
       await queryClient.invalidateQueries({ queryKey: contaKeys.me() });
@@ -42,17 +45,13 @@ export function useUpdateMyProfileMutation() {
   return { ...ctx, apiError };
 }
 
-/**
- * Altera a própria senha. O backend revoga todas as sessões (todos os dispositivos);
- * Sessão local também é encerrada e o usuário volta ao login.
- */
 export function useChangeMyPasswordMutation() {
   const { logout } = useAuth();
   const router = useRouter();
   const [apiError, setApiError] = useState<string | null>(null);
 
   const ctx = useMutation({
-    mutationFn: (formValue: ChangeMyPasswordFormValues) => changeMyPassword(formValue),
+    mutationFn: (formValue: ChangeMyPasswordFormValues) => changeMyPassword(changeMyPasswordFormToRequest(formValue)),
     onSuccess: async (message) => {
       setApiError(null);
       toastSuccess('Senha alterada', `${message} Inicie sessão novamente.`);

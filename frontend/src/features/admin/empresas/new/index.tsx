@@ -2,8 +2,9 @@
 
 import { Alert, PageHeader } from '@/components';
 import { FormProvider } from '@/context';
-import { CompanyFormFields } from '../form';
-import { companyFormSchema, defaultFormCompany, useCreateCompanyMutation, type CompanyFormValues } from '../service';
+import { CompanyFormFields, companyFormSchema, defaultFormCompany, type CompanyFormValues } from '../form';
+import { companiesRoutes } from '../companies-routes';
+import { useCreateCompanyMutation } from '../service';
 
 export function AdminNewCompanyPage() {
   const { apiError, mutateAsync } = useCreateCompanyMutation();
@@ -19,7 +20,7 @@ export function AdminNewCompanyPage() {
       ) : null}
 
       <FormProvider validationSchema={companyFormSchema} defaultValues={defaultFormCompany} onSubmit={handleSubmit}>
-        <CompanyFormFields submitLabel="Criar empresa" />
+        <CompanyFormFields submitLabel="Criar empresa" backHref={companiesRoutes.list} />
       </FormProvider>
     </div>
   );

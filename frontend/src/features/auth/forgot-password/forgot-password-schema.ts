@@ -1,7 +1,14 @@
-import { forgotPasswordSchema, type ForgotPasswordDto } from '../service';
+import { z } from 'zod';
+import type { ForgotPasswordRequest } from '../service/auth-request-schema';
 
-export { forgotPasswordSchema, type ForgotPasswordDto };
+export const forgotPasswordFormSchema = z.object({
+  email: z.email({ message: 'E-mail inválido.' })
+});
 
-export const forgotPasswordDefaultValues: ForgotPasswordDto = {
-  email: ''
-};
+export type ForgotPasswordFormValues = z.infer<typeof forgotPasswordFormSchema>;
+
+export const forgotPasswordDefaultValues: ForgotPasswordFormValues = { email: '' };
+
+export function forgotPasswordFormToRequest(values: ForgotPasswordFormValues): ForgotPasswordRequest {
+  return { email: values.email.trim() };
+}

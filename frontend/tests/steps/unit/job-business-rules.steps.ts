@@ -1,4 +1,4 @@
-import { jobFormSchema, type JobFormValues } from '@/features/recrutamento/vagas/service/jobs-schema';
+import { jobFormSchema, type JobFormValues } from '@/features/recrutamento/vagas/form/job-form-schema';
 import { MAX_VOCABULARY_ITEMS_PER_JOB } from '@/shared/schema/job-vocabulary';
 import { Given, Then, When } from '@cucumber/cucumber';
 import { expect } from 'chai';

@@ -40,7 +40,27 @@ public class JobApplicationRepository : BaseRepository<JobApplication>, IJobAppl
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<ListDataPagination<JobApplication>> GetByJobIdAsync(
+    public async Task<JobApplicationProjection?> GetProjectionByIdAsync(long id, CancellationToken cancellationToken)
+    {
+        return await ProjectWithCandidate(_context.JobApplications.AsNoTracking().Where(a => a.Id == id))
+            .FirstOrDefaultAsync(cancellationToken);
+    }
+
+    public async Task<ListDataPagination<JobApplicationProjection>> GetAllWithCandidateAsync(
+        CancellationToken cancellationToken,
+        int page,
+        int size,
+        string? orderBy = null)
+    {
+        var query = _context.JobApplications
+            .AsNoTracking()
+            .Where(a => !a.IsDeleted);
+
+        return await ProjectWithCandidate(ApplyOrderBy(query, orderBy))
+            .ToPaginatedListAsync(page, size, cancellationToken);
+    }
+
+    public async Task<ListDataPagination<JobApplicationProjection>> GetByJobIdAsync(
         long jobId,
         CancellationToken cancellationToken,
         int page,
@@ -57,15 +77,11 @@ public class JobApplicationRepository : BaseRepository<JobApplication>, IJobAppl
             query = query.Where(a => a.Status == status.Value);
         }
 
-        if (!string.IsNullOrWhiteSpace(orderBy))
-        {
-            query = ApplyOrderBy(query, orderBy);
-        }
-
-        return await query.ToPaginatedListAsync(page, size, cancellationToken);
+        return await ProjectWithCandidate(ApplyOrderBy(query, orderBy))
+            .ToPaginatedListAsync(page, size, cancellationToken);
     }
 
-    public async Task<ListDataPagination<JobApplication>> GetByUserIdAsync(
+    public async Task<ListDataPagination<JobApplicationProjection>> GetByUserIdAsync(
         long userId,
         CancellationToken cancellationToken,
         int page,
@@ -82,15 +98,44 @@ public class JobApplicationRepository : BaseRepository<JobApplication>, IJobAppl
             query = query.Where(a => a.Status == status.Value);
         }
 
-        if (!string.IsNullOrWhiteSpace(orderBy))
-        {
-            query = ApplyOrderBy(query, orderBy);
-        }
-
-        return await query.ToPaginatedListAsync(page, size, cancellationToken);
+        return await ProjectWithCandidate(ApplyOrderBy(query, orderBy))
+            .ToPaginatedListAsync(page, size, cancellationToken);
     }
 
-    private static IQueryable<JobApplication> ApplyOrderBy(IQueryable<JobApplication> query, string orderBy)
+    /// <summary>
+    /// Resolve o candidato junto da candidatura, em uma consulta só.
+    /// </summary>
+    /// <remarks>
+    /// É um LEFT JOIN (<c>DefaultIfEmpty</c>) e não um INNER: o usuário é excluído logicamente, mas
+    /// se uma linha órfã existir por qualquer motivo, um INNER a faria sumir da listagem em
+    /// silêncio - a candidatura desapareceria da tela sem erro nenhum. Com LEFT, a candidatura
+    /// aparece e o nome vem vazio, que é um problema visível.
+    ///
+    /// O candidato excluído continua sendo devolvido, com <c>IsDeleted</c> marcado: o histórico do
+    /// processo seletivo precisa dele, e cabe à tela decidir como sinalizar.
+    /// </remarks>
+    private IQueryable<JobApplicationProjection> ProjectWithCandidate(IQueryable<JobApplication> applications)
+    {
+        return from application in applications
+               join user in _context.Users.AsNoTracking() on application.UserId equals user.Id into candidates
+               from candidate in candidates.DefaultIfEmpty()
+               select new JobApplicationProjection(
+                   application.Id,
+                   application.JobId,
+                   new JobApplicationCandidate(
+                       application.UserId,
+                       candidate != null ? (candidate.UserName ?? string.Empty) : string.Empty,
+                       candidate != null ? (candidate.Email ?? string.Empty) : string.Empty,
+                       candidate != null && candidate.IsDeleted),
+                   application.Status,
+                   application.AppliedAt,
+                   application.CreatedAt,
+                   application.UpdatedAt,
+                   application.DeletedAt,
+                   application.IsDeleted);
+    }
+
+    private static IQueryable<JobApplication> ApplyOrderBy(IQueryable<JobApplication> query, string? orderBy)
     {
         return orderBy switch
         {

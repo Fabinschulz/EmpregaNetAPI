@@ -12,7 +12,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { applyToJob, changeStatus, deleteApplication, listAll, listByJob, listMine } from './job-applications-api';
 import { jobApplicationsKeys } from './job-applications-keys';
-import { applicationStatusLabels, type ApplicationStatus } from './job-applications-schema';
+import { applicationStatusLabels, type ApplicationStatus } from '../domain';
 
 export function useMyJobApplicationsQuery(params?: JobApplicationsListQueryParams) {
   const { isAuthenticated } = useAuth();
@@ -73,11 +73,10 @@ export function useApplyToJobMutation(jobId: number) {
 
   const ctx = useMutation({
     mutationFn: () => applyToJob({ jobId }),
-    onSuccess: async (res) => {
+    onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: jobApplicationsKeys.all });
       await queryClient.invalidateQueries({ queryKey: jobsFeedKeys.all });
-      const message = typeof res === 'string' ? res : 'Candidatura enviada.';
-      toastSuccess('Candidatura enviada', message);
+      toastSuccess('Candidatura enviada', 'A empresa foi notificada da sua candidatura.');
     },
     onError: (err) => {
       reportMutationApiError({ err, actionLabel: 'candidatar-se', resource: 'candidatura', setApiError });

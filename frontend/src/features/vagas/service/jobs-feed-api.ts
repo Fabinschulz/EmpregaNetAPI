@@ -1,13 +1,13 @@
 import { axiosApi, createAxiosConfig } from '@/shared/api';
+import type { JobsFeedQueryParams } from './jobs-feed-params';
 import {
-  jobFeedInteractionsSchema,
-  jobVocabularySchema,
+  jobFeedInteractionsResponseSchema,
+  jobVocabularyResponseSchema,
   jobsFeedResponseSchema,
-  type JobFeedInteractionsDto,
-  type JobVocabularyDto,
-  type JobsFeedQueryParams,
-  type JobsFeedResponseDto
-} from './jobs-feed-schema';
+  type JobFeedInteractionsResponse,
+  type JobVocabularyResponse,
+  type JobsFeedResponse
+} from './jobs-feed-response-schema';
 
 export const MAX_INTERACTION_IDS = 100;
 
@@ -19,17 +19,17 @@ function chunk<T>(items: T[], size: number): T[][] {
   return chunks;
 }
 
-export async function fetchJobsFeed(params: JobsFeedQueryParams): Promise<JobsFeedResponseDto> {
+export async function fetchJobsFeed(params: JobsFeedQueryParams): Promise<JobsFeedResponse> {
   const res = await axiosApi.get<unknown>('/api/jobs/feed', { params });
   return jobsFeedResponseSchema.parse(res.data);
 }
 
-export async function fetchJobVocabulary(): Promise<JobVocabularyDto> {
+export async function fetchJobVocabulary(): Promise<JobVocabularyResponse> {
   const res = await axiosApi.get<unknown>('/api/jobs/vocabulary');
-  return jobVocabularySchema.parse(res.data);
+  return jobVocabularyResponseSchema.parse(res.data);
 }
 
-export async function fetchJobFeedInteractions(jobIds: number[]): Promise<JobFeedInteractionsDto> {
+export async function fetchJobFeedInteractions(jobIds: number[]): Promise<JobFeedInteractionsResponse> {
   if (jobIds.length === 0) {
     return { appliedJobIds: [] };
   }
@@ -40,7 +40,7 @@ export async function fetchJobFeedInteractions(jobIds: number[]): Promise<JobFee
   const batches = await Promise.all(
     chunk(jobIds, MAX_INTERACTION_IDS).map(async (ids) => {
       const res = await axiosApi.get<unknown>('/api/jobs/feed/interactions', createAxiosConfig({ ids }));
-      return jobFeedInteractionsSchema.parse(res.data).appliedJobIds;
+      return jobFeedInteractionsResponseSchema.parse(res.data).appliedJobIds;
     })
   );
 

@@ -23,7 +23,7 @@ Funcionalidade: Fluxo completo do formulário de empresa (leitura da API até re
           "complement": "Sala 4",
           "neighborhood": "Centro",
           "city": "São Paulo",
-          "state": 25,
+          "state": "SP",
           "zipCode": "01310-100"
         }
       }
@@ -44,6 +44,7 @@ Funcionalidade: Fluxo completo do formulário de empresa (leitura da API até re
       | address.city           | São Paulo                   |
       | address.state          | SP                          |
       | address.zipCode        | 01310-100                   |
+    E o payload de reenvio deve satisfazer o contrato de requisição
 
   Cenário: complemento de endereço ausente na API deve virar null no reenvio, não uma string vazia
     Dado que a API devolveu os dados desta empresa cadastrada:
@@ -69,3 +70,20 @@ Funcionalidade: Fluxo completo do formulário de empresa (leitura da API até re
     Quando eu carrego esses dados no formulário de edição de empresa
     E eu monto o payload de reenvio a partir do formulário, sem alterar nada
     Então o complemento do endereço no payload de reenvio deve ser nulo
+    E o payload de reenvio deve satisfazer o contrato de requisição
+
+  # Address.State é o enum UF e a API registra StringEnumConverter: a sigla é a única forma que
+  # chega. O contrato aceitava também o índice, e com isso deixava passar em silêncio o drift que
+  # deveria denunciar. A leitura por índice segue viva no normalizeUf ao carregar o formulário,
+  # com cobertura em brazilian-uf-and-activity.feature.
+  Cenário: UF devolvida como índice numérico deve ser recusada pelo contrato de leitura
+    Dado que a API devolveu os dados desta empresa cadastrada:
+      """
+      {
+        "id": 9,
+        "companyName": "Empresa Legada Ltda",
+        "address": { "state": 25 }
+      }
+      """
+    Quando eu valido esses dados contra o contrato de leitura de empresa
+    Então a validação do contrato de empresa deve falhar no campo "address.state"

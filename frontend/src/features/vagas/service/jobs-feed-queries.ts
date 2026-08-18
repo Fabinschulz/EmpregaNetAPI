@@ -6,17 +6,15 @@ import { useMemo } from 'react';
 import { fetchJobFeedInteractions, fetchJobVocabulary, fetchJobsFeed } from './jobs-feed-api';
 import { jobsFeedKeys } from './jobs-feed-keys';
 import {
-  JOBS_FEED_PAGE_SIZE,
   jobsFeedFiltersToApiParams,
   jobsFeedFiltersToQueryString,
-  type JobFeedItemDto,
-  type JobVocabularyDto,
-  type JobsFeedFilters,
-  type JobsFeedResponseDto
-} from './jobs-feed-schema';
+  type JobsFeedFilters
+} from '../feed/filters/jobs-feed-filters';
+import { JOBS_FEED_PAGE_SIZE } from './jobs-feed-params';
+import type { JobFeedItemResponse, JobVocabularyResponse, JobsFeedResponse } from './jobs-feed-response-schema';
 
 type UseJobsFeedQueryOptions = {
-  initialPage?: JobsFeedResponseDto;
+  initialPage?: JobsFeedResponse;
   initialFilters?: JobsFeedFilters;
 };
 
@@ -43,14 +41,14 @@ export function useJobsFeedQuery(
     initialData: seedsCurrentFilters ? { pages: [initialPage], pageParams: [1] } : undefined
   });
 
-  const jobs = useMemo<JobFeedItemDto[]>(() => query.data?.pages.flatMap((page) => page.data) ?? [], [query.data]);
+  const jobs = useMemo<JobFeedItemResponse[]>(() => query.data?.pages.flatMap((page) => page.data) ?? [], [query.data]);
 
   const totalItems = query.data?.pages[0]?.totalItems ?? 0;
 
   return { ...query, jobs, totalItems };
 }
 
-export function useJobVocabularyQuery(initialData?: JobVocabularyDto) {
+export function useJobVocabularyQuery(initialData?: JobVocabularyResponse) {
   return useQuery({
     queryKey: jobsFeedKeys.vocabulary(),
     queryFn: fetchJobVocabulary,

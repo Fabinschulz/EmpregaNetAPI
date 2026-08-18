@@ -1,12 +1,3 @@
-/**
- * Unidades federativas do Brasil - fonte única.
- *
- * Vivia em `features/admin/empresas/service`; passou para cá quando o terceiro consumidor
- * apareceu (formulário de empresa, formulário de vaga e filtros do feed). Duas listas de UF
- * divergindo é o tipo de defeito que só aparece quando um estado some de um filtro.
- */
-
-/** Ordem do enum `UF` do backend (índice 0 = NaoSelecionado), para converter inteiro em nome. */
 const UF_ORDER = [
   'NaoSelecionado',
   'AC',
@@ -70,13 +61,6 @@ export const UF_OPTIONS = [
 
 export type UfValue = (typeof UF_OPTIONS)[number]['value'];
 
-/**
- * Opções para seletores: sigla + nome (`MG - Minas Gerais`).
- *
- * Fonte única do rótulo composto. O formulário de vaga e o painel de filtros do feed montavam
- * cada um a sua versão da mesma expressão, e duas grafias do mesmo estado num select e num
- * filtro é confusão gratuita para quem usa.
- */
 export const UF_SELECT_OPTIONS = UF_OPTIONS.map((uf) => ({
   value: uf.value,
   label: `${uf.value} - ${uf.label}`
@@ -88,12 +72,6 @@ export function isUfValue(value: string): value is UfValue {
   return UF_VALUE_SET.has(value);
 }
 
-/** Rótulo curto usado em cartões e chips: `MG` em vez de `Minas Gerais`. */
-export function ufLabel(value: string): string {
-  return isUfValue(value) ? value : '';
-}
-
-/** Nome por extenso, para seletores de formulário. */
 export function ufFullLabel(value: string): string {
   return UF_OPTIONS.find((o) => o.value === value)?.label ?? '';
 }

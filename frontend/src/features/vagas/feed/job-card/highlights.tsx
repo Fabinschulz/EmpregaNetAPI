@@ -1,4 +1,4 @@
-import type { JobFeedItemDto } from '@/features/vagas/service';
+import type { JobFeedItemResponse } from '@/features/vagas/service';
 import {
   experienceLevelVocabulary,
   jobTypeVocabulary,
@@ -12,7 +12,7 @@ import { Accessibility, Briefcase, Building2, Clock, GraduationCap, House, MapPi
 import styles from './job-card.module.scss';
 
 type JobCardHighlightsProps = {
-  job: JobFeedItemDto;
+  job: JobFeedItemResponse;
 };
 
 const WORK_MODEL_ICONS: Record<string, LucideIcon> = {

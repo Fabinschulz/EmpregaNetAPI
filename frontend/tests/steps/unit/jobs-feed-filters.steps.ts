@@ -5,9 +5,9 @@ import {
   jobsFeedFiltersToApiParams,
   jobsFeedFiltersToSearchParams,
   parseJobsFeedFilters,
-  type JobsFeedFilters,
-  type JobsFeedQueryParams
-} from '@/features/vagas/service/jobs-feed-schema';
+  type JobsFeedFilters
+} from '@/features/vagas/feed/filters/jobs-feed-filters';
+import type { JobsFeedQueryParams } from '@/features/vagas/service/jobs-feed-params';
 import type { BusinessRulesWorld } from '../../support/world';
 import { getByPath } from '../../support/object-path';
 

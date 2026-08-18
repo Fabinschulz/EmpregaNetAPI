@@ -4,12 +4,11 @@ import { FormProvider } from '@/context';
 import { useRegisterMutation } from '../service';
 import { StandalonePageNavLink, StandalonePage } from '@/components';
 import { RegisterFormFields } from './register-form';
-import type { RegisterDto } from './register-schema';
-import { registerDefaultValues, registerFormSchema } from './register-schema';
+import { registerDefaultValues, registerFormSchema, type RegisterFormValues } from './register-schema';
 
 export function Register() {
   const { apiError, mutateAsync, successMessage } = useRegisterMutation();
-  const handleSubmit = async (formValue: RegisterDto) => await mutateAsync(formValue);
+  const handleSubmit = async (formValue: RegisterFormValues) => await mutateAsync(formValue);
 
   return (
     <StandalonePage

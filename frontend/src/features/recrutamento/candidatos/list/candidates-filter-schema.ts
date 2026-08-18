@@ -1,9 +1,5 @@
-import { userSchema } from '@/shared/schema';
-import { LIST_ORDER_BY_VALUES, createPaginatedResponseSchema, type CandidatesListQueryParams } from '@/shared/schema';
+import { LIST_ORDER_BY_VALUES, type CandidatesListQueryParams } from '@/shared/schema';
 import { z } from 'zod';
-
-export const candidatesListResponseSchema = createPaginatedResponseSchema(userSchema);
-export type CandidatesListResponseDto = z.infer<typeof candidatesListResponseSchema>;
 
 export const candidatesFilterFormSchema = z.object({
   search: z.string().trim().max(120, { message: 'A busca não pode exceder 120 caracteres.' }),

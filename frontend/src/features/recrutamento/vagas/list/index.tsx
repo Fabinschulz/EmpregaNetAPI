@@ -18,13 +18,9 @@ import { formatDate, type JobsListQueryParams } from '@/shared';
 import { Pencil, Plus } from 'lucide-react';
 import Link from 'next/link';
 import { useCallback, useMemo, useState } from 'react';
-import {
-  defaultJobsFilter,
-  jobsFilterFormSchema,
-  useDeleteJobMutation,
-  useJobsListQuery,
-  type JobDto
-} from '../service';
+import { useDeleteJobMutation, useJobsListQuery, type JobResponse } from '../service';
+import { defaultJobsFilter, jobsFilterFormSchema } from './jobs-filter-schema';
+import { jobsRoutes } from '../jobs-routes';
 import { JobsFilterFields } from './jobs-filter-fields';
 
 type JobsFilterParams = Pick<JobsListQueryParams, 'search' | 'isActive'>;
@@ -54,7 +50,7 @@ export function RecruitmentJobsPage() {
   );
 
   const { mutate: deleteJob, isPending: isDeleting } = useDeleteJobMutation();
-  const { getDeleteAction, confirmDialogProps } = useRowDeleteAction<JobDto>({
+  const { getDeleteAction, confirmDialogProps } = useRowDeleteAction<JobResponse>({
     permission: 'job.delete',
     resource: 'vaga',
     getId: (job) => job.id,
@@ -65,7 +61,7 @@ export function RecruitmentJobsPage() {
       `A vaga "${job.title}" e o seu histórico serão removidos permanentemente. Para apenas retirá-la das buscas, use "Encerrar vaga" na edição.`
   });
 
-  const columns = useMemo<DataTableColumn<JobDto>[]>(
+  const columns = useMemo<DataTableColumn<JobResponse>[]>(
     () => [
       { key: 'title', header: 'Título', render: (job) => <strong>{job.title}</strong> },
       {
@@ -81,7 +77,7 @@ export function RecruitmentJobsPage() {
         type: 'actions',
         getActions: (job) => {
           const actions: RowAction[] = [
-            { key: 'edit', label: 'Editar', icon: Pencil, href: `/recrutamento/vagas/${job.id}` }
+            { key: 'edit', label: 'Editar', icon: Pencil, href: jobsRoutes.detail(job.id) }
           ];
 
           const deleteAction = getDeleteAction(job);
@@ -109,7 +105,7 @@ export function RecruitmentJobsPage() {
           description="Gestão de vagas de emprego, incluindo criação, edição e acompanhamento das candidaturas."
           actions={
             <Button variant="primary" asChild>
-              <Link href="/recrutamento/vagas/new">
+              <Link href={jobsRoutes.new}>
                 <Plus aria-hidden />
                 Nova vaga
               </Link>

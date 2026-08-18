@@ -12,7 +12,6 @@ export type FormFieldIds = {
   hint: string;
 };
 
-
 export type FormFieldBaseProps = {
   name: string;
   label?: string;
@@ -22,7 +21,6 @@ export type FormFieldBaseProps = {
   disabled?: boolean;
   className?: string;
 };
-
 
 export type FormFieldControl = {
   name: string;

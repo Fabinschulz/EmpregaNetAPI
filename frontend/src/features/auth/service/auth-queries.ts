@@ -14,15 +14,15 @@ import {
   resendEmailConfirmation,
   resetPassword
 } from './auth-api';
-import type {
-  ConfirmEmailDto,
-  ForgotPasswordDto,
-  LoginDto,
-  LoginWithGoogleDto,
-  RegisterDto,
-  ResendEmailConfirmationDto,
-  ResetPasswordFormValues
-} from './auth-schema';
+import { forgotPasswordFormToRequest, type ForgotPasswordFormValues } from '../forgot-password/forgot-password-schema';
+import { loginFormToRequest, type LoginFormValues } from '../login/login-schema';
+import { registerFormToRequest, type RegisterFormValues } from '../register/register-schema';
+import {
+  resendConfirmationFormToRequest,
+  type ResendConfirmationFormValues
+} from '../resend-confirmation/resend-confirmation-schema';
+import { resetPasswordFormToRequest, type ResetPasswordFormValues } from '../reset-password/reset-password-schema';
+import type { ConfirmEmailRequest, LoginWithGoogleRequest } from './auth-request-schema';
 
 function useAuthSessionMutation(actionLabel: string, resource: string) {
   const { setLoggedUser } = useAuth();
@@ -67,7 +67,7 @@ export function useLoginMutation() {
   const auth = useAuthSessionMutation('iniciar sessão', 'sessão');
 
   const ctx = useMutation({
-    mutationFn: (formValue: LoginDto) => login(formValue),
+    mutationFn: (formValue: LoginFormValues) => login(loginFormToRequest(formValue)),
     onMutate: auth.onMutate,
     onSuccess: auth.onAuthSuccess,
     onError: auth.onAuthError
@@ -80,7 +80,7 @@ export function useLoginWithGoogleMutation() {
   const auth = useAuthSessionMutation('iniciar sessão com Google', 'sessão');
 
   const ctx = useMutation({
-    mutationFn: (formValue: LoginWithGoogleDto) => loginWithGoogle(formValue),
+    mutationFn: (request: LoginWithGoogleRequest) => loginWithGoogle(request),
     onMutate: auth.onMutate,
     onSuccess: auth.onAuthSuccess,
     onError: auth.onAuthError
@@ -94,7 +94,7 @@ export function useRegisterMutation() {
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   const ctx = useMutation({
-    mutationFn: (formValue: RegisterDto) => register(formValue),
+    mutationFn: (formValue: RegisterFormValues) => register(registerFormToRequest(formValue)),
     onSuccess: (res) => {
       setApiError(null);
       const message = typeof res === 'string' ? res : 'Conta criada. Confirme o e-mail antes de iniciar sessão.';
@@ -115,7 +115,7 @@ export function useForgotPasswordMutation() {
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   const ctx = useMutation({
-    mutationFn: (formValue: ForgotPasswordDto) => forgotPassword(formValue),
+    mutationFn: (formValue: ForgotPasswordFormValues) => forgotPassword(forgotPasswordFormToRequest(formValue)),
     onSuccess: (message) => {
       setApiError(null);
       setSuccessMessage(message);
@@ -136,7 +136,7 @@ export function useResetPasswordMutation() {
   const router = useRouter();
 
   const ctx = useMutation({
-    mutationFn: (formValue: ResetPasswordFormValues) => resetPassword(formValue),
+    mutationFn: (formValue: ResetPasswordFormValues) => resetPassword(resetPasswordFormToRequest(formValue)),
     onSuccess: (message) => {
       setApiError(null);
       setSuccessMessage(message);
@@ -158,7 +158,7 @@ export function useConfirmEmailMutation() {
   const router = useRouter();
 
   const ctx = useMutation({
-    mutationFn: (formValue: ConfirmEmailDto) => confirmEmail(formValue),
+    mutationFn: (request: ConfirmEmailRequest) => confirmEmail(request),
     onSuccess: (message) => {
       setApiError(null);
       setSuccessMessage(message);
@@ -179,7 +179,8 @@ export function useResendEmailConfirmationMutation() {
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   const ctx = useMutation({
-    mutationFn: (formValue: ResendEmailConfirmationDto) => resendEmailConfirmation(formValue),
+    mutationFn: (formValue: ResendConfirmationFormValues) =>
+      resendEmailConfirmation(resendConfirmationFormToRequest(formValue)),
     onSuccess: (message) => {
       setApiError(null);
       setSuccessMessage(message);

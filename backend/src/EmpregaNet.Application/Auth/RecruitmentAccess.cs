@@ -14,8 +14,7 @@ public static class RecruitmentAccess
         var ctx = currentUser.GetContextUser();
         if (ctx is null)
         {
-            throw new ValidationAppException(
-                nameof(currentUser),
+            throw ValidationAppException.ForBusinessRule(
                 "Usuário autenticado não encontrado no contexto.",
                 DomainErrorEnum.MISSING_RESOURCE_PERMISSION);
         }
@@ -23,8 +22,7 @@ public static class RecruitmentAccess
         var roles = ctx.UserToken.GetRoleNames();
         if (!RecruitmentRoleNames.IsRecruitmentStaff(roles))
         {
-            throw new ValidationAppException(
-                nameof(currentUser),
+            throw ValidationAppException.ForBusinessRule(
                 "Apenas perfis de recrutamento (Admin, Recruiter ou Manager) podem executar esta operação.",
                 DomainErrorEnum.MISSING_RESOURCE_PERMISSION);
         }

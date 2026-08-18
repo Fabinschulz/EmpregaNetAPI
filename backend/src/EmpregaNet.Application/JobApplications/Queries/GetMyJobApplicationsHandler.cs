@@ -4,7 +4,6 @@ using EmpregaNet.Application.JobApplications.ViewModel;
 using EmpregaNet.Domain.Common;
 using EmpregaNet.Domain.Enums;
 using EmpregaNet.Domain.Interfaces;
-using FluentValidation;
 using Microsoft.Extensions.Logging;
 
 namespace EmpregaNet.Application.JobApplications.Queries;
@@ -17,18 +16,15 @@ public sealed class GetMyJobApplicationsHandler :
 {
     private readonly IJobApplicationRepository _jobApplicationRepository;
     private readonly IHttpCurrentUser _httpCurrentUser;
-    private readonly IValidator<GetMyJobApplicationsQuery> _validator;
     private readonly ILogger<GetMyJobApplicationsHandler> _logger;
 
     public GetMyJobApplicationsHandler(
         IJobApplicationRepository jobApplicationRepository,
         IHttpCurrentUser httpCurrentUser,
-        IValidator<GetMyJobApplicationsQuery> validator,
         ILogger<GetMyJobApplicationsHandler> logger)
     {
         _jobApplicationRepository = jobApplicationRepository;
         _httpCurrentUser = httpCurrentUser;
-        _validator = validator;
         _logger = logger;
     }
 

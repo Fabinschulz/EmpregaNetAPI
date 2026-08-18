@@ -2,13 +2,12 @@
 
 import { Alert, Button, Card, CardContent, CardDescription, CardHeader, CardTitle, PageHeader } from '@/components';
 import { FormProvider } from '@/context';
+import { useChangeMyPasswordMutation, useDeleteMyAccountMutation } from '../service';
 import {
   changeMyPasswordFormSchema,
   defaultChangeMyPasswordForm,
-  useChangeMyPasswordMutation,
-  useDeleteMyAccountMutation,
   type ChangeMyPasswordFormValues
-} from '../service';
+} from './change-password-form-schema';
 import { Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import styles from '../conta.module.scss';

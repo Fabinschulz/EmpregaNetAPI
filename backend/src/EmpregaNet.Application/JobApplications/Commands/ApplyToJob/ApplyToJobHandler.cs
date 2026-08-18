@@ -41,8 +41,7 @@ public sealed class ApplyToJobHandler : IRequestHandler<CreateCommand<ApplyToJob
         var user = _httpCurrentUser.GetContextUser();
         if (user is null)
         {
-            throw new ValidationAppException(
-                nameof(_httpCurrentUser.UserId),
+            throw ValidationAppException.ForBusinessRule(
                 "Usuário autenticado não encontrado no contexto da requisição.",
                 DomainErrorEnum.MISSING_RESOURCE_PERMISSION);
         }
@@ -51,8 +50,7 @@ public sealed class ApplyToJobHandler : IRequestHandler<CreateCommand<ApplyToJob
 
         if (userRoles.Any(r => NonCandidateRoles.Contains(r, StringComparer.OrdinalIgnoreCase)))
         {
-            throw new ValidationAppException(
-                nameof(_httpCurrentUser.UserId),
+            throw ValidationAppException.ForBusinessRule(
                 "Apenas candidatos podem se candidatar para vagas.",
                 DomainErrorEnum.INVALID_ACTION_FOR_RECORD);
         }

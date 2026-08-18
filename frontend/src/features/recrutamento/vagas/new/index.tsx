@@ -2,8 +2,9 @@
 
 import { Alert, PageHeader } from '@/components';
 import { FormProvider } from '@/context';
-import { defaultFormJob, jobFormSchema, useCreateJobMutation, type JobFormValues } from '../service';
-import { JobFormFields } from '../job-form';
+import { JobFormFields, defaultFormJob, jobFormSchema, type JobFormValues } from '../form';
+import { jobsRoutes } from '../jobs-routes';
+import { useCreateJobMutation } from '../service';
 
 export function RecruitmentNewJobPage() {
   const { apiError, mutateAsync } = useCreateJobMutation();
@@ -19,7 +20,7 @@ export function RecruitmentNewJobPage() {
       ) : null}
 
       <FormProvider validationSchema={jobFormSchema} defaultValues={defaultFormJob} onSubmit={handleSubmit}>
-        <JobFormFields submitLabel="Criar vaga" />
+        <JobFormFields submitLabel="Criar vaga" backHref={jobsRoutes.list} />
       </FormProvider>
     </div>
   );

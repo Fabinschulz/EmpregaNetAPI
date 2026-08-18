@@ -1,10 +1,10 @@
-import type { DomainErrorDto } from '@/shared/schema';
+import type { DomainErrorResponse } from '@/shared/schema';
 import { parseApiError } from '@/utils';
 
 export type QueryApiErrorState = {
   message: string | null;
   statusCode: number | undefined;
-  domainError: DomainErrorDto | null;
+  domainError: DomainErrorResponse | null;
   correlationId?: string;
 };
 

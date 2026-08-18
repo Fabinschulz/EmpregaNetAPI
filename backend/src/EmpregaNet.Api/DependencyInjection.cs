@@ -6,7 +6,6 @@ using EmpregaNet.Application.Auth;
 using EmpregaNet.Application.Auth.UseCase;
 using EmpregaNet.Infra.Cache;
 using Microsoft.AspNetCore.ResponseCompression;
-using Newtonsoft.Json;
 
 public static class DependencyInjection
 {
@@ -73,15 +72,18 @@ public static class DependencyInjection
         {
             options.SuppressModelStateInvalidFilter = true;
         })
-        .AddNewtonsoftJson(options =>
-        {
-            // Ignora referências circulares durante a serialização JSON
-            options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
-            //options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore; // Se descomentado, ignora propriedades nulas no JSON de resposta
-        })
+        // `AddNewtonsoftJson` substitui os formatters do MVC: é o Newtonsoft, e não o
+        // System.Text.Json, que serializa tudo o que sai dos controllers. Qualquer regra de
+        // serialização das respostas precisa de ser configurada aqui.
+        .AddNewtonsoftJson(ResponseJsonConfig.Configure)
         .AddJsonOptions(options =>
         {
             options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+        });
+
+        services.ConfigureHttpJsonOptions(options =>
+        {
+            options.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
         });
 
         services.SetupSwaggerDocumentation();

@@ -1,6 +1,5 @@
 using EmpregaNet.Application.Auth;
 using EmpregaNet.Domain.Common;
-using FluentValidation;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using EmpregaNet.Application.Common.Base;
@@ -21,18 +20,15 @@ public sealed class GetAllJobHandler : IRequestHandler<GetAllQuery<JobViewModel>
 {
     private readonly IJobRepository _repository;
     private readonly ILogger<GetAllJobHandler> _logger;
-    private readonly IValidator<GetAllQuery<JobViewModel>> _validator;
     private readonly IHttpContextAccessor _httpContextAccessor;
 
     public GetAllJobHandler(
         IJobRepository repository,
         ILogger<GetAllJobHandler> logger,
-        IValidator<GetAllQuery<JobViewModel>> validator,
         IHttpContextAccessor httpContextAccessor)
     {
         _repository = repository ?? throw new ArgumentNullException(nameof(repository));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        _validator = validator ?? throw new ArgumentNullException(nameof(validator));
         _httpContextAccessor = httpContextAccessor;
     }
 

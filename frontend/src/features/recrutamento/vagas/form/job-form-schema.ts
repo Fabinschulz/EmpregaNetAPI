@@ -1,61 +1,16 @@
 import {
   MAX_VOCABULARY_ITEMS_PER_JOB,
   UF_VALUE_SET,
-  createPaginatedResponseSchema,
   experienceLevelVocabulary,
   jobAreaVocabulary,
   jobTypeVocabulary,
   normalizeUf,
   workModelVocabulary,
-  workShiftVocabulary,
-  type JobsListQueryParams
-} from '@/shared/schema';
-import { z } from 'zod';
-
-export {
-  experienceLevelVocabulary,
-  jobAreaVocabulary,
-  jobTypeVocabulary,
-  workModelVocabulary,
   workShiftVocabulary
 } from '@/shared/schema';
-
-export const jobSchema = z.object({
-  id: z.number().int(),
-  title: z.string().min(1),
-  summary: z.string().nullable().optional(),
-  description: z.string().nullable().optional(),
-  companyId: z.number().int().nullable().optional(),
-  salaryMin: z.number().nullable().optional(),
-  salaryMax: z.number().nullable().optional(),
-  salaryDisclosed: z.boolean().nullable().optional(),
-  jobType: z.union([z.string(), z.number()]).nullable().optional(),
-  workModel: z.union([z.string(), z.number()]).nullable().optional(),
-  workShift: z.union([z.string(), z.number()]).nullable().optional(),
-  experienceLevel: z.union([z.string(), z.number()]).nullable().optional(),
-  area: z.union([z.string(), z.number()]).nullable().optional(),
-  isPcdFriendly: z.boolean().nullable().optional(),
-  city: z.string().nullable().optional(),
-  state: z.union([z.string(), z.number()]).nullable().optional(),
-  country: z.string().nullable().optional(),
-  requirements: z.array(z.string()).nullable().optional(),
-  benefits: z.array(z.string()).nullable().optional(),
-  isActive: z.boolean(),
-  publishedAt: z.string().nullable().optional(),
-  createdAt: z.string().nullable().optional()
-});
-
-export type JobDto = z.infer<typeof jobSchema>;
-export const jobsListResponseSchema = createPaginatedResponseSchema(jobSchema);
-export type JobsListResponseDto = z.infer<typeof jobsListResponseSchema>;
-
-export const companyOptionSchema = z.object({
-  id: z.number().int(),
-  name: z.string()
-});
-
-export const companyOptionsResponseSchema = z.array(companyOptionSchema);
-export type CompanyOption = z.infer<typeof companyOptionSchema>;
+import { z } from 'zod';
+import type { JobRequest } from '../service/jobs-request-schema';
+import type { JobResponse } from '../service/jobs-response-schema';
 
 const optionalMoney = z
   .string()
@@ -129,30 +84,6 @@ export const defaultFormJob: JobFormValues = {
   benefits: []
 };
 
-const moneyToInput = (value: number | null | undefined): string => (value != null ? String(value) : '');
-
-export function jobFormValuesFromDto(job: JobDto): JobFormValues {
-  return {
-    companyId: job.companyId != null ? String(job.companyId) : '',
-    title: job.title,
-    summary: job.summary ?? '',
-    description: job.description ?? '',
-    jobType: jobTypeVocabulary.normalize(job.jobType),
-    workModel: workModelVocabulary.normalize(job.workModel),
-    workShift: workShiftVocabulary.normalize(job.workShift),
-    experienceLevel: experienceLevelVocabulary.normalize(job.experienceLevel),
-    area: jobAreaVocabulary.normalize(job.area),
-    city: job.city ?? '',
-    state: normalizeUf(job.state),
-    pcd: job.isPcdFriendly ? 'yes' : 'no',
-    salaryDisclosure: (job.salaryDisclosed ?? true) ? 'disclosed' : 'undisclosed',
-    salaryMin: moneyToInput(job.salaryMin),
-    salaryMax: moneyToInput(job.salaryMax),
-    requirements: job.requirements ?? [],
-    benefits: job.benefits ?? []
-  };
-}
-
 export const SALARY_DISCLOSURE_OPTIONS = [
   { value: 'disclosed', label: 'Divulgar faixa salarial' },
   { value: 'undisclosed', label: 'A combinar' }
@@ -163,7 +94,31 @@ export const PCD_OPTIONS = [
   { value: 'yes', label: 'Vaga afirmativa para PcD' }
 ] as const;
 
-export function jobFormToApiPayload(values: JobFormValues) {
+const moneyToInput = (value: number | null | undefined): string => (value != null ? String(value) : '');
+
+export function jobFormValuesFromResponse(job: JobResponse): JobFormValues {
+  return {
+    companyId: String(job.companyId),
+    title: job.title,
+    summary: job.summary ?? '',
+    description: job.description,
+    jobType: jobTypeVocabulary.normalize(job.jobType),
+    workModel: workModelVocabulary.normalize(job.workModel),
+    workShift: workShiftVocabulary.normalize(job.workShift),
+    experienceLevel: experienceLevelVocabulary.normalize(job.experienceLevel),
+    area: jobAreaVocabulary.normalize(job.area),
+    city: job.city,
+    state: normalizeUf(job.state),
+    pcd: job.isPcdFriendly ? 'yes' : 'no',
+    salaryDisclosure: job.salaryDisclosed ? 'disclosed' : 'undisclosed',
+    salaryMin: moneyToInput(job.salaryMin),
+    salaryMax: moneyToInput(job.salaryMax),
+    requirements: job.requirements,
+    benefits: job.benefits
+  };
+}
+
+export function jobFormToRequest(values: JobFormValues): JobRequest {
   const toNumber = (value: string) => (value === '' ? undefined : Number(value));
   const salaryDisclosed = values.salaryDisclosure === 'disclosed';
 
@@ -185,23 +140,5 @@ export function jobFormToApiPayload(values: JobFormValues) {
     salaryMax: salaryDisclosed ? toNumber(values.salaryMax) : undefined,
     requirements: values.requirements,
     benefits: values.benefits
-  };
-}
-
-export const jobsFilterFormSchema = z.object({
-  search: z.string().trim().max(120, { message: 'A busca não pode exceder 120 caracteres.' }),
-  status: z.enum(['all', 'active', 'closed'])
-});
-
-export type JobsFilterFormValues = z.infer<typeof jobsFilterFormSchema>;
-export const defaultJobsFilter: JobsFilterFormValues = {
-  search: '',
-  status: 'all'
-};
-
-export function jobsFilterToParams(values: JobsFilterFormValues): Pick<JobsListQueryParams, 'search' | 'isActive'> {
-  return {
-    search: values.search.trim() || undefined,
-    isActive: values.status === 'all' ? undefined : values.status === 'active'
   };
 }

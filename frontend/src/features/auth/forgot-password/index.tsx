@@ -4,12 +4,15 @@ import { FormProvider } from '@/context';
 import { useForgotPasswordMutation } from '../service';
 import { StandalonePageNavLink, StandalonePage } from '@/components';
 import { ForgotPasswordFormFields } from './forgot-password-form';
-import type { ForgotPasswordDto } from './forgot-password-schema';
-import { forgotPasswordDefaultValues, forgotPasswordSchema } from './forgot-password-schema';
+import {
+  forgotPasswordDefaultValues,
+  forgotPasswordFormSchema,
+  type ForgotPasswordFormValues
+} from './forgot-password-schema';
 
 export function ForgotPassword() {
   const { apiError, mutateAsync, successMessage } = useForgotPasswordMutation();
-  const handleSubmit = async (formValue: ForgotPasswordDto) => await mutateAsync(formValue);
+  const handleSubmit = async (formValue: ForgotPasswordFormValues) => await mutateAsync(formValue);
 
   return (
     <StandalonePage
@@ -24,7 +27,7 @@ export function ForgotPassword() {
       }
     >
       <FormProvider
-        validationSchema={forgotPasswordSchema}
+        validationSchema={forgotPasswordFormSchema}
         defaultValues={forgotPasswordDefaultValues}
         onSubmit={handleSubmit}
       >

@@ -9,6 +9,19 @@ export function getFieldErrorMessage(path: string, errors: unknown): string | un
   return undefined;
 }
 
+export function hasObjectPath(path: string, obj: unknown): boolean {
+  const parts = path.split('.').filter(Boolean);
+  if (parts.length === 0) return false;
+
+  let current: unknown = obj;
+  for (const key of parts) {
+    if (current == null || typeof current !== 'object') return false;
+    if (!(key in (current as Record<string, unknown>))) return false;
+    current = (current as Record<string, unknown>)[key];
+  }
+  return true;
+}
+
 function _getObjectPropertyValue(path: string, obj: unknown): unknown {
   if (obj == null || typeof obj !== 'object') return undefined;
   const parts = path.split('.').filter(Boolean);

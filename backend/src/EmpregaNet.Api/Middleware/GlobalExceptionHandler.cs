@@ -1,4 +1,5 @@
 using System.Net;
+using System.Text.Json;
 using EmpregaNet.Application.Common.Exceptions;
 using EmpregaNet.Domain.Common;
 using EmpregaNet.Domain.Enums;
@@ -8,6 +9,8 @@ namespace EmpregaNet.Api.Middleware
 {
     internal sealed class GlobalExceptionHandler : IExceptionHandler
     {
+        private static readonly string[] EnvelopeSegments = ["entity", "request", "command", "model", "dto"];
+
         private readonly ILogger<GlobalExceptionHandler> _logger;
 
         public GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger)
@@ -26,29 +29,20 @@ namespace EmpregaNet.Api.Middleware
 
             _logger.LogError(exception, "Erro ao processar a requisição: {Message}. CorrelationId: {CorrelationId}", exception.Message, correlationId);
             SentrySdk.ConfigureScope(scope =>
-             {
-                 scope.SetExtra("DomainError_Code", domainError.Code.ToString());
-                 scope.SetExtra("DomainError_Message", domainError.Message);
-                 scope.SetExtra("DomainError_StatusCode", domainError.StatusCode);
+            {
+                scope.SetExtra("DomainError_Code", domainError.Code.ToString());
+                scope.SetExtra("DomainError_Message", domainError.Message);
+                scope.SetExtra("DomainError_StatusCode", domainError.StatusCode);
 
-                 if (domainError.Details is IDictionary<string, object> detailsDictionary && detailsDictionary.TryGetValue("Errors", out var errorsValue))
-                 {
-                     if (errorsValue is string[] stringErrors)
-                     {
-                         scope.SetExtra("Validation_Errors", stringErrors);
-                     }
-                     else if (errorsValue is IEnumerable<string> enumerableErrors)
-                     {
-                         scope.SetExtra("Validation_Errors", enumerableErrors.ToArray());
-                     }
-                     else if (errorsValue is object[] objectErrors)
-                     {
-                         scope.SetExtra("Validation_Errors", objectErrors.Select(e => e?.ToString() ?? "N/A").ToArray());
-                     }
-                 }
+                if (domainError.Errors.Count > 0)
+                {
+                    scope.SetExtra(
+                        "Validation_Errors",
+                        domainError.Errors.Select(e => e.Field is null ? e.Message : $"{e.Field}: {e.Message}").ToArray());
+                }
 
-                 SentrySdk.CaptureException(exception);
-             });
+                SentrySdk.CaptureException(exception);
+            });
 
             httpContext.Response.StatusCode = httpStatusCode;
             httpContext.Response.ContentType = "application/json";
@@ -56,7 +50,7 @@ namespace EmpregaNet.Api.Middleware
 
             return true;
         }
-    
+
         private Exception ResolveHandleableException(Exception exception)
         {
             var current = exception;
@@ -82,122 +76,159 @@ namespace EmpregaNet.Api.Middleware
             return exception;
         }
 
-
         /// <summary>
-        /// Mapeia diferentes tipos de exceção para uma estrutura DomainError e um StatusCode HTTP.
+        /// Mapeia a exceção para o corpo <see cref="DomainError"/> e o status HTTP correspondente.
         /// </summary>
-        /// <param name="exception">A exceção a ser mapeada.</param>
-        /// <param name="correlationId">O ID de correlação da requisição.</param>
-        /// <returns>Uma tupla contendo o DomainError mapeado e o StatusCode HTTP apropriado.</returns>
         private (DomainError domainError, int httpStatusCode) MapExceptionToDomainError(Exception exception, string correlationId)
         {
-            var code = DomainErrorEnum.UNEXPECTED_EXCEPTION;
-            var message = "Erro inesperado. Tente novamente mais tarde.";
-            object details = new { };
-            string[] errors = Array.Empty<string>();
-            var statusCode = (int)HttpStatusCode.InternalServerError;
-
             var isDevelopment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development";
+
+            var code = DomainErrorEnum.UNEXPECTED_EXCEPTION;
+            var headline = "Erro inesperado. Tente novamente mais tarde.";
+            var statusCode = (int)HttpStatusCode.InternalServerError;
+            IReadOnlyList<DomainErrorItem> errors = [];
 
             switch (exception)
             {
                 case BadRequestException badRequestException:
                     statusCode = (int)HttpStatusCode.BadRequest;
                     code = DomainErrorEnum.INVALID_PARAMS;
-                    message = "Requisição inválida.";
-                    errors = badRequestException.Errors;
+                    headline = "Requisição inválida.";
+                    errors = FormLevel(badRequestException.Errors, code);
                     break;
 
                 case NotFoundException notFoundException:
                     statusCode = (int)HttpStatusCode.NotFound;
                     code = DomainErrorEnum.RESOURCE_ID_NOT_FOUND;
-                    message = "Recurso não encontrado.";
-                    errors = ClientErrorDetails(isDevelopment, notFoundException.Message);
+                    headline = "Recurso não encontrado.";
+                    errors = ClientErrorDetails(isDevelopment, notFoundException.Message, code);
                     break;
 
                 case InvalidOperationException invalidOperationException:
                     statusCode = (int)HttpStatusCode.Conflict;
                     code = DomainErrorEnum.INVALID_ACTION_FOR_RECORD;
-                    message = "Operação inválida.";
-                    errors = ClientErrorDetails(isDevelopment, invalidOperationException.Message);
+                    headline = "Operação inválida.";
+                    errors = ClientErrorDetails(isDevelopment, invalidOperationException.Message, code);
                     break;
 
                 case KeyNotFoundException keyNotFoundException:
                     statusCode = (int)HttpStatusCode.NotFound;
                     code = DomainErrorEnum.RESOURCE_ID_NOT_FOUND;
-                    message = "Chave não encontrada.";
-                    errors = ClientErrorDetails(isDevelopment, keyNotFoundException.Message);
+                    headline = "Chave não encontrada.";
+                    errors = ClientErrorDetails(isDevelopment, keyNotFoundException.Message, code);
                     break;
 
                 case UnauthorizedAccessException unauthorizedAccessException:
                     statusCode = (int)HttpStatusCode.Unauthorized;
                     code = DomainErrorEnum.MISSING_RESOURCE_PERMISSION;
-                    message = "Acesso não autorizado.";
-                    errors = ClientErrorDetails(isDevelopment, unauthorizedAccessException.Message);
+                    headline = "Acesso não autorizado.";
+                    errors = ClientErrorDetails(isDevelopment, unauthorizedAccessException.Message, code);
                     break;
 
                 case DatabaseNotFoundException databaseNotFoundException:
                     statusCode = (int)HttpStatusCode.ServiceUnavailable;
                     code = DomainErrorEnum.UNEXPECTED_EXCEPTION;
-                    message = "Banco de dados não encontrado.";
-                    errors = ClientErrorDetails(isDevelopment, databaseNotFoundException.Message);
+                    headline = "Banco de dados não encontrado.";
+                    errors = ClientErrorDetails(isDevelopment, databaseNotFoundException.Message, code);
                     break;
 
                 case ValidationAppException validationException:
                     statusCode = (int)HttpStatusCode.BadRequest;
                     code = validationException.Code ?? DomainErrorEnum.INVALID_PARAMS;
-                    message = validationException.Message ?? "Erro de validação.";
-                    errors = validationException.Errors.SelectMany(e => e.Value).ToArray();
+                    headline = "Corrija os campos destacados.";
+                    errors = ToErrorItems(validationException, code);
                     break;
 
                 case ForbiddenAccessException forbiddenAccessException:
                     statusCode = (int)HttpStatusCode.Forbidden;
                     code = DomainErrorEnum.MISSING_RESOURCE_PERMISSION;
-                    message = "Acesso negado. Você não possui o nível de permissão necessário para acessar este recurso.";
-                    errors = ClientErrorDetails(isDevelopment, forbiddenAccessException.Message);
+                    headline = "Acesso negado. Você não possui o nível de permissão necessário para acessar este recurso.";
+                    errors = ClientErrorDetails(isDevelopment, forbiddenAccessException.Message, code);
                     break;
 
                 case NotSupportedException notSupportedException:
                     statusCode = (int)HttpStatusCode.NotImplemented;
                     code = DomainErrorEnum.UNSUPPORTED_OPERATION;
-                    message = notSupportedException.Message ?? "Operação não suportada.";
-                    errors = ClientErrorDetails(isDevelopment, notSupportedException.Message ?? "Mensagem não fornecida.");
+                    headline = notSupportedException.Message ?? "Operação não suportada.";
+                    errors = ClientErrorDetails(isDevelopment, notSupportedException.Message, code);
                     break;
 
                 default:
                     statusCode = (int)HttpStatusCode.InternalServerError;
                     code = DomainErrorEnum.UNEXPECTED_EXCEPTION;
-                    message = "Erro interno no servidor.";
-                    errors = ClientErrorDetails(isDevelopment, exception.Message);
+                    headline = "Erro interno no servidor.";
+                    errors = ClientErrorDetails(isDevelopment, exception.Message, code);
                     break;
-            }
-
-            details = new Dictionary<string, object>();
-
-            if (errors.Any())
-            {
-                ((Dictionary<string, object>)details).Add("Errors", errors);
-            }
-            if (exception.StackTrace != null && isDevelopment)
-            {
-                ((Dictionary<string, object>)details).Add("StackTrace", exception.StackTrace);
             }
 
             var domainError = new DomainError
             {
                 StatusCode = statusCode,
                 Code = code,
-                Message = message,
-                Details = details,
-                CorrelationId = correlationId
+                Message = ResolveMessage(headline, errors),
+                Errors = errors,
+                CorrelationId = correlationId,
+                StackTrace = isDevelopment ? exception.StackTrace : null
             };
 
             return (domainError, statusCode);
         }
 
-        private static string[] ClientErrorDetails(bool isDevelopment, string? detail) =>
+        private static string ResolveMessage(string headline, IReadOnlyList<DomainErrorItem> errors) =>
+            errors.Count == 1 ? errors[0].Message : headline;
+
+        private static List<DomainErrorItem> ToErrorItems(ValidationAppException exception, DomainErrorEnum code) =>
+            exception.Errors
+                .SelectMany(entry => entry.Value.Select(message => new DomainErrorItem
+                {
+                    Field = NormalizeFieldPath(entry.Key),
+                    Message = message,
+                    Code = code
+                }))
+                .ToList();
+
+        private static List<DomainErrorItem> FormLevel(IEnumerable<string> messages, DomainErrorEnum code) =>
+            messages
+                .Where(message => !string.IsNullOrWhiteSpace(message))
+                .Select(message => new DomainErrorItem { Field = null, Message = message, Code = code })
+                .ToList();
+
+        private static List<DomainErrorItem> ClientErrorDetails(bool isDevelopment, string? detail, DomainErrorEnum code) =>
             isDevelopment && !string.IsNullOrWhiteSpace(detail)
-                ? [detail]
-                : Array.Empty<string>();
+                ? [new DomainErrorItem { Field = null, Message = detail, Code = code }]
+                : [];
+
+        /// <summary>
+        /// Converte o caminho vindo do FluentValidation ou de <c>nameof</c> no caminho que o cliente espera.
+        /// Exemplo: <c>entity.Address.Street</c> -> <c>address.street</c>
+        /// </summary>
+        private static string? NormalizeFieldPath(string? propertyPath)
+        {
+            if (string.IsNullOrWhiteSpace(propertyPath))
+            {
+                return null;
+            }
+
+            var segments = propertyPath
+                .Split('.', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                .SkipWhile(segment => EnvelopeSegments.Contains(segment, StringComparer.OrdinalIgnoreCase))
+                .Select(ToCamelCaseSegment)
+                .ToArray();
+
+            return segments.Length == 0 ? null : string.Join('.', segments);
+        }
+
+        private static string ToCamelCaseSegment(string segment)
+        {
+            var bracket = segment.IndexOf('[');
+            if (bracket < 0)
+            {
+                return JsonNamingPolicy.CamelCase.ConvertName(segment);
+            }
+
+            var name = segment[..bracket];
+            var indexer = segment[bracket..];
+            return JsonNamingPolicy.CamelCase.ConvertName(name) + indexer;
+        }
     }
 }

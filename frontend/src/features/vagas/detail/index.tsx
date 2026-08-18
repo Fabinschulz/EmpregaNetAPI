@@ -3,7 +3,7 @@
 import { Alert, Button, Card, CardContent, CardFooter, CardHeader, CardTitle, StatusBadge } from '@/components';
 import { useAuth } from '@/context';
 import { useApplyToJobMutation } from '@/features/candidaturas/service';
-import type { JobDto } from '@/features/recrutamento/vagas/service';
+import type { JobResponse } from '@/features/recrutamento/vagas/service';
 import { useRelativeTime } from '@/hooks';
 import {
   experienceLevelVocabulary,
@@ -30,7 +30,7 @@ import styles from './job-detail.module.scss';
 
 type JobDetailPageProps = {
   /** Vaga já resolvida no servidor (Server Component). Este componente não busca dados. */
-  job: JobDto;
+  job: JobResponse;
 };
 
 type MetaItem = {

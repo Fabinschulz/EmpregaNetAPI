@@ -1,24 +1,5 @@
 import { z } from 'zod';
 
-/**
- * Parâmetros de paginação/ordenação enviados à API, alinhados a `ListQueryParams` do backend
- * (`page`, `size`, `orderBy`). Schema Zod validável (com defaults), em vez de um tipo TS solto -
- * permite validar entradas vindas de UI (ex.: um seletor de itens por página) antes de
- * repassar à camada de serviços.
- */
-export const paginationParamsSchema = z.object({
-  page: z.number().int().positive({ message: 'A página deve ser maior ou igual a 1.' }).default(1),
-  size: z
-    .number()
-    .int()
-    .positive({ message: 'O tamanho de página deve ser maior que 0.' })
-    .max(200, { message: 'O tamanho de página não pode exceder 200.' })
-    .default(20),
-  orderBy: z.string().trim().min(1).optional()
-});
-
-export type PaginationParams = z.infer<typeof paginationParamsSchema>;
-
 /** Tamanhos de página padrão oferecidos nas listagens (seletor "itens por página"). */
 export const PAGE_SIZE_OPTIONS = [10, 20, 50, 100] as const;
 
@@ -35,8 +16,6 @@ export const paginationMetaSchema = z.object({
   totalItems: z.number().int().nonnegative().optional()
 });
 
-export type PaginationMetaResponse = z.infer<typeof paginationMetaSchema>;
-
 /**
  * Cria o schema de uma resposta paginada da API para o schema de item `T` informado.
  *
@@ -47,8 +26,6 @@ export function createPaginatedResponseSchema<TItem extends z.ZodTypeAny>(itemSc
     data: z.array(itemSchema)
   });
 }
-
-export type PaginatedResponse<TItem> = PaginationMetaResponse & { data: TItem[] };
 
 /**
  * Calcula o total de páginas a partir do total de itens e do tamanho de página.

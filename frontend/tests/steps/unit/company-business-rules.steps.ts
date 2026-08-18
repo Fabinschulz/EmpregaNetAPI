@@ -1,4 +1,4 @@
-import { companyFormSchema, type CompanyFormValues } from '@/features/admin/empresas/service/companies-schema';
+import { companyFormSchema, type CompanyFormValues } from '@/features/admin/empresas/form/company-form-schema';
 import { Given, Then, When } from '@cucumber/cucumber';
 import { expect } from 'chai';
 import { setByPath } from '../../support/object-path';

@@ -1,18 +1,18 @@
-import { refreshToken, type UserLoggedDto } from '@/shared/auth';
+import { refreshToken, type UserLoggedResponse } from '@/shared/auth';
 import type { AxiosError, AxiosInstance, InternalAxiosRequestConfig } from 'axios';
 
 type AuthHandlers = {
-  onSessionRefreshed: (logged: UserLoggedDto) => void;
+  onSessionRefreshed: (logged: UserLoggedResponse) => void;
   onLogout: () => void;
 };
 
 let handlers: AuthHandlers | null = null;
-let refreshPromise: Promise<UserLoggedDto | null> | null = null;
+let refreshPromise: Promise<UserLoggedResponse | null> | null = null;
 
 export const registerAxiosAuthHandlers = (next: AuthHandlers) => (handlers = next);
 
 /** Tenta atualizar a sessão usando o refresh token do cookie httpOnly (enviado por `withCredentials`). */
-async function tryRefreshSession(): Promise<UserLoggedDto | null> {
+async function tryRefreshSession(): Promise<UserLoggedResponse | null> {
   if (!refreshPromise) {
     refreshPromise = refreshToken()
       .then((logged) => {

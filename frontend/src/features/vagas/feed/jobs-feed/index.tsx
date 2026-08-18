@@ -6,10 +6,10 @@ import {
   useJobFeedInteractionsQuery,
   useJobVocabularyQuery,
   useJobsFeedQuery,
-  type JobVocabularyDto,
-  type JobsFeedFilters,
-  type JobsFeedResponseDto
+  type JobVocabularyResponse,
+  type JobsFeedResponse
 } from '@/features/vagas/service';
+import type { JobsFeedFilters } from '../filters/jobs-feed-filters';
 import { useInfiniteScroll } from '@/hooks';
 import { RefreshCw } from 'lucide-react';
 import { useMemo } from 'react';
@@ -22,9 +22,9 @@ import { FeedSortSelect } from '../sort-select';
 import styles from './jobs-feed.module.scss';
 
 type JobsFeedProps = {
-  initialPage?: JobsFeedResponseDto;
+  initialPage?: JobsFeedResponse;
   initialFilters?: JobsFeedFilters;
-  initialVocabulary?: JobVocabularyDto;
+  initialVocabulary?: JobVocabularyResponse;
 };
 
 export function JobsFeed({ initialPage, initialFilters, initialVocabulary }: JobsFeedProps) {

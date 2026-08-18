@@ -6,9 +6,10 @@ import { reportMutationApiError, startRouterTransition, toastSuccess } from '@/u
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { companiesRoutes } from '../companies-routes';
+import { companyFormToRequest, type CompanyFormValues } from '../form/company-form-schema';
 import { createCompany, deleteCompany, getCompany, listCompanies, updateCompany } from './companies-api';
 import { companiesKeys } from './companies-keys';
-import type { CompanyFormValues } from './companies-schema';
 
 export function useCompaniesListQuery(params?: CompaniesListQueryParams) {
   const { isAuthenticated } = useAuth();
@@ -37,10 +38,11 @@ export function useCreateCompanyMutation() {
   const router = useRouter();
 
   const ctx = useMutation({
-    mutationFn: (formValue: CompanyFormValues) => createCompany(formValue),
-    onSuccess: async () => {
+    mutationFn: (formValue: CompanyFormValues) => createCompany(companyFormToRequest(formValue)),
+    onSuccess: async (id) => {
       await queryClient.invalidateQueries({ queryKey: companiesKeys.lists() });
-      startRouterTransition(() => router.push('/admin/empresas'));
+      toastSuccess('Empresa criada', 'Continue de onde parou para completar o cadastro.');
+      startRouterTransition(() => router.replace(companiesRoutes.detail(id)));
     },
     onError: (err) => {
       reportMutationApiError({ err, actionLabel: 'criar empresa', resource: 'empresa', setApiError });
@@ -50,17 +52,17 @@ export function useCreateCompanyMutation() {
   return { ...ctx, apiError };
 }
 
+/** Ao salvar, o usuário permanece no formulário; sair da edição é decisão dele, pelo "Voltar". */
 export function useUpdateCompanyMutation(companyId: number) {
   const queryClient = useQueryClient();
   const [apiError, setApiError] = useState<string | null>(null);
-  const router = useRouter();
 
   const ctx = useMutation({
-    mutationFn: (formValue: CompanyFormValues) => updateCompany(companyId, formValue),
+    mutationFn: (formValue: CompanyFormValues) => updateCompany(companyId, companyFormToRequest(formValue)),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: companiesKeys.detail(companyId) });
       await queryClient.invalidateQueries({ queryKey: companiesKeys.lists() });
-      startRouterTransition(() => router.push('/admin/empresas'));
+      toastSuccess('Empresa atualizada', 'As alterações foram gravadas.');
     },
     onError: (err) => {
       reportMutationApiError({ err, actionLabel: 'atualizar empresa', resource: 'empresa', setApiError });

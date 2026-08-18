@@ -11,7 +11,7 @@ namespace EmpregaNet.Application.Users.Commands;
 /// <summary>Dados que o próprio usuário pode alterar (sem mudar tipo/perfil administrativo).</summary>
 public sealed record UpdateMyProfileCommand(
     string? Email,
-    string? UserName,
+    string? Username,
     string? PhoneNumber
 ) : IRequest<UserViewModel>;
 
@@ -39,21 +39,19 @@ public sealed class UpdateMyProfileHandler : IRequestHandler<UpdateMyProfileComm
         var user = await _userManager.FindByIdAsync(_httpCurrentUser.UserId.ToString());
         if (user is null)
         {
-            throw new ValidationAppException(
-                nameof(_httpCurrentUser.UserId),
+            throw ValidationAppException.ForBusinessRule(
                 "Usuário não encontrado.",
                 DomainErrorEnum.USER_NOT_FOUND);
         }
 
         if (user.IsDeleted)
         {
-            throw new ValidationAppException(
-                nameof(_httpCurrentUser.UserId),
+            throw ValidationAppException.ForBusinessRule(
                 "Não é possível atualizar uma conta excluída.",
                 DomainErrorEnum.INVALID_ACTION_FOR_STATUS);
         }
 
-        await ApplyContactFieldsAsync(_userManager, user, request.Email, request.UserName, request.PhoneNumber);
+        await ApplyContactFieldsAsync(_userManager, user, request.Email, request.Username, request.PhoneNumber);
 
         user.UpdatedAt = DateTimeOffset.UtcNow;
 
@@ -61,7 +59,7 @@ public sealed class UpdateMyProfileHandler : IRequestHandler<UpdateMyProfileComm
         if (!update.Succeeded)
         {
             var msg = update.Errors.FirstOrDefault()?.Description ?? "Falha ao salvar os dados.";
-            throw new ValidationAppException(nameof(request), msg, DomainErrorEnum.RESOURCE_ERROR);
+            throw ValidationAppException.ForBusinessRule(msg, DomainErrorEnum.RESOURCE_ERROR);
         }
 
         _logger.LogInformation("Usuário {UserId} atualizou o próprio perfil.", user.Id);
@@ -87,7 +85,7 @@ public sealed class UpdateMyProfileHandler : IRequestHandler<UpdateMyProfileComm
             if (byName is not null && byName.Id != user.Id)
             {
                 throw new ValidationAppException(
-                    nameof(userName),
+                    nameof(UpdateMyProfileCommand.Username),
                     "Já existe outro usuário com este nome.",
                     DomainErrorEnum.RESOURCE_ALREADY_EXISTS);
             }
@@ -96,7 +94,7 @@ public sealed class UpdateMyProfileHandler : IRequestHandler<UpdateMyProfileComm
             if (!setName.Succeeded)
             {
                 var msg = setName.Errors.FirstOrDefault()?.Description ?? "Falha ao atualizar o nome de usuário.";
-                throw new ValidationAppException(nameof(userName), msg, DomainErrorEnum.INVALID_PARAMS);
+                throw new ValidationAppException(nameof(UpdateMyProfileCommand.Username), msg, DomainErrorEnum.INVALID_PARAMS);
             }
         }
 
@@ -106,7 +104,7 @@ public sealed class UpdateMyProfileHandler : IRequestHandler<UpdateMyProfileComm
             if (byEmail is not null && byEmail.Id != user.Id)
             {
                 throw new ValidationAppException(
-                    nameof(email),
+                    nameof(UpdateMyProfileCommand.Email),
                     "Já existe outro usuário com este e-mail.",
                     DomainErrorEnum.RESOURCE_ALREADY_EXISTS);
             }
@@ -115,7 +113,7 @@ public sealed class UpdateMyProfileHandler : IRequestHandler<UpdateMyProfileComm
             if (!setEmail.Succeeded)
             {
                 var msg = setEmail.Errors.FirstOrDefault()?.Description ?? "Falha ao atualizar o e-mail.";
-                throw new ValidationAppException(nameof(email), msg, DomainErrorEnum.INVALID_PARAMS);
+                throw new ValidationAppException(nameof(UpdateMyProfileCommand.Email), msg, DomainErrorEnum.INVALID_PARAMS);
             }
         }
 
@@ -126,7 +124,7 @@ public sealed class UpdateMyProfileHandler : IRequestHandler<UpdateMyProfileComm
             if (!setPhone.Succeeded)
             {
                 var msg = setPhone.Errors.FirstOrDefault()?.Description ?? "Falha ao atualizar o telefone.";
-                throw new ValidationAppException(nameof(phoneNumber), msg, DomainErrorEnum.INVALID_PARAMS);
+                throw new ValidationAppException(nameof(UpdateMyProfileCommand.PhoneNumber), msg, DomainErrorEnum.INVALID_PARAMS);
             }
         }
     }

@@ -5,7 +5,7 @@ import 'server-only';
 
 import { getPublicEnv } from '@/utils/lib/env';
 import { cacheLife, cacheTag } from 'next/cache';
-import { jobSchema, type JobDto } from './jobs-schema';
+import { jobResponseSchema, type JobResponse } from './jobs-response-schema';
 
 /**
  * Base URL usada pelo processo Next (server-side) para alcançar a API. Em produção o
@@ -19,7 +19,7 @@ function serverApiBaseUrl(): string {
 /**
  * Busca uma vaga no servidor (Server Components / `generateMetadata`) sem passar pelo
  * axios do cliente: o endpoint `/api/jobs/:id` é público, então não há cookie de sessão
- * envolvido. Reutiliza o mesmo `jobSchema` da camada de serviço como validação de fronteira,
+ * envolvido. Reutiliza o mesmo `jobResponseSchema` da camada de serviço como validação de fronteira,
  * mantendo o contrato único com a API .NET.
  *
  * `'use cache'` + `cacheLife('minutes')` dão comportamento tipo ISR (Incremental Static Regeneration): a resposta é memoizada
@@ -29,12 +29,12 @@ function serverApiBaseUrl(): string {
  * mutations de editar/encerrar/excluir. A expiração por `cacheLife` continua sendo a rede
  * de segurança para qualquer caminho que não passe por lá.
  *
- * Distingue os casos: `404 -> null` (vira `notFound()`); resposta inválida ao `jobSchema`
+ * Distingue os casos: `404 -> null` (vira `notFound()`); resposta inválida ao `jobResponseSchema`
  * LANÇA (como o resto da camada de serviço), para não mascarar drift de contrato como 404.
  *
  * Uso exclusivamente server-side, importa `next/cache`, indisponível no cliente.
  */
-export async function getJobCached(id: number): Promise<JobDto | null> {
+export async function getJobCached(id: number): Promise<JobResponse | null> {
   'use cache';
   cacheLife('minutes');
   cacheTag(`job:${id}`);
@@ -49,5 +49,5 @@ export async function getJobCached(id: number): Promise<JobDto | null> {
   if (!res.ok) throw new Error(`Falha ao carregar a vaga ${id} (HTTP ${res.status}).`);
 
   const data: unknown = await res.json();
-  return jobSchema.parse(data);
+  return jobResponseSchema.parse(data);
 }

@@ -23,8 +23,7 @@ public sealed class JobEmployerAccess : IJobEmployerAccess
         var appUser = await _userManager.FindByIdAsync(_currentUser.UserId.ToString());
         if (appUser is null || appUser.IsDeleted)
         {
-            throw new ValidationAppException(
-                nameof(_currentUser.UserId),
+            throw ValidationAppException.ForBusinessRule(
                 "Usuário não encontrado.",
                 DomainErrorEnum.RESOURCE_ID_NOT_FOUND);
         }
@@ -35,16 +34,14 @@ public sealed class JobEmployerAccess : IJobEmployerAccess
 
         if (appUser.EmployerCompanyId is null)
         {
-            throw new ValidationAppException(
-                nameof(User.EmployerCompanyId),
+            throw ValidationAppException.ForBusinessRule(
                 "Seu usuário ainda não está vinculado a uma empresa. Solicite ao administrador.",
                 DomainErrorEnum.MISSING_RESOURCE_PERMISSION);
         }
 
         if (appUser.EmployerCompanyId.Value != companyId)
         {
-            throw new ValidationAppException(
-                nameof(companyId),
+            throw ValidationAppException.ForBusinessRule(
                 "Você só pode gerenciar vagas da empresa à qual está vinculado.",
                 DomainErrorEnum.MISSING_RESOURCE_PERMISSION);
         }

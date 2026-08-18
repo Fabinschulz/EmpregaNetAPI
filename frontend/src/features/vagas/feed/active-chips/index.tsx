@@ -1,6 +1,6 @@
 'use client';
 
-import type { JobsFeedFilters } from '@/features/vagas/service';
+import type { JobsFeedFilters } from '../filters/jobs-feed-filters';
 import {
   experienceLevelVocabulary,
   findSalaryRange,

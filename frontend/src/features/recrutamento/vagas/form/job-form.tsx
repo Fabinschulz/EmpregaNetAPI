@@ -1,41 +1,38 @@
 'use client';
 
 import {
-  Button,
-  FormActions,
-  FormGrid,
-  FormRow,
-  FormSection,
-  FormSubmitButton,
-  InputField,
-  MultiSelectField,
-  SelectField,
-  TextareaField
+    Button,
+    FormActions,
+    FormGrid,
+    FormRow,
+    FormSection,
+    FormSubmitButton,
+    InputField,
+    MultiSelectField,
+    SelectField,
+    TextareaField
 } from '@/components';
 import { useFormContext } from '@/context';
 import { useJobVocabularyQuery } from '@/features/vagas/service';
-import { UF_SELECT_OPTIONS } from '@/shared/schema';
+import {
+    experienceLevelVocabulary,
+    jobAreaVocabulary,
+    jobTypeVocabulary, UF_SELECT_OPTIONS, workModelVocabulary,
+    workShiftVocabulary
+} from '@/shared/schema';
 import { Archive, Save } from 'lucide-react';
 import { useMemo } from 'react';
-import {
-  PCD_OPTIONS,
-  SALARY_DISCLOSURE_OPTIONS,
-  experienceLevelVocabulary,
-  jobAreaVocabulary,
-  jobTypeVocabulary,
-  useSelectableCompaniesQuery,
-  workModelVocabulary,
-  workShiftVocabulary,
-  type JobFormValues
-} from './service';
+import { useSelectableCompaniesQuery } from '../service';
+import { PCD_OPTIONS, SALARY_DISCLOSURE_OPTIONS, type JobFormValues } from './job-form-schema';
 
 type JobFormFieldsProps = {
   submitLabel: string;
+  backHref: string;
   onClose?: () => void;
   closeDisabled?: boolean;
 };
 
-export function JobFormFields({ submitLabel, onClose, closeDisabled }: JobFormFieldsProps) {
+export function JobFormFields({ submitLabel, backHref, onClose, closeDisabled }: JobFormFieldsProps) {
   const { submitting, watch } = useFormContext<JobFormValues>();
   const { data: companies, isPending: companiesLoading } = useSelectableCompaniesQuery();
   const { data: vocabulary, isPending: vocabularyLoading } = useJobVocabularyQuery();
@@ -126,7 +123,7 @@ export function JobFormFields({ submitLabel, onClose, closeDisabled }: JobFormFi
         />
       </FormSection>
 
-      <FormActions>
+      <FormActions backHref={backHref}>
         <FormSubmitButton variant="primary">
           <Save aria-hidden />
           {submitting ? 'Salvando...' : submitLabel}

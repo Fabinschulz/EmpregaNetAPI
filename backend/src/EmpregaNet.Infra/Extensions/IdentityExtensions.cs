@@ -143,8 +143,7 @@ namespace EmpregaNet.Infra.Extensions
                                                     StatusCode = 403,
                                                     Code = DomainErrorEnum.MISSING_RESOURCE_PERMISSION,
                                                     Message = "Acesso negado. Você não possui permissão para esta operação.",
-                                                    CorrelationId = context.HttpContext.Items["Correlation-ID"]?.ToString() ?? Guid.NewGuid().ToString(),
-                                                    Details = null!
+                                                    CorrelationId = context.HttpContext.Items["Correlation-ID"]?.ToString() ?? Guid.NewGuid().ToString()
                                                 };
 
                                                 await context.Response.WriteAsJsonAsync(domainError);
@@ -161,8 +160,7 @@ namespace EmpregaNet.Infra.Extensions
                                                     StatusCode = 401,
                                                     Code = DomainErrorEnum.MISSING_RESOURCE_PERMISSION,
                                                     Message = "Token inválido ou não informado.",
-                                                    CorrelationId = context.HttpContext.Items["Correlation-ID"]?.ToString() ?? Guid.NewGuid().ToString(),
-                                                    Details = null!
+                                                    CorrelationId = context.HttpContext.Items["Correlation-ID"]?.ToString() ?? Guid.NewGuid().ToString()
                                                 };
 
                                                 await context.Response.WriteAsJsonAsync(domainError);

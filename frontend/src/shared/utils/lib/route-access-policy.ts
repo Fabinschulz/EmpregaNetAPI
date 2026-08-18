@@ -24,10 +24,6 @@ export function evaluateRouteAccess(pathname: string, session: RouteSession): Ro
   return 'allow';
 }
 
-export function isRouteAccessAllowed(pathname: string, session: RouteSession): boolean {
-  return evaluateRouteAccess(pathname, session) === 'allow';
-}
-
 export function buildLoginRedirectPath(returnPath: string): string {
   return `${LOGIN_PATH}?redirect=${encodeURIComponent(returnPath)}`;
 }

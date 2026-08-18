@@ -2,13 +2,13 @@ import 'server-only';
 
 import { getPublicEnv } from '@/utils/lib/env';
 import { cacheLife } from 'next/cache';
+import type { JobsFeedQueryParams } from './jobs-feed-params';
 import {
-  jobVocabularySchema,
+  jobVocabularyResponseSchema,
   jobsFeedResponseSchema,
-  type JobVocabularyDto,
-  type JobsFeedQueryParams,
-  type JobsFeedResponseDto
-} from './jobs-feed-schema';
+  type JobVocabularyResponse,
+  type JobsFeedResponse
+} from './jobs-feed-response-schema';
 
 function serverApiBaseUrl(): string {
   return process.env.API_INTERNAL_BASE_URL?.trim() || getPublicEnv().NEXT_PUBLIC_API_BASE_URL;
@@ -45,7 +45,7 @@ function buildQueryString(params: JobsFeedQueryParams): string {
  *
  * Falha de rede ou resposta inválida **lança**: o Server Component decide o que mostrar.
  */
-export async function getJobsFeedCached(params: JobsFeedQueryParams): Promise<JobsFeedResponseDto> {
+export async function getJobsFeedCached(params: JobsFeedQueryParams): Promise<JobsFeedResponse> {
   'use cache';
   cacheLife('minutes');
 
@@ -69,7 +69,7 @@ export async function getJobsFeedCached(params: JobsFeedQueryParams): Promise<Jo
  * pedisse ao montar: o painel é a primeira coisa que o utilizador vê. Como só muda com deploy,
  * a janela de cache é longa.
  */
-export async function getJobVocabularyCached(): Promise<JobVocabularyDto> {
+export async function getJobVocabularyCached(): Promise<JobVocabularyResponse> {
   'use cache';
   cacheLife('days');
 
@@ -82,5 +82,5 @@ export async function getJobVocabularyCached(): Promise<JobVocabularyDto> {
   }
 
   const data: unknown = await res.json();
-  return jobVocabularySchema.parse(data);
+  return jobVocabularyResponseSchema.parse(data);
 }

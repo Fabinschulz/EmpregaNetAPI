@@ -17,15 +17,15 @@ import { FormProvider } from '@/context';
 import { formatDateTime, userTypeLabel } from '@/shared';
 import { useParams } from 'next/navigation';
 import { useMemo, type ReactNode } from 'react';
+import { useAdminUserQuery, useUpdateAdminUserMutation } from '../service';
 import {
-  adminUserFormValuesFromDto,
+  adminUserFormValuesFromResponse,
   adminUserUpdateFormSchema,
   defaultAdminUserUpdateForm,
-  useAdminUserQuery,
-  useUpdateAdminUserMutation,
   type AdminUserUpdateFormValues
-} from '../service';
+} from './admin-user-form-schema';
 import styles from './admin-user-detail.module.scss';
+import { adminUsersRoutes } from '../admin-users-routes';
 import { AdminUserFormFields } from './admin-user-form';
 
 function initialsOf(name: string): string {
@@ -54,7 +54,7 @@ export function AdminUserDetailPage() {
 
   const initial = useMemo<AdminUserUpdateFormValues>(() => {
     if (!user) return defaultAdminUserUpdateForm;
-    return adminUserFormValuesFromDto(user);
+    return adminUserFormValuesFromResponse(user);
   }, [user]);
 
   const handleSubmit = async (formValue: AdminUserUpdateFormValues) => await updateAsync(formValue);
@@ -139,7 +139,7 @@ export function AdminUserDetailPage() {
                   onSubmit={handleSubmit}
                   readOnly={user.isDeleted}
                 >
-                  <AdminUserFormFields />
+                  <AdminUserFormFields backHref={adminUsersRoutes.list} />
                 </FormProvider>
               </CardContent>
             </Card>

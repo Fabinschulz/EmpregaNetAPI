@@ -3,20 +3,20 @@
 import { ApiQueryBoundary, PageHeader, TableContainer, TableFilters, type DataTableColumn } from '@/components';
 import { FormProvider } from '@/context';
 import { usePersistedTablePagination } from '@/hooks';
-import { formatDate, type CandidatesListQueryParams, type UserDto } from '@/shared';
+import { formatDate, type CandidatesListQueryParams, type UserResponse } from '@/shared';
 import { Eye } from 'lucide-react';
 import { useCallback, useMemo, useState } from 'react';
+import { useCandidatesListQuery } from '../service';
 import {
   candidatesFilterFormSchema,
   candidatesFilterToParams,
-  defaultCandidatesFilter,
-  useCandidatesListQuery
-} from '../service';
+  defaultCandidatesFilter
+} from './candidates-filter-schema';
 import { CandidatesFilterFields } from './candidates-filter-fields';
 
 type CandidatesFilterParams = Pick<CandidatesListQueryParams, 'search' | 'orderBy'>;
 
-const CANDIDATES_COLUMNS: DataTableColumn<UserDto>[] = [
+const CANDIDATES_COLUMNS: DataTableColumn<UserResponse>[] = [
   { key: 'username', header: 'Candidato', render: (candidate) => <strong>{candidate.username}</strong> },
   { key: 'email', header: 'E-mail', render: (candidate) => candidate.email },
   { key: 'createdAt', header: 'Cadastrado em', render: (candidate) => formatDate(candidate.createdAt) },

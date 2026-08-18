@@ -12,8 +12,9 @@ import {
 } from '@/components';
 import { useFormContext } from '@/context';
 import { useZipCodeAutofill } from '@/hooks';
+import { UF_OPTIONS } from '@/shared/schema';
 import { Save } from 'lucide-react';
-import { TYPE_OF_ACTIVITY_OPTIONS, UF_OPTIONS } from '../service';
+import { TYPE_OF_ACTIVITY_OPTIONS } from '../domain/type-of-activity';
 
 const ACTIVITY_OPTIONS = TYPE_OF_ACTIVITY_OPTIONS.map((o) => ({ value: o.value, label: o.label }));
 const STATE_OPTIONS = UF_OPTIONS.map((o) => ({ value: o.value, label: `${o.value} - ${o.label}` }));
@@ -28,9 +29,10 @@ const ADDRESS_FIELDS = {
 
 type CompanyFormFieldsProps = {
   submitLabel: string;
+  backHref: string;
 };
 
-export function CompanyFormFields({ submitLabel }: CompanyFormFieldsProps) {
+export function CompanyFormFields({ submitLabel, backHref }: CompanyFormFieldsProps) {
   const { submitting } = useFormContext();
   const { hint: zipCodeHint, onZipCodeChange } = useZipCodeAutofill(ADDRESS_FIELDS);
 
@@ -72,7 +74,7 @@ export function CompanyFormFields({ submitLabel }: CompanyFormFieldsProps) {
         </FormRow>
       </FormSection>
 
-      <FormActions>
+      <FormActions backHref={backHref}>
         <FormSubmitButton variant="primary">
           <Save aria-hidden />
           {submitting ? 'Salvando...' : submitLabel}

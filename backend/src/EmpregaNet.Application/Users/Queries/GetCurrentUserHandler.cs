@@ -25,8 +25,7 @@ public sealed class GetCurrentUserHandler : IRequestHandler<GetCurrentUserQuery,
         var user = await _userManager.FindByIdAsync(_currentUser.UserId.ToString());
         if (user is null || user.IsDeleted)
         {
-            throw new ValidationAppException(
-                nameof(_currentUser.UserId),
+            throw ValidationAppException.ForBusinessRule(
                 "Usuário não encontrado.",
                 DomainErrorEnum.USER_NOT_FOUND);
         }

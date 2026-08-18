@@ -1,6 +1,7 @@
 import { When, Then } from '@cucumber/cucumber';
 import { expect } from 'chai';
-import { normalizeTypeOfActivity, normalizeUf } from '@/features/admin/empresas/service/companies-schema';
+import { normalizeTypeOfActivity } from '@/features/admin/empresas/domain/type-of-activity';
+import { normalizeUf } from '@/shared/schema';
 import type { BusinessRulesWorld } from '../../support/world';
 
 /** "(vazio)" na tabela do Gherkin representa string vazia - mais legível que uma célula em branco. */

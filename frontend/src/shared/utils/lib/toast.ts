@@ -1,7 +1,6 @@
-import { parseApiError } from '@/utils';
+import { isContractViolation, parseApiError } from '@/utils';
 import { isAxiosError } from 'axios';
 import { toast } from 'sonner';
-import { z } from 'zod';
 
 const GENERIC =
   'Não foi possível concluir a operação neste momento. Verifique a sua conexão com à rede e tente novamente dentro de instantes.';
@@ -25,9 +24,10 @@ export function toastInfo(title: string, description?: string): void {
 export function notifyApiError(err: unknown, resource: string, actionLabel: string): void {
   const suffix = resource ? ` (${resource})` : '';
 
-  if (err instanceof z.ZodError) {
-    toast.error('Dados inválidos ou incompletos', {
-      description: `A resposta do servidor não pôde ser validada. Se o problema persistir, contacte o suporte.`
+  if (isContractViolation(err)) {
+    toast.error('Resposta inesperada do servidor', {
+      description: parseApiError(err, resource).message,
+      duration: 7000
     });
     return;
   }

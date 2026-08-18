@@ -4,12 +4,15 @@ import { FormProvider } from '@/context';
 import { useResendEmailConfirmationMutation } from '../service';
 import { StandalonePageNavLink, StandalonePage } from '@/components';
 import { ResendConfirmationFormFields } from './resend-confirmation-form';
-import type { ResendEmailConfirmationDto } from './resend-confirmation-schema';
-import { resendConfirmationDefaultValues, resendEmailConfirmationSchema } from './resend-confirmation-schema';
+import {
+  resendConfirmationDefaultValues,
+  resendConfirmationFormSchema,
+  type ResendConfirmationFormValues
+} from './resend-confirmation-schema';
 
 export function ResendConfirmation() {
   const { apiError, mutateAsync, successMessage } = useResendEmailConfirmationMutation();
-  const handleSubmit = async (formValue: ResendEmailConfirmationDto) => await mutateAsync(formValue);
+  const handleSubmit = async (formValue: ResendConfirmationFormValues) => await mutateAsync(formValue);
 
   return (
     <StandalonePage
@@ -24,7 +27,7 @@ export function ResendConfirmation() {
       }
     >
       <FormProvider
-        validationSchema={resendEmailConfirmationSchema}
+        validationSchema={resendConfirmationFormSchema}
         defaultValues={resendConfirmationDefaultValues}
         onSubmit={handleSubmit}
       >

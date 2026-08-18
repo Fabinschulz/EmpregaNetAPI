@@ -2,12 +2,11 @@
 
 import { useAuth } from '@/context';
 import { withDefaultListParams, type AdminUsersListQueryParams } from '@/shared/schema';
-import { reportMutationApiError, startRouterTransition, toastSuccess } from '@/utils';
+import { reportMutationApiError, toastSuccess } from '@/utils';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { adminUserFormToRequest, type AdminUserUpdateFormValues } from '../detail/admin-user-form-schema';
 import { deleteAdminUser, getAdminUser, listAdminUsers, updateAdminUser } from './admin-api';
-import type { AdminUserUpdateFormValues } from './admin-schema';
 import { adminUsersKeys } from './admin-users-keys';
 
 export function useAdminUsersListQuery(params?: AdminUsersListQueryParams) {
@@ -34,17 +33,13 @@ export function useAdminUserQuery(id: number) {
 export function useUpdateAdminUserMutation(userId: number) {
   const queryClient = useQueryClient();
   const [apiError, setApiError] = useState<string | null>(null);
-  const router = useRouter();
 
   const ctx = useMutation({
-    mutationFn: (formValue: AdminUserUpdateFormValues) =>
-      updateAdminUser(userId, {
-        userType: formValue.userType.trim() || null
-      }),
+    mutationFn: (formValue: AdminUserUpdateFormValues) => updateAdminUser(userId, adminUserFormToRequest(formValue)),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: adminUsersKeys.detail(userId) });
       await queryClient.invalidateQueries({ queryKey: adminUsersKeys.lists() });
-      startRouterTransition(() => router.push('/admin/usuarios'));
+      toastSuccess('Usuário atualizado', 'As alterações foram gravadas.');
     },
     onError: (err) => {
       reportMutationApiError({ err, actionLabel: 'atualizar usuário', resource: 'usuário', setApiError });

@@ -47,8 +47,7 @@ public sealed class ChangeMyPasswordHandler : IRequestHandler<ChangeMyPasswordCo
         var user = await _userManager.FindByIdAsync(_httpCurrentUser.UserId.ToString());
         if (user is null || user.IsDeleted)
         {
-            throw new ValidationAppException(
-                nameof(_httpCurrentUser.UserId),
+            throw ValidationAppException.ForBusinessRule(
                 "Usuário não encontrado.",
                 DomainErrorEnum.USER_NOT_FOUND);
         }

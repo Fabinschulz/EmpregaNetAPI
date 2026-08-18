@@ -16,12 +16,10 @@ public sealed record GetAllCandidatesQuery(int Page, int Size, string? OrderBy, 
 public sealed class GetAllCandidatesHandler : IRequestHandler<GetAllCandidatesQuery, ListDataPagination<UserViewModel>>
 {
     private readonly UserManager<User> _userManager;
-    private readonly IValidator<GetAllCandidatesQuery> _validator;
 
     public GetAllCandidatesHandler(UserManager<User> userManager, IValidator<GetAllCandidatesQuery> validator)
     {
         _userManager = userManager;
-        _validator = validator;
     }
 
     public async Task<ListDataPagination<UserViewModel>> Handle(GetAllCandidatesQuery request, CancellationToken cancellationToken)
