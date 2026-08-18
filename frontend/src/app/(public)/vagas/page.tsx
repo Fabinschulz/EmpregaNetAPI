@@ -1,8 +1,8 @@
 import { JobsFeed } from '@/features/vagas/feed';
 import {
-    jobsFeedFiltersToApiParams,
-    parseJobsFeedFilters,
-    searchParamsFromRecord
+  jobsFeedFiltersToApiParams,
+  parseJobsFeedFilters,
+  searchParamsFromRecord
 } from '@/features/vagas/feed/filters';
 import { JOBS_FEED_PAGE_SIZE } from '@/features/vagas/service';
 // eslint-disable-next-line no-restricted-imports

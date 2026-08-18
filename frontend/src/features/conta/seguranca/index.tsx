@@ -1,6 +1,15 @@
 'use client';
 
-import { Alert, Button, Card, CardContent, CardDescription, CardHeader, CardTitle, PageHeader } from '@/shared/components';
+import {
+  Alert,
+  Button,
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  PageHeader
+} from '@/shared/components';
 import { FormProvider } from '@/shared/context';
 import { useChangeMyPasswordMutation, useDeleteMyAccountMutation } from '../service';
 import {

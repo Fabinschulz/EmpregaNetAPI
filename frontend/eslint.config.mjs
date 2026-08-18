@@ -11,8 +11,7 @@ const NO_FEATURES_FROM_SHARED = {
 
 const NO_APP_FROM_SHARED = {
   group: ['@/app', '@/app/*'],
-  message:
-    'shared/ não pode importar de app/. A dependência aponta para dentro: app -> features -> shared.'
+  message: 'shared/ não pode importar de app/. A dependência aponta para dentro: app -> features -> shared.'
 };
 
 const NO_DEEP_CROSS_SLICE = {
@@ -118,10 +117,7 @@ const eslintConfig = defineConfig([
   {
     files: ['src/app/**/*.{ts,tsx}'],
     rules: {
-      'no-restricted-imports': [
-        'error',
-        { patterns: [NO_DEEP_CROSS_SLICE], paths: [NO_SHARED_MEGA_BARREL] }
-      ]
+      'no-restricted-imports': ['error', { patterns: [NO_DEEP_CROSS_SLICE], paths: [NO_SHARED_MEGA_BARREL] }]
     }
   },
   {
@@ -136,10 +132,7 @@ const eslintConfig = defineConfig([
   {
     files: ['src/features/**/*.{ts,tsx}'],
     rules: {
-      'no-restricted-imports': [
-        'error',
-        { patterns: [NO_DEEP_CROSS_SLICE], paths: [NO_SHARED_MEGA_BARREL] }
-      ]
+      'no-restricted-imports': ['error', { patterns: [NO_DEEP_CROSS_SLICE], paths: [NO_SHARED_MEGA_BARREL] }]
     }
   },
   {
