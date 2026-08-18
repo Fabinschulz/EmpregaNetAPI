@@ -1,0 +1,18 @@
+# Alinha o editor ao prettier.config.cjs, que o CI verifica com `pnpm format:check`.
+#
+# Existe porque o editor vinha reindentando blocos de import para 4 espaços a cada
+# auto-import, e o `prettier --check` do CI recusava — quebra que não aparece em
+# nenhum diff de lógica e só se manifesta no pipeline.
+
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[*.{ts,tsx,js,jsx,mjs,cjs,json,scss,css,md,yml,yaml}]
+indent_style = space
+indent_size = 2
+max_line_length = 120

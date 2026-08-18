@@ -1,24 +1,26 @@
 'use client';
 
 import {
-    Button,
-    FormActions,
-    FormGrid,
-    FormRow,
-    FormSection,
-    FormSubmitButton,
-    InputField,
-    MultiSelectField,
-    SelectField,
-    TextareaField
+  Button,
+  FormActions,
+  FormGrid,
+  FormRow,
+  FormSection,
+  FormSubmitButton,
+  InputField,
+  MultiSelectField,
+  SelectField,
+  TextareaField
 } from '@/components';
 import { useFormContext } from '@/context';
 import { useJobVocabularyQuery } from '@/features/vagas/service';
 import {
-    experienceLevelVocabulary,
-    jobAreaVocabulary,
-    jobTypeVocabulary, UF_SELECT_OPTIONS, workModelVocabulary,
-    workShiftVocabulary
+  experienceLevelVocabulary,
+  jobAreaVocabulary,
+  jobTypeVocabulary,
+  UF_SELECT_OPTIONS,
+  workModelVocabulary,
+  workShiftVocabulary
 } from '@/shared/schema';
 import { Archive, Save } from 'lucide-react';
 import { useMemo } from 'react';
