@@ -1,6 +1,6 @@
 'use client';
 
-import { AutocompleteInput, type AutocompleteOption } from '@/components/ui';
+import { AutocompleteInput, type AutocompleteOption } from '@/shared/components/ui';
 import type React from 'react';
 import { FormField, useFormField, type FormFieldBaseProps } from '../field';
 

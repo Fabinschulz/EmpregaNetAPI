@@ -1,4 +1,4 @@
-import { parseCookieHeader } from '@/utils';
+import { parseCookieHeader } from '@/shared/utils';
 import { jwtDecode } from 'jwt-decode';
 
 /**
@@ -100,81 +100,25 @@ function buildSession(token: string): Session {
  * Constrói a sessão a partir do cookie httpOnly `access_token` presente no header `Cookie`.
  * Uso exclusivamente server-side (middleware/proxy) para gating de rotas.
  */
+/**
+ * A sessão existe e ainda não expirou.
+ *
+ * Mora aqui, e não inline no `proxy.ts`, porque é a regra que decide se uma requisição é tratada
+ * como autenticada — a coisa mais próxima de uma decisão de segurança que o frontend toma. Como
+ * função nomeada ela é coberta por cenários; como expressão solta dentro do middleware, não era.
+ *
+ * Um token sem `exp` é aceito: a API é quem valida a assinatura e o prazo de verdade, e recusar
+ * aqui um token que o servidor aceitaria só produziria um logout que o usuário não entende.
+ */
+export function isSessionValid(session: Session | null): boolean {
+  if (!session?.token) return false;
+  if (session.exp === undefined) return true;
+  return session.exp * 1000 > Date.now();
+}
+
 export function readSessionFromCookieHeader(cookieHeader: string | null | undefined): Session | null {
   const cookies = parseCookieHeader(cookieHeader);
   const token = cookies[ACCESS_TOKEN_COOKIE];
   if (!token) return null;
   return buildSession(token);
-}
-
-// ---------------------------------------------------------------------------
-// Metadados de sessão no cliente (hidratação sem requisição).
-//
-// Guarda APENAS dados de exibição/gating de UI (roles, nome, e-mail), nunca o token.
-// A credencial vive exclusivamente nos cookies httpOnly: um XSS que leia estes
-// metadados não obtém nada utilizável, pois a autorização real é decidida no
-// servidor pelo cookie. Se os metadados ficarem obsoletos (logout noutra aba,
-// cookies expirados), a primeira chamada à API devolve 401 e o interceptor corrige.
-// ---------------------------------------------------------------------------
-
-const SESSION_METADATA_KEY = 'empreganet_session_meta';
-const SESSION_METADATA_EVENT = 'empreganet:session-meta';
-
-export type SessionMetadata = {
-  roles: string[];
-  username: string | null;
-  email: string | null;
-};
-
-function parseMetadata(raw: string): SessionMetadata | null {
-  try {
-    const parsed = JSON.parse(raw) as SessionMetadata;
-    if (!Array.isArray(parsed.roles)) return null;
-    return parsed;
-  } catch {
-    return null;
-  }
-}
-
-// Cache referencial para o snapshot do useSyncExternalStore (mesmo raw -> mesmo objeto).
-let metadataCacheRaw: string | null = null;
-let metadataCacheParsed: SessionMetadata | null = null;
-
-/** Snapshot dos metadados de sessão (estável referencialmente para useSyncExternalStore). */
-export function getSessionMetadataSnapshot(): SessionMetadata | null {
-  const raw = localStorage.getItem(SESSION_METADATA_KEY);
-  if (raw !== metadataCacheRaw) {
-    metadataCacheRaw = raw;
-    metadataCacheParsed = raw ? parseMetadata(raw) : null;
-  }
-  return metadataCacheParsed;
-}
-
-/**
- * Subscreve mudanças dos metadados: evento custom (mesma aba) + `storage` (outras abas),
- * o que sincroniza login/logout entre abas automaticamente.
- */
-export function subscribeSessionMetadata(callback: () => void): () => void {
-  window.addEventListener(SESSION_METADATA_EVENT, callback);
-  window.addEventListener('storage', callback);
-  return () => {
-    window.removeEventListener(SESSION_METADATA_EVENT, callback);
-    window.removeEventListener('storage', callback);
-  };
-}
-
-function notifySessionMetadataChanged() {
-  window.dispatchEvent(new Event(SESSION_METADATA_EVENT));
-}
-
-export function saveSessionMetadata(meta: SessionMetadata) {
-  if (typeof window === 'undefined') return;
-  localStorage.setItem(SESSION_METADATA_KEY, JSON.stringify(meta));
-  notifySessionMetadataChanged();
-}
-
-export function clearSessionMetadata() {
-  if (typeof window === 'undefined') return;
-  localStorage.removeItem(SESSION_METADATA_KEY);
-  notifySessionMetadataChanged();
 }

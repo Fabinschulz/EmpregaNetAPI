@@ -1,6 +1,6 @@
 'use client';
 
-import { CenteredPageFrame } from '@/components';
+import { CenteredPageFrame } from '@/shared/components';
 import type { ReactNode } from 'react';
 
 type StatusLayoutProps = {

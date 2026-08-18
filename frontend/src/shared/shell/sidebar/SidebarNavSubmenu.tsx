@@ -1,6 +1,6 @@
 'use client';
 
-import { Button } from '@/components';
+import { Button } from '@/shared/components';
 import clsx from 'clsx';
 import { ChevronDown } from 'lucide-react';
 import Link from 'next/link';

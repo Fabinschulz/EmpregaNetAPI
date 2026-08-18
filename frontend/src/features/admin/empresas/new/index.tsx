@@ -1,7 +1,7 @@
 'use client';
 
-import { Alert, PageHeader } from '@/components';
-import { FormProvider } from '@/context';
+import { Alert, PageHeader } from '@/shared/components';
+import { FormProvider } from '@/shared/context';
 import { CompanyFormFields, companyFormSchema, defaultFormCompany, type CompanyFormValues } from '../form';
 import { companiesRoutes } from '../companies-routes';
 import { useCreateCompanyMutation } from '../service';

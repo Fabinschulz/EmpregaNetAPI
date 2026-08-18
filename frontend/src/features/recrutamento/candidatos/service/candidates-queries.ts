@@ -1,6 +1,6 @@
 'use client';
 
-import { useAuth } from '@/context';
+import { useAuth } from '@/shared/context';
 import { withDefaultListParams, type CandidatesListQueryParams } from '@/shared/schema';
 import { useQuery } from '@tanstack/react-query';
 import { candidatesKeys } from './candidates-keys';

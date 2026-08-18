@@ -1,7 +1,7 @@
 'use client';
 
-import { Button } from '@/components/ui';
-import { useHasMounted } from '@/hooks';
+import { Button } from '@/shared/components';
+import { useHasMounted } from '@/shared/hooks';
 import { Menu, Moon, Sun } from 'lucide-react';
 import Link from 'next/link';
 import { UserAvatar } from '../user-avatar';

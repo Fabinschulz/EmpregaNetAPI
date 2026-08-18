@@ -1,6 +1,6 @@
 import { When, Then } from '@cucumber/cucumber';
 import { expect } from 'chai';
-import { isCompleteZipCode, maskZipCode } from '@/utils';
+import { isCompleteZipCode, maskZipCode } from '@/shared/utils';
 import type { BusinessRulesWorld } from '../../support/world';
 
 When('eu aplico a máscara de CEP a {string}', function (this: BusinessRulesWorld, entrada: string) {

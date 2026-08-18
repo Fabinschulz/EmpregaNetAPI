@@ -1,6 +1,6 @@
 'use client';
 
-import { Spinner } from '@/components';
+import { Spinner } from '@/shared/components';
 import { Search, X } from 'lucide-react';
 import styles from './search-bar.module.scss';
 

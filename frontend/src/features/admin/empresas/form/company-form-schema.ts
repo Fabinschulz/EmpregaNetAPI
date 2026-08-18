@@ -1,5 +1,5 @@
 import { UF_VALUE_SET, normalizeUf } from '@/shared/schema';
-import { maskBrazilPhone, onlyDigits } from '@/utils';
+import { maskBrazilPhone, onlyDigits } from '@/shared/utils';
 import { z } from 'zod';
 import { TYPE_OF_ACTIVITY_VALUE_SET, normalizeTypeOfActivity } from '../domain/type-of-activity';
 import type { CompanyRequest } from '../service/companies-request-schema';

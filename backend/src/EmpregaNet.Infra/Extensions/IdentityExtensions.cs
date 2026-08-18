@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 
 namespace EmpregaNet.Infra.Extensions
@@ -125,10 +126,18 @@ namespace EmpregaNet.Infra.Extensions
 
                                             OnAuthenticationFailed = context =>
                                             {
-                                                if (builder.Environment.IsDevelopment())
+                                                if (!builder.Environment.IsDevelopment())
                                                 {
-                                                    Console.WriteLine("TOKEN FALHOU: " + context.Exception.Message);
+                                                    return Task.CompletedTask;
                                                 }
+
+                                                context.HttpContext.RequestServices
+                                                    .GetRequiredService<ILoggerFactory>()
+                                                    .CreateLogger("EmpregaNet.Authentication")
+                                                    .LogDebug(
+                                                        context.Exception,
+                                                        "Falha na validação do token JWT. CorrelationId: {CorrelationId}",
+                                                        context.HttpContext.Items["Correlation-ID"]?.ToString() ?? context.HttpContext.TraceIdentifier);
 
                                                 return Task.CompletedTask;
                                             },

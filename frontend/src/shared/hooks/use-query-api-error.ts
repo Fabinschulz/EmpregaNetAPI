@@ -1,5 +1,5 @@
 import type { DomainErrorResponse } from '@/shared/schema';
-import { parseApiError } from '@/utils';
+import { parseApiError } from '@/shared/utils';
 
 export type QueryApiErrorState = {
   message: string | null;

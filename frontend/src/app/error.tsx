@@ -1,7 +1,8 @@
 'use client';
 
-import { ErrorFallback } from '@/components';
-import { formatAppErrorUserMessage, type AppRouteError } from '@/utils';
+import { ErrorFallback } from '@/shared/components';
+import { formatAppErrorUserMessage, reportRenderError, type AppRouteError } from '@/shared/utils';
+import { useEffect } from 'react';
 
 type SegmentErrorProps = Readonly<{
   error: AppRouteError;
@@ -9,6 +10,10 @@ type SegmentErrorProps = Readonly<{
 }>;
 
 export default function Error({ error, reset }: SegmentErrorProps) {
+  useEffect(() => {
+    reportRenderError(error, { source: 'route-error', digest: error.digest });
+  }, [error]);
+
   return (
     <div className="error-page">
       <ErrorFallback

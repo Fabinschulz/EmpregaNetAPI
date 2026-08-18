@@ -1,7 +1,7 @@
 'use client';
 
-import { Button, Spinner } from '@/components';
-import { useAuth } from '@/context';
+import { Button, Spinner } from '@/shared/components';
+import { useAuth } from '@/shared/context';
 import { useApplyToJobMutation } from '@/features/candidaturas/service';
 import { ArrowRight, Check, LogIn } from 'lucide-react';
 import Link from 'next/link';

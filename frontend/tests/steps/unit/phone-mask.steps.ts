@@ -1,6 +1,6 @@
 import { When, Then } from '@cucumber/cucumber';
 import { expect } from 'chai';
-import { isValidBrazilCellPhone, isValidBrazilPhone, maskBrazilPhone } from '@/utils';
+import { isValidBrazilCellPhone, isValidBrazilPhone, maskBrazilPhone } from '@/shared/utils';
 import type { BusinessRulesWorld } from '../../support/world';
 
 When('eu aplico a máscara de telefone a {string}', function (this: BusinessRulesWorld, entrada: string) {

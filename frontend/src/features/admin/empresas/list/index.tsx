@@ -10,11 +10,11 @@ import {
   useRowDeleteAction,
   type DataTableColumn,
   type RowAction
-} from '@/components';
-import { FormProvider } from '@/context';
-import { usePersistedTablePagination } from '@/hooks';
-import type { CompaniesListQueryParams } from '@/shared';
-import { formatDate } from '@/utils';
+} from '@/shared/components';
+import { FormProvider } from '@/shared/context';
+import { usePersistedTablePagination } from '@/shared/hooks';
+import { type CompaniesListQueryParams } from '@/shared/schema';
+import { formatDate } from '@/shared/utils';
 import { Pencil, Plus } from 'lucide-react';
 import Link from 'next/link';
 import { useCallback, useMemo, useState } from 'react';

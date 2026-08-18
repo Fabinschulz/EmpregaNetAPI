@@ -1,2 +1,2 @@
 export { AuthLayout } from './auth-layout';
-export * from './service';
+export { ResetPassword } from './reset-password';

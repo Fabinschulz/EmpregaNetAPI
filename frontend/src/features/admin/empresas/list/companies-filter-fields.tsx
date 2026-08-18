@@ -1,9 +1,9 @@
 'use client';
 
-import { AutocompleteField, Button, FilterBar, FilterField, SelectField, type AutocompleteOption } from '@/components';
-import { useFormContext } from '@/context';
-import { useFilterFormSync } from '@/hooks';
-import { LIST_ORDER_BY_OPTIONS, type CompaniesListQueryParams } from '@/shared';
+import { AutocompleteField, Button, FilterBar, FilterField, SelectField, type AutocompleteOption } from '@/shared/components';
+import { useFormContext } from '@/shared/context';
+import { useFilterFormSync } from '@/shared/hooks';
+import { LIST_ORDER_BY_OPTIONS, type CompaniesListQueryParams } from '@/shared/schema';
 import { X } from 'lucide-react';
 import {
   companiesFilterToParams,

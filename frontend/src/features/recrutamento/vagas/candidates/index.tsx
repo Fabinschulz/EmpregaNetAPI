@@ -10,8 +10,8 @@ import {
   useRowDeleteAction,
   type DataTableColumn,
   type RowAction
-} from '@/components';
-import { FormProvider } from '@/context';
+} from '@/shared/components';
+import { FormProvider } from '@/shared/context';
 import { ApplicationStatusBadge } from '@/features/candidaturas/application-status-badge';
 import {
   applicationStatusTransitions,
@@ -26,8 +26,8 @@ import {
   candidateDisplayName,
   type JobApplicationResponse
 } from '@/features/candidaturas/service';
-import { usePersistedTablePagination } from '@/hooks';
-import { formatDate } from '@/shared';
+import { usePersistedTablePagination } from '@/shared/hooks';
+import { formatDate } from '@/shared/utils';
 import { Ban, CheckCircle2, Flag, Pencil, PlayCircle, RotateCcw, XCircle, type LucideIcon } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';

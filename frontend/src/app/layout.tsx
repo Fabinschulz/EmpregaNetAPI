@@ -1,4 +1,4 @@
-import { AppProviders } from '@/components/providers';
+import { AppProviders } from '@/shared/components';
 import type { Metadata } from 'next';
 import './globals.scss';
 

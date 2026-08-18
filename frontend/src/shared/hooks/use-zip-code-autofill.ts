@@ -1,8 +1,8 @@
 'use client';
 
-import { useFormContext } from '@/context';
+import { useFormContext } from '@/shared/context';
 import { lookupAddressByZipCode } from '@/shared/api';
-import { isCompleteZipCode, maskZipCode } from '@/utils';
+import { isCompleteZipCode, maskZipCode } from '@/shared/utils';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 export type ZipCodeAutofillFields = {

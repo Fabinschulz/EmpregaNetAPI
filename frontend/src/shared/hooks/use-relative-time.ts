@@ -1,6 +1,6 @@
 'use client';
 
-import { formatDate, formatRelativeTime } from '@/utils';
+import { formatDate, formatRelativeTime } from '@/shared/utils';
 import { useSyncExternalStore } from 'react';
 
 /** Com que frequência o rótulo se atualiza. Um minuto basta para "há 3 minutos". */

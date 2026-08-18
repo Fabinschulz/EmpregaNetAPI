@@ -1,6 +1,6 @@
 'use client';
 
-import { useAuth } from '@/context';
+import { useAuth } from '@/shared/context';
 import { keepPreviousData, useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
 import { fetchJobFeedInteractions, fetchJobVocabulary, fetchJobsFeed } from './jobs-feed-api';

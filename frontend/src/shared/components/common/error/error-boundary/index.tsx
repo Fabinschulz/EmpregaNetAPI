@@ -1,5 +1,6 @@
 'use client';
 
+import { reportRenderError } from '@/shared/utils';
 import React, { type ErrorInfo, type ReactNode } from 'react';
 import { ErrorFallback } from '../error-fallback';
 import styles from './error-boundary.module.scss';
@@ -33,7 +34,10 @@ export class GracefullyDegradingErrorBoundary extends React.Component<
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error('Error Boundary capturou um erro:', error, errorInfo);
+    reportRenderError(error, {
+      source: 'error-boundary',
+      componentStack: errorInfo.componentStack ?? undefined
+    });
     this.setState({ error, errorInfo });
   }
 

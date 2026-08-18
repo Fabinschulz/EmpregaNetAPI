@@ -2,8 +2,8 @@
 
 import { useMemo } from 'react';
 import { useParams } from 'next/navigation';
-import { Alert, ApiQueryBoundary, FormFieldsSkeleton, PageHeader } from '@/components';
-import { FormProvider } from '@/context';
+import { Alert, ApiQueryBoundary, FormFieldsSkeleton, PageHeader } from '@/shared/components';
+import { FormProvider } from '@/shared/context';
 import {
   CompanyFormFields,
   companyFormSchema,

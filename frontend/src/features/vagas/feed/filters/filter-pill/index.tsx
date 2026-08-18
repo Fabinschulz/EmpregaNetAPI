@@ -1,6 +1,6 @@
 'use client';
 
-import { Popover, PopoverContent, PopoverTrigger } from '@/components';
+import { Popover, PopoverContent, PopoverTrigger } from '@/shared/components';
 import { ChevronDown } from 'lucide-react';
 import type { ReactNode } from 'react';
 import styles from './filter-pill.module.scss';

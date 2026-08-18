@@ -1,9 +1,9 @@
 'use client';
 
-import { useAuth } from '@/context';
-import { AuthSessionChecking } from '@/components';
+import { useAuth } from '@/shared/context';
+import { AuthSessionChecking } from '@/shared/components';
 import { me } from '@/features/conta/service';
-import { resolvePostLoginPath } from '@/utils';
+import { resolvePostLoginPath } from '@/shared/utils';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 

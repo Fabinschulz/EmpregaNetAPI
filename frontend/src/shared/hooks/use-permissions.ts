@@ -1,7 +1,7 @@
 'use client';
 
-import { useAuth } from '@/context';
-import { can, type Permission } from '@/utils/lib';
+import { useAuth } from '@/shared/context';
+import { can, type Permission } from '@/shared/utils';
 import { useCallback } from 'react';
 
 export function usePermissions() {

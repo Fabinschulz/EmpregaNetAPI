@@ -9,9 +9,9 @@ import {
   InputField,
   PhoneField,
   SelectField
-} from '@/components';
-import { useFormContext } from '@/context';
-import { useZipCodeAutofill } from '@/hooks';
+} from '@/shared/components';
+import { useFormContext } from '@/shared/context';
+import { useZipCodeAutofill } from '@/shared/hooks';
 import { UF_OPTIONS } from '@/shared/schema';
 import { Save } from 'lucide-react';
 import { TYPE_OF_ACTIVITY_OPTIONS } from '../domain/type-of-activity';

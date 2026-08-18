@@ -1,8 +1,8 @@
 'use client';
 
-import { useAuth } from '@/context';
+import { useAuth } from '@/shared/context';
 import { withDefaultListParams, type AdminUsersListQueryParams } from '@/shared/schema';
-import { reportMutationApiError, toastSuccess } from '@/utils';
+import { reportMutationApiError, toastSuccess } from '@/shared/utils';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { adminUserFormToRequest, type AdminUserUpdateFormValues } from '../detail/admin-user-form-schema';

@@ -1,7 +1,8 @@
 'use client';
 
-import { ErrorFallback } from '@/components';
-import { formatAppErrorUserMessage, type AppRouteError } from '@/utils';
+import { ErrorFallback } from '@/shared/components';
+import { formatAppErrorUserMessage, reportRenderError, type AppRouteError } from '@/shared/utils';
+import { useEffect } from 'react';
 import './globals.scss';
 
 type GlobalErrorProps = Readonly<{
@@ -10,6 +11,10 @@ type GlobalErrorProps = Readonly<{
 }>;
 
 export default function GlobalError({ error, reset }: GlobalErrorProps) {
+  useEffect(() => {
+    reportRenderError(error, { source: 'global-error', digest: error.digest });
+  }, [error]);
+
   return (
     <html lang="pt-BR" suppressHydrationWarning>
       <body className="global-error-body">

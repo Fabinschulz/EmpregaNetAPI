@@ -1,6 +1,6 @@
 'use client';
 
-import { cn, truncateText } from '@/utils';
+import { cn, truncateText } from '@/shared/utils';
 import { ChevronDown, X } from 'lucide-react';
 import * as React from 'react';
 import type { ControlTriggerProps } from '../../control-props';

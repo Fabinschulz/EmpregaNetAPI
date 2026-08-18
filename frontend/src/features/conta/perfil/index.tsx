@@ -11,8 +11,8 @@ import {
   CardTitle,
   FormFieldsSkeleton,
   PageHeader
-} from '@/components';
-import { FormProvider } from '@/context';
+} from '@/shared/components';
+import { FormProvider } from '@/shared/context';
 import { useMeQuery, useUpdateMyProfileMutation } from '../service';
 import { profileFormSchema, profileFormValuesFromResponse, type ProfileFormValues } from './profile-form-schema';
 import styles from '../conta.module.scss';

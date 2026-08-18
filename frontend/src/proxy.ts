@@ -1,81 +1,30 @@
 // https://nextjs.org/docs/app/api-reference/file-conventions/proxy
 
-import { readSessionFromCookieHeader } from '@/shared/auth';
-import { buildForbiddenRedirectPath, evaluateRouteAccess, LOGIN_PATH, type RouteAccessDecision } from '@/utils';
+import { ACCESS_TOKEN_COOKIE, isSessionValid, readSessionFromCookieHeader } from '@/shared/auth/session';
+import { buildForbiddenRedirectPath, buildLoginRedirectPath, evaluateRouteAccess } from '@/shared/utils';
 import { NextResponse, type NextRequest } from 'next/server';
 
-const defaultOrigins = [
-  'http://localhost:3000',
-  'https://localhost:3000',
-  'http://localhost:8081',
-  'http://localhost:5225'
-];
+export function proxy(req: NextRequest): NextResponse {
+  const { pathname, search } = req.nextUrl;
 
-function getAllowedOrigins(): string[] {
-  const fromEnv = process.env.NEXT_PUBLIC_ALLOWED_ORIGINS;
-  if (!fromEnv?.trim()) return defaultOrigins;
-  return fromEnv
-    .split(',')
-    .map((o) => o.trim())
-    .filter(Boolean);
-}
-
-const corsOptions = {
-  'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-  'Access-Control-Allow-Credentials': 'true'
-};
-
-function routeAccessRedirect(req: NextRequest, pathname: string, decision: RouteAccessDecision): NextResponse | null {
-  if (decision === 'allow') return null;
-
-  const url = req.nextUrl.clone();
-  url.search = '';
-
-  if (decision === 'login') {
-    url.pathname = LOGIN_PATH;
-    url.searchParams.set('redirect', pathname);
-    return NextResponse.redirect(url);
-  }
-
-  return NextResponse.redirect(new URL(buildForbiddenRedirectPath(pathname), req.url));
-}
-
-export function proxy(req: NextRequest) {
-  const { pathname } = req.nextUrl;
-  const allowedOrigins = getAllowedOrigins();
-  const origin = req.headers.get('origin') ?? '';
-  const isAllowedOrigin = allowedOrigins.includes(origin);
-  const isPreflight = req.method === 'OPTIONS';
-
-  if (isPreflight) {
-    const preflightHeaders = {
-      ...(isAllowedOrigin && { 'Access-Control-Allow-Origin': origin }),
-      ...corsOptions
-    };
-    return NextResponse.json({}, { headers: preflightHeaders });
-  }
-
-  // Lê o cookie httpOnly `access_token` (server-side) para o gating de rotas.
   const session = readSessionFromCookieHeader(req.headers.get('cookie'));
-  const isSessionValid = !!session?.token && (session.exp === undefined || session.exp * 1000 > Date.now());
-  const accessDecision = evaluateRouteAccess(pathname, {
-    isAuthenticated: isSessionValid,
+  const decision = evaluateRouteAccess(pathname, {
+    isAuthenticated: isSessionValid(session),
     roles: session?.roles ?? []
   });
-  const redirect = routeAccessRedirect(req, pathname, accessDecision);
-  if (redirect) return redirect;
 
-  const response = NextResponse.next();
-  if (isAllowedOrigin) {
-    response.headers.set('Access-Control-Allow-Origin', origin);
+  if (decision === 'login') {
+    const response = NextResponse.redirect(new URL(buildLoginRedirectPath(`${pathname}${search}`), req.url));
+    if (session?.token) response.cookies.delete(ACCESS_TOKEN_COOKIE);
+
+    return response;
   }
 
-  Object.entries(corsOptions).forEach(([key, value]) => {
-    response.headers.set(key, value);
-  });
+  if (decision === 'forbidden') {
+    return NextResponse.redirect(new URL(buildForbiddenRedirectPath(pathname), req.url));
+  }
 
-  return response;
+  return NextResponse.next();
 }
 
 export const config = {

@@ -12,9 +12,9 @@ import {
   FormFieldsSkeleton,
   PageHeader,
   StatusBadge
-} from '@/components';
-import { FormProvider } from '@/context';
-import { formatDateTime, userTypeLabel } from '@/shared';
+} from '@/shared/components';
+import { FormProvider } from '@/shared/context';
+import { formatDateTime, userTypeLabel } from '@/shared/utils';
 import { useParams } from 'next/navigation';
 import { useMemo, type ReactNode } from 'react';
 import { useAdminUserQuery, useUpdateAdminUserMutation } from '../service';

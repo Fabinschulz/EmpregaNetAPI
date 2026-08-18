@@ -1,6 +1,6 @@
 'use client';
 
-import { Alert } from '@/components';
+import { Alert } from '@/shared/components';
 import type { ReactNode } from 'react';
 import { EmpregaUaiLogo } from '../branding';
 import styles from './standalone-page.module.scss';

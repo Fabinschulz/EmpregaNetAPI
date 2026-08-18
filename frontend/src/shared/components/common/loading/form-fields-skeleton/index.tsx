@@ -1,4 +1,4 @@
-import { Skeleton } from '@/components';
+import { Skeleton } from '@/shared/components';
 import clsx from 'clsx';
 import styles from './form-fields-skeleton.module.scss';
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { useQueryApiError } from '@/hooks';
+import { useQueryApiError } from '@/shared/hooks';
 import type { ReactNode } from 'react';
 import { GracefullyDegradingErrorBoundary } from './error-boundary';
 

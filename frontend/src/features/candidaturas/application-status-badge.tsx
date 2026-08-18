@@ -1,6 +1,6 @@
 'use client';
 
-import { StatusBadge, type StatusTone } from '@/components';
+import { StatusBadge, type StatusTone } from '@/shared/components';
 import { applicationStatusLabels, parseApplicationStatus, type ApplicationStatus } from './domain';
 
 const STATUS_TONE: Record<ApplicationStatus, StatusTone> = {

@@ -1,5 +1,5 @@
-import { LoadingState } from '@/components';
-import { ResetPassword } from '@/features/auth/reset-password';
+import { ResetPassword } from '@/features/auth';
+import { LoadingState } from '@/shared/components';
 import { Metadata } from 'next';
 import { Suspense } from 'react';
 

@@ -1,13 +1,13 @@
 'use client';
 
-import { SelectInput, type SelectOption } from '@/components/ui';
+import { SelectInput, type SelectOption } from '@/shared/components/ui';
 import type React from 'react';
 import { FormField, useFormField, type FormFieldBaseProps } from '../field';
 
 export type SelectFieldProps = FormFieldBaseProps & {
   options: readonly SelectOption[];
   placeholder?: string;
-  /** Ver {@link import('@/components/ui').SelectInputProps.loading}. */
+  /** Ver {@link import('@/shared/components/ui').SelectInputProps.loading}. */
   loading?: boolean;
 };
 

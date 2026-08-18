@@ -1,5 +1,5 @@
 import type { UserResponse } from '@/shared/schema';
-import { normalizeUserTypeValue } from '@/utils';
+import { normalizeUserTypeValue } from '@/shared/utils';
 import { z } from 'zod';
 import type { UpdateAdminUserRequest } from '../service/admin-request-schema';
 

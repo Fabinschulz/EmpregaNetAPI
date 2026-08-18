@@ -1,6 +1,6 @@
 'use client';
 
-import { cn } from '@/utils/lib';
+import { cn } from '@/shared/utils/lib';
 import type * as React from 'react';
 import styles from './Textarea.module.scss';
 

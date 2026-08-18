@@ -1,5 +1,5 @@
 import type { UserResponse } from '@/shared/schema';
-import { isValidBrazilCellPhone, maskBrazilPhone, onlyDigits } from '@/utils';
+import { isValidBrazilCellPhone, maskBrazilPhone, onlyDigits } from '@/shared/utils';
 import { z } from 'zod';
 import type { UpdateMyProfileRequest } from '../service/conta-request-schema';
 

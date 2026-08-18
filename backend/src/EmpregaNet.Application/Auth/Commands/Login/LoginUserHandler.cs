@@ -3,8 +3,8 @@ using EmpregaNet.Application.Common.Exceptions;
 using EmpregaNet.Application.Abstraction;
 using EmpregaNet.Domain.Entities;
 using EmpregaNet.Domain.Enums;
-using FluentValidation;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Logging;
 
 namespace EmpregaNet.Application.Auth.Commands;
 
@@ -16,18 +16,20 @@ public sealed class LoginUserHandler : IRequestHandler<LoginUserCommand, UserLog
     private readonly SignInManager<User> _signInManager;
     private readonly IJwtBuilder _jwtBuilder;
     private readonly IRefreshTokenService _refreshTokens;
+    private readonly ILogger<LoginUserHandler> _logger;
 
     public LoginUserHandler(
         UserManager<User> userManager,
         SignInManager<User> signInManager,
         IJwtBuilder jwtBuilder,
         IRefreshTokenService refreshTokens,
-        IValidator<LoginUserCommand> validator)
+        ILogger<LoginUserHandler> logger)
     {
         _userManager = userManager;
         _signInManager = signInManager;
         _jwtBuilder = jwtBuilder;
         _refreshTokens = refreshTokens;
+        _logger = logger;
     }
 
     public async Task<UserLoggedViewModel> Handle(LoginUserCommand request, CancellationToken cancellationToken)
@@ -44,6 +46,8 @@ public sealed class LoginUserHandler : IRequestHandler<LoginUserCommand, UserLog
 
         if (user is null || user.IsDeleted)
         {
+            _logger.LogWarning("Tentativa de login para conta inexistente ou excluída.");
+
             throw new ValidationAppException(
                 nameof(request.Login),
                 "Usuário e/ou senha inválidos.",
@@ -53,6 +57,8 @@ public sealed class LoginUserHandler : IRequestHandler<LoginUserCommand, UserLog
         var result = await _signInManager.CheckPasswordSignInAsync(user, request.Password, lockoutOnFailure: true);
         if (result.IsLockedOut)
         {
+            _logger.LogWarning("Login bloqueado por lockout para o usuário {UserId}.", user.Id);
+
             throw new ValidationAppException(
                 nameof(request.Login),
                 "Conta temporariamente bloqueada por tentativas falhadas. Tente novamente mais tarde.",
@@ -61,6 +67,8 @@ public sealed class LoginUserHandler : IRequestHandler<LoginUserCommand, UserLog
 
         if (result.RequiresTwoFactor)
         {
+            _logger.LogWarning("Login exigiu segundo fator, não suportado, para o usuário {UserId}.", user.Id);
+
             throw new ValidationAppException(
                 nameof(request.Login),
                 "Esta conta requer autenticação em dois passos; contacte o suporte.",
@@ -69,6 +77,8 @@ public sealed class LoginUserHandler : IRequestHandler<LoginUserCommand, UserLog
 
         if (result.IsNotAllowed)
         {
+            _logger.LogWarning("Login não permitido (e-mail não confirmado) para o usuário {UserId}.", user.Id);
+
             throw new ValidationAppException(
                 nameof(request.Login),
                 "Confirme o seu e-mail antes de iniciar sessão. Verifique a caixa de entrada ou solicite um novo link de confirmação.",
@@ -77,11 +87,15 @@ public sealed class LoginUserHandler : IRequestHandler<LoginUserCommand, UserLog
 
         if (!result.Succeeded)
         {
+            _logger.LogWarning("Senha inválida para o usuário {UserId}.", user.Id);
+
             throw new ValidationAppException(
                 nameof(request.Password),
                 "Usuário e/ou senha inválidos.",
                 DomainErrorEnum.INVALID_PASSWORD);
         }
+
+        _logger.LogInformation("Login bem-sucedido para o usuário {UserId}.", user.Id);
 
         var vm = await _jwtBuilder.BuildUserTokenAsync(user);
         vm.RefreshToken = await _refreshTokens.IssueAsync(user.Id, cancellationToken);

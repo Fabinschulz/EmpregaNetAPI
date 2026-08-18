@@ -1,4 +1,4 @@
-import type { JobFeedItemResponse } from '@/features/vagas/service';
+import { type JobFeedItemResponse } from '@/features/vagas/service';
 import {
   experienceLevelVocabulary,
   jobTypeVocabulary,
@@ -6,9 +6,18 @@ import {
   workModelVocabulary,
   workShiftVocabulary
 } from '@/shared/schema';
-import { cn } from '@/utils';
-import type { LucideIcon } from 'lucide-react';
-import { Accessibility, Briefcase, Building2, Clock, GraduationCap, House, MapPin, Sparkles } from 'lucide-react';
+import { cn } from '@/shared/utils';
+import {
+  type LucideIcon,
+  Accessibility,
+  Briefcase,
+  Building2,
+  Clock,
+  GraduationCap,
+  House,
+  MapPin,
+  Sparkles
+} from 'lucide-react';
 import styles from './job-card.module.scss';
 
 type JobCardHighlightsProps = {

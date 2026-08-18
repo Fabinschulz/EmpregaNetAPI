@@ -1,10 +1,10 @@
 'use client';
 
-import { Alert, Button, Card, CardContent, CardFooter, CardHeader, CardTitle, StatusBadge } from '@/components';
-import { useAuth } from '@/context';
+import { Alert, Button, Card, CardContent, CardFooter, CardHeader, CardTitle, StatusBadge } from '@/shared/components';
+import { useAuth } from '@/shared/context';
 import { useApplyToJobMutation } from '@/features/candidaturas/service';
 import type { JobResponse } from '@/features/recrutamento/vagas/service';
-import { useRelativeTime } from '@/hooks';
+import { useRelativeTime } from '@/shared/hooks';
 import {
   experienceLevelVocabulary,
   jobAreaVocabulary,
@@ -13,7 +13,7 @@ import {
   workModelVocabulary,
   workShiftVocabulary
 } from '@/shared/schema';
-import { formatSalaryRange } from '@/utils';
+import { formatSalaryRange } from '@/shared/utils';
 import type { LucideIcon } from 'lucide-react';
 import {
   Accessibility,

@@ -1,7 +1,7 @@
 'use client';
 
-import { Alert, ApiQueryBoundary, Button, FormFieldsSkeleton, PageHeader } from '@/components';
-import { FormProvider } from '@/context';
+import { Alert, ApiQueryBoundary, Button, FormFieldsSkeleton, PageHeader } from '@/shared/components';
+import { FormProvider } from '@/shared/context';
 import { Users } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';

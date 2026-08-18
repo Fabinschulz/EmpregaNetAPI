@@ -1,6 +1,6 @@
 'use client';
 
-import { SelectInput } from '@/components';
+import { SelectInput } from '@/shared/components';
 import { JOB_SORT_OPTIONS, type JobSortValue } from '@/shared/schema';
 import { useMemo } from 'react';
 import styles from './sort-select.module.scss';

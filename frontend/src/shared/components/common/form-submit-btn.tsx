@@ -1,7 +1,7 @@
 'use client';
 
-import { Button, Spinner, type ButtonProps } from '@/components';
-import { useFormContext } from '@/context';
+import { Button, Spinner, type ButtonProps } from '@/shared/components';
+import { useFormContext } from '@/shared/context';
 import * as React from 'react';
 
 export type FormSubmitButtonProps = Omit<ButtonProps, 'type'>;

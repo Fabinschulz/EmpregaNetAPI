@@ -1,8 +1,8 @@
 'use client';
 
-import { AutocompleteField, Button, FilterBar, FilterField, SelectField, type AutocompleteOption } from '@/components';
-import { useFormContext } from '@/context';
-import { useFilterFormSync } from '@/hooks';
+import { AutocompleteField, Button, FilterBar, FilterField, SelectField, type AutocompleteOption } from '@/shared/components';
+import { useFormContext } from '@/shared/context';
+import { useFilterFormSync } from '@/shared/hooks';
 import { defaultJobsFilter, jobsFilterToParams, type JobsFilterFormValues } from './jobs-filter-schema';
 import type { JobsListQueryParams } from '@/shared/schema';
 import { X } from 'lucide-react';

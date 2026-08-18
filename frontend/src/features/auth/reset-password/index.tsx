@@ -1,14 +1,16 @@
 'use client';
 
-import { Alert } from '@/components';
-import { FormProvider } from '@/context';
+import { Alert, StandalonePageNavLink, StandalonePage } from '@/shared/components';
+import { FormProvider } from '@/shared/context';
 import { useResetPasswordMutation } from '../service';
 import { useSearchParams } from 'next/navigation';
 import { useMemo } from 'react';
-import { StandalonePageNavLink, StandalonePage } from '@/components';
 import { ResetPasswordFormFields } from './reset-password-form';
-import type { ResetPasswordFormValues } from './reset-password-schema';
-import { resetPasswordDefaultValues, resetPasswordFormSchema } from './reset-password-schema';
+import {
+  type ResetPasswordFormValues,
+  resetPasswordDefaultValues,
+  resetPasswordFormSchema
+} from './reset-password-schema';
 
 export function ResetPassword() {
   const searchParams = useSearchParams();

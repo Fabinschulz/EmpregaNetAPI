@@ -1,4 +1,4 @@
-import { LoadingState } from '@/components';
+import { LoadingState } from '@/shared/components';
 import { AppShell } from '@/shared/shell';
 import { Suspense } from 'react';
 

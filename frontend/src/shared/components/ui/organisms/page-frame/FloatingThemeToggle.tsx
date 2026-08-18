@@ -1,7 +1,7 @@
 'use client';
 
-import { Button } from '@/components';
-import { useHasMounted } from '@/hooks';
+import { Button } from '@/shared/components';
+import { useHasMounted } from '@/shared/hooks';
 import { Moon, Sun } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import styles from './floating-theme-toggle.module.scss';

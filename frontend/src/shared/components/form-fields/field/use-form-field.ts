@@ -1,7 +1,7 @@
 'use client';
 
-import { useFormContext } from '@/context';
-import { getFieldErrorMessage } from '@/utils';
+import { useFormContext } from '@/shared/context';
+import { getFieldErrorMessage } from '@/shared/utils';
 import { useId } from 'react';
 import { useController, type RefCallBack } from 'react-hook-form';
 

@@ -11,8 +11,8 @@ import {
   MultiSelectField,
   SelectField,
   TextareaField
-} from '@/components';
-import { useFormContext } from '@/context';
+} from '@/shared/components';
+import { useFormContext } from '@/shared/context';
 import { useJobVocabularyQuery } from '@/features/vagas/service';
 import {
   experienceLevelVocabulary,

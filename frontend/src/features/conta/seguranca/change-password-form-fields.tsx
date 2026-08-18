@@ -1,6 +1,6 @@
 'use client';
 
-import { FormActions, FormGrid, FormRow, FormSubmitButton, InputField } from '@/components';
+import { FormActions, FormGrid, FormRow, FormSubmitButton, InputField } from '@/shared/components';
 import { KeyRound } from 'lucide-react';
 
 export function ChangePasswordFormFields() {

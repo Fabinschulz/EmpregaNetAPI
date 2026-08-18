@@ -1,6 +1,6 @@
 'use client';
 
-import { Alert, Button, PageHeader } from '@/components';
+import { Alert, Button, PageHeader } from '@/shared/components';
 import {
   emptyJobVocabulary,
   useJobFeedInteractionsQuery,
@@ -10,7 +10,7 @@ import {
   type JobsFeedResponse
 } from '@/features/vagas/service';
 import type { JobsFeedFilters } from '../filters/jobs-feed-filters';
-import { useInfiniteScroll } from '@/hooks';
+import { useInfiniteScroll } from '@/shared/hooks';
 import { RefreshCw } from 'lucide-react';
 import { useMemo } from 'react';
 import { FeedActiveChips } from '../active-chips';

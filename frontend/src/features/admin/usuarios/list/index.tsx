@@ -10,11 +10,11 @@ import {
   useRowDeleteAction,
   type DataTableColumn,
   type RowAction
-} from '@/components';
-import { FormProvider } from '@/context';
-import { usePersistedTablePagination } from '@/hooks';
-import type { UserResponse } from '@/shared';
-import { formatDate, userTypeLabel, type AdminUsersListQueryParams } from '@/shared';
+} from '@/shared/components';
+import { FormProvider } from '@/shared/context';
+import { usePersistedTablePagination } from '@/shared/hooks';
+import { type UserResponse, type AdminUsersListQueryParams } from '@/shared/schema';
+import { formatDate, userTypeLabel } from '@/shared/utils';
 import { Eye } from 'lucide-react';
 import { useCallback, useMemo, useState } from 'react';
 import { useAdminUsersListQuery, useDeleteAdminUserMutation } from '../service';

@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { cn } from '@/utils/lib';
+import { cn } from '@/shared/utils/lib';
 import styles from './Table.module.scss';
 
 /**

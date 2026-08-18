@@ -1,4 +1,4 @@
-import { cn } from '@/utils';
+import { cn } from '@/shared/utils';
 import styles from './empregauai-logo.module.scss';
 
 type EmpregaUaiLogoProps = {

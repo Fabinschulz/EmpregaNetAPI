@@ -1,11 +1,9 @@
 'use client';
 
-import { Alert } from '@/components';
-import { useConfirmEmailMutation } from '../service';
+import { Alert, StandalonePageNavLink, StandalonePage } from '@/shared/components';
+import { useConfirmEmailMutation, type ConfirmEmailRequest } from '../service';
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useMemo, useRef } from 'react';
-import { StandalonePageNavLink, StandalonePage } from '@/components';
-import type { ConfirmEmailRequest } from '../service';
 
 export function ConfirmEmail() {
   const searchParams = useSearchParams();

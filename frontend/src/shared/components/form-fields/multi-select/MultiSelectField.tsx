@@ -1,13 +1,13 @@
 'use client';
 
-import { MultiSelectInput, type MultiSelectOption } from '@/components/ui';
+import { MultiSelectInput, type MultiSelectOption } from '@/shared/components/ui';
 import type React from 'react';
 import { FormField, useFormField, type FormFieldBaseProps } from '../field';
 
 export type MultiSelectFieldProps = FormFieldBaseProps & {
   options: readonly MultiSelectOption[];
   placeholder?: string;
-  /** Ver {@link import('@/components/ui').MultiSelectInputProps.loading}. */
+  /** Ver {@link import('@/shared/components/ui').MultiSelectInputProps.loading}. */
   loading?: boolean;
 };
 

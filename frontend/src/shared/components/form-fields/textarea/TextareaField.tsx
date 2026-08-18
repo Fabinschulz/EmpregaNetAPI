@@ -1,6 +1,6 @@
 'use client';
 
-import { Textarea, type TextareaProps } from '@/components/ui';
+import { Textarea, type TextareaProps } from '@/shared/components/ui';
 import type React from 'react';
 import { FormField, useFormField, type FormFieldBaseProps } from '../field';
 

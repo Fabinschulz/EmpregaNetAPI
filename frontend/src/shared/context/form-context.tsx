@@ -1,31 +1,31 @@
 'use client';
 
-import { hasObjectPath, parseApiError, pickKnownFields } from '@/utils';
+import { applyApiFieldErrors, hasObjectPath, parseApiError } from '@/shared/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import type { ReactNode } from 'react';
 import React, { createContext, useContext, useEffect, useRef, useTransition } from 'react';
 import type {
-  DefaultValues,
-  FieldErrors,
-  FieldValues,
-  FormState,
-  Path,
-  Resolver,
-  UseFormSetError
+    DefaultValues,
+    FieldErrors,
+    FieldValues,
+    FormState,
+    Path,
+    Resolver,
+    UseFormSetError
 } from 'react-hook-form';
 import {
-  useForm,
-  useFormState,
-  type Control,
-  type FieldErrorsImpl,
-  type FieldNamesMarkedBoolean,
-  type SubmitErrorHandler,
-  type UseFormGetValues,
-  type UseFormRegister,
-  type UseFormReset,
-  type UseFormSetValue,
-  type UseFormTrigger,
-  type UseFormWatch
+    useForm,
+    useFormState,
+    type Control,
+    type FieldErrorsImpl,
+    type FieldNamesMarkedBoolean,
+    type SubmitErrorHandler,
+    type UseFormGetValues,
+    type UseFormRegister,
+    type UseFormReset,
+    type UseFormSetValue,
+    type UseFormTrigger,
+    type UseFormWatch
 } from 'react-hook-form';
 import type { ZodType } from 'zod';
 
@@ -110,14 +110,13 @@ const applyServerFieldErrors = <T extends FieldValues>(
   getValues: UseFormGetValues<T>,
   setError: UseFormSetError<T>
 ) => {
-  const { fieldErrors } = parseApiError(error);
   const values = getValues();
 
-  const known = pickKnownFields(fieldErrors, (field) => hasObjectPath(field, values));
-
-  for (const [field, message] of Object.entries(known)) {
-    setError(field as Path<T>, { type: 'server', message });
-  }
+  applyApiFieldErrors(
+    parseApiError(error),
+    (field, fieldError) => setError(field as Path<T>, { type: 'server', message: fieldError.message }),
+    (field) => hasObjectPath(field, values)
+  );
 };
 
 export interface FormProviderProps<T extends FieldValues = FieldValues> {

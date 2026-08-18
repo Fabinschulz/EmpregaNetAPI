@@ -1,7 +1,7 @@
 'use client';
 
-import type { UseTablePaginationResult } from '@/hooks';
-import { cn } from '@/utils/lib';
+import type { UseTablePaginationResult } from '@/shared/hooks';
+import { cn } from '@/shared/utils/lib';
 import { RefreshCw } from 'lucide-react';
 import * as React from 'react';
 import { ListRowsSkeleton } from '../../../common/loading/list-rows-skeleton';

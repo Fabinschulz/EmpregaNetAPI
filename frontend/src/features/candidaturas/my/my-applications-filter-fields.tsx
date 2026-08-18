@@ -1,14 +1,14 @@
 'use client';
 
-import { Button, FilterBar, SelectField } from '@/components';
-import { useFormContext } from '@/context';
+import { Button, FilterBar, SelectField } from '@/shared/components';
+import { useFormContext } from '@/shared/context';
 import { APPLICATION_STATUSES, applicationStatusLabels } from '../domain';
 import {
   defaultMyApplicationsFilter,
   myApplicationsFilterToParams,
   type MyApplicationsFilterFormValues
 } from './my-applications-filter-schema';
-import { DATE_ORDER_BY_OPTIONS, type JobApplicationsListQueryParams } from '@/shared';
+import { DATE_ORDER_BY_OPTIONS, type JobApplicationsListQueryParams } from '@/shared/schema';
 import { X } from 'lucide-react';
 import { useEffect, useRef } from 'react';
 

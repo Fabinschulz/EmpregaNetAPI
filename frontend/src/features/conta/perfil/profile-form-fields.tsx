@@ -1,6 +1,6 @@
 'use client';
 
-import { FormActions, FormGrid, FormRow, FormSubmitButton, InputField, PhoneField } from '@/components';
+import { FormActions, FormGrid, FormRow, FormSubmitButton, InputField, PhoneField } from '@/shared/components';
 import { Save } from 'lucide-react';
 
 export function ProfileFormFields() {

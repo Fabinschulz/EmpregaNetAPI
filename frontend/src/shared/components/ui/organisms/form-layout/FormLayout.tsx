@@ -1,6 +1,6 @@
 'use client';
 
-import { cn } from '@/utils';
+import { cn } from '@/shared/utils';
 import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import type { ReactNode } from 'react';

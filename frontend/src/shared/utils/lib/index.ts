@@ -5,6 +5,7 @@ export * from './query-client';
 export * from './rbac';
 export * from './route-access-policy';
 export * from './router-transition';
+export * from './telemetry';
 export * from './toast';
 export * from './user-types';
 export * from './utils';

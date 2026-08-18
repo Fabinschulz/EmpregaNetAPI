@@ -1,6 +1,6 @@
 import { domainErrorSchema, type DomainErrorResponse } from '@/shared/schema';
 
-const UNKNOWN_ERROR_MESSAGE = 'Erro desconhecido. Por favor, entre em contato com o suporte técnico.';
+export const UNKNOWN_ERROR_MESSAGE = 'Erro desconhecido. Por favor, entre em contato com o suporte técnico.';
 
 export type FieldErrorMap = Readonly<Record<string, string>>;
 
@@ -11,10 +11,20 @@ export type DomainErrorBreakdown = {
 
 /**
  * Valida o corpo JSON de erro devolvido pela API (`DomainError`).
+ *
+ * <para>Todos os campos do schema são opcionais, por isso um objeto qualquer passa na validação.
+ * Sem nada de útil dentro não há erro de domínio nenhum: devolver `null` deixa o chamador cair na
+ * mensagem por status, que diz mais ao utilizador do que um corpo vazio.</para>
  */
 export function tryParseDomainError(payload: unknown): DomainErrorResponse | null {
   const parsed = domainErrorSchema.safeParse(payload);
-  return parsed.success ? parsed.data : null;
+  if (!parsed.success) return null;
+
+  const { statusCode, code, message, errors } = parsed.data;
+  const hasContent =
+    statusCode !== undefined || code !== undefined || message !== undefined || (errors?.length ?? 0) > 0;
+
+  return hasContent ? parsed.data : null;
 }
 
 /**

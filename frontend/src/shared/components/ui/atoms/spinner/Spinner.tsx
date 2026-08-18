@@ -1,4 +1,4 @@
-import { cn } from '@/utils/lib';
+import { cn } from '@/shared/utils';
 import styles from './Spinner.module.scss';
 
 export type SpinnerSize = 'sm' | 'md' | 'lg';

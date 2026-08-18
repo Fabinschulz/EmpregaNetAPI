@@ -1,8 +1,8 @@
 'use client';
 
-import { TooltipProvider } from '@/components';
-import { AuthProvider } from '@/context';
-import { QueryProvider } from '@/utils';
+import { TooltipProvider } from '@/shared/components';
+import { AuthProvider } from '@/shared/context';
+import { QueryProvider } from '@/shared/utils';
 import type { ReactNode } from 'react';
 import { ThemedToaster, ThemeProvider } from './theme-provider';
 

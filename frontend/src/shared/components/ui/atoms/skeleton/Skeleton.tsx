@@ -1,7 +1,7 @@
 'use client';
 
+import { cn } from '@/shared/utils';
 import * as React from 'react';
-import { cn } from '@/utils/lib';
 import styles from './Skeleton.module.scss';
 
 export type SkeletonProps = React.HTMLAttributes<HTMLDivElement>;

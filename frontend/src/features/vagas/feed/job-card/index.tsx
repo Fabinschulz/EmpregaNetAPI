@@ -1,9 +1,9 @@
 'use client';
 
 import type { JobFeedItemResponse } from '@/features/vagas/service';
-import { useRelativeTime } from '@/hooks';
+import { useRelativeTime } from '@/shared/hooks';
 import { jobAreaVocabulary } from '@/shared/schema';
-import { cn, formatSalaryRange } from '@/utils';
+import { cn, formatSalaryRange } from '@/shared/utils';
 import { MapPin, Users } from 'lucide-react';
 import Link from 'next/link';
 import { JobCardActions } from './actions';

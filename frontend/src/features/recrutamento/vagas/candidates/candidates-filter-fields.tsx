@@ -1,10 +1,10 @@
 'use client';
 
-import { SelectField, type SelectOption } from '@/components';
-import { useFormContext } from '@/context';
+import { SelectField, type SelectOption } from '@/shared/components';
+import { useFormContext } from '@/shared/context';
 import { APPLICATION_STATUSES, applicationStatusLabels } from '@/features/candidaturas/domain';
-import { useFilterFormSync } from '@/hooks';
-import { DATE_ORDER_BY_OPTIONS, LIST_ORDER_BY_VALUES } from '@/shared';
+import { useFilterFormSync } from '@/shared/hooks';
+import { DATE_ORDER_BY_OPTIONS, LIST_ORDER_BY_VALUES } from '@/shared/schema';
 import { z } from 'zod';
 
 export const candidatesStatusFilterValues = ['all', ...APPLICATION_STATUSES] as const;

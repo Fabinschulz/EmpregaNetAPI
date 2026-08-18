@@ -1,6 +1,6 @@
 import { Given, Then, When } from '@cucumber/cucumber';
 import { expect } from 'chai';
-import { canAccessPath } from '@/utils';
+import { canAccessPath } from '@/shared/utils';
 import type { BusinessRulesWorld } from '../../support/world';
 
 Given('que o usuário tem os papéis {string}', function (this: BusinessRulesWorld, papeis: string) {

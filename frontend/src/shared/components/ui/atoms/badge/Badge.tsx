@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { cva, type VariantProps } from 'class-variance-authority';
-import { cn } from '@/utils/lib';
+import { cn } from '@/shared/utils/lib';
 import styles from './Badge.module.scss';
 
 const badgeVariants = cva(styles.root, {

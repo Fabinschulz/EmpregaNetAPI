@@ -7,7 +7,7 @@ import {
   parseJobsFeedFilters,
   type JobsFeedFilters
 } from './jobs-feed-filters';
-import { useDebouncedDraft } from '@/hooks';
+import { useDebouncedDraft } from '@/shared/hooks';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useMemo } from 'react';
 

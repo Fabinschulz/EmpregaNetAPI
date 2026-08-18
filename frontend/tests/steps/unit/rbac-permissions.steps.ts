@@ -1,6 +1,6 @@
 import { Then, When } from '@cucumber/cucumber';
 import { expect } from 'chai';
-import { can, type Permission } from '@/utils';
+import { can, type Permission } from '@/shared/utils';
 import type { BusinessRulesWorld } from '../../support/world';
 
 // O step "Dado que o usuário tem os papéis {string}" é reaproveitado de

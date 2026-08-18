@@ -1,6 +1,6 @@
 'use client';
 
-import { maskBrazilPhone } from '@/utils';
+import { maskBrazilPhone } from '@/shared/utils';
 import { InputField, type InputFieldProps } from '../input';
 
 export type PhoneFieldProps = Omit<InputFieldProps, 'type' | 'inputMode' | 'format'>;

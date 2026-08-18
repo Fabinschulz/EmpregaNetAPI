@@ -1,8 +1,8 @@
 'use client';
 
-import * as React from 'react';
+import { cn } from '@/shared/utils';
 import { cva, type VariantProps } from 'class-variance-authority';
-import { cn } from '@/utils/lib';
+import * as React from 'react';
 import styles from './Alert.module.scss';
 
 const alertVariants = cva(styles.alert, {

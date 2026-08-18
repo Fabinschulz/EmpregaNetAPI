@@ -1,7 +1,7 @@
 'use client';
 
-import { Alert, PageHeader } from '@/components';
-import { FormProvider } from '@/context';
+import { Alert, PageHeader } from '@/shared/components';
+import { FormProvider } from '@/shared/context';
 import { JobFormFields, defaultFormJob, jobFormSchema, type JobFormValues } from '../form';
 import { jobsRoutes } from '../jobs-routes';
 import { useCreateJobMutation } from '../service';

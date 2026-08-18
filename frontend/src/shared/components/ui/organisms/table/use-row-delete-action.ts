@@ -1,7 +1,7 @@
 'use client';
 
-import { usePermissions } from '@/hooks';
-import type { Permission } from '@/utils/lib';
+import { usePermissions } from '@/shared/hooks';
+import type { Permission } from '@/shared/utils/lib';
 import { Trash2 } from 'lucide-react';
 import { useCallback, useState } from 'react';
 import type { ConfirmDialogProps } from '../../molecules/alert-dialog';

@@ -1,6 +1,6 @@
 'use client';
 
-import { cn } from '@/utils/lib';
+import { cn } from '@/shared/utils/lib';
 import * as SelectPrimitive from '@radix-ui/react-select';
 import { Check, ChevronDown } from 'lucide-react';
 import * as React from 'react';

@@ -9,8 +9,8 @@ import {
   useRowDeleteAction,
   type DataTableColumn,
   type RowAction
-} from '@/components';
-import { FormProvider } from '@/context';
+} from '@/shared/components';
+import { FormProvider } from '@/shared/context';
 import { ApplicationStatusBadge } from '@/features/candidaturas/application-status-badge';
 import {
   applicationStatusTransitions,
@@ -28,8 +28,9 @@ import {
   defaultRecruitmentApplicationsFilter,
   recruitmentApplicationsFilterFormSchema
 } from './recruitment-applications-filter-schema';
-import { usePersistedTablePagination } from '@/hooks';
-import { formatDate, type ListOrderByValue } from '@/shared';
+import { usePersistedTablePagination } from '@/shared/hooks';
+import { formatDate } from '@/shared/utils';
+import { type ListOrderByValue } from '@/shared/schema';
 import { Ban, CheckCircle2, Eye, Flag, PlayCircle, RotateCcw, XCircle, type LucideIcon } from 'lucide-react';
 import { useCallback, useMemo, useState } from 'react';
 import { RecruitmentApplicationsFilterFields } from './recruitment-applications-filter-fields';

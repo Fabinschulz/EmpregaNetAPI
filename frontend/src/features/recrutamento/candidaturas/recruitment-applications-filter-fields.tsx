@@ -1,9 +1,9 @@
 'use client';
 
-import { FilterBar, SelectField } from '@/components';
-import { useFormContext } from '@/context';
+import { FilterBar, SelectField } from '@/shared/components';
+import { useFormContext } from '@/shared/context';
 import { type RecruitmentApplicationsFilterFormValues } from './recruitment-applications-filter-schema';
-import { DATE_ORDER_BY_OPTIONS, type ListOrderByValue } from '@/shared';
+import { DATE_ORDER_BY_OPTIONS, type ListOrderByValue } from '@/shared/schema';
 import { useEffect, useRef } from 'react';
 
 type RecruitmentApplicationsFilterFieldsProps = {

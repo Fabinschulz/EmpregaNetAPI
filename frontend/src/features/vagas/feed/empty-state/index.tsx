@@ -1,6 +1,6 @@
 'use client';
 
-import { Button } from '@/components';
+import { Button } from '@/shared/components';
 import { SearchX } from 'lucide-react';
 import styles from './empty-state.module.scss';
 

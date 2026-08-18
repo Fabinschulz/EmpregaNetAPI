@@ -1,14 +1,14 @@
 'use client';
 
-import { AutocompleteField, Button, FilterBar, FilterField, SelectField, type AutocompleteOption } from '@/components';
-import { useFormContext } from '@/context';
-import { useFilterFormSync } from '@/hooks';
+import { AutocompleteField, Button, FilterBar, FilterField, SelectField, type AutocompleteOption } from '@/shared/components';
+import { useFormContext } from '@/shared/context';
+import { useFilterFormSync } from '@/shared/hooks';
 import {
   adminUsersFilterToParams,
   defaultAdminUsersFilter,
   type AdminUsersFilterFormValues
 } from './admin-users-filter-schema';
-import { LIST_ORDER_BY_OPTIONS, type AdminUsersListQueryParams } from '@/shared';
+import { LIST_ORDER_BY_OPTIONS, type AdminUsersListQueryParams } from '@/shared/schema';
 import { X } from 'lucide-react';
 
 const SITUATION_OPTIONS = [

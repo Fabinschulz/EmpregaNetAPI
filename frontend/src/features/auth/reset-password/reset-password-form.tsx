@@ -1,8 +1,7 @@
 'use client';
 
-import { FormSubmitButton, InputField } from '@/components';
-import { useFormContext } from '@/context';
-import { StandalonePageFormActions, StandalonePageFormGrid } from '@/components';
+import { FormSubmitButton, InputField, StandalonePageFormActions, StandalonePageFormGrid } from '@/shared/components';
+import { useFormContext } from '@/shared/context';
 
 export function ResetPasswordFormFields() {
   const { submitting } = useFormContext();

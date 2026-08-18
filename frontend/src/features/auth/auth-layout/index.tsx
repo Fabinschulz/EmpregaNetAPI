@@ -1,7 +1,7 @@
 'use client';
 
 import { Suspense, type ReactNode } from 'react';
-import { CenteredPageFrame } from '@/components';
+import { CenteredPageFrame } from '@/shared/components';
 import { AuthSessionBoundary } from './auth-session-boundary';
 
 type AuthLayoutProps = {

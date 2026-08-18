@@ -1,14 +1,14 @@
 'use client';
 
-import { Alert, Button } from '@/components';
-import { useAuth } from '@/context';
+import { Alert, Button } from '@/shared/components';
+import { useAuth } from '@/shared/context';
 import {
   StandalonePageFooterPrompt,
   StandalonePageFormActions,
   StandalonePageNavLink,
   StandalonePage
-} from '@/components';
-import { DEFAULT_POST_LOGIN_PATH, isSafeInternalPath, startRouterTransition } from '@/utils';
+} from '@/shared/components';
+import { DEFAULT_POST_LOGIN_PATH, isSafeInternalPath, startRouterTransition } from '@/shared/utils';
 import { LayoutDashboard } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 

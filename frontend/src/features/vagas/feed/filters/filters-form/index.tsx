@@ -1,6 +1,6 @@
 'use client';
 
-import { CheckboxGroup, GroupedCheckboxes, RadioGroup } from '@/components';
+import { CheckboxGroup, GroupedCheckboxes, RadioGroup } from '@/shared/components';
 import type { JobVocabularyResponse } from '@/features/vagas/service';
 import type { JobsFeedFilters } from '../jobs-feed-filters';
 import {

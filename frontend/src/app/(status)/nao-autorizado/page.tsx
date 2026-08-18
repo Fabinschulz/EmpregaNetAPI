@@ -1,4 +1,4 @@
-import { LoadingState } from '@/components';
+import { LoadingState } from '@/shared/components';
 import { Unauthorized } from '@/shared/status';
 import { Suspense } from 'react';
 

@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-restricted-imports
 import { getJobCached } from '@/features/recrutamento/vagas/service/jobs-server';
 import { JobDetailPage } from '@/features/vagas/detail';
 import { normalizeUf } from '@/shared/schema';

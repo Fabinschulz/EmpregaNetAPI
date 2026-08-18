@@ -1,14 +1,14 @@
 'use client';
 
-import { AutocompleteField, Button, FilterBar, FilterField, SelectField, type AutocompleteOption } from '@/components';
-import { useFormContext } from '@/context';
-import { useFilterFormSync } from '@/hooks';
+import { AutocompleteField, Button, FilterBar, FilterField, SelectField, type AutocompleteOption } from '@/shared/components';
+import { useFormContext } from '@/shared/context';
+import { useFilterFormSync } from '@/shared/hooks';
 import {
   candidatesFilterToParams,
   defaultCandidatesFilter,
   type CandidatesFilterFormValues
 } from './candidates-filter-schema';
-import { LIST_ORDER_BY_OPTIONS, type CandidatesListQueryParams } from '@/shared';
+import { LIST_ORDER_BY_OPTIONS, type CandidatesListQueryParams } from '@/shared/schema';
 import { X } from 'lucide-react';
 
 type CandidatesFilterParams = Pick<CandidatesListQueryParams, 'search' | 'orderBy'>;

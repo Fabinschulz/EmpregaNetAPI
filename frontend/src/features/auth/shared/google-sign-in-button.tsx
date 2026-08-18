@@ -1,8 +1,8 @@
 'use client';
 
-import { useTheme } from '@/context';
-import { useHasMounted } from '@/hooks';
-import { getGoogleClientId } from '@/utils/lib/env';
+import { useTheme } from '@/shared/context';
+import { useHasMounted } from '@/shared/hooks';
+import { getGoogleClientId } from '@/shared/utils';
 import Script from 'next/script';
 import { useEffect, useRef, useState } from 'react';
 import styles from './google-sign-in-button.module.scss';

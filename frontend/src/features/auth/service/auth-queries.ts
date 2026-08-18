@@ -1,7 +1,7 @@
 'use client';
 
-import { useAuth } from '@/context';
-import { reportMutationApiError, resolvePostLoginPath, startRouterTransition, toastSuccess } from '@/utils';
+import { useAuth } from '@/shared/context';
+import { reportMutationApiError, resolvePostLoginPath, startRouterTransition, toastSuccess } from '@/shared/utils';
 import { useMutation } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { useCallback, useState } from 'react';

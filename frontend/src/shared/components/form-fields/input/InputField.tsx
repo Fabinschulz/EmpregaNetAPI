@@ -1,6 +1,6 @@
 'use client';
 
-import { Input, type InputProps } from '@/components/ui';
+import { Input, type InputProps } from '@/shared/components/ui';
 import type React from 'react';
 import { FormField, useFormField, type FormFieldBaseProps } from '../field';
 

@@ -1,8 +1,8 @@
 'use client';
 
-import type { UseTablePaginationResult } from '@/hooks';
+import type { UseTablePaginationResult } from '@/shared/hooks';
 import { clampPage, computeTotalPages } from '@/shared/schema';
-import { cn } from '@/utils/lib';
+import { cn } from '@/shared/utils/lib';
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
 import { useEffect } from 'react';
 import { Button } from '../../atoms/button';

@@ -1,4 +1,4 @@
-import { onlyDigits } from '@/utils';
+import { onlyDigits } from '@/shared/utils';
 import { z } from 'zod';
 
 const VIA_CEP_BASE_URL = 'https://viacep.com.br/ws';

@@ -1,6 +1,6 @@
 'use client';
 
-import { cn } from '@/utils';
+import { cn } from '@/shared/utils';
 import type { CSSProperties, ReactNode } from 'react';
 import styles from './filter-bar.module.scss';
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { cn } from '@/utils';
+import { cn } from '@/shared/utils';
 import { Search } from 'lucide-react';
 import { useId, useMemo, useState, type ReactNode } from 'react';
 import styles from './ChoiceGroup.module.scss';

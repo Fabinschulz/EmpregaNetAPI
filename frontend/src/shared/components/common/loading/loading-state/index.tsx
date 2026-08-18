@@ -1,5 +1,5 @@
-import { Spinner, type SpinnerSize } from '@/components/ui';
-import { cn } from '@/utils/lib';
+import { Spinner, type SpinnerSize } from '@/shared/components';
+import { cn } from '@/shared/utils';
 import styles from './loading-state.module.scss';
 
 type LoadingStateProps = {

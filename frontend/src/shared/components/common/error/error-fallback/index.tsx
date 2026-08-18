@@ -1,8 +1,7 @@
 'use client';
 
-import { Button, Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components';
-import type { LucideIcon } from 'lucide-react';
-import { AlertTriangle, FileQuestion, RefreshCw } from 'lucide-react';
+import { Button, Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shared/components';
+import { type LucideIcon, AlertTriangle, FileQuestion, RefreshCw } from 'lucide-react';
 import styles from './error-fallback.module.scss';
 
 export type ErrorFallbackVariant = 'error' | 'service' | 'not-found';

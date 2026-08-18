@@ -1,6 +1,6 @@
 'use client';
 
-import { FormProvider } from '@/context';
+import { FormProvider } from '@/shared/context';
 import { useLoginMutation, useLoginWithGoogleMutation } from '../service';
 import { useEffect, useRef } from 'react';
 import {
@@ -10,7 +10,7 @@ import {
   StandalonePageLinkRow,
   StandalonePageNavLink,
   StandalonePage
-} from '@/components';
+} from '@/shared/components';
 import { GoogleSignInButton } from '../shared';
 import { LoginFormFields } from './login-form';
 import { loginDefaultValues, loginFormSchema, type LoginFormValues } from './login-schema';

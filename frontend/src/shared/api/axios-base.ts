@@ -1,4 +1,4 @@
-import { getPublicEnv } from '@/utils';
+import { getPublicEnv } from '@/shared/utils';
 import axios, { type AxiosInstance, type AxiosRequestConfig } from 'axios';
 import * as Qs from 'qs';
 

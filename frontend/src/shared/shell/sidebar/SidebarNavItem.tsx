@@ -1,6 +1,6 @@
 'use client';
 
-import { Button } from '@/components/ui';
+import { Button } from '@/shared/components';
 import clsx from 'clsx';
 import Link from 'next/link';
 import type { ShellNavItem } from '../hooks/use-app-shell-navigation';

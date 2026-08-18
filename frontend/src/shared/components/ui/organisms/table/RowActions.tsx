@@ -1,6 +1,6 @@
 'use client';
 
-import { cn } from '@/utils/lib';
+import { cn } from '@/shared/utils/lib';
 import { MoreVertical, type LucideIcon } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';

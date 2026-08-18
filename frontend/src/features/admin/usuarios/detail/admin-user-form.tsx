@@ -1,8 +1,8 @@
 'use client';
 
-import { FormActions, FormGrid, FormSubmitButton, SelectField } from '@/components';
-import { useFormContext } from '@/context';
-import { USER_TYPE_OPTIONS } from '@/shared';
+import { FormActions, FormGrid, FormSubmitButton, SelectField } from '@/shared/components';
+import { useFormContext } from '@/shared/context';
+import { USER_TYPE_OPTIONS } from '@/shared/utils';
 import { Save } from 'lucide-react';
 
 type AdminUserFormFieldsProps = {

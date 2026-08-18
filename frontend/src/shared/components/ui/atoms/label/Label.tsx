@@ -1,6 +1,6 @@
 'use client';
 
-import { cn } from '@/utils/lib';
+import { cn } from '@/shared/utils/lib';
 import * as LabelPrimitive from '@radix-ui/react-label';
 import * as React from 'react';
 import styles from './Label.module.scss';

@@ -1,4 +1,4 @@
-import { USER_TYPES } from '@/utils';
+import { USER_TYPES } from '@/shared/utils';
 import { z } from 'zod';
 
 const USER_TYPE_VALUE_SET: ReadonlySet<string> = new Set(USER_TYPES.map((t) => t.value));

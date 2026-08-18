@@ -1,12 +1,12 @@
 'use client';
 
-import { Button, Card, CardContent, CardHeader, CardTitle, PageHeader, Skeleton } from '@/components';
-import { useAuth } from '@/context';
 import { useCompaniesListQuery } from '@/features/admin/empresas/service';
 import { useAdminUsersListQuery } from '@/features/admin/usuarios/service';
 import { useAllJobApplicationsQuery, useMyJobApplicationsQuery } from '@/features/candidaturas/service';
 import { useJobsListQuery } from '@/features/recrutamento/vagas/service';
-import { isAdmin, isRecruitmentStaff } from '@/shared';
+import { Button, Card, CardContent, CardHeader, CardTitle, PageHeader, Skeleton } from '@/shared/components';
+import { useAuth } from '@/shared/context';
+import { isAdmin, isRecruitmentStaff } from '@/shared/utils';
 import { Briefcase, Building2, FileText, LayoutDashboard, Users, type LucideIcon } from 'lucide-react';
 import Link from 'next/link';
 import styles from './dashboard.module.scss';

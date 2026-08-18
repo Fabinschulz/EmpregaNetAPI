@@ -1,6 +1,6 @@
 'use client';
 
-import { ApiQueryBoundary, FormFieldsSkeleton, PageHeader } from '@/components';
+import { ApiQueryBoundary, FormFieldsSkeleton, PageHeader } from '@/shared/components';
 import { useCandidateQuery } from '../service';
 import { useParams } from 'next/navigation';
 import { useMemo } from 'react';

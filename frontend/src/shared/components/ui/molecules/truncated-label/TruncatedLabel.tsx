@@ -1,6 +1,6 @@
 'use client';
 
-import { truncateText } from '@/utils';
+import { truncateText } from '@/shared/utils';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../tooltip';
 
 /** Acima deste comprimento o rótulo é cortado e o texto completo passa para o tooltip. */

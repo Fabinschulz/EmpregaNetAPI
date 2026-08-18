@@ -1,8 +1,7 @@
 'use client';
 
-import { isAdmin, isRecruitmentStaff } from '@/utils/lib';
-import type { LucideIcon } from 'lucide-react';
-import { Briefcase, Building2, FileText, LayoutDashboard, UserCircle, Users } from 'lucide-react';
+import { isAdmin, isRecruitmentStaff } from '@/shared/utils/lib';
+import { type LucideIcon, Briefcase, Building2, FileText, LayoutDashboard, UserCircle, Users } from 'lucide-react';
 import { useMemo } from 'react';
 
 export type ShellNavChild = {

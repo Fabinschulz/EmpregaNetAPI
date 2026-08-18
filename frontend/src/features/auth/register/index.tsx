@@ -1,8 +1,8 @@
 'use client';
 
-import { FormProvider } from '@/context';
+import { FormProvider } from '@/shared/context';
 import { useRegisterMutation } from '../service';
-import { StandalonePageNavLink, StandalonePage } from '@/components';
+import { StandalonePageNavLink, StandalonePage } from '@/shared/components';
 import { RegisterFormFields } from './register-form';
 import { registerDefaultValues, registerFormSchema, type RegisterFormValues } from './register-schema';
 

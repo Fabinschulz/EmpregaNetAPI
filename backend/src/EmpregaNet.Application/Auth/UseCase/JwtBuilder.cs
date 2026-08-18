@@ -3,6 +3,8 @@ using EmpregaNet.Application.Auth.ViewModel;
 using EmpregaNet.Application.Abstraction;
 using EmpregaNet.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -14,15 +16,18 @@ public class JwtBuilder : IJwtBuilder
     private readonly UserManager<User> _userManager;
     private readonly RoleManager<Role> _roleManager;
     private readonly JwtSettings _jwtSettings;
+    private readonly ILogger<JwtBuilder> _logger;
 
     public JwtBuilder(
         UserManager<User> userManager,
         RoleManager<Role> roleManager,
-        IOptions<JwtSettings> jwtSettingsOptions)
+        IOptions<JwtSettings> jwtSettingsOptions,
+        ILogger<JwtBuilder> logger)
     {
         _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
         _roleManager = roleManager ?? throw new ArgumentNullException(nameof(roleManager));
         _jwtSettings = jwtSettingsOptions.Value ?? throw new ArgumentNullException(nameof(jwtSettingsOptions));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
     /// <summary>
@@ -79,8 +84,10 @@ public class JwtBuilder : IJwtBuilder
 
         var userClaims = await _userManager.GetClaimsAsync(user);
         identity.AddClaims(userClaims);
-        await AddRoleClaimsAsync(user, identity);
-        await AddPermissionClaimsFromRolesAsync(user, identity);
+        var roleNames = await _userManager.GetRolesAsync(user);
+
+        AddRoleClaims(roleNames, identity);
+        await AddPermissionClaimsFromRolesAsync(roleNames, identity);
 
         return identity;
     }
@@ -101,26 +108,27 @@ public class JwtBuilder : IJwtBuilder
             };
     }
 
-    private async Task AddRoleClaimsAsync(User user, ClaimsIdentity identity)
+    private static void AddRoleClaims(IList<string> roleNames, ClaimsIdentity identity)
     {
-        var roles = await _userManager.GetRolesAsync(user);
-        foreach (var roleName in roles)
+        foreach (var roleName in roleNames)
         {
             identity.AddClaim(new Claim(ClaimTypes.Role, roleName));
         }
     }
 
-    private async Task AddPermissionClaimsFromRolesAsync(User user, ClaimsIdentity identity)
+    private async Task AddPermissionClaimsFromRolesAsync(IList<string> roleNames, ClaimsIdentity identity)
     {
-        var userRoleNames = await _userManager.GetRolesAsync(user);
         var codes = new HashSet<string>(StringComparer.Ordinal);
 
-        foreach (var roleName in userRoleNames)
-        {
-            var role = await _roleManager.FindByNameAsync(roleName);
-            if (role is null)
-                continue;
+        if (roleNames.Count == 0)
+            return;
 
+        var roles = await _roleManager.Roles
+            .Where(r => r.Name != null && roleNames.Contains(r.Name))
+            .ToListAsync();
+
+        foreach (var role in roles)
+        {
             var roleClaims = await _roleManager.GetClaimsAsync(role);
             foreach (var c in roleClaims.Where(c => c.Type == PermissionClaims.IdentityRolePermission))
             {
@@ -128,9 +136,15 @@ public class JwtBuilder : IJwtBuilder
                 {
                     codes.Add(UserPermissionVieModel.FromStoredPair(c.Value).Code);
                 }
-                catch (FormatException)
+                catch (FormatException ex)
                 {
                     // claim malformada no banco é ignorada, não deve impedir a geração do token. O erro é registrado para análise futura.
+
+                    _logger.LogWarning(
+                        ex,
+                        "Claim de permissão malformada no papel {RoleName}; a permissão foi ignorada. Valor: {ClaimValue}",
+                        role.Name,
+                        c.Value);
                 }
             }
         }

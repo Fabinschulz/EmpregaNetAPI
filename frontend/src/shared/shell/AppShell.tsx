@@ -1,8 +1,8 @@
 'use client';
 
-import { useAuth, useTheme } from '@/context';
-import { useHasMounted } from '@/hooks';
-import { startRouterTransition, toastSuccess } from '@/utils';
+import { useAuth, useTheme } from '@/shared/context';
+import { useHasMounted } from '@/shared/hooks';
+import { startRouterTransition, toastSuccess } from '@/shared/utils';
 import clsx from 'clsx';
 import { usePathname, useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';

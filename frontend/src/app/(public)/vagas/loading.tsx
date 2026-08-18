@@ -1,4 +1,4 @@
-import { LoadingState } from '@/components';
+import { LoadingState } from '@/shared/components';
 
 /**
  * Boundary do segmento de vagas.

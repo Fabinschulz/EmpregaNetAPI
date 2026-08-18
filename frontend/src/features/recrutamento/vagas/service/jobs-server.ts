@@ -3,7 +3,7 @@
 // `service/index.ts`, que é consumido por Client Components.
 import 'server-only';
 
-import { getPublicEnv } from '@/utils/lib/env';
+import { getPublicEnv } from '@/shared/utils';
 import { cacheLife, cacheTag } from 'next/cache';
 import { jobResponseSchema, type JobResponse } from './jobs-response-schema';
 

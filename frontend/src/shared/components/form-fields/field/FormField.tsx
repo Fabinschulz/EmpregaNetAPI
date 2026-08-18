@@ -1,7 +1,7 @@
 'use client';
 
-import { Label } from '@/components/ui';
-import { cn } from '@/utils';
+import { Label } from '@/shared/components/ui';
+import { cn } from '@/shared/utils';
 import type { ReactNode } from 'react';
 import type { FormFieldIds } from './use-form-field';
 import styles from './form-field.module.scss';

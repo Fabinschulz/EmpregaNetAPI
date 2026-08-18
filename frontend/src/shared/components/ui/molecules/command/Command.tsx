@@ -1,6 +1,6 @@
 'use client';
 
-import { cn } from '@/utils/lib';
+import { cn } from '@/shared/utils';
 import { Command as CommandPrimitive } from 'cmdk';
 import * as React from 'react';
 import styles from './Command.module.scss';

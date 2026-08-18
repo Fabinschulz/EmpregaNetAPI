@@ -1,4 +1,4 @@
-import { LoadingState } from '@/components';
+import { LoadingState } from '@/shared/components';
 import { ConfirmEmail } from '@/features/auth/confirm-email';
 import { Metadata } from 'next';
 import { Suspense } from 'react';

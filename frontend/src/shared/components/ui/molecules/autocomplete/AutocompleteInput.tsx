@@ -1,7 +1,7 @@
 'use client';
 
-import { useDebouncedDraft } from '@/hooks';
-import { cn } from '@/utils';
+import { useDebouncedDraft } from '@/shared/hooks';
+import { cn } from '@/shared/utils';
 import { Loader2, Search } from 'lucide-react';
 import * as React from 'react';
 import type { ControlTriggerProps } from '../../control-props';

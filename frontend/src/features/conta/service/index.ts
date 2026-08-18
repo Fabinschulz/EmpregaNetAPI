@@ -1,4 +1,7 @@
-export * from './conta-api';
-export * from './conta-keys';
-export * from './conta-queries';
-export * from './conta-request-schema';
+export { me } from './conta-api';
+export {
+  useChangeMyPasswordMutation,
+  useDeleteMyAccountMutation,
+  useMeQuery,
+  useUpdateMyProfileMutation
+} from './conta-queries';

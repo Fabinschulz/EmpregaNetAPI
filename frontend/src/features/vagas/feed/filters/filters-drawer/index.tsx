@@ -1,6 +1,6 @@
 'use client';
 
-import { Button } from '@/components';
+import { Button } from '@/shared/components';
 import type { JobVocabularyResponse } from '@/features/vagas/service';
 import * as Dialog from '@radix-ui/react-dialog';
 import { SlidersHorizontal, X } from 'lucide-react';

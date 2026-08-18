@@ -1,9 +1,10 @@
 'use client';
 
-import { ApiQueryBoundary, PageHeader, TableContainer, TableFilters, type DataTableColumn } from '@/components';
-import { FormProvider } from '@/context';
-import { usePersistedTablePagination } from '@/hooks';
-import { formatDate, type JobApplicationsListQueryParams } from '@/shared';
+import { ApiQueryBoundary, PageHeader, TableContainer, TableFilters, type DataTableColumn } from '@/shared/components';
+import { FormProvider } from '@/shared/context';
+import { usePersistedTablePagination } from '@/shared/hooks';
+import { formatDate } from '@/shared/utils';
+import { type JobApplicationsListQueryParams } from '@/shared/schema';
 import { Eye } from 'lucide-react';
 import { useCallback, useState } from 'react';
 import { ApplicationStatusBadge } from '../application-status-badge';

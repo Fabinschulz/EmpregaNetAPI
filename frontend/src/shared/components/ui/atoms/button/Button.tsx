@@ -4,7 +4,7 @@ import * as React from 'react';
 import { Slot } from '@radix-ui/react-slot';
 import { cva, type VariantProps } from 'class-variance-authority';
 import type { LucideIcon } from 'lucide-react';
-import { cn } from '@/utils/lib';
+import { cn } from '@/shared/utils/lib';
 import styles from './Button.module.scss';
 
 const buttonVariants = cva(styles.root, {

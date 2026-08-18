@@ -1,6 +1,6 @@
 'use client';
 
-import { Button } from '@/components/ui';
+import { Button } from '@/shared/components';
 import { X } from 'lucide-react';
 import Link from 'next/link';
 import styles from './sidebar.module.scss';

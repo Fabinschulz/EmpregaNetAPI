@@ -1,4 +1,4 @@
-import { Skeleton } from '@/components';
+import { Skeleton } from '@/shared/components';
 import styles from './job-card.module.scss';
 
 export function JobCardSkeleton() {

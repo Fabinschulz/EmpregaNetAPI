@@ -1,6 +1,6 @@
 'use client';
 
-import { cn } from '@/utils/lib';
+import { cn } from '@/shared/utils/lib';
 import { Eye, EyeOff } from 'lucide-react';
 import * as React from 'react';
 import styles from './Input.module.scss';
