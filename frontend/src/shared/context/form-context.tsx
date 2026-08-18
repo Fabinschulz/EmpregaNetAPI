@@ -43,7 +43,6 @@ export type FormContextProps<T extends FieldValues = FieldValues> = {
   watch: UseFormWatch<T>;
   submitting: boolean;
   isDirty: boolean;
-  isValid: boolean;
   dirtyFields: Partial<FieldNamesMarkedBoolean<T>>;
   readOnly?: boolean;
   trigger: UseFormTrigger<T>;
@@ -153,8 +152,9 @@ export function FormProvider<T extends FieldValues = FieldValues>({
     watch,
     trigger,
     register,
-    formState: { isDirty, isValid, dirtyFields }
+    formState: { isDirty, dirtyFields }
   } = useForm<T>({
+    mode: 'onTouched',
     resolver: zodResolver(validationSchema as never) as Resolver<T>,
     defaultValues: defaultValues as DefaultValues<T>
   });
@@ -207,7 +207,6 @@ export function FormProvider<T extends FieldValues = FieldValues>({
     watch,
     submitting: isSubmitPending,
     isDirty,
-    isValid,
     dirtyFields,
     trigger,
     register

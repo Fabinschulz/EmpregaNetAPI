@@ -34,6 +34,7 @@ Usa a ferramenta **Agent** (subagent_type `claude`) com o conteúdo do arquivo c
 | Testes | [`test-engineer.md`](docs/agents/test-engineer.md) |
 | Bugs / causa raiz | [`debug-specialist.md`](docs/agents/debug-specialist.md) |
 | Performance | [`performance-optimizer.md`](docs/agents/performance-optimizer.md) |
+| QA End-to-End (navega a UI real) | [`e2e-qa-engineer.md`](docs/agents/e2e-qa-engineer.md) |
 
 Orquestração mínima: um especialista quando bastar; cadeias curtas só quando a tarefa exigir (ver `meta-agent.md`).
 
@@ -44,6 +45,7 @@ Orquestração mínima: um especialista quando bastar; cadeias curtas só quando
 | Backend .NET | [`docs/skills/backend-skill/SKILL.md`](docs/skills/backend-skill/SKILL.md) |
 | Frontend Next.js | [`docs/skills/frontend-skill/SKILL.md`](docs/skills/frontend-skill/SKILL.md) |
 | Orquestrador SDD | [`docs/skills/sdd-orchestrator/SKILL.md`](docs/skills/sdd-orchestrator/SKILL.md) |
+| QA End-to-End (regressão via browser) | [`docs/skills/e2e-qa-skill/SKILL.md`](docs/skills/e2e-qa-skill/SKILL.md) |
 
 ## Regras de comportamento
 

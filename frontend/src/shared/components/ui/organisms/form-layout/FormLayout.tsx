@@ -1,5 +1,6 @@
 'use client';
 
+import { useFormContext } from '@/shared/context';
 import { cn } from '@/shared/utils';
 import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
@@ -44,11 +45,13 @@ type FormActionsProps = FormLayoutProps & {
 
 /** Rodapé com as ações do formulário. */
 export function FormActions({ children, className, backHref, backLabel = 'Voltar' }: FormActionsProps) {
+  const { reset } = useFormContext();
+
   return (
     <div className={cn(styles.actions, className)}>
       {backHref ? (
         <Button type="button" variant="outline" className={styles.back} asChild>
-          <Link href={backHref}>
+          <Link href={backHref} onClick={() => setTimeout(() => reset())}>
             <ArrowLeft aria-hidden />
             {backLabel}
           </Link>

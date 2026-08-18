@@ -60,6 +60,7 @@ Dominó técnico comum neste codebase: PostgreSQL via EF Core, cache Redis opcio
 | `code-reviewer.md` | Diff / pré-merge |
 | `debug-specialist.md` | Causa raiz |
 | `performance-optimizer.md` | Performance com evidência |
+| `e2e-qa-engineer.md` | Regressão E2E navegando a UI real (Browser tool) |
 
 ---
 

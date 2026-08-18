@@ -49,12 +49,14 @@ export function useFormField<TValue = unknown>({
   disabled,
   hint
 }: Pick<FormFieldBaseProps, 'name' | 'error' | 'disabled' | 'hint'>): UseFormFieldResult<TValue> {
-  const { control: formControl, validationErrors, readOnly } = useFormContext();
+  const { control: formControl, validationErrors, readOnly, formState } = useFormContext();
   const uid = useId();
 
   const { field, fieldState } = useController({ name, control: formControl });
 
-  const error = errorProp ?? getFieldErrorMessage(name, validationErrors);
+  const shouldShowValidationError = fieldState.isTouched || formState?.isSubmitted === true;
+  const validationError = shouldShowValidationError ? getFieldErrorMessage(name, validationErrors) : undefined;
+  const error = errorProp ?? validationError;
 
   const ids: FormFieldIds = {
     control: `${uid}-${name}-control`,
