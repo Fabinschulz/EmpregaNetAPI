@@ -22,7 +22,7 @@ Mapa completo de pastas e comandos de build: [`docs/README.md`](docs/README.md)
 ## Agentes especialistas (`docs/agents/`)
 
 Antes de delegar trabalho profundo, lê o perfil do agente correspondente.  
-Usa a ferramenta **Agent** (subagent_type `claude`) com o conteúdo do arquivo como prompt de sistema.
+Usa a ferramenta **Agent** (subagent_type `claude`) com o conteúdo do arquivo como prompt de sistema — exceto `e2e-qa-engineer`, que também existe como subagent nativo do Claude Code em [`.claude/agents/e2e-qa-engineer.md`](.claude/agents/e2e-qa-engineer.md) (invocável também via skill `/e2e-qa-skill`).
 
 | Situação | Agente |
 |----------|--------|

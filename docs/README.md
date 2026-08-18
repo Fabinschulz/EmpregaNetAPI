@@ -64,6 +64,19 @@ Dominó técnico comum neste codebase: PostgreSQL via EF Core, cache Redis opcio
 
 ---
 
+## Skills (`skills/`)
+
+| Ficheiro | Uso rápido |
+| -------- | ---------- |
+| `backend-skill/SKILL.md` | Convenções .NET |
+| `frontend-skill/SKILL.md` | Convenções Next.js/React |
+| `sdd-orchestrator/SKILL.md` | Fluxo PRD → design → spec/tasks |
+| `e2e-qa-skill/SKILL.md` | Metodologia de regressão E2E via Browser |
+
+Equivalente no Claude Code deste repositório (invocável nativamente via subagent `e2e-qa-engineer` e skill `/e2e-qa-skill`): [`.claude/agents/e2e-qa-engineer.md`](../.claude/agents/e2e-qa-engineer.md) e [`.claude/skills/e2e-qa-skill/SKILL.md`](../.claude/skills/e2e-qa-skill/SKILL.md) — apontam para os arquivos acima como fonte canônica da metodologia; mantenha os dois em sync se atualizar um.
+
+---
+
 ## Comandos úteis (verificação local)
 
 Na raiz do repositório (ajusta se o CI usar outra ordem):
