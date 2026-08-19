@@ -17,7 +17,7 @@ Documento vivo: descreve **como** especificação, implementação e validação
 | Princípio | Implicação prática |
 | --------- | ------------------- |
 | **Single source of truth** | Comportamento de negócio: linguagem ubíqua + testes/regras na Application (.NET). Contrato HTTP: ViewModels/DTOs estáveis; no frontend, **Zod** espelha o contrato consumido. |
-| **Human-in-the-loop** | IA (agentes em `docs/agents/`) acelera redacção, implementação e revisão; **merge** e decisões de risco ficam com humanos. |
+| **Human-in-the-loop** | IA (agentes em `.claude/agents/`) acelera redacção, implementação e revisão; **merge** e decisões de risco ficam com humanos. |
 | **Least power** | Preferir o mecanismo mais simples que satisfaz a spec (YAGNI, KISS, DRY). |
 | **Traceability** | Cada PR liga-se a uma spec ou ticket com critérios de aceitação mensuráveis. |
 | **Defence in depth** | Validação na API, saneamento na fronteira do cliente, autorização explícita (RBAC) em caminhos sensíveis. |
@@ -83,7 +83,7 @@ Para trabalho com **artefactos dedicados por pasta** (como em projectos SDD com 
 | Preparação da implementação | `spec.md` (matriz CA → cobertura), `tasks.md` (plano + *deviation notes*) |
 | Congelamento opcional | `state.md` quando a spec estiver aprovada para desenvolvimento |
 
-Regras operacionais, versionamento em frontmatter e **gate** “sem código até aprovação por fase”: [`SDD-ORCHESTRATOR.md`](SDD-ORCHESTRATOR.md). Templates de acionamento e geração de `state.md`: [`SDD-USAGE-GUIDE.md`](SDD-USAGE-GUIDE.md). Índice de pastas: [`../features/README.md`](../features/README.md). Skill de IA: [`../skills/sdd-orchestrator/SKILL.md`](../skills/sdd-orchestrator/SKILL.md).
+Regras operacionais, versionamento em frontmatter e **gate** “sem código até aprovação por fase”: [`SDD-ORCHESTRATOR.md`](SDD-ORCHESTRATOR.md). Templates de acionamento e geração de `state.md`: [`SDD-USAGE-GUIDE.md`](SDD-USAGE-GUIDE.md). Índice de pastas: [`../features/README.md`](../features/README.md). Skill executora: [`sdd-orchestrator`](../../.claude/skills/sdd-orchestrator/SKILL.md).
 
 ---
 
@@ -100,11 +100,11 @@ Regras operacionais, versionamento em frontmatter e **gate** “sem código até
 
 - Backend: (Clean arch) Domain / Application / Infra / Api; comandos e queries com mediator interno do projecto.
 - Frontend: pastas por feature, serviços e schemas por domínio.
-- Orquestração IA: consultar `docs/agents/meta-agent.md` para pedidos amplos; `dotnet-architect` para novas fronteiras; `frontend-engineer` para UI.
+- Orquestração IA: invocar a skill `/meta-agent` para pedidos amplos; `dotnet-architect` para novas fronteiras; `frontend-engineer` para UI.
 
 ### Fase C - Implementação
 
-- Seguir `docs/skills/backend-skill/SKILL.md` e `docs/skills/frontend-skill/SKILL.md`.
+- Seguir as skills `backend-skill` e `frontend-skill` (`.claude/skills/`).
 - Commits pequenos, mensagens que referenciam o ticket/spec.
 
 ### Fase D - Verificação (gates)
@@ -114,7 +114,7 @@ Regras operacionais, versionamento em frontmatter e **gate** “sem código até
 | **Build** | Na raiz do repo: `dotnet build backend/EmpregaNet.sln` e `dotnet build Bff/EmpregaNet.Bff.sln`; em `frontend/`: `pnpm lint` e `pnpm build`. |
 | **Testes** | `dotnet test backend/tests/tests.csproj` verde quando aplicável; novos caminhos cobertos em Application ou integração. |
 | **Segurança** | Sem secrets no repo; validação de input; autorização nos endpoints sensíveis. |
-| **Revisão** | Humano + opcional passagem mental alinhada a [`docs/agents/code-reviewer.md`](../agents/code-reviewer.md). |
+| **Revisão** | Humano + opcional passagem mental alinhada a agente [`code-reviewer`](../../.claude/agents/code-reviewer.md). |
 
 ### Fase E - Entrega e observabilidade
 
@@ -147,7 +147,7 @@ Positivas e negativas; o que fica proibido ou obrigatório daqui em diante.
 
 ## 5. Integração com agentes de IA (mapa mental)
 
-Os prompts em `docs/agents/` são **perfis cognitivos** especializados. Use-os para reduzir erro de “generalista” em tarefas exigentes:
+Os prompts em `.claude/agents/` são **perfis cognitivos** especializados. Use-os para reduzir erro de “generalista” em tarefas exigentes:
 
 | Fase / necessidade | Agente sugerido |
 | -------------------- | ----------------- |
@@ -192,8 +192,8 @@ O ficheiro [`CLAUDE.md`](../../CLAUDE.md) na raiz garante que este SDD e as skil
 | Índice `docs/` (mapa repo + comandos) | [`../README.md`](../README.md) |
 | Contexto sempre aplicável | [`CLAUDE.md`](../../CLAUDE.md) (raiz do repositório) |
 | Guia de onboarding (arquitectura, setup, fluxos) | [`README.md`](../../README.md) (raiz do repositório) |
-| Agentes | `docs/agents/*.md` |
-| Skills | `docs/skills/*/SKILL.md` (backend, frontend, orquestrador SDD) |
+| Agentes | `.claude/agents/*.md` (índice em `docs/agents/README.md`) |
+| Skills | `.claude/skills/*/SKILL.md` (índice em `docs/skills/README.md`) |
 | SDD (este documento) | `docs/sdd/EMPREGANET-SDD.md` |
 | Orquestrador SDD (fases PRD→tasks) | `docs/sdd/SDD-ORCHESTRATOR.md` |
 | Guia de uso (templates, `state.md`) | `docs/sdd/SDD-USAGE-GUIDE.md` |

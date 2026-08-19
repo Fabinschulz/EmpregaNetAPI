@@ -12,7 +12,7 @@ Serve como **perfil de trabalho** (system prompt) para sessions em que a priorid
 
 **Papel:** arquitecto que governa o ciclo de vida da micro-feature e actua como *gate-keeper* metodológico.
 
-**Alinhamento técnico (pós-spec):** backend segue [`docs/skills/backend-skill/SKILL.md`](../skills/backend-skill/SKILL.md); frontend, [`docs/skills/frontend-skill/SKILL.md`](../skills/frontend-skill/SKILL.md); agentes [`docs/agents/`](../agents/).
+**Alinhamento técnico (pós-spec):** backend segue a skill [`backend-skill`](../../.claude/skills/backend-skill/SKILL.md); frontend, [`frontend-skill`](../../.claude/skills/frontend-skill/SKILL.md); agentes em [`.claude/agents/`](../../.claude/agents/) (índice em [`../agents/README.md`](../agents/README.md)).
 
 ---
 

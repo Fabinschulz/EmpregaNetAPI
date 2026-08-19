@@ -19,33 +19,40 @@ Mapa completo de pastas e comandos de build: [`docs/README.md`](docs/README.md)
 - **ADRs:** [`docs/sdd/adrs/`](docs/sdd/adrs/) - decisões estruturais duradouras.
 - **Backlog:** [`docs/sdd/FEATURES-BACKLOG.md`](docs/sdd/FEATURES-BACKLOG.md) (quando existir).
 
-## Agentes especialistas (`docs/agents/`)
+## Agentes especialistas (`.claude/agents/`)
 
-Antes de delegar trabalho profundo, lê o perfil do agente correspondente.  
-Usa a ferramenta **Agent** (subagent_type `claude`) com o conteúdo do arquivo como prompt de sistema — exceto `e2e-qa-engineer`, que também existe como subagent nativo do Claude Code em [`.claude/agents/e2e-qa-engineer.md`](.claude/agents/e2e-qa-engineer.md) (invocável também via skill `/e2e-qa-skill`).
+Invoca pelo **nome** com a ferramenta Agent (`subagent_type`). Cada agente já traz a sua allowlist de
+ferramentas e lê a skill correspondente no arranque — não copies convenções para o prompt de delegação.
+Índice e padrão de escrita: [`docs/agents/README.md`](docs/agents/README.md).
 
 | Situação | Agente |
 |----------|--------|
-| Pedido vago ou multi-domínio | [`meta-agent.md`](docs/agents/meta-agent.md) |
-| Fronteiras / layering / API shape | [`dotnet-architect.md`](docs/agents/dotnet-architect.md) |
-| Implementação .NET concreta | [`dotnet-implementer.md`](docs/agents/dotnet-implementer.md) |
-| UI / Next.js / React | [`frontend-engineer.md`](docs/agents/frontend-engineer.md) |
-| Qualidade de PR / diff | [`code-reviewer.md`](docs/agents/code-reviewer.md) |
-| Testes | [`test-engineer.md`](docs/agents/test-engineer.md) |
-| Bugs / causa raiz | [`debug-specialist.md`](docs/agents/debug-specialist.md) |
-| Performance | [`performance-optimizer.md`](docs/agents/performance-optimizer.md) |
-| QA End-to-End (navega a UI real) | [`e2e-qa-engineer.md`](docs/agents/e2e-qa-engineer.md) |
+| Fronteiras / layering / API shape (read-only) | `dotnet-architect` |
+| Implementação .NET concreta | `dotnet-implementer` |
+| UI / Next.js / React | `frontend-engineer` |
+| Testes automatizados | `test-engineer` |
+| Qualidade de PR / diff (read-only) | `code-reviewer` |
+| Bugs / causa raiz | `debug-specialist` |
+| Performance com evidência | `performance-optimizer` |
+| QA End-to-End (navega a UI real) | `e2e-qa-engineer` |
 
-Orquestração mínima: um especialista quando bastar; cadeias curtas só quando a tarefa exigir (ver `meta-agent.md`).
+Orquestração mínima: um especialista quando bastar; cadeias curtas só quando a tarefa exigir.
 
-## Skills de implementação (`docs/skills/`)
+## Skills (`.claude/skills/`)
+
+Carregadas automaticamente quando a situação encaixa, ou por `/<nome>`. Índice e padrão:
+[`docs/skills/README.md`](docs/skills/README.md).
 
 | Área | Skill |
 |------|-------|
-| Backend .NET | [`docs/skills/backend-skill/SKILL.md`](docs/skills/backend-skill/SKILL.md) |
-| Frontend Next.js | [`docs/skills/frontend-skill/SKILL.md`](docs/skills/frontend-skill/SKILL.md) |
-| Orquestrador SDD | [`docs/skills/sdd-orchestrator/SKILL.md`](docs/skills/sdd-orchestrator/SKILL.md) |
-| QA End-to-End (regressão via browser) | [`docs/skills/e2e-qa-skill/SKILL.md`](docs/skills/e2e-qa-skill/SKILL.md) |
+| Convenções backend .NET (conhecimento) | `backend-skill` |
+| Convenções frontend Next.js (conhecimento) | `frontend-skill` |
+| Pedido vago ou multi-domínio → rotear e encadear | `/meta-agent` |
+| Especificar feature antes de código (gate por fase) | `/sdd-orchestrator` |
+| Regressão E2E pela UI real | `/e2e-qa-skill` |
+
+Orquestração é skill, não agente: um subagente não tem a ferramenta Agent e por isso só conseguiria
+recomendar, não delegar.
 
 ## Regras de comportamento
 

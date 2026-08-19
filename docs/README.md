@@ -26,8 +26,8 @@ Dominó técnico comum neste codebase: PostgreSQL via EF Core, cache Redis opcio
 | Prioridade | Documento |
 | ---------- | --------- |
 | 1 | [`sdd/EMPREGANET-SDD.md`](sdd/EMPREGANET-SDD.md) - filosofia, fases A–E, gates, IA |
-| 2 | [`skills/backend-skill/SKILL.md`](skills/backend-skill/SKILL.md) e [`skills/frontend-skill/SKILL.md`](skills/frontend-skill/SKILL.md) - convenções de implementação |
-| 3 | [`agents/meta-agent.md`](agents/meta-agent.md) - quando o pedido for largo |
+| 2 | [`backend-skill`](../.claude/skills/backend-skill/SKILL.md) e [`frontend-skill`](../.claude/skills/frontend-skill/SKILL.md) - convenções de implementação |
+| 3 | skill [`meta-agent`](../.claude/skills/meta-agent/SKILL.md) - quando o pedido for largo |
 
 ---
 
@@ -37,10 +37,10 @@ Dominó técnico comum neste codebase: PostgreSQL via EF Core, cache Redis opcio
 | --------- | ----------- |
 | [`sdd/SDD-ORCHESTRATOR.md`](sdd/SDD-ORCHESTRATOR.md) | Fluxo PRD → design → spec/tasks; gate antes de código |
 | [`sdd/SDD-USAGE-GUIDE.md`](sdd/SDD-USAGE-GUIDE.md) | Templates de prompt, versões em frontmatter, `state.md` |
-| [`skills/sdd-orchestrator/SKILL.md`](skills/sdd-orchestrator/SKILL.md) | Atalho de IA para esse fluxo |
-| [`sdd/adrs/README.md`](sdd/adrs/README.md) | ADRs transversais (índice dos 7 existentes) |
+| Skill [`sdd-orchestrator`](../.claude/skills/sdd-orchestrator/SKILL.md) | Executor do fluxo, com gate por fase |
+| [`sdd/adrs/README.md`](sdd/adrs/README.md) | ADRs transversais (índice dos 9 existentes) |
 
-`docs/features/<feature-id>/` é a convenção para specs por feature (`prd.md`, `design.md`, `spec.md`, `tasks.md`). Um `sdd/FEATURES-BACKLOG.md` é opcional: o issue tracker pode ser a fonte de verdade.
+`docs/features/<feature-id>/` é a convenção para specs por feature (`prd.md`, `design.md`, `spec.md`, `tasks.md`) - ver [`features/README.md`](features/README.md). Um `sdd/FEATURES-BACKLOG.md` é opcional: o issue tracker pode ser a fonte de verdade.
 
 | Feature | Escopo |
 | ------- | ------ |
@@ -48,32 +48,43 @@ Dominó técnico comum neste codebase: PostgreSQL via EF Core, cache Redis opcio
 
 ---
 
-## Agentes (`agents/`)
+## Agentes (`.claude/agents/`)
 
-| Ficheiro | Uso rápido |
-| -------- | ---------- |
-| `meta-agent.md` | Orquestração ou pedidos vagos |
-| `dotnet-architect.md` | Fronteiras backend, layering |
-| `dotnet-implementer.md` | Código .NET concreto |
-| `frontend-engineer.md` | Next.js / React |
-| `test-engineer.md` | Estratégia e qualidade de testes |
-| `code-reviewer.md` | Diff / pré-merge |
-| `debug-specialist.md` | Causa raiz |
-| `performance-optimizer.md` | Performance com evidência |
-| `e2e-qa-engineer.md` | Regressão E2E navegando a UI real (Browser tool) |
+Invocáveis pelo **nome** via ferramenta Agent. Padrão de escrita e separação de responsabilidades:
+[`agents/README.md`](agents/README.md).
+
+| Agente | Uso rápido | Escreve código? |
+| ------ | ---------- | --------------- |
+| `dotnet-architect` | Fronteiras backend, layering, forma da API | Não — read-only |
+| `dotnet-implementer` | Código .NET concreto, com build + testes | Sim |
+| `frontend-engineer` | Next.js / React, com lint + testes + build | Sim |
+| `test-engineer` | Testes automatizados (xUnit, Cucumber) | Só testes |
+| `code-reviewer` | Diff / pré-merge | Não — read-only |
+| `debug-specialist` | Causa raiz, correção mínima verificada | Sim |
+| `performance-optimizer` | Performance com evidência medida | Sim |
+| `e2e-qa-engineer` | Regressão E2E navegando a UI real (Browser) | Não altera código |
 
 ---
 
-## Skills (`skills/`)
+## Skills (`.claude/skills/`)
 
-| Ficheiro | Uso rápido |
-| -------- | ---------- |
-| `backend-skill/SKILL.md` | Convenções .NET |
-| `frontend-skill/SKILL.md` | Convenções Next.js/React |
-| `sdd-orchestrator/SKILL.md` | Fluxo PRD → design → spec/tasks |
-| `e2e-qa-skill/SKILL.md` | Metodologia de regressão E2E via Browser |
+Carregadas automaticamente pela `description`, ou invocadas por `/<nome>`. Padrão:
+[`skills/README.md`](skills/README.md).
 
-Equivalente no Claude Code deste repositório (invocável nativamente via subagent `e2e-qa-engineer` e skill `/e2e-qa-skill`): [`.claude/agents/e2e-qa-engineer.md`](../.claude/agents/e2e-qa-engineer.md) e [`.claude/skills/e2e-qa-skill/SKILL.md`](../.claude/skills/e2e-qa-skill/SKILL.md) — apontam para os arquivos acima como fonte canônica da metodologia; mantenha os dois em sync se atualizar um.
+| Skill | Tipo | Uso rápido |
+| ----- | ---- | ---------- |
+| `backend-skill` | Conhecimento | Convenções .NET: camadas, mediator interno, EF Core, contrato HTTP, testes |
+| `frontend-skill` | Conhecimento | Convenções Next.js: `cacheComponents`, SCSS Modules, Zod, auth/RBAC, loading |
+| `/meta-agent` | Orquestração | Roteia pedido vago ou multi-domínio para o especialista certo |
+| `/sdd-orchestrator` | Orquestração | PRD → design → spec/tasks com gate humano por fase |
+| `/e2e-qa-skill` | Orquestração + metodologia | Regressão E2E pela UI real |
+
+Duas decisões estruturais que explicam este layout:
+
+- **Orquestração é skill, não agente** — um subagente não tem acesso à ferramenta Agent, logo só conseguiria
+  recomendar, não delegar. Skills correm na thread principal.
+- **Conhecimento vive só nas skills** — nenhum agente recopia convenções do projeto. Cada agente declara
+  `## Contexto obrigatório` e lê a skill no arranque (subagentes não têm a ferramenta Skill, mas têm `Read`).
 
 ---
 
