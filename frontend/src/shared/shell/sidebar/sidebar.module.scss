@@ -3,7 +3,7 @@
   z-index: 40;
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
+  min-height: 0;
   overflow: hidden;
   background: var(--sidebar-bg);
 }
@@ -29,6 +29,11 @@
 }
 
 .brand {
+  display: inline-flex;
+  align-items: center;
+  /* E um link de navegacao (vai para o inicio): precisa de alvo de toque, nao so do tamanho
+     do texto. Cabe nos 56px do cabecalho. */
+  min-height: 44px;
   font-weight: 780;
   letter-spacing: 0.3px;
   font-size: 1.05rem;
@@ -43,6 +48,7 @@
   min-height: 0;
   overflow-x: hidden;
   overflow-y: auto;
+  overscroll-behavior: contain;
   padding: 12px 10px 16px;
   display: flex;
   flex-direction: column;
@@ -92,6 +98,7 @@
   display: inline-flex;
   align-items: center;
   gap: 10px;
+  min-height: var(--control-min-height, 44px);
   padding: 10px 12px;
   border: 1px solid transparent;
   color: var(--nav-fg, var(--muted));
@@ -171,6 +178,8 @@
   flex-shrink: 0;
   margin-top: auto;
   padding: 14px 12px 16px;
+  /* Barra de gestos do iOS/Android nao pode tapar o botao de sair do drawer. */
+  padding-bottom: max(16px, env(safe-area-inset-bottom, 0px));
   border-top: 1px solid var(--border);
   display: flex;
   flex-direction: column;
@@ -253,7 +262,15 @@
 @media (min-width: 901px) {
   .root {
     margin: var(--shell-panel-inset, 12px) 0 var(--shell-panel-inset, 12px) var(--shell-panel-inset, 12px);
-    min-height: calc(100vh - (var(--shell-panel-inset, 12px) * 2));
+    /* Painel preso a viewport em vez de esticado pela grelha: a altura para de acompanhar o
+       conteudo da pagina e `.scroll` passa a ter rolagem propria. Quem rola continua a ser o
+       documento — o feed de vagas depende disso (scroll infinito e `window.scrollTo`). */
+    position: sticky;
+    top: var(--shell-panel-inset, 12px);
+    align-self: start;
+    height: calc(100vh - (var(--shell-panel-inset, 12px) * 2));
+    height: calc(100dvh - (var(--shell-panel-inset, 12px) * 2));
+    min-height: 0;
     border: 1px solid var(--border);
     border-radius: var(--sidebar-radius, var(--radius-xl, 20px));
     box-shadow: var(--shadow-card);
