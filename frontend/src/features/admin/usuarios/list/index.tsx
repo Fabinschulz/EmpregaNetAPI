@@ -1,30 +1,30 @@
 'use client';
 
 import {
-  ApiQueryBoundary,
-  ConfirmDialog,
-  PageHeader,
-  StatusBadge,
-  TableContainer,
-  TableFilters,
-  useRowDeleteAction,
-  type DataTableColumn,
-  type RowAction
+    ApiQueryBoundary,
+    ConfirmDialog,
+    PageHeader,
+    StatusBadge,
+    TableContainer,
+    TableFilters,
+    useRowDeleteAction,
+    type DataTableColumn,
+    type RowAction
 } from '@/shared/components';
 import { FormProvider } from '@/shared/context';
-import { usePersistedTablePagination } from '@/shared/hooks';
-import { type UserResponse, type AdminUsersListQueryParams } from '@/shared/schema';
+import { useListRefresh, usePersistedTablePagination } from '@/shared/hooks';
+import { type AdminUsersListQueryParams, type UserResponse } from '@/shared/schema';
 import { formatDate, userTypeLabel } from '@/shared/utils';
 import { Eye } from 'lucide-react';
 import { useCallback, useMemo, useState } from 'react';
-import { useAdminUsersListQuery, useDeleteAdminUserMutation } from '../service';
-import {
-  adminUsersFilterFormSchema,
-  adminUsersFilterToParams,
-  defaultAdminUsersFilter
-} from './admin-users-filter-schema';
 import { adminUsersRoutes } from '../admin-users-routes';
+import { useAdminUsersListQuery, useDeleteAdminUserMutation } from '../service';
 import { AdminUsersFilterFields } from './admin-users-filter-fields';
+import {
+    adminUsersFilterFormSchema,
+    adminUsersFilterToParams,
+    defaultAdminUsersFilter
+} from './admin-users-filter-schema';
 
 type AdminUsersFilterParams = Pick<AdminUsersListQueryParams, 'search' | 'isDeleted' | 'orderBy'>;
 
@@ -40,6 +40,8 @@ export function AdminUsersPage() {
     size: pagination.pageSize,
     ...filters
   });
+
+  const handleRefresh = useListRefresh({ refetch, resource: 'usuários' });
 
   const handleFiltersChange = useCallback(
     (next: AdminUsersFilterParams) => {
@@ -116,7 +118,7 @@ export function AdminUsersPage() {
           pagination={pagination}
           totalItems={data?.totalItems}
           isPending={isPending}
-          onRefresh={() => void refetch()}
+          onRefresh={handleRefresh}
           isRefreshing={isFetching}
           emptyTitle="Nenhum usuário"
           emptyMessage="Nenhum usuário encontrado para os filtros informados."

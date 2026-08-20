@@ -2,19 +2,19 @@
 
 import { ApiQueryBoundary, PageHeader, TableContainer, TableFilters, type DataTableColumn } from '@/shared/components';
 import { FormProvider } from '@/shared/context';
-import { usePersistedTablePagination } from '@/shared/hooks';
-import { formatDate } from '@/shared/utils';
+import { useListRefresh, usePersistedTablePagination } from '@/shared/hooks';
 import { type JobApplicationsListQueryParams } from '@/shared/schema';
+import { formatDate } from '@/shared/utils';
 import { Eye } from 'lucide-react';
 import { useCallback, useState } from 'react';
 import { ApplicationStatusBadge } from '../application-status-badge';
 import { useMyJobApplicationsQuery, type JobApplicationResponse } from '../service';
-import {
-  defaultMyApplicationsFilter,
-  myApplicationsFilterFormSchema,
-  myApplicationsFilterToParams
-} from './my-applications-filter-schema';
 import { MyApplicationsFilterFields } from './my-applications-filter-fields';
+import {
+    defaultMyApplicationsFilter,
+    myApplicationsFilterFormSchema,
+    myApplicationsFilterToParams
+} from './my-applications-filter-schema';
 
 type MyApplicationsFilterParams = Pick<JobApplicationsListQueryParams, 'status' | 'orderBy'>;
 
@@ -48,6 +48,8 @@ export function MyApplicationsPage() {
     ...filters
   });
 
+  const handleRefresh = useListRefresh({ refetch, resource: 'candidaturas' });
+
   const handleFiltersChange = useCallback(
     (next: MyApplicationsFilterParams) => {
       setFilters(next);
@@ -75,7 +77,7 @@ export function MyApplicationsPage() {
           pagination={pagination}
           totalItems={data?.totalItems}
           isPending={isPending}
-          onRefresh={() => void refetch()}
+          onRefresh={handleRefresh}
           isRefreshing={isFetching}
           emptyTitle="Nenhuma candidatura"
           emptyMessage="Nenhuma candidatura encontrada para os filtros informados."

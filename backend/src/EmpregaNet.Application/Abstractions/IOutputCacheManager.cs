@@ -40,11 +40,11 @@ public interface IOutputCacheManager
     Task InvalidateUserMeAsync(long userId, CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Invalida cache relacionada a aplicações de emprego, tanto a lista de aplicações do usuário autenticado (JobApplicationsMine)
-    /// quanto a lista de aplicações por vaga (JobApplicationsByJob).
-    /// Essa invalidação é importante após mutações que possam afetar o estado das aplicações (ex: criar, atualizar ou excluir uma aplicação).
-    /// Como essas caches não são específicas por usuário, não é necessário um ID para a invalidação. 
-    /// O método pode ser chamado sempre que houver uma mudança relevante nas aplicações de emprego para garantir que os dados em cache sejam atualizados corretamente.
+    /// Invalida a cache afetada por uma mutação de candidatura (criar, atualizar status, excluir):
+    /// a lista do próprio utilizador (JobApplicationsMine), a lista por vaga (JobApplicationsByJob)
+    /// e a leitura de candidatos (Candidates) — a ficha do candidato expõe a contagem de
+    /// candidaturas por status e ficaria a mostrar o quadro anterior.
+    /// Nenhuma dessas caches é específica por utilizador, por isso não recebe ID.
     /// </summary>
     /// <param name="cancellationToken"></param>
     Task InvalidateJobApplicationsAsync(CancellationToken cancellationToken = default);

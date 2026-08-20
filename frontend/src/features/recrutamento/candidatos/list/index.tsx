@@ -2,18 +2,18 @@
 
 import { ApiQueryBoundary, PageHeader, TableContainer, TableFilters, type DataTableColumn } from '@/shared/components';
 import { FormProvider } from '@/shared/context';
-import { usePersistedTablePagination } from '@/shared/hooks';
-import { formatDate } from '@/shared/utils';
+import { useListRefresh, usePersistedTablePagination } from '@/shared/hooks';
 import { type CandidatesListQueryParams, type UserResponse } from '@/shared/schema';
+import { formatDate } from '@/shared/utils';
 import { Eye } from 'lucide-react';
 import { useCallback, useMemo, useState } from 'react';
 import { useCandidatesListQuery } from '../service';
-import {
-  candidatesFilterFormSchema,
-  candidatesFilterToParams,
-  defaultCandidatesFilter
-} from './candidates-filter-schema';
 import { CandidatesFilterFields } from './candidates-filter-fields';
+import {
+    candidatesFilterFormSchema,
+    candidatesFilterToParams,
+    defaultCandidatesFilter
+} from './candidates-filter-schema';
 
 type CandidatesFilterParams = Pick<CandidatesListQueryParams, 'search' | 'orderBy'>;
 
@@ -42,6 +42,8 @@ export function RecruitmentCandidatesPage() {
     size: pagination.pageSize,
     ...filters
   });
+
+  const handleRefresh = useListRefresh({ refetch, resource: 'candidatos' });
 
   const handleFiltersChange = useCallback(
     (next: CandidatesFilterParams) => {
@@ -75,7 +77,7 @@ export function RecruitmentCandidatesPage() {
           pagination={pagination}
           totalItems={data?.totalItems}
           isPending={isPending}
-          onRefresh={() => void refetch()}
+          onRefresh={handleRefresh}
           isRefreshing={isFetching}
           emptyTitle="Nenhum candidato"
           emptyMessage="Nenhum candidato encontrado para os filtros informados."

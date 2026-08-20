@@ -1,6 +1,6 @@
 'use client';
 
-import { Alert, PageHeader } from '@/shared/components';
+import { Alert, FormHeader, FormNotice } from '@/shared/components';
 import { FormProvider } from '@/shared/context';
 import { CompanyFormFields, companyFormSchema, defaultFormCompany, type CompanyFormValues } from '../form';
 import { companiesRoutes } from '../companies-routes';
@@ -11,17 +11,21 @@ export function AdminNewCompanyPage() {
   const handleSubmit = async (formValue: CompanyFormValues) => await mutateAsync(formValue);
 
   return (
-    <div>
-      <PageHeader title="Nova empresa" description="Cadastre uma nova empresa parceira." />
+    <FormProvider validationSchema={companyFormSchema} defaultValues={defaultFormCompany} onSubmit={handleSubmit}>
+      <FormHeader
+        title="Nova empresa"
+        description="Cadastre uma nova empresa parceira."
+        backHref={companiesRoutes.list}
+        submitLabel="Criar empresa"
+      />
       {apiError ? (
-        <Alert variant="destructive" title="Erro" style={{ margin: '1rem 0' }}>
-          {apiError}
-        </Alert>
+        <FormNotice>
+          <Alert variant="destructive" title="Erro">
+            {apiError}
+          </Alert>
+        </FormNotice>
       ) : null}
-
-      <FormProvider validationSchema={companyFormSchema} defaultValues={defaultFormCompany} onSubmit={handleSubmit}>
-        <CompanyFormFields submitLabel="Criar empresa" backHref={companiesRoutes.list} />
-      </FormProvider>
-    </div>
+      <CompanyFormFields />
+    </FormProvider>
   );
 }

@@ -11,26 +11,8 @@
 }
 
 .meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px 20px;
-  margin-top: 4px;
-  list-style: none;
-  padding: 0;
-}
-
-.metaItem {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 0.875rem;
-  color: var(--muted);
-
-  svg {
-    width: 16px;
-    height: 16px;
-    flex-shrink: 0;
-  }
+  gap: var(--entity-card-row-gap) 20px;
+  margin-top: 6px;
 }
 
 .summary {
@@ -40,19 +22,14 @@
   color: var(--text);
 }
 
-.sectionLabel {
-  margin: 0 0 6px;
-  font-size: 0.8125rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: var(--muted);
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
-.sectionLabel + .tags,
-.description + .sectionLabel,
-.tags + .sectionLabel {
-  margin-top: 20px;
+.body h2:not(:first-child) {
+  margin-top: 12px;
 }
 
 .description {
@@ -60,24 +37,6 @@
   color: var(--text);
   line-height: 1.6;
   white-space: pre-wrap;
-}
-
-.tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.tag {
-  padding: 4px 10px;
-  border-radius: var(--radius-pill);
-  background: var(--brand-soft);
-  font-size: 0.8125rem;
-  font-weight: 550;
-  color: var(--text);
 }
 
 .footer {

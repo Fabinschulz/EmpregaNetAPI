@@ -1,6 +1,6 @@
 'use client';
 
-import { Alert, PageHeader } from '@/shared/components';
+import { Alert, FormHeader, FormNotice } from '@/shared/components';
 import { FormProvider } from '@/shared/context';
 import { JobFormFields, defaultFormJob, jobFormSchema, type JobFormValues } from '../form';
 import { jobsRoutes } from '../jobs-routes';
@@ -11,17 +11,21 @@ export function RecruitmentNewJobPage() {
   const handleSubmit = async (formValue: JobFormValues) => await mutateAsync(formValue);
 
   return (
-    <div>
-      <PageHeader title="Nova vaga" description="Publique uma nova vaga para a sua empresa." />
+    <FormProvider validationSchema={jobFormSchema} defaultValues={defaultFormJob} onSubmit={handleSubmit}>
+      <FormHeader
+        title="Nova vaga"
+        description="Publique uma nova vaga para a sua empresa."
+        backHref={jobsRoutes.list}
+        submitLabel="Criar vaga"
+      />
       {apiError ? (
-        <Alert variant="destructive" title="Erro">
-          {apiError}
-        </Alert>
+        <FormNotice>
+          <Alert variant="destructive" title="Erro">
+            {apiError}
+          </Alert>
+        </FormNotice>
       ) : null}
-
-      <FormProvider validationSchema={jobFormSchema} defaultValues={defaultFormJob} onSubmit={handleSubmit}>
-        <JobFormFields submitLabel="Criar vaga" backHref={jobsRoutes.list} />
-      </FormProvider>
-    </div>
+      <JobFormFields />
+    </FormProvider>
   );
 }

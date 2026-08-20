@@ -11,10 +11,11 @@ import {
   CardTitle,
   FormFieldsSkeleton,
   PageHeader,
-  StatusBadge
+  StatusBadge,
+  entityInitials
 } from '@/shared/components';
 import { FormProvider } from '@/shared/context';
-import { formatDateTime, userTypeLabel } from '@/shared/utils';
+import { formatDateTime, roleLabel, userTypeLabel } from '@/shared/utils';
 import { useParams } from 'next/navigation';
 import { useMemo, type ReactNode } from 'react';
 import { useAdminUserQuery, useUpdateAdminUserMutation } from '../service';
@@ -27,15 +28,6 @@ import {
 import styles from './admin-user-detail.module.scss';
 import { adminUsersRoutes } from '../admin-users-routes';
 import { AdminUserFormFields } from './admin-user-form';
-
-function initialsOf(name: string): string {
-  const letters = name
-    .split(' ')
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((part) => part[0]);
-  return letters.join('').toUpperCase() || 'U';
-}
 
 function MetaItem({ label, value }: { label: string; value: ReactNode }) {
   return (
@@ -80,7 +72,7 @@ export function AdminUserDetailPage() {
                 <div className={styles.identityRow}>
                   <div className={styles.identity}>
                     <div className={styles.avatar} aria-hidden>
-                      {initialsOf(user.username)}
+                      {entityInitials(user.username)}
                     </div>
                     <div className={styles.identityText}>
                       <p className={styles.name}>{user.username}</p>
@@ -90,7 +82,7 @@ export function AdminUserDetailPage() {
                         {user.roles.length ? (
                           user.roles.map((role) => (
                             <Badge key={role} variant="default">
-                              {role}
+                              {roleLabel(role)}
                             </Badge>
                           ))
                         ) : (

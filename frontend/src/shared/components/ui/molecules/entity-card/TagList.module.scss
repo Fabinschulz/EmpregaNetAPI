@@ -1,0 +1,38 @@
+.list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tag {
+  padding: 3px 9px;
+  border-radius: var(--radius-pill);
+  border: 1px solid transparent;
+  background: var(--brand-soft);
+  font-size: 0.75rem;
+  font-weight: 550;
+  color: var(--text);
+  white-space: nowrap;
+}
+
+.accent {
+  background: var(--surface-hover);
+  border-color: var(--border-strong);
+  color: var(--text);
+}
+
+.more {
+  padding: 3px 9px;
+  border-radius: var(--radius-pill);
+  border: 1px dashed var(--border-strong);
+  background: transparent;
+  font-size: 0.75rem;
+  font-weight: 550;
+  color: var(--muted);
+  white-space: nowrap;
+  cursor: default;
+}

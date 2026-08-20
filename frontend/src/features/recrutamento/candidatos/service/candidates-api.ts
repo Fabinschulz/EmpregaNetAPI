@@ -1,5 +1,6 @@
 import { axiosApi, createAxiosConfig } from '@/shared/api';
-import { userResponseSchema, type CandidatesListQueryParams, type UserResponse } from '@/shared/schema';
+import { type CandidatesListQueryParams } from '@/shared/schema';
+import { candidateDetailResponseSchema, type CandidateDetailResponse } from './candidate-detail-response-schema';
 import { candidatesListResponseSchema, type CandidatesListResponse } from './candidates-response-schema';
 
 export async function listCandidates(params?: CandidatesListQueryParams): Promise<CandidatesListResponse> {
@@ -7,7 +8,7 @@ export async function listCandidates(params?: CandidatesListQueryParams): Promis
   return candidatesListResponseSchema.parse(res.data);
 }
 
-export async function getCandidate(id: number): Promise<UserResponse> {
+export async function getCandidate(id: number): Promise<CandidateDetailResponse> {
   const res = await axiosApi.get<unknown>(`/api/candidates/${id}`, createAxiosConfig());
-  return userResponseSchema.parse(res.data);
+  return candidateDetailResponseSchema.parse(res.data);
 }

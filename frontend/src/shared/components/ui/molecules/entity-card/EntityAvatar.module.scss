@@ -1,0 +1,46 @@
+.avatar {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  overflow: hidden;
+
+  background: var(--surface-hover);
+  border: 1px solid var(--border);
+  color: var(--muted);
+  font-weight: 650;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  user-select: none;
+}
+
+.image {
+  object-fit: cover;
+}
+
+.sm {
+  width: var(--entity-card-avatar-sm);
+  height: var(--entity-card-avatar-sm);
+  border-radius: 8px;
+  font-size: 0.6875rem;
+}
+
+.md {
+  width: var(--entity-card-avatar-md);
+  height: var(--entity-card-avatar-md);
+  border-radius: var(--radius);
+  font-size: 0.9375rem;
+}
+
+.lg {
+  width: var(--entity-card-avatar-lg);
+  height: var(--entity-card-avatar-lg);
+  border-radius: var(--radius-md);
+  font-size: 1.25rem;
+}
+
+.placeholderMd {
+  width: var(--entity-card-avatar-md);
+  height: var(--entity-card-avatar-md);
+  border-radius: var(--radius);
+  flex: 0 0 auto;
+}

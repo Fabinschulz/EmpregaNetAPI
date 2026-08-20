@@ -59,11 +59,7 @@
 
 .feedItem {
   content-visibility: auto;
-
-  /* Palpite inicial de altura para o `content-visibility` (o `auto` faz o browser passar a usar a
-     altura real depois do primeiro render). Medido no browser: 244px no desktop. Subestimar faz a
-     barra de scroll saltar ao renderizar o item. */
-  contain-intrinsic-size: auto 244px;
+  contain-intrinsic-size: auto 272px;
 
   animation: card-enter 220ms ease-out both;
 }
@@ -100,6 +96,6 @@
   }
 
   .feedItem {
-    contain-intrinsic-size: auto 278px;
+    contain-intrinsic-size: auto 424px;
   }
 }

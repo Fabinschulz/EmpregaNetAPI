@@ -1,33 +1,108 @@
 .grid {
   display: grid;
-  gap: 12px;
+  gap: var(--form-section-gap, 24px);
+  width: 100%;
+  margin-top: 4px;
+}
+
+.gridNarrow {
+  --form-section-gap: 12px;
+  --form-gap: 12px;
+
   max-width: 640px;
   margin-top: 12px;
 }
 
+.notice {
+  margin: 16px 0;
+}
+
 .row {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
+  grid-template-columns: repeat(var(--form-cols, 2), minmax(0, 1fr));
+  gap: var(--form-gap, 16px);
+  align-items: start;
+}
+
+.row > * {
+  min-width: 0;
+}
+
+.row :is(input, select, textarea, [role='combobox']) {
+  scroll-margin-top: 104px;
+}
+
+.col {
+  min-width: 0;
+  grid-column: span var(--form-span, 1);
+}
+
+.colFull {
+  grid-column: 1 / -1;
 }
 
 .section {
+  position: relative;
   border: 0;
   padding: 0;
-  margin: 8px 0 0;
+  margin: 0;
+  min-width: 0;
+}
+
+.grid > .section + .section {
+  padding-top: var(--form-section-gap, 24px);
+}
+
+.grid > .section + .section::before {
+  content: '';
+  position: absolute;
+  inset-inline: 0;
+  top: 0;
+  height: 1px;
+  background: var(--border);
 }
 
 .legend {
   padding: 0;
-  margin-bottom: 12px;
+  margin: 0 0 14px;
+  font-size: 0.9375rem;
   font-weight: 600;
+  line-height: 1.35;
+  color: var(--text);
 }
 
-.sectionBody {
-  display: grid;
-  gap: 12px;
+.sectionDescription {
+  margin: -8px 0 14px;
+  color: var(--muted);
+  font-size: 0.8125rem;
+  line-height: 1.45;
 }
 
+.headerSticky {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+
+.header {
+  padding-block: 10px 14px;
+  margin-block-end: 4px;
+  border-bottom: 1px solid var(--border);
+  background: var(--content-bg, var(--bg));
+}
+
+.actionsBar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding-bottom: 14px;
+  margin-bottom: 4px;
+  border-bottom: 1px solid var(--border);
+}
+
+/* Rodapé de ações (`FormActions`): formulário curto de conta, que cabe na tela inteiro. */
 .actions {
   display: flex;
   justify-content: flex-end;
@@ -42,12 +117,61 @@
   margin-right: auto;
 }
 
-@media (max-width: 560px) {
+@media (max-width: 1023px) {
   .row {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(var(--form-cols-md, 2), minmax(0, 1fr));
+  }
+
+  .col {
+    grid-column: span 1;
+  }
+
+  .colFull {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 640px) {
+  /* `.gridNarrow` já é compacto; alargar o espaçamento dele aqui seria o inverso do desejado. */
+  .grid:not(.gridNarrow) {
+    --form-section-gap: 20px;
+    --form-gap: 12px;
+  }
+
+  .row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .row :is(input, select, textarea, [role='combobox']) {
+    scroll-margin-top: 12px;
+  }
+
+  .col,
+  .colFull {
+    grid-column: 1 / -1;
+  }
+
+  .headerSticky {
+    position: static;
+  }
+
+  .header,
+  .actionsBar {
+    padding-block-end: 12px;
   }
 
   .actions {
     justify-content: stretch;
+  }
+
+  .header > :last-child,
+  .actionsBar {
+    width: 100%;
+  }
+
+  .header > :last-child > *,
+  .actionsBar > * {
+    flex: 1 1 auto;
+    justify-content: center;
   }
 }

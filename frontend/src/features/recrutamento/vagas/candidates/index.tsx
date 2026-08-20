@@ -4,6 +4,7 @@ import {
   ApiQueryBoundary,
   Button,
   ConfirmDialog,
+  FilterBar,
   PageHeader,
   TableContainer,
   TableFilters,
@@ -40,7 +41,6 @@ import {
   defaultCandidatesFilter,
   type CandidatesFilterParams
 } from './candidates-filter-fields';
-import styles from './candidates.module.scss';
 
 /** Ícone da ação que leva a candidatura para cada status alvo. */
 const TRANSITION_ICON: Record<ApplicationStatus, LucideIcon> = {
@@ -195,9 +195,9 @@ export function CandidatesByJobPage() {
                 defaultValues={defaultCandidatesFilter}
                 onSubmit={() => undefined}
               >
-                <div className={styles.filterRow}>
+                <FilterBar>
                   <CandidatesFilterFields onChange={handleFilterChange} />
-                </div>
+                </FilterBar>
               </FormProvider>
             </TableFilters>
           }

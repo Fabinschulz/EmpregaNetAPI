@@ -1,19 +1,16 @@
 'use client';
 
+import { useJobVocabularyQuery } from '@/features/vagas/service';
 import {
-  Button,
-  FormActions,
+  FormCol,
   FormGrid,
-  FormRow,
   FormSection,
-  FormSubmitButton,
   InputField,
   MultiSelectField,
   SelectField,
   TextareaField
 } from '@/shared/components';
 import { useFormContext } from '@/shared/context';
-import { useJobVocabularyQuery } from '@/features/vagas/service';
 import {
   experienceLevelVocabulary,
   jobAreaVocabulary,
@@ -22,20 +19,12 @@ import {
   workModelVocabulary,
   workShiftVocabulary
 } from '@/shared/schema';
-import { Archive, Save } from 'lucide-react';
 import { useMemo } from 'react';
 import { useSelectableCompaniesQuery } from '../service';
 import { PCD_OPTIONS, SALARY_DISCLOSURE_OPTIONS, type JobFormValues } from './job-form-schema';
 
-type JobFormFieldsProps = {
-  submitLabel: string;
-  backHref: string;
-  onClose?: () => void;
-  closeDisabled?: boolean;
-};
-
-export function JobFormFields({ submitLabel, backHref, onClose, closeDisabled }: JobFormFieldsProps) {
-  const { submitting, watch } = useFormContext<JobFormValues>();
+export function JobFormFields() {
+  const { watch } = useFormContext<JobFormValues>();
   const { data: companies, isPending: companiesLoading } = useSelectableCompaniesQuery();
   const { data: vocabulary, isPending: vocabularyLoading } = useJobVocabularyQuery();
 
@@ -53,62 +42,64 @@ export function JobFormFields({ submitLabel, backHref, onClose, closeDisabled }:
 
   return (
     <FormGrid>
-      <FormSection title="Identificação">
-        <SelectField
-          name="companyId"
-          label="Empresa"
-          options={companyOptions}
-          placeholder="Selecione a empresa"
-          loading={companiesLoading}
-          required
-        />
-        <InputField name="title" label="Título da vaga" required />
-        <InputField
-          name="summary"
-          label="Resumo"
-          hint="Chamada curta exibida no cartão do feed (até 280 caracteres)."
-        />
-        <TextareaField name="description" label="Descrição" rows={6} required />
-      </FormSection>
-
-      <FormSection title="Jornada e experiência">
-        <FormRow>
-          <SelectField name="workShift" label="Turno" options={workShiftVocabulary.options} required />
+      <FormSection title="Identificação" cols={4}>
+        <FormCol span={2}>
           <SelectField
-            name="experienceLevel"
-            label="Experiência exigida"
-            options={experienceLevelVocabulary.options}
+            name="companyId"
+            label="Empresa"
+            options={companyOptions}
+            placeholder="Selecione a empresa"
+            loading={companiesLoading}
             required
           />
-        </FormRow>
-        <FormRow>
-          <SelectField name="jobType" label="Tipo de contratação" options={jobTypeVocabulary.options} required />
-          <SelectField name="area" label="Área" options={jobAreaVocabulary.options} required />
-        </FormRow>
-        <FormRow>
-          <SelectField name="workModel" label="Modalidade" options={workModelVocabulary.options} required />
-          <SelectField name="pcd" label="Vaga afirmativa" options={PCD_OPTIONS} required />
-        </FormRow>
+        </FormCol>
+        <FormCol span={2}>
+          <InputField name="title" label="Título da vaga" required />
+        </FormCol>
+        <FormCol span="full">
+          <InputField
+            name="summary"
+            label="Resumo"
+            hint="Chamada curta exibida no cartão do feed (até 280 caracteres)."
+          />
+        </FormCol>
+        <FormCol span="full">
+          <TextareaField name="description" label="Descrição" rows={6} required />
+        </FormCol>
       </FormSection>
 
-      <FormSection title="Localização">
-        <FormRow>
+      <FormSection title="Jornada e experiência" cols={3}>
+        <SelectField name="workShift" label="Turno" options={workShiftVocabulary.options} required />
+        <SelectField name="jobType" label="Tipo de contratação" options={jobTypeVocabulary.options} required />
+        <SelectField name="workModel" label="Modalidade" options={workModelVocabulary.options} required />
+        <SelectField name="area" label="Área" options={jobAreaVocabulary.options} required />
+        <SelectField
+          name="experienceLevel"
+          label="Experiência exigida"
+          options={experienceLevelVocabulary.options}
+          required
+        />
+        <SelectField name="pcd" label="Vaga afirmativa" options={PCD_OPTIONS} required />
+      </FormSection>
+
+      <FormSection title="Localização" cols={3}>
+        <FormCol span={2}>
           <InputField name="city" label="Cidade" required />
-          <SelectField name="state" label="Estado" options={UF_SELECT_OPTIONS} required />
-        </FormRow>
+        </FormCol>
+        <SelectField name="state" label="Estado" options={UF_SELECT_OPTIONS} required />
       </FormSection>
 
-      <FormSection title="Remuneração">
+      <FormSection title="Remuneração" cols={3}>
         <SelectField name="salaryDisclosure" label="Salário" options={SALARY_DISCLOSURE_OPTIONS} required />
         {salaryDisclosed ? (
-          <FormRow>
+          <>
             <InputField name="salaryMin" label="Salário mínimo (R$)" type="number" min={0} step="0.01" />
             <InputField name="salaryMax" label="Salário máximo (R$)" type="number" min={0} step="0.01" />
-          </FormRow>
+          </>
         ) : null}
       </FormSection>
 
-      <FormSection title="Requisitos e benefícios">
+      <FormSection title="Requisitos e benefícios" cols={2}>
         <MultiSelectField
           name="requirements"
           label="Requisitos"
@@ -124,19 +115,6 @@ export function JobFormFields({ submitLabel, backHref, onClose, closeDisabled }:
           loading={vocabularyLoading}
         />
       </FormSection>
-
-      <FormActions backHref={backHref}>
-        <FormSubmitButton variant="primary">
-          <Save aria-hidden />
-          {submitting ? 'Salvando...' : submitLabel}
-        </FormSubmitButton>
-        {onClose ? (
-          <Button type="button" onClick={onClose} disabled={closeDisabled}>
-            <Archive aria-hidden />
-            Encerrar vaga
-          </Button>
-        ) : null}
-      </FormActions>
     </FormGrid>
   );
 }

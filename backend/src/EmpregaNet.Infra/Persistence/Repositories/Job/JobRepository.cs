@@ -12,6 +12,7 @@ namespace EmpregaNet.Infra.Persistence.Repositories;
 public class JobRepository : BaseRepository<Job>, IJobRepository
 {
     private const char LikeEscapeCharacter = '\\';
+    private const int FeedDescriptionExcerptLength = 320;
 
     public JobRepository(PostgreSqlContext context) : base(context)
     {
@@ -62,6 +63,10 @@ public class JobRepository : BaseRepository<Job>, IJobRepository
                 x.Job.Id,
                 x.Job.Title,
                 x.Job.Summary,
+                x.Job.Description.Length > FeedDescriptionExcerptLength
+                    ? x.Job.Description.Substring(0, FeedDescriptionExcerptLength)
+                    : x.Job.Description,
+                x.Job.Description.Length > FeedDescriptionExcerptLength,
                 new JobFeedCompany(x.Company.Id, x.Company.CompanyName),
                 new JobFeedLocation(x.Job.Location.City, x.Job.Location.State, x.Job.Location.Country),
                 new JobFeedSalary(x.Job.SalaryMin, x.Job.SalaryMax, x.Job.SalaryDisclosed),

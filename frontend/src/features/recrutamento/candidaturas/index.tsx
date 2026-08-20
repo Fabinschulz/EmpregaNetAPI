@@ -1,39 +1,39 @@
 'use client';
 
-import {
-  ApiQueryBoundary,
-  ConfirmDialog,
-  PageHeader,
-  TableContainer,
-  TableFilters,
-  useRowDeleteAction,
-  type DataTableColumn,
-  type RowAction
-} from '@/shared/components';
-import { FormProvider } from '@/shared/context';
 import { ApplicationStatusBadge } from '@/features/candidaturas/application-status-badge';
 import {
-  applicationStatusTransitions,
-  applicationTransitionLabels,
-  parseApplicationStatus,
-  type ApplicationStatus
+    applicationStatusTransitions,
+    applicationTransitionLabels,
+    parseApplicationStatus,
+    type ApplicationStatus
 } from '@/features/candidaturas/domain';
 import {
-  useAllJobApplicationsQuery,
-  useChangeApplicationStatusMutation,
-  useDeleteApplicationMutation,
-  type JobApplicationResponse
+    useAllJobApplicationsQuery,
+    useChangeApplicationStatusMutation,
+    useDeleteApplicationMutation,
+    type JobApplicationResponse
 } from '@/features/candidaturas/service';
 import {
-  defaultRecruitmentApplicationsFilter,
-  recruitmentApplicationsFilterFormSchema
-} from './recruitment-applications-filter-schema';
-import { usePersistedTablePagination } from '@/shared/hooks';
-import { formatDate } from '@/shared/utils';
+    ApiQueryBoundary,
+    ConfirmDialog,
+    PageHeader,
+    TableContainer,
+    TableFilters,
+    useRowDeleteAction,
+    type DataTableColumn,
+    type RowAction
+} from '@/shared/components';
+import { FormProvider } from '@/shared/context';
+import { useListRefresh, usePersistedTablePagination } from '@/shared/hooks';
 import { type ListOrderByValue } from '@/shared/schema';
+import { formatDate } from '@/shared/utils';
 import { Ban, CheckCircle2, Eye, Flag, PlayCircle, RotateCcw, XCircle, type LucideIcon } from 'lucide-react';
 import { useCallback, useMemo, useState } from 'react';
 import { RecruitmentApplicationsFilterFields } from './recruitment-applications-filter-fields';
+import {
+    defaultRecruitmentApplicationsFilter,
+    recruitmentApplicationsFilterFormSchema
+} from './recruitment-applications-filter-schema';
 
 /** Ícone da ação que leva a candidatura para cada status alvo. */
 const TRANSITION_ICON: Record<ApplicationStatus, LucideIcon> = {
@@ -63,6 +63,8 @@ export function RecruitmentApplicationsPage() {
     size: pagination.pageSize,
     orderBy
   });
+
+  const handleRefresh = useListRefresh({ refetch, resource: 'candidaturas' });
   const { mutate: changeApplicationStatus, isPending: isChangingStatus } = useChangeApplicationStatusMutation();
   const { mutate: deleteApplication, isPending: isDeleting } = useDeleteApplicationMutation();
 
@@ -156,7 +158,7 @@ export function RecruitmentApplicationsPage() {
           pagination={pagination}
           totalItems={data?.totalItems}
           isPending={isPending}
-          onRefresh={() => void refetch()}
+          onRefresh={handleRefresh}
           isRefreshing={isFetching}
           emptyTitle="Nenhuma candidatura"
           emptyMessage="Nenhuma candidatura encontrada."

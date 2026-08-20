@@ -1,9 +1,10 @@
 'use client';
 
-import { useMemo } from 'react';
-import { useParams } from 'next/navigation';
-import { Alert, ApiQueryBoundary, FormFieldsSkeleton, PageHeader } from '@/shared/components';
+import { Alert, ApiQueryBoundary, FormFieldsSkeleton, FormHeader, FormNotice, PageHeader } from '@/shared/components';
 import { FormProvider } from '@/shared/context';
+import { useParams } from 'next/navigation';
+import { useMemo } from 'react';
+import { companiesRoutes } from '../companies-routes';
 import {
   CompanyFormFields,
   companyFormSchema,
@@ -11,8 +12,12 @@ import {
   defaultFormCompany,
   type CompanyFormValues
 } from '../form';
-import { companiesRoutes } from '../companies-routes';
 import { useCompanyQuery, useUpdateCompanyMutation } from '../service';
+
+const HEADING = {
+  title: 'Editar empresa',
+  description: 'Atualize os dados cadastrais da empresa.'
+} as const;
 
 export function AdminEditCompanyPage() {
   const params = useParams<{ id: string }>();
@@ -36,26 +41,29 @@ export function AdminEditCompanyPage() {
       resource="empresa"
       onRetry={() => void refetch()}
     >
-      <section>
-        <PageHeader title="Editar empresa" description="Atualize os dados cadastrais da empresa." />
-        {apiError ? (
-          <Alert variant="destructive" title="Erro">
-            {apiError}
-          </Alert>
-        ) : null}
-        {isPending ? (
+      {isPending ? (
+        <section>
+          <PageHeader {...HEADING} />
           <FormFieldsSkeleton fields={8} />
-        ) : (
-          <FormProvider
-            key={`company-${id}`}
-            validationSchema={companyFormSchema}
-            defaultValues={initial}
-            onSubmit={handleSubmit}
-          >
-            <CompanyFormFields submitLabel="Salvar" backHref={companiesRoutes.list} />
-          </FormProvider>
-        )}
-      </section>
+        </section>
+      ) : (
+        <FormProvider
+          key={`company-${id}`}
+          validationSchema={companyFormSchema}
+          defaultValues={initial}
+          onSubmit={handleSubmit}
+        >
+          <FormHeader {...HEADING} backHref={companiesRoutes.list} submitLabel="Salvar" />
+          {apiError ? (
+            <FormNotice>
+              <Alert variant="destructive" title="Erro">
+                {apiError}
+              </Alert>
+            </FormNotice>
+          ) : null}
+          <CompanyFormFields />
+        </FormProvider>
+      )}
     </ApiQueryBoundary>
   );
 }

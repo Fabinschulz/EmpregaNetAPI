@@ -41,7 +41,7 @@ public class CandidatesController : ControllerBase
     /// <summary>Obtém o detalhe de um candidato pelo identificador.</summary>
     [HttpGet("{id:long}")]
     [OutputCache(PolicyName = OutputCachePolicies.AuthenticatedRead, Tags = [ApplicationCacheTags.Candidates])]
-    [ProducesResponseType(typeof(UserViewModel), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(CandidateDetailViewModel), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(DomainError))]
     [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(DomainError))]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(DomainError))]

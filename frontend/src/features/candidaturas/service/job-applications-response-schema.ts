@@ -1,4 +1,5 @@
 import { createPaginatedResponseSchema } from '@/shared/schema';
+import { displayNameOrId } from '@/shared/utils';
 import { z } from 'zod';
 
 const jobApplicationCandidateResponseSchema = z.object({
@@ -29,5 +30,5 @@ export const jobApplicationsListResponseSchema = createPaginatedResponseSchema(j
 export type JobApplicationsListResponse = z.infer<typeof jobApplicationsListResponseSchema>;
 
 export function candidateDisplayName(candidate: JobApplicationCandidateResponse): string {
-  return candidate.name.trim() || `#${candidate.id}`;
+  return displayNameOrId(candidate.name, candidate.id);
 }

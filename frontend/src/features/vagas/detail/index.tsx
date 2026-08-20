@@ -1,9 +1,23 @@
 'use client';
 
-import { Alert, Button, Card, CardContent, CardFooter, CardHeader, CardTitle, StatusBadge } from '@/shared/components';
-import { useAuth } from '@/shared/context';
 import { useApplyToJobMutation } from '@/features/candidaturas/service';
 import type { JobResponse } from '@/features/recrutamento/vagas/service';
+import {
+  Alert,
+  Button,
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardSectionLabel,
+  CardTitle,
+  InfoItem,
+  InfoList,
+  StatusBadge,
+  TagList,
+  toCardTags
+} from '@/shared/components';
+import { useAuth } from '@/shared/context';
 import { useRelativeTime } from '@/shared/hooks';
 import {
   experienceLevelVocabulary,
@@ -14,7 +28,6 @@ import {
   workShiftVocabulary
 } from '@/shared/schema';
 import { formatSalaryRange } from '@/shared/utils';
-import type { LucideIcon } from 'lucide-react';
 import {
   Accessibility,
   Banknote,
@@ -26,6 +39,7 @@ import {
   LayoutGrid,
   MapPin
 } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 import styles from './job-detail.module.scss';
 
 type JobDetailPageProps = {
@@ -37,6 +51,9 @@ type MetaItem = {
   key: string;
   icon: LucideIcon;
   label: string;
+  /** Dado que decide a leitura: sobe de peso na banda. */
+  strong?: boolean;
+  srLabel?: string;
 };
 
 export function JobDetailPage({ job }: JobDetailPageProps) {
@@ -56,12 +73,40 @@ export function JobDetailPage({ job }: JobDetailPageProps) {
   const city = job.city?.trim();
   const state = normalizeUf(job.state);
   if (city || state) {
-    meta.push({ key: 'location', icon: MapPin, label: [city, state].filter(Boolean).join(', ') });
+    meta.push({
+      key: 'location',
+      icon: MapPin,
+      label: [city, state].filter(Boolean).join(', '),
+      srLabel: 'Localização'
+    });
+  }
+
+  meta.push({
+    key: 'salary',
+    icon: Banknote,
+    label: formatSalaryRange(job.salaryMin, job.salaryMax, job.salaryDisclosed ?? true),
+    strong: job.salaryDisclosed ?? true,
+    srLabel: 'Faixa salarial'
+  });
+
+  const workModel = workModelVocabulary.normalize(job.workModel);
+  if (workModel) {
+    meta.push({
+      key: 'workModel',
+      icon: Building2,
+      label: workModelVocabulary.label(workModel),
+      srLabel: 'Modalidade'
+    });
+  }
+
+  const jobType = jobTypeVocabulary.normalize(job.jobType);
+  if (jobType) {
+    meta.push({ key: 'jobType', icon: Briefcase, label: jobTypeVocabulary.label(jobType), srLabel: 'Contratação' });
   }
 
   const workShift = workShiftVocabulary.normalize(job.workShift);
   if (workShift) {
-    meta.push({ key: 'workShift', icon: Clock, label: workShiftVocabulary.label(workShift) });
+    meta.push({ key: 'workShift', icon: Clock, label: workShiftVocabulary.label(workShift), srLabel: 'Turno' });
   }
 
   const experienceLevel = experienceLevelVocabulary.normalize(job.experienceLevel);
@@ -69,41 +114,26 @@ export function JobDetailPage({ job }: JobDetailPageProps) {
     meta.push({
       key: 'experienceLevel',
       icon: GraduationCap,
-      label: experienceLevelVocabulary.label(experienceLevel)
+      label: experienceLevelVocabulary.label(experienceLevel),
+      srLabel: 'Experiência'
     });
   }
 
-  const jobType = jobTypeVocabulary.normalize(job.jobType);
-  if (jobType) {
-    meta.push({ key: 'jobType', icon: Briefcase, label: jobTypeVocabulary.label(jobType) });
-  }
-
-  const workModel = workModelVocabulary.normalize(job.workModel);
-  if (workModel && workModel !== 'OnSite') {
-    meta.push({ key: 'workModel', icon: Building2, label: workModelVocabulary.label(workModel) });
+  const area = jobAreaVocabulary.normalize(job.area);
+  if (area) {
+    meta.push({ key: 'area', icon: LayoutGrid, label: jobAreaVocabulary.label(area), srLabel: 'Área' });
   }
 
   if (job.isPcdFriendly) {
     meta.push({ key: 'pcd', icon: Accessibility, label: 'Vaga afirmativa para PcD' });
   }
 
-  const area = jobAreaVocabulary.normalize(job.area);
-  if (area) {
-    meta.push({ key: 'area', icon: LayoutGrid, label: jobAreaVocabulary.label(area) });
-  }
-
-  meta.push({
-    key: 'salary',
-    icon: Banknote,
-    label: formatSalaryRange(job.salaryMin, job.salaryMax, job.salaryDisclosed ?? true)
-  });
-
   if (job.publishedAt ?? job.createdAt) {
-    meta.push({ key: 'published', icon: CalendarDays, label: `Publicada ${publishedLabel}` });
+    meta.push({ key: 'published', icon: CalendarDays, label: `Publicada ${publishedLabel}`, srLabel: 'Publicação' });
   }
 
-  const requirements = job.requirements ?? [];
-  const benefits = job.benefits ?? [];
+  const requirements = toCardTags(job.requirements ?? []);
+  const benefits = toCardTags(job.benefits ?? []);
 
   return (
     <section>
@@ -116,43 +146,30 @@ export function JobDetailPage({ job }: JobDetailPageProps) {
 
           {job.summary?.trim() ? <p className={styles.summary}>{job.summary}</p> : null}
 
-          <ul className={styles.meta}>
-            {meta.map(({ key, icon: Icon, label }) => (
-              <li key={key} className={styles.metaItem}>
-                <Icon aria-hidden />
-                <span>{label}</span>
-              </li>
+          <InfoList className={styles.meta} ariaLabel="Dados da vaga">
+            {meta.map(({ key, icon, label, strong, srLabel }) => (
+              <InfoItem key={key} icon={icon} strong={strong} srLabel={srLabel}>
+                {label}
+              </InfoItem>
             ))}
-          </ul>
+          </InfoList>
         </CardHeader>
 
-        <CardContent>
-          <h2 className={styles.sectionLabel}>Descrição</h2>
+        <CardContent className={styles.body}>
+          <CardSectionLabel as="h2">Descrição</CardSectionLabel>
           <p className={styles.description}>{job.description?.trim() ? job.description : 'Sem descrição.'}</p>
 
           {requirements.length > 0 ? (
             <>
-              <h2 className={styles.sectionLabel}>Requisitos</h2>
-              <ul className={styles.tags}>
-                {requirements.map((requirement) => (
-                  <li key={requirement} className={styles.tag}>
-                    {requirement}
-                  </li>
-                ))}
-              </ul>
+              <CardSectionLabel as="h2">Requisitos</CardSectionLabel>
+              <TagList tags={requirements} ariaLabel="Requisitos da vaga" />
             </>
           ) : null}
 
           {benefits.length > 0 ? (
             <>
-              <h2 className={styles.sectionLabel}>Benefícios</h2>
-              <ul className={styles.tags}>
-                {benefits.map((benefit) => (
-                  <li key={benefit} className={styles.tag}>
-                    {benefit}
-                  </li>
-                ))}
-              </ul>
+              <CardSectionLabel as="h2">Benefícios</CardSectionLabel>
+              <TagList tags={benefits} ariaLabel="Benefícios da vaga" />
             </>
           ) : null}
         </CardContent>

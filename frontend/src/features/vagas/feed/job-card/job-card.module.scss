@@ -3,8 +3,8 @@
   display: flex;
   flex-direction: column;
 
-  gap: 8px;
-  padding: 16px 18px;
+  gap: var(--entity-card-gap);
+  padding: var(--entity-card-padding);
   background: var(--card-bg);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
@@ -26,38 +26,49 @@
   box-shadow: var(--brand-glow);
 }
 
-.header {
+@media (prefers-reduced-motion: reduce) {
+  .card {
+    transition: border-color 160ms ease;
+  }
+
+  .card:hover {
+    transform: none;
+  }
+}
+
+.card[data-closed='true'] {
+  background: color-mix(in srgb, var(--card-bg) 88%, var(--bg));
+}
+
+.card[data-closed='true'] .title,
+.card[data-closed='true'] .summary {
+  color: var(--muted);
+}
+
+
+.identity {
   display: flex;
-  align-items: center;
-  gap: 8px;
+  align-items: flex-start;
+  gap: 12px;
   min-width: 0;
 }
 
-.avatar {
-  display: grid;
-  place-items: center;
-  flex: 0 0 auto;
-
-  /* Menor que antes: é contexto, não o elemento que decide o clique. */
-  width: 24px;
-  height: 24px;
-  border-radius: 6px;
-  background: var(--surface-hover);
-  border: 1px solid var(--border);
-  color: var(--muted);
-  font-size: 0.6875rem;
-  font-weight: 650;
-  letter-spacing: 0.02em;
+.identityText {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1 1 auto;
 }
 
-.avatarImage {
-  object-fit: cover;
+.identityAside {
+  flex: 0 0 auto;
 }
 
 .company {
   margin: 0;
   min-width: 0;
-  font-size: 0.8125rem;
+  font-size: var(--entity-card-meta-size);
   font-weight: 550;
   color: var(--muted);
   overflow: hidden;
@@ -65,44 +76,18 @@
   white-space: nowrap;
 }
 
-/* Local e salário numa linha só, separados por ponto médio. */
-.facts {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: 6px;
-  margin: 0;
-}
-
-.location {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 0.875rem;
-  color: var(--muted);
-}
-
-.factSeparator {
-  color: var(--border-strong);
-}
-
-.published {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  margin: 0;
-  font-size: 0.8125rem;
-  color: var(--muted);
-  white-space: nowrap;
-}
-
 /* O elemento mais forte do cartão: é por ele que se decide abrir a vaga. */
 .title {
   margin: 0;
-  font-size: 1.0625rem;
-  line-height: 1.35;
+  font-size: var(--entity-card-title-size);
+  line-height: 1.3;
   font-weight: 680;
   letter-spacing: -0.01em;
+
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
 }
 
 /* O design system é de acento neutro (`--brand` é fundo, não cor de link), por isso a hierarquia
@@ -133,90 +118,32 @@
   outline: none;
 }
 
-.salary {
-  font-size: 0.9375rem;
-  font-weight: 650;
-  color: var(--text);
-}
-
-/* Salário a combinar tem peso menor: é ausência de informação, não um destaque. */
-.salary[data-disclosed='false'] {
-  font-weight: 500;
-  color: var(--muted);
-}
-
-.highlights,
-.tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
+.summary {
   margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  padding: 4px 10px;
-  border-radius: var(--radius-pill);
-  background: var(--surface-hover);
-  border: 1px solid var(--border);
-  font-size: 0.8125rem;
-  color: var(--text);
-  white-space: nowrap;
-}
-
-.chipIcon {
-  width: 14px;
-  height: 14px;
-  flex: 0 0 auto;
-  opacity: 0.75;
-}
-
-.tag,
-.tagMore {
-  padding: 3px 9px;
-  border-radius: var(--radius-pill);
-  background: var(--brand-soft);
-  font-size: 0.75rem;
-  font-weight: 550;
-  color: var(--text);
-  white-space: nowrap;
-}
-
-.tagMore {
-  background: transparent;
-  border: 1px dashed var(--border-strong);
+  font-size: var(--entity-card-body-size);
+  line-height: 1.5;
   color: var(--muted);
-  cursor: default;
+
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
 }
 
-/* Sem separador: a borda somava peso visual a cada cartão numa lista longa. */
 .footer {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: 10px;
-  margin-top: 2px;
-}
-
-.meta {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
   gap: 12px;
-  font-size: 0.8125rem;
-  color: var(--muted);
+
+  margin-top: 2px;
+  padding-top: var(--entity-card-row-gap);
+  border-top: 1px solid color-mix(in srgb, var(--border) 60%, transparent);
 }
 
-.area,
-.applicants {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
+.footerMeta {
+  font-size: var(--entity-card-meta-size);
 }
 
 .actions {
@@ -225,49 +152,76 @@
   align-items: center;
   gap: 8px;
   margin-left: auto;
-
-  /* Acima do `::after` do título, senão o clique nos botões cairia no link do cartão. */
   position: relative;
   z-index: 1;
+}
+
+
+.iconAction {
+  flex: 0 0 auto;
 }
 
 .appliedBadge {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 6px 12px;
+  padding: 8px 14px;
   border-radius: var(--radius-pill);
   background: var(--success-soft);
   color: var(--success);
-  font-size: 0.8125rem;
+  font-size: var(--entity-card-meta-size);
   font-weight: 600;
   white-space: nowrap;
 }
 
-/* ---- Skeleton ------------------------------------------------------------------------- */
+.appliedIcon {
+  width: 15px;
+  height: 15px;
+  flex: 0 0 auto;
+}
+
 
 .skeletonLine {
   border-radius: var(--radius);
 }
 
-.skeletonHeader {
+.skeletonIdentity {
   display: flex;
-  align-items: center;
-  gap: 8px;
+  align-items: flex-start;
+  gap: 12px;
 }
 
-.skeletonChips {
+.skeletonIdentityText {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1 1 auto;
+}
+
+.skeletonRow {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: 8px 16px;
 }
 
-/* ---- Responsivo ------------------------------------------------------------------------ */
+.skeletonFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-top: var(--entity-card-row-gap);
+  border-top: 1px solid color-mix(in srgb, var(--border) 60%, transparent);
+}
+
 
 @media (max-width: 640px) {
   .card {
-    padding: 16px;
+    padding: var(--entity-card-padding-compact);
     border-radius: var(--radius);
+  }
+
+  .identity {
+    flex-wrap: wrap;
   }
 
   .footer {
@@ -279,9 +233,12 @@
     margin-left: 0;
   }
 
-  /* No mobile os dois botões dividem a largura em vez de espremerem-se lado a lado. */
   .actions > * {
     flex: 1 1 0;
+    justify-content: center;
+  }
+
+  .appliedBadge {
     justify-content: center;
   }
 }

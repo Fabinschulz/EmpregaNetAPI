@@ -1,27 +1,27 @@
 'use client';
 
 import {
-  ApiQueryBoundary,
-  Button,
-  ConfirmDialog,
-  PageHeader,
-  TableContainer,
-  TableFilters,
-  useRowDeleteAction,
-  type DataTableColumn,
-  type RowAction
+    ApiQueryBoundary,
+    Button,
+    ConfirmDialog,
+    PageHeader,
+    TableContainer,
+    TableFilters,
+    useRowDeleteAction,
+    type DataTableColumn,
+    type RowAction
 } from '@/shared/components';
 import { FormProvider } from '@/shared/context';
-import { usePersistedTablePagination } from '@/shared/hooks';
+import { useListRefresh, usePersistedTablePagination } from '@/shared/hooks';
 import { type CompaniesListQueryParams } from '@/shared/schema';
 import { formatDate } from '@/shared/utils';
 import { Pencil, Plus } from 'lucide-react';
 import Link from 'next/link';
 import { useCallback, useMemo, useState } from 'react';
-import { useCompaniesListQuery, useDeleteCompanyMutation, type CompanyResponse } from '../service';
-import { companiesFilterFormSchema, companiesFilterToParams, defaultCompaniesFilter } from './companies-filter-schema';
 import { companiesRoutes } from '../companies-routes';
+import { useCompaniesListQuery, useDeleteCompanyMutation, type CompanyResponse } from '../service';
 import { CompaniesFilterFields } from './companies-filter-fields';
+import { companiesFilterFormSchema, companiesFilterToParams, defaultCompaniesFilter } from './companies-filter-schema';
 
 type CompaniesFilterParams = Pick<CompaniesListQueryParams, 'search' | 'isDeleted' | 'orderBy'>;
 
@@ -35,6 +35,8 @@ export function AdminCompaniesPage() {
     size: pagination.pageSize,
     ...filters
   });
+
+  const handleRefresh = useListRefresh({ refetch, resource: 'empresas' });
 
   const handleFiltersChange = useCallback(
     (next: CompaniesFilterParams) => {
@@ -96,7 +98,7 @@ export function AdminCompaniesPage() {
       <section>
         <PageHeader
           title="Empresas"
-          description="Gestão de empresas (Admin)."
+          description="Gestão de empresas."
           actions={
             <Button variant="primary" asChild>
               <Link href={companiesRoutes.new}>
@@ -114,7 +116,7 @@ export function AdminCompaniesPage() {
           pagination={pagination}
           totalItems={data?.totalItems}
           isPending={isPending}
-          onRefresh={() => void refetch()}
+          onRefresh={handleRefresh}
           isRefreshing={isFetching}
           emptyTitle="Nenhuma empresa"
           emptyMessage="Nenhuma empresa encontrada para os filtros informados."

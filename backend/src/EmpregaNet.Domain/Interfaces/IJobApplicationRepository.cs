@@ -15,6 +15,14 @@ public interface IJobApplicationRepository : IBaseRepository<JobApplication>
 
     Task<JobApplicationProjection?> GetProjectionByIdAsync(long id, CancellationToken cancellationToken);
 
+    /// <summary>
+    /// Quantas candidaturas activas o utilizador tem em cada status. Agregado no banco: a ficha do
+    /// candidato precisa da contagem de candidaturas por status, mas não precisa de todas as candidaturas.
+    /// </summary>
+    Task<IReadOnlyDictionary<ApplicationStatusEnum, int>> GetStatusCountsByUserAsync(
+        long userId,
+        CancellationToken cancellationToken);
+
     Task<ListDataPagination<JobApplicationProjection>> GetAllWithCandidateAsync(
         CancellationToken cancellationToken,
         int page,

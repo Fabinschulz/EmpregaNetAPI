@@ -1,25 +1,37 @@
-import { Skeleton } from '@/shared/components';
+import { EntityAvatarSkeleton, Skeleton } from '@/shared/components';
 import styles from './job-card.module.scss';
 
 export function JobCardSkeleton() {
   return (
     <div className={styles.card} aria-hidden>
-      <div className={styles.skeletonHeader}>
-        <Skeleton className={styles.avatar} />
-        <Skeleton className={styles.skeletonLine} style={{ height: 12, width: '28%' }} />
+      <div className={styles.skeletonIdentity}>
+        <EntityAvatarSkeleton />
+
+        <div className={styles.skeletonIdentityText}>
+          <Skeleton className={styles.skeletonLine} style={{ height: 12, width: '26%' }} />
+          <Skeleton className={styles.skeletonLine} style={{ height: 18, width: '58%' }} />
+        </div>
       </div>
 
-      <Skeleton className={styles.skeletonLine} style={{ height: 19, width: '62%' }} />
-      <Skeleton className={styles.skeletonLine} style={{ height: 14, width: '44%' }} />
-
-      <div className={styles.skeletonChips}>
-        <Skeleton className={styles.skeletonLine} style={{ height: 22, width: 92 }} />
-        <Skeleton className={styles.skeletonLine} style={{ height: 22, width: 68 }} />
+      <div className={styles.skeletonRow}>
+        <Skeleton className={styles.skeletonLine} style={{ height: 14, width: 112 }} />
+        <Skeleton className={styles.skeletonLine} style={{ height: 14, width: 96 }} />
+        <Skeleton className={styles.skeletonLine} style={{ height: 14, width: 84 }} />
+        <Skeleton className={styles.skeletonLine} style={{ height: 14, width: 70 }} />
       </div>
 
-      <div className={styles.skeletonChips}>
-        <Skeleton className={styles.skeletonLine} style={{ height: 20, width: 76 }} />
-        <Skeleton className={styles.skeletonLine} style={{ height: 20, width: 58 }} />
+      <Skeleton className={styles.skeletonLine} style={{ height: 13, width: '92%' }} />
+      <Skeleton className={styles.skeletonLine} style={{ height: 13, width: '64%' }} />
+
+      <div className={styles.skeletonRow}>
+        <Skeleton className={styles.skeletonLine} style={{ height: 20, width: 88, borderRadius: 999 }} />
+        <Skeleton className={styles.skeletonLine} style={{ height: 20, width: 64, borderRadius: 999 }} />
+        <Skeleton className={styles.skeletonLine} style={{ height: 20, width: 104, borderRadius: 999 }} />
+      </div>
+
+      <div className={styles.skeletonFooter}>
+        <Skeleton className={styles.skeletonLine} style={{ height: 13, width: 148 }} />
+        <Skeleton className={styles.skeletonLine} style={{ height: 36, width: 220, borderRadius: 999 }} />
       </div>
     </div>
   );

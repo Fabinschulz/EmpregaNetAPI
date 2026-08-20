@@ -5,7 +5,7 @@ import { KeyRound } from 'lucide-react';
 
 export function ChangePasswordFormFields() {
   return (
-    <FormGrid>
+    <FormGrid narrow>
       <InputField name="currentPassword" label="Senha atual" type="password" required />
       <FormRow>
         <InputField name="newPassword" label="Nova senha" type="password" required />

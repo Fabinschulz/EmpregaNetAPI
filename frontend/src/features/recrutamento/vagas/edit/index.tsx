@@ -1,14 +1,27 @@
 'use client';
 
-import { Alert, ApiQueryBoundary, Button, FormFieldsSkeleton, PageHeader } from '@/shared/components';
+import {
+  Alert,
+  ApiQueryBoundary,
+  Button,
+  FormFieldsSkeleton,
+  FormHeader,
+  FormNotice,
+  PageHeader
+} from '@/shared/components';
 import { FormProvider } from '@/shared/context';
-import { Users } from 'lucide-react';
+import { Archive, Users } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useMemo } from 'react';
 import { JobFormFields, defaultFormJob, jobFormSchema, jobFormValuesFromResponse, type JobFormValues } from '../form';
 import { jobsRoutes } from '../jobs-routes';
 import { useCloseJobMutation, useJobQuery, useUpdateJobMutation } from '../service';
+
+const HEADING = {
+  title: 'Editar vaga',
+  description: 'Atualize os dados ou encerre a vaga.'
+} as const;
 
 export function RecruitmentEditJobPage() {
   const params = useParams<{ id: string }>();
@@ -34,42 +47,40 @@ export function RecruitmentEditJobPage() {
       resource="vaga"
       onRetry={() => void refetch()}
     >
-      <section>
-        <PageHeader
-          title="Editar vaga"
-          description="Atualize os dados ou encerre a vaga."
-          actions={
+      {isPending ? (
+        <section>
+          <PageHeader {...HEADING} />
+          <FormFieldsSkeleton fields={8} />
+        </section>
+      ) : (
+        <FormProvider
+          key={`job-${jobId}`}
+          validationSchema={jobFormSchema}
+          defaultValues={initial}
+          onSubmit={handleSubmit}
+        >
+          <FormHeader {...HEADING} backHref={jobsRoutes.list} submitLabel="Salvar">
             <Button variant="outline" asChild>
               <Link href={jobsRoutes.candidates(jobId)}>
                 <Users aria-hidden />
                 Ver candidatos
               </Link>
             </Button>
-          }
-        />
-        {apiError ? (
-          <Alert variant="destructive" title="Erro" style={{ margin: '1rem 0' }}>
-            {apiError}
-          </Alert>
-        ) : null}
-        {isPending ? (
-          <FormFieldsSkeleton fields={8} />
-        ) : (
-          <FormProvider
-            key={`job-${jobId}`}
-            validationSchema={jobFormSchema}
-            defaultValues={initial}
-            onSubmit={handleSubmit}
-          >
-            <JobFormFields
-              submitLabel="Salvar"
-              backHref={jobsRoutes.list}
-              onClose={close}
-              closeDisabled={isUpdating || isClosing}
-            />
-          </FormProvider>
-        )}
-      </section>
+            <Button type="button" onClick={() => close()} disabled={isUpdating || isClosing}>
+              <Archive aria-hidden />
+              Encerrar vaga
+            </Button>
+          </FormHeader>
+          {apiError ? (
+            <FormNotice>
+              <Alert variant="destructive" title="Erro">
+                {apiError}
+              </Alert>
+            </FormNotice>
+          ) : null}
+          <JobFormFields />
+        </FormProvider>
+      )}
     </ApiQueryBoundary>
   );
 }

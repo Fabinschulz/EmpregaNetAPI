@@ -5,7 +5,7 @@ import { Save } from 'lucide-react';
 
 export function ProfileFormFields() {
   return (
-    <FormGrid>
+    <FormGrid narrow>
       <FormRow>
         <InputField name="username" label="Nome de usuário" required />
         <InputField name="email" label="E-mail" type="email" required />

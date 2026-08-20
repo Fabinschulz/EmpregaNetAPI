@@ -1,6 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
-using EmpregaNet.Domain.Common;
-
 namespace EmpregaNet.Application.Jobs.ViewModel;
 
 /// <summary>
@@ -48,47 +45,4 @@ public sealed class JobFeedSalaryViewModel
 
     /// <summary><c>false</c> significa "a combinar".</summary>
     public bool Disclosed { get; init; }
-}
-
-[ExcludeFromCodeCoverage]
-public static class JobFeedMapper
-{
-    public static JobFeedItemViewModel ToFeedItem(this JobFeedProjection projection)
-    {
-        return new JobFeedItemViewModel
-        {
-            Id = projection.Id,
-            Title = projection.Title,
-            Summary = projection.Summary,
-            Company = new JobFeedCompanyViewModel
-            {
-                Id = projection.Company.Id,
-                Name = projection.Company.Name,
-                LogoUrl = null
-            },
-            Location = new JobFeedLocationViewModel
-            {
-                City = projection.Location.City,
-                State = projection.Location.State.ToString(),
-                Country = projection.Location.Country
-            },
-            Salary = new JobFeedSalaryViewModel
-            {
-                Min = projection.Salary.Min,
-                Max = projection.Salary.Max,
-                Disclosed = projection.Salary.Disclosed
-            },
-            JobType = projection.JobType.ToString(),
-            WorkModel = projection.WorkModel.ToString(),
-            WorkShift = projection.WorkShift.ToString(),
-            ExperienceLevel = projection.ExperienceLevel.ToString(),
-            Area = projection.Area.ToString(),
-            IsPcdFriendly = projection.IsPcdFriendly,
-            Requirements = projection.Requirements,
-            Benefits = projection.Benefits,
-            PublishedAt = projection.PublishedAt,
-            ApplicationsCount = projection.ApplicationsCount,
-            IsActive = projection.IsActive
-        };
-    }
 }

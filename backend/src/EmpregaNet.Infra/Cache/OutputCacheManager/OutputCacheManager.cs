@@ -47,11 +47,15 @@ public sealed class OutputCacheManager : IOutputCacheManager
     public Task InvalidateUserMeAsync(long userId, CancellationToken cancellationToken = default)
         => EvictTagAsync(ApplicationCacheTags.UserMe(userId), cancellationToken);
 
-    public Task InvalidateJobApplicationsAsync(CancellationToken cancellationToken = default)
-        => EvictTagsAsync(
+    public async Task InvalidateJobApplicationsAsync(CancellationToken cancellationToken = default)
+    {
+        await EvictTagsAsync(
             cancellationToken,
             ApplicationCacheTags.JobApplicationsMine,
             ApplicationCacheTags.JobApplicationsByJob);
+
+        await InvalidateCandidatesAsync(cancellationToken: cancellationToken);
+    }
 
     private Task EvictTagsAsync(CancellationToken cancellationToken, params string[] tags)
     {

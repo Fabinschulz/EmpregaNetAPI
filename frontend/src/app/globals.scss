@@ -106,6 +106,19 @@ html {
   --radius-pill: 999px;
 
   --card-bg: var(--gray-850);
+
+  --entity-card-padding: 18px;
+  --entity-card-padding-compact: 16px;
+  --entity-card-gap: 12px;
+  --entity-card-row-gap: 8px;
+  --entity-card-avatar-sm: 28px;
+  --entity-card-avatar-md: 44px;
+  --entity-card-avatar-lg: 64px;
+  --entity-card-title-size: 1.0625rem;
+  --entity-card-body-size: 0.875rem;
+  --entity-card-meta-size: 0.8125rem;
+  --entity-card-label-size: 0.6875rem;
+
   --content-bg: var(--bg);
   --topbar-bg: transparent;
   --topbar-border: var(--border);

@@ -14,12 +14,20 @@ const STATUS_TONE: Record<ApplicationStatus, StatusTone> = {
   Error: 'negative'
 };
 
+type ApplicationStatusBadgeProps = {
+  status: string | null | undefined;
+  count?: number;
+};
+
 /**
  * Badge do status, com rótulo pt-BR e cor semântica.
  * Valores desconhecidos (fora do enum) são exibidos como texto neutro.
  */
-export function ApplicationStatusBadge({ status }: { status: string | null | undefined }) {
+export function ApplicationStatusBadge({ status, count }: ApplicationStatusBadgeProps) {
   const parsed = parseApplicationStatus(status);
-  if (!parsed) return <StatusBadge label={status} tone="neutral" />;
-  return <StatusBadge label={applicationStatusLabels[parsed]} tone={STATUS_TONE[parsed]} />;
+  const label = parsed ? applicationStatusLabels[parsed] : status;
+  const withCount = label && count !== undefined ? `${label} · ${count}` : label;
+
+  if (!parsed) return <StatusBadge label={withCount} tone="neutral" />;
+  return <StatusBadge label={withCount} tone={STATUS_TONE[parsed]} />;
 }

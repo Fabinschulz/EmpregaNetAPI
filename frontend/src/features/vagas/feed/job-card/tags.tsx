@@ -1,32 +1,9 @@
-import styles from './job-card.module.scss';
+import type { JobFeedItemResponse } from '@/features/vagas/service';
+import { TagList } from '@/shared/components';
+import { toJobTags } from './job-tags';
 
-type JobCardTagsProps = {
-  requirements: readonly string[];
-  benefits: readonly string[];
-};
+const MAX_VISIBLE = 6;
 
-const MAX_VISIBLE = 3;
-
-export function JobCardTags({ requirements, benefits }: JobCardTagsProps) {
-  const all = [...benefits, ...requirements];
-  if (all.length === 0) return null;
-
-  const visible = all.slice(0, MAX_VISIBLE);
-  const hidden = all.slice(MAX_VISIBLE);
-
-  return (
-    <ul className={styles.tags}>
-      {visible.map((tag) => (
-        <li key={tag} className={styles.tag}>
-          {tag}
-        </li>
-      ))}
-
-      {hidden.length > 0 ? (
-        <li className={styles.tagMore} title={hidden.join(', ')}>
-          +{hidden.length}
-        </li>
-      ) : null}
-    </ul>
-  );
+export function JobCardTags({ job }: { job: JobFeedItemResponse }) {
+  return <TagList tags={toJobTags(job)} max={MAX_VISIBLE} ariaLabel="Características da vaga" />;
 }

@@ -1,0 +1,179 @@
+.card {
+  display: flex;
+  flex-direction: column;
+
+  gap: var(--entity-card-gap);
+  padding: var(--entity-card-padding);
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.card:focus-within {
+  border-color: var(--brand);
+  box-shadow: var(--brand-glow);
+}
+
+.card[data-inactive='true'] {
+  background: color-mix(in srgb, var(--card-bg) 88%, var(--bg));
+}
+
+.card[data-inactive='true'] .name {
+  color: var(--muted);
+}
+
+.identity {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  min-width: 0;
+
+  padding-bottom: var(--entity-card-gap);
+  border-bottom: 1px solid color-mix(in srgb, var(--border) 60%, transparent);
+}
+
+.identityText {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.identityAside {
+  flex: 0 0 auto;
+}
+
+/* Ocupa a posição que o nome da empresa tem no cartão de vaga: contexto acima do nome. */
+.eyebrow {
+  margin: 0;
+  font-size: var(--entity-card-meta-size);
+  font-weight: 550;
+  color: var(--muted);
+}
+
+.name {
+  margin: 0;
+  font-size: 1.25rem;
+  line-height: 1.25;
+  font-weight: 680;
+  letter-spacing: -0.01em;
+  color: var(--text);
+  overflow-wrap: anywhere;
+}
+
+.facts {
+  margin-top: 4px;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--entity-card-row-gap);
+}
+
+.link {
+  color: inherit;
+  text-decoration: none;
+  overflow-wrap: anywhere;
+}
+
+.link:hover {
+  text-decoration: underline;
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 2px;
+}
+
+.total {
+  margin: 0;
+  font-size: var(--entity-card-body-size);
+  font-weight: 620;
+  color: var(--text);
+}
+
+.statusList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.empty {
+  margin: 0;
+  font-size: var(--entity-card-body-size);
+  color: var(--muted);
+}
+
+
+.footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+
+  padding-top: var(--entity-card-row-gap);
+  border-top: 1px solid color-mix(in srgb, var(--border) 60%, transparent);
+}
+
+.footerMeta {
+  margin: 0;
+  font-size: var(--entity-card-meta-size);
+  color: var(--muted);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.noAction {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--entity-card-meta-size);
+  color: var(--muted);
+}
+
+.noActionIcon {
+  width: 15px;
+  height: 15px;
+  opacity: 0.7;
+}
+
+
+@media (max-width: 640px) {
+  .card {
+    padding: var(--entity-card-padding-compact);
+    border-radius: var(--radius);
+  }
+
+  /* O selo de status desce para baixo do nome em vez de espremer a coluna de texto. */
+  .identity {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .footer {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .actions {
+    margin-left: 0;
+  }
+
+  .actions > * {
+    flex: 1 1 0;
+    justify-content: center;
+  }
+}

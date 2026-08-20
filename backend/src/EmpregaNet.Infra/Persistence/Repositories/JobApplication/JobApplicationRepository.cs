@@ -46,6 +46,20 @@ public class JobApplicationRepository : BaseRepository<JobApplication>, IJobAppl
             .FirstOrDefaultAsync(cancellationToken);
     }
 
+    public async Task<IReadOnlyDictionary<ApplicationStatusEnum, int>> GetStatusCountsByUserAsync(
+        long userId,
+        CancellationToken cancellationToken)
+    {
+        var counts = await _context.JobApplications
+            .AsNoTracking()
+            .Where(a => a.UserId == userId && !a.IsDeleted)
+            .GroupBy(a => a.Status)
+            .Select(g => new { Status = g.Key, Count = g.Count() })
+            .ToListAsync(cancellationToken);
+
+        return counts.ToDictionary(x => x.Status, x => x.Count);
+    }
+
     public async Task<ListDataPagination<JobApplicationProjection>> GetAllWithCandidateAsync(
         CancellationToken cancellationToken,
         int page,

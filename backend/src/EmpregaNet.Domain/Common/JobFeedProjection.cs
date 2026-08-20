@@ -9,6 +9,8 @@ public sealed record JobFeedProjection(
     long Id,
     string Title,
     string? Summary,
+    string? DescriptionExcerpt,
+    bool DescriptionTruncated,
     JobFeedCompany Company,
     JobFeedLocation Location,
     JobFeedSalary Salary,

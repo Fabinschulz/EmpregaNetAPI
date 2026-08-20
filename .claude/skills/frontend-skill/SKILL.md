@@ -144,7 +144,43 @@ Leitura = **Description em pt-BR**; escrita = **nome do enum**. Fonte única em 
 | a11y | HTML semântico; ícones com `aria-label`; imagens com alternativa textual |
 | Reduced motion | Respeitar as preferências já suportadas no projecto |
 
-### 8.1 Estados de carregamento — componentes canónicos
+### 8.1 Layout de formulário — componentes canónicos
+
+Todo formulário de cadastro/edição dentro do `AppShell` usa os primitivos de
+`shared/components/ui/organisms/form-layout`. Não desenhar grid nem barra de ações por feature.
+
+| Componente | Papel |
+| ---------- | ----- |
+| `FormHeader` | Título + descrição à esquerda, **ações à direita** (Voltar, secundárias, primária). Fica *sticky* no topo (estático no telefone). Sem `title`, sai só a barra de ações — para o formulário que vive dentro de um `Card` cujo `CardHeader` já tem título |
+| `FormActions` | Rodapé de ações — **só** para o formulário curto de auto-serviço (ver exceção abaixo) |
+| `FormSection` | `fieldset` + `legend` (+ `description` opcional) com grid próprio: `cols={1..4}` |
+| `FormRow` | Linha de campos avulsa, `cols={1..4}` (padrão 2) |
+| `FormCol` | Largura relativa de um campo: `span={2}`, ou `span="full"` para linha inteira em qualquer tela |
+| `FormNotice` | Faixa dos alertas da API, entre cabeçalho e campos |
+
+Regras que devem ser mantidas:
+
+- **Ações no cabeçalho, nunca num rodapé.** Num formulário longo, Salvar no fim obriga a percorrer
+  tudo para descobrir se há como gravar. Como o `FormHeader` é renderizado dentro do `FormProvider`,
+  o botão primário é o `submit` do próprio `<form>` — sem `form="id"` nem handler avulso.
+- **Aproveitar a largura em desktop:** 4 colunas quando os campos comportam, 3 para campos médios,
+  `span` maior só para o que precisa (logradouro, descrição). Campo curto (CEP, número) não ocupa a
+  largura de um logradouro.
+- **Colapso responsivo é do primitivo:** desktop usa `cols`, tablet limita a 2 e o telefone empilha.
+  `span` numérico é proporcional e volta a uma célula quando o grid encolhe; só `span="full"` fica
+  inteiro em todas as telas. Não escrever media queries por feature.
+- **Agrupar por seção** com título (e descrição quando o título não basta), em vez de uma sequência
+  única de campos. Criação e edição da mesma entidade partilham o componente de campos.
+- **Filtros de listagem seguem o irmão deste padrão:** `FilterBar` + `FilterField span`.
+
+Exceção registada — **formulário curto dentro de um `Card`**: conta (perfil, segurança) e tipo de
+usuário (admin). São formulários de 1 a 3 campos, visíveis por inteiro sem rolar. Ficam com
+`FormGrid narrow` (coluna de 640px, espaçamento compacto) e `FormActions` no rodapé, onde a ação é o
+passo natural no fim da leitura. Espalhar três campos por 1000px ali só afasta rótulo de valor, e
+ação no cabeçalho não resolve rolagem que não existe. **Não migrar essas telas para `FormHeader`.**
+O critério é o tamanho, não a rota: formulário que precisa de seções e rolagem usa `FormHeader`.
+
+### 8.2 Estados de carregamento — componentes canónicos
 
 Não criar spinner/placeholder novo: o design system já tem o vocabulário.
 
@@ -221,7 +257,7 @@ Se o diff tocou renderização, conferir a classificação de rota no output do 
 
 1. [ ] Pasta de feature coesa; componentes suficientemente pequenos.
 2. [ ] `service/` da feature com Zod na fronteira — entrada **e** payload de saída.
-3. [ ] Estados **loading/error/empty/retry** com os componentes canónicos (§8.1) — sem spinner ad-hoc.
+3. [ ] Estados **loading/error/empty/retry** com os componentes canónicos (§8.2) — sem spinner ad-hoc.
 4. [ ] Form com RHF + Zod e mensagens ao utilizador em **pt-BR**.
 5. [ ] a11y: navegação por teclado, foco em overlays, `prefers-reduced-motion`.
 6. [ ] Rota nova → `isPublicPath`/`canAccessPath` actualizados; proxy e guard continuam a usar `evaluateRouteAccess`.
@@ -239,7 +275,9 @@ Se o diff tocou renderização, conferir a classificação de rota no output do 
 | `fetch`/axios espalhado sem service | Regressão rápida de contratos inconsistentes |
 | Reexportar módulo `server-only` em barrel de feature | Arrasta `next/cache` para o bundle do cliente e quebra a build |
 | Buscar o mesmo recurso no servidor **e** com `useQuery` | Duplica responsabilidade; passe por prop |
-| Spinner/skeleton ad-hoc | Já existem `Spinner`, `LoadingState` e os skeletons (§8.1) |
+| Spinner/skeleton ad-hoc | Já existem `Spinner`, `LoadingState` e os skeletons (§8.2) |
+| Salvar/Voltar num rodapé de formulário de cadastro/edição | Obriga a percorrer o formulário todo para achar a ação; o lugar é o `FormHeader`. Conta é exceção registada (§8.1) |
+| Grid de campos ou media query por feature | `FormSection`/`FormRow`/`FormCol` já resolvem colunas e colapso (§8.1) |
 | Terceira implementação de política de rota | Proxy e guard partilham `evaluateRouteAccess` |
 | Token de auth em JS / `js-cookie` para sessão | A API já emite `httpOnly`; duplicar cria cookie fantasma |
 | `any` em TypeScript | `strict` é regra do projecto |
@@ -257,6 +295,7 @@ Copy de utilizador final em **português (Brasil)**; identificadores de código 
 
 | Versão | Mudança |
 | ------ | ------- |
+| 3.1.0 | Layout canónico de formulário (§8.1): ações no `FormHeader`, grid responsivo por `FormSection`/`FormRow`/`FormCol`, com os anti-padrões correspondentes |
 | 3.0.0 | Movida para `.claude/skills/` (passa a ser carregável); resolvida a contradição sobre E2E de browser (§10) que a marcava como inexistente; acrescentados cookie httpOnly, contrato `userType`, política única de rota, secção de validação com comandos reais e anti-padrões correspondentes |
 | 2.1.0 | `service/` por feature, regras de Server vs Client com `cacheComponents`, componentes canónicos de loading, infra Cucumber |
 | 2.0.0 | Formalização de estrutura + boas práticas fundidas aos guardrails EmpregaNet |

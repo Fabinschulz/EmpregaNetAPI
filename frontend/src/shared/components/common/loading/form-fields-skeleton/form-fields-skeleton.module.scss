@@ -1,20 +1,32 @@
 .wrap {
-  margin-top: 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  max-width: 520px;
-}
-
-.field {
-  height: 22px;
-  border-radius: 8px;
-}
-
-.wide {
+  margin-top: 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
   width: 100%;
 }
 
-.mid {
-  width: 55%;
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.label {
+  height: 14px;
+  width: 45%;
+  border-radius: 6px;
+}
+
+.control {
+  height: 44px;
+  border-radius: var(--radius-md);
+}
+
+@media (max-width: 640px) {
+  .wrap {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+  }
 }

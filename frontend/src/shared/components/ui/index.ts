@@ -9,6 +9,7 @@ export * from './molecules/alert-dialog';
 export * from './molecules/autocomplete';
 export * from './molecules/choice';
 export * from './molecules/command';
+export * from './molecules/entity-card';
 export * from './molecules/input';
 export * from './molecules/multi-select';
 export * from './molecules/popover';

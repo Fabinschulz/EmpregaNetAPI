@@ -1,28 +1,28 @@
 'use client';
 
 import {
-  ApiQueryBoundary,
-  Button,
-  ConfirmDialog,
-  PageHeader,
-  StatusBadge,
-  TableContainer,
-  TableFilters,
-  useRowDeleteAction,
-  type DataTableColumn,
-  type RowAction
+    ApiQueryBoundary,
+    Button,
+    ConfirmDialog,
+    PageHeader,
+    StatusBadge,
+    TableContainer,
+    TableFilters,
+    useRowDeleteAction,
+    type DataTableColumn,
+    type RowAction
 } from '@/shared/components';
 import { FormProvider } from '@/shared/context';
-import { usePersistedTablePagination } from '@/shared/hooks';
-import { formatDate } from '@/shared/utils';
+import { useListRefresh, usePersistedTablePagination } from '@/shared/hooks';
 import { type JobsListQueryParams } from '@/shared/schema';
+import { formatDate } from '@/shared/utils';
 import { Pencil, Plus } from 'lucide-react';
 import Link from 'next/link';
 import { useCallback, useMemo, useState } from 'react';
-import { useDeleteJobMutation, useJobsListQuery, type JobResponse } from '../service';
-import { defaultJobsFilter, jobsFilterFormSchema } from './jobs-filter-schema';
 import { jobsRoutes } from '../jobs-routes';
+import { useDeleteJobMutation, useJobsListQuery, type JobResponse } from '../service';
 import { JobsFilterFields } from './jobs-filter-fields';
+import { defaultJobsFilter, jobsFilterFormSchema } from './jobs-filter-schema';
 
 type JobsFilterParams = Pick<JobsListQueryParams, 'search' | 'isActive'>;
 
@@ -36,6 +36,8 @@ export function RecruitmentJobsPage() {
     size: pagination.pageSize,
     ...filters
   });
+
+  const handleRefresh = useListRefresh({ refetch, resource: 'vagas' });
 
   const handleFiltersChange = useCallback(
     (next: JobsFilterParams) => {
@@ -121,7 +123,7 @@ export function RecruitmentJobsPage() {
           pagination={pagination}
           totalItems={data?.totalItems}
           isPending={isPending}
-          onRefresh={() => void refetch()}
+          onRefresh={handleRefresh}
           isRefreshing={isFetching}
           emptyTitle="Nenhuma vaga"
           emptyMessage="Nenhuma vaga encontrada para os filtros informados."

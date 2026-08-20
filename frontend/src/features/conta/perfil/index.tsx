@@ -13,6 +13,7 @@ import {
   PageHeader
 } from '@/shared/components';
 import { FormProvider } from '@/shared/context';
+import { roleLabel } from '@/shared/utils';
 import { useMeQuery, useUpdateMyProfileMutation } from '../service';
 import { profileFormSchema, profileFormValuesFromResponse, type ProfileFormValues } from './profile-form-schema';
 import styles from '../conta.module.scss';
@@ -53,7 +54,7 @@ export function ProfilePage() {
                     <div className={styles.badgeGroup} aria-label="Perfil de acesso">
                       {user.roles.map((role) => (
                         <Badge key={role} variant="secondary">
-                          {role}
+                          {roleLabel(role)}
                         </Badge>
                       ))}
                     </div>

@@ -28,6 +28,22 @@ public sealed class GetJobsFeedHandlerTests
             .Setup(x => x.GetFeedAsync(It.IsAny<JobFeedFilter>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(new ListDataPagination<JobFeedProjection>([], 0, 1, 20));
 
+    private void SetupSingleJob(string? summary, string? description)
+    {
+        var projection = new JobFeedProjection(
+            1, "Vaga", summary, description, false,
+            new JobFeedCompany(1, "Acme"),
+            new JobFeedLocation("Extrema", UF.MG, "BR"),
+            new JobFeedSalary(null, null, false),
+            JobTypeEnum.Clt, WorkModelEnum.OnSite, WorkShiftEnum.NaoSelecionado,
+            ExperienceLevelEnum.NaoSelecionado, JobAreaEnum.NaoSelecionado, false,
+            [], [], DateTimeOffset.UtcNow, 0, true);
+
+        _repo
+            .Setup(x => x.GetFeedAsync(It.IsAny<JobFeedFilter>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new ListDataPagination<JobFeedProjection>([projection], 1, 1, 20));
+    }
+
     private JobFeedFilter CapturedFilter()
     {
         JobFeedFilter? captured = null;
@@ -183,6 +199,8 @@ public sealed class GetJobsFeedHandlerTests
             Id: 42,
             Title: "Operador(a) de Empilhadeira",
             Summary: "Centro de distribuição, 2º turno",
+            DescriptionExcerpt: "Descrição completa da vaga.",
+            DescriptionTruncated: false,
             Company: new JobFeedCompany(3, "Acme Logística"),
             Location: new JobFeedLocation("Extrema", UF.MG, "BR"),
             Salary: new JobFeedSalary(2300m, 2800m, true),
@@ -220,7 +238,7 @@ public sealed class GetJobsFeedHandlerTests
     public async Task Handle_DeveExporEnumsComoNomeENaoComoInteiro()
     {
         var projection = new JobFeedProjection(
-            1, "Vaga", null,
+            1, "Vaga", null, null, false,
             new JobFeedCompany(1, "Acme"),
             new JobFeedLocation("Extrema", UF.MG, "BR"),
             new JobFeedSalary(null, null, false),
@@ -241,6 +259,39 @@ public sealed class GetJobsFeedHandlerTests
         item.ExperienceLevel.Should().Be("MaisDeCincoAnos");
         item.Area.Should().Be("Manutencao");
         item.IsPcdFriendly.Should().BeTrue();
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData("   ")]
+    public async Task Handle_SemResumo_DeveDerivarOResumoDaDescricao(string? summary)
+    {
+        SetupSingleJob(summary, "  Atendimento ao cliente   em loja física.  ");
+
+        var item = (await CreateSut().Handle(new GetJobsFeedQuery(), CancellationToken.None)).Data.Single();
+
+        item.Summary.Should().Be("Atendimento ao cliente em loja física.");
+    }
+
+    [Fact]
+    public async Task Handle_ComResumo_NaoDeveUsarADescricao()
+    {
+        SetupSingleJob("Resumo próprio da vaga.", "Descrição longa e diferente.");
+
+        var item = (await CreateSut().Handle(new GetJobsFeedQuery(), CancellationToken.None)).Data.Single();
+
+        item.Summary.Should().Be("Resumo próprio da vaga.");
+    }
+
+    [Fact]
+    public async Task Handle_SemResumoESemDescricao_DeveDevolverNulo()
+    {
+        SetupSingleJob(summary: null, description: null);
+
+        var item = (await CreateSut().Handle(new GetJobsFeedQuery(), CancellationToken.None)).Data.Single();
+
+        item.Summary.Should().BeNull();
     }
 
     [Fact]

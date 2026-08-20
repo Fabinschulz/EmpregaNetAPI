@@ -10,10 +10,10 @@ type AdminUserFormFieldsProps = {
 };
 
 export function AdminUserFormFields({ backHref }: AdminUserFormFieldsProps) {
-  const { submitting, readOnly } = useFormContext();
+  const { readOnly } = useFormContext();
 
   return (
-    <FormGrid>
+    <FormGrid narrow>
       <SelectField
         name="userType"
         label="Tipo de Usuário"
@@ -23,7 +23,7 @@ export function AdminUserFormFields({ backHref }: AdminUserFormFieldsProps) {
       <FormActions backHref={backHref}>
         <FormSubmitButton variant="primary" disabled={readOnly}>
           <Save aria-hidden />
-          {submitting ? 'Salvando...' : 'Salvar'}
+          Salvar
         </FormSubmitButton>
       </FormActions>
     </FormGrid>
