@@ -15,7 +15,7 @@ export function DashboardHeader({ meta, isRefreshing, onRefresh }: DashboardHead
   return (
     <div className={styles.root}>
       <PageHeader
-        title="Métricas e analytics"
+        title="Métricas de recrutamento"
         description="Acompanhe vagas, candidaturas e candidatos da operação de recrutamento."
         actions={
           <Button type="button" variant="outline" onClick={onRefresh} disabled={isRefreshing} aria-busy={isRefreshing}>

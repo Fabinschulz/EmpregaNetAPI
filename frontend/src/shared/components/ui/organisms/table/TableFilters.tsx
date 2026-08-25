@@ -4,7 +4,7 @@ import { cn } from '@/shared/utils/lib';
 import * as React from 'react';
 import styles from './TableFilters.module.scss';
 
-export type TableFiltersProps = {
+export type FiltersSectionProps = {
   /** Título do painel de busca (ex.: "Buscar vagas"). */
   title: string;
   /** Descrição curta opcional exibida abaixo do título. */
@@ -21,7 +21,7 @@ export type TableFiltersProps = {
  * seguido do formulário de filtros. Garante que toda tela de listagem apresente
  * a busca com a mesma aparência e estrutura.
  */
-export function TableFilters({ title, description, actions, children, className }: TableFiltersProps) {
+export function FilterSection({ title, description, actions, children, className }: FiltersSectionProps) {
   return (
     <section className={cn(styles.root, className)} aria-label={title} suppressHydrationWarning>
       <header className={styles.header}>

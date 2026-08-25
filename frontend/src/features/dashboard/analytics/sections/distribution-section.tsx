@@ -36,7 +36,7 @@ export function ApplicationStatusPanel({ filters }: { filters: DashboardFilters 
     <DashboardPanel
       title="Status das candidaturas"
       description="Composição do processo seletivo no período"
-      hint="Mostra todos os status, mesmo com o filtro de status ativo - filtrá-lo aqui deixaria uma fatia só."
+      hint="Mostra todos os status, mesmo com o filtro de status ativo."
       state={breakdownState(data?.applicationsByStatus)}
       skeleton={<ChartSkeleton height={220} />}
       errorMessage={message}

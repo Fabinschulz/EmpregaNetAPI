@@ -47,7 +47,6 @@ export function InsightsPanel({
           <Lightbulb />
         </span>
         <div>
-          <h3 className={styles.title}>Insights do período</h3>
           <p className={styles.description}>O que os números deste recorte dizem, e o que pedem ação.</p>
         </div>
       </CardHeader>

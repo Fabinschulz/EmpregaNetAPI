@@ -1,7 +1,9 @@
+@use 'shared/dashboard-tokens' as tokens;
+
 .page {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: tokens.$gap-xl;
   min-width: 0;
 }
 
@@ -12,17 +14,8 @@
   min-width: 0;
 }
 
-.sectionTitle {
-  margin: 0;
-  font-size: 0.75rem;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--text);
-}
-
 @media (max-width: 720px) {
   .page {
-    gap: 16px;
+    gap: tokens.$gap-lg;
   }
 }

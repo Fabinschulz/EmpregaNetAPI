@@ -18,9 +18,9 @@ import {
     actionIcons,
     ApiQueryBoundary,
     ConfirmDialog,
+    FilterSection,
     PageHeader,
     TableContainer,
-    TableFilters,
     useRowDeleteAction,
     type DataTableColumn,
     type RowAction
@@ -157,7 +157,7 @@ export function RecruitmentApplicationsPage() {
           emptyTitle="Nenhuma candidatura"
           emptyMessage="Nenhuma candidatura encontrada."
           filters={
-            <TableFilters title="Ordenar candidaturas" description="Escolha a ordem de exibição das candidaturas.">
+            <FilterSection title="Ordenar candidaturas" description="Escolha a ordem de exibição das candidaturas.">
               <FormProvider
                 validationSchema={recruitmentApplicationsFilterFormSchema}
                 defaultValues={defaultRecruitmentApplicationsFilter}
@@ -165,7 +165,7 @@ export function RecruitmentApplicationsPage() {
               >
                 <RecruitmentApplicationsFilterFields onChange={handleOrderByChange} />
               </FormProvider>
-            </TableFilters>
+            </FilterSection>
           }
         />
 

@@ -1,5 +1,6 @@
 'use client';
 
+import { FilterSection } from '@/shared/components';
 import { FormProvider } from '@/shared/context';
 import { useQueryApiError } from '@/shared/hooks';
 import { useState } from 'react';
@@ -49,18 +50,20 @@ export function AnalyticsDashboard({ canSelectCompany }: { canSelectCompany: boo
     <div className={styles.page}>
       <DashboardHeader meta={overview.data?.meta} isRefreshing={isRefreshing} onRefresh={refresh} />
 
-      <FormProvider<DashboardFilterFormValues>
-        validationSchema={dashboardFilterFormSchema}
-        defaultValues={defaultDashboardFilterForm}
-        onSubmit={() => undefined}
+      <FilterSection
+        title="Filtrar métricas"
+        description="Refine os indicadores por período, localização, área e status da candidatura."
       >
-        <DashboardFiltersBar onChange={setFilters} canSelectCompany={canSelectCompany} />
-      </FormProvider>
+        <FormProvider<DashboardFilterFormValues>
+          validationSchema={dashboardFilterFormSchema}
+          defaultValues={defaultDashboardFilterForm}
+          onSubmit={() => undefined}
+        >
+          <DashboardFiltersBar onChange={setFilters} canSelectCompany={canSelectCompany} />
+        </FormProvider>
+      </FilterSection>
 
       <section aria-labelledby="dashboard-kpis" className={styles.section}>
-        <h2 id="dashboard-kpis" className={styles.sectionTitle}>
-          Indicadores da operação
-        </h2>
         <KpiSection
           kpis={overview.data?.kpis ?? []}
           meta={overview.data?.meta}
@@ -72,48 +75,35 @@ export function AnalyticsDashboard({ canSelectCompany }: { canSelectCompany: boo
         />
       </section>
 
-      <section aria-labelledby="dashboard-trends" className={styles.section}>
-        <h2 id="dashboard-trends" className={styles.sectionTitle}>
-          Evolução no período
-        </h2>
+      <section aria-label="Evolução no período" className={styles.section}>
         <TrendsSection filters={filters} />
       </section>
 
-      <section aria-labelledby="dashboard-funnel" className={styles.section}>
-        <h2 id="dashboard-funnel" className={styles.sectionTitle}>
-          Funil e composição do processo
-        </h2>
+      <section aria-label="Funil de conversão" className={styles.section}>
+        <DashboardPanel
+          title="Funil de recrutamento"
+          hint="Começa na candidatura: a plataforma não registra visualizações de vaga. A etapa de aprovação soma aprovadas e concluídas, porque a candidatura guarda apenas o status atual."
+          state={funnelState}
+          skeleton={<FunnelSkeleton />}
+          errorMessage={overviewError.message}
+          onRetry={() => overview.refetch()}
+        >
+          {overview.data ? <RecruitmentFunnel funnel={overview.data.funnel} /> : null}
+        </DashboardPanel>
+      </section>
 
+      <section aria-labelledby="dashboard-distribution" className={styles.section}>
         <div className={sectionStyles.gridAuto}>
-          <DashboardPanel
-            title="Funil de recrutamento"
-            description={overview.data ? `${overview.data.meta.from} - ${overview.data.meta.to}` : undefined}
-            hint="Começa na candidatura: a plataforma não registra visualizações de vaga. A etapa de aprovação soma aprovadas e concluídas, porque a candidatura guarda apenas o status atual."
-            state={funnelState}
-            skeleton={<FunnelSkeleton />}
-            errorMessage={overviewError.message}
-            onRetry={() => overview.refetch()}
-          >
-            {overview.data ? <RecruitmentFunnel funnel={overview.data.funnel} /> : null}
-          </DashboardPanel>
-
           <ApplicationStatusPanel filters={filters} />
           <AreaDistributionPanel filters={filters} />
         </div>
       </section>
 
-      <section aria-labelledby="dashboard-jobs" className={styles.section}>
-        <h2 id="dashboard-jobs" className={styles.sectionTitle}>
-          Performance das vagas
-        </h2>
+      <section aria-label="Performance das vagas" className={styles.section}>
         <JobsSection filters={filters} />
       </section>
 
       <section aria-labelledby="dashboard-insights" className={styles.section}>
-        <h2 id="dashboard-insights" className={styles.sectionTitle}>
-          O que exige atenção
-        </h2>
-
         <InsightsPanel
           insights={insights.data?.items ?? []}
           isPending={insights.isPending}

@@ -1,7 +1,9 @@
+@use '../shared/dashboard-tokens' as tokens;
+
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(210px, 100%), 1fr));
-  gap: 12px;
+  gap: tokens.$gap-md;
 }
 
 .card {

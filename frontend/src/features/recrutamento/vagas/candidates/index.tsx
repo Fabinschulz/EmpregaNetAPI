@@ -1,34 +1,34 @@
 'use client';
 
-import {
-  actionIcons,
-  ApiQueryBoundary,
-  Button,
-  ConfirmDialog,
-  FilterBar,
-  PageHeader,
-  TableContainer,
-  TableFilters,
-  useRowDeleteAction,
-  type DataTableColumn,
-  type RowAction
-} from '@/shared/components';
-import { FormProvider } from '@/shared/context';
 import { ApplicationStatusBadge } from '@/features/candidaturas/application-status-badge';
 import {
-  applicationStatusTransitions,
-  applicationTransitionIcons,
-  applicationTransitionLabels,
-  parseApplicationStatus,
-  type ApplicationStatus
+    applicationStatusTransitions,
+    applicationTransitionIcons,
+    applicationTransitionLabels,
+    parseApplicationStatus,
+    type ApplicationStatus
 } from '@/features/candidaturas/domain';
 import {
-  useApplicationsByJobQuery,
-  useChangeApplicationStatusMutation,
-  useDeleteApplicationMutation,
-  candidateDisplayName,
-  type JobApplicationResponse
+    candidateDisplayName,
+    useApplicationsByJobQuery,
+    useChangeApplicationStatusMutation,
+    useDeleteApplicationMutation,
+    type JobApplicationResponse
 } from '@/features/candidaturas/service';
+import {
+    actionIcons,
+    ApiQueryBoundary,
+    Button,
+    ConfirmDialog,
+    FilterBar,
+    FilterSection,
+    PageHeader,
+    TableContainer,
+    useRowDeleteAction,
+    type DataTableColumn,
+    type RowAction
+} from '@/shared/components';
+import { FormProvider } from '@/shared/context';
 import { usePersistedTablePagination } from '@/shared/hooks';
 import { formatDate } from '@/shared/utils';
 import Link from 'next/link';
@@ -37,10 +37,10 @@ import { useCallback, useMemo, useState } from 'react';
 import { jobsRoutes } from '../jobs-routes';
 import { useJobQuery } from '../service';
 import {
-  CandidatesFilterFields,
-  candidatesFilterSchema,
-  defaultCandidatesFilter,
-  type CandidatesFilterParams
+    CandidatesFilterFields,
+    candidatesFilterSchema,
+    defaultCandidatesFilter,
+    type CandidatesFilterParams
 } from './candidates-filter-fields';
 
 /** Transições que exigem confirmação por serem terminais/negativas. */
@@ -175,7 +175,7 @@ export function CandidatesByJobPage() {
           emptyTitle="Nenhuma candidatura"
           emptyMessage="Nenhuma candidatura encontrada para os filtros informados."
           filters={
-            <TableFilters
+            <FilterSection
               title="Filtrar candidaturas"
               description="Filtre por status e ordene pela data de recebimento."
             >
@@ -188,7 +188,7 @@ export function CandidatesByJobPage() {
                   <CandidatesFilterFields onChange={handleFilterChange} />
                 </FilterBar>
               </FormProvider>
-            </TableFilters>
+            </FilterSection>
           }
         />
 

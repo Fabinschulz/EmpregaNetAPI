@@ -1,5 +1,6 @@
 'use client';
 
+import { notifyApiError, toastSuccess } from '@/shared/utils';
 import { keepPreviousData, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useCallback, useState } from 'react';
 import {
@@ -73,6 +74,9 @@ export function useDashboardRefresh() {
     setIsRefreshing(true);
     try {
       await queryClient.invalidateQueries({ queryKey: dashboardKeys.all });
+      toastSuccess('Métricas atualizadas', 'Os dados do dashboard foram recarregados.');
+    } catch (error) {
+      notifyApiError(error, 'atualizar as métricas', 'dashboard');
     } finally {
       setIsRefreshing(false);
     }

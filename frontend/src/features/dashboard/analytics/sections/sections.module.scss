@@ -1,8 +1,10 @@
+@use '../shared/dashboard-tokens' as tokens;
+
 .gridAuto {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr));
   align-items: start;
-  gap: 12px;
+  gap: tokens.$gap-md;
 }
 
 .legend {

@@ -1,12 +1,12 @@
 'use client';
 
 import {
-  actionIcons,
-  ApiQueryBoundary,
-  PageHeader,
-  TableContainer,
-  TableFilters,
-  type DataTableColumn
+    actionIcons,
+    ApiQueryBoundary,
+    FilterSection,
+    PageHeader,
+    TableContainer,
+    type DataTableColumn
 } from '@/shared/components';
 import { FormProvider } from '@/shared/context';
 import { useListRefresh, usePersistedTablePagination } from '@/shared/hooks';
@@ -88,7 +88,7 @@ export function MyApplicationsPage() {
           emptyTitle="Nenhuma candidatura"
           emptyMessage="Nenhuma candidatura encontrada para os filtros informados."
           filters={
-            <TableFilters title="Filtrar candidaturas" description="Filtre por status e ordenação.">
+            <FilterSection title="Filtrar candidaturas" description="Filtre por status e ordenação.">
               <FormProvider
                 validationSchema={myApplicationsFilterFormSchema}
                 defaultValues={defaultMyApplicationsFilter}
@@ -96,7 +96,7 @@ export function MyApplicationsPage() {
               >
                 <MyApplicationsFilterFields onChange={handleFiltersChange} />
               </FormProvider>
-            </TableFilters>
+            </FilterSection>
           }
         />
       </section>

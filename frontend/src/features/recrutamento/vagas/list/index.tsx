@@ -5,10 +5,10 @@ import {
     ApiQueryBoundary,
     Button,
     ConfirmDialog,
+    FilterSection,
     PageHeader,
     StatusBadge,
     TableContainer,
-    TableFilters,
     useRowDeleteAction,
     type DataTableColumn,
     type RowAction
@@ -128,7 +128,7 @@ export function RecruitmentJobsPage() {
           emptyTitle="Nenhuma vaga"
           emptyMessage="Nenhuma vaga encontrada para os filtros informados."
           filters={
-            <TableFilters title="Buscar vagas" description="Filtre por título/descrição ou pela situação da vaga.">
+            <FilterSection title="Buscar vagas" description="Filtre por título/descrição ou pela situação da vaga.">
               <FormProvider
                 validationSchema={jobsFilterFormSchema}
                 defaultValues={defaultJobsFilter}
@@ -140,7 +140,7 @@ export function RecruitmentJobsPage() {
                   searchLoading={isFetching}
                 />
               </FormProvider>
-            </TableFilters>
+            </FilterSection>
           }
         />
 

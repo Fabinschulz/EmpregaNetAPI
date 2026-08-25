@@ -1,12 +1,12 @@
 'use client';
 
 import {
-  actionIcons,
-  ApiQueryBoundary,
-  PageHeader,
-  TableContainer,
-  TableFilters,
-  type DataTableColumn
+    actionIcons,
+    ApiQueryBoundary,
+    FilterSection,
+    PageHeader,
+    TableContainer,
+    type DataTableColumn
 } from '@/shared/components';
 import { FormProvider } from '@/shared/context';
 import { useListRefresh, usePersistedTablePagination } from '@/shared/hooks';
@@ -88,7 +88,7 @@ export function RecruitmentCandidatesPage() {
           emptyTitle="Nenhum candidato"
           emptyMessage="Nenhum candidato encontrado para os filtros informados."
           filters={
-            <TableFilters title="Buscar candidatos" description="Filtre por nome/e-mail e ordenação.">
+            <FilterSection title="Buscar candidatos" description="Filtre por nome/e-mail e ordenação.">
               <FormProvider
                 validationSchema={candidatesFilterFormSchema}
                 defaultValues={defaultCandidatesFilter}
@@ -100,7 +100,7 @@ export function RecruitmentCandidatesPage() {
                   searchLoading={isFetching}
                 />
               </FormProvider>
-            </TableFilters>
+            </FilterSection>
           }
         />
       </section>

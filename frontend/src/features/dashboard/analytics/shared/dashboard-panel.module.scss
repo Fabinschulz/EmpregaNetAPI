@@ -1,3 +1,4 @@
+@use 'dashboard-tokens' as tokens;
 
 .panel {
   display: flex;
@@ -86,7 +87,7 @@
   display: flex;
   flex: 1 1 auto;
   flex-direction: column;
-  gap: 10px;
+  gap: tokens.$gap-sm;
   min-width: 0;
 }
 

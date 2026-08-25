@@ -5,9 +5,9 @@ import {
     ApiQueryBoundary,
     Button,
     ConfirmDialog,
+    FilterSection,
     PageHeader,
     TableContainer,
-    TableFilters,
     useRowDeleteAction,
     type DataTableColumn,
     type RowAction
@@ -121,7 +121,7 @@ export function AdminCompaniesPage() {
           emptyTitle="Nenhuma empresa"
           emptyMessage="Nenhuma empresa encontrada para os filtros informados."
           filters={
-            <TableFilters title="Buscar empresas" description="Filtre por nome/e-mail/CNPJ, situação e ordenação.">
+            <FilterSection title="Buscar empresas" description="Filtre por nome/e-mail/CNPJ, situação e ordenação.">
               <FormProvider
                 validationSchema={companiesFilterFormSchema}
                 defaultValues={defaultCompaniesFilter}
@@ -133,7 +133,7 @@ export function AdminCompaniesPage() {
                   searchLoading={isFetching}
                 />
               </FormProvider>
-            </TableFilters>
+            </FilterSection>
           }
         />
 

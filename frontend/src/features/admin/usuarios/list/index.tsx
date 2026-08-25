@@ -4,10 +4,10 @@ import {
     actionIcons,
     ApiQueryBoundary,
     ConfirmDialog,
+    FilterSection,
     PageHeader,
     StatusBadge,
     TableContainer,
-    TableFilters,
     useRowDeleteAction,
     type DataTableColumn,
     type RowAction
@@ -123,7 +123,7 @@ export function AdminUsersPage() {
           emptyTitle="Nenhum usuário"
           emptyMessage="Nenhum usuário encontrado para os filtros informados."
           filters={
-            <TableFilters title="Buscar usuários" description="Filtre por nome/e-mail, situação e ordenação.">
+            <FilterSection title="Buscar usuários" description="Filtre por nome/e-mail, situação e ordenação.">
               <FormProvider
                 validationSchema={adminUsersFilterFormSchema}
                 defaultValues={defaultAdminUsersFilter}
@@ -135,7 +135,7 @@ export function AdminUsersPage() {
                   searchLoading={isFetching}
                 />
               </FormProvider>
-            </TableFilters>
+            </FilterSection>
           }
         />
 
