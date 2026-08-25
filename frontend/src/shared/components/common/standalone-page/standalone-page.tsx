@@ -2,7 +2,7 @@
 
 import { Alert } from '@/shared/components';
 import type { ReactNode } from 'react';
-import { EmpregaUaiLogo } from '../branding';
+import { BrandLogo } from '../branding';
 import styles from './standalone-page.module.scss';
 
 type StandalonePageProps = {
@@ -30,8 +30,7 @@ export function StandalonePage({
   return (
     <section className={styles.page} aria-labelledby="auth-page-title" suppressHydrationWarning>
       <header className={styles.header}>
-        <EmpregaUaiLogo />
-        <p className={styles.brand}>EmpregaUAI</p>
+        <BrandLogo />
         <h1 id="auth-page-title" className={styles.title}>
           {title}
         </h1>

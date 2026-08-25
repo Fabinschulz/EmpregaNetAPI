@@ -1,0 +1,27 @@
+.root {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1rem;
+}
+
+.image {
+  height: clamp(56px, 14vw, 72px);
+  width: auto;
+}
+
+.onLight {
+  display: none;
+
+  :global(html[data-theme='light']) & {
+    display: block;
+  }
+}
+
+.onDark {
+  display: block;
+
+  :global(html[data-theme='light']) & {
+    display: none;
+  }
+}

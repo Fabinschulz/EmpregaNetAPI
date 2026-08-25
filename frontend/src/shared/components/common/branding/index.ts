@@ -1,1 +1,1 @@
-export { EmpregaUaiLogo } from './empregauai-logo';
+export { BrandLogo } from './brand-logo';
