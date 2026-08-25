@@ -98,6 +98,40 @@ pnpm --dir frontend exec next build --debug-prerender
 
 ---
 
+### 5.2 Atomic design em `shared/components/ui`
+
+A biblioteca de UI é organizada em quatro tiers, e a dependência aponta **sempre para baixo**:
+
+`atoms/` ← `molecules/` ← `organisms/` ← `templates/` (as *pages* são as rotas em `src/app`).
+
+| Tier | Critério objectivo | Exemplos reais |
+| ---- | ------------------ | -------------- |
+| `atoms/` | Envolve **um** elemento/primitivo. Não importa nenhum outro componente. Um valor, um alvo de foco | `Button`, `Input`, `Textarea`, `Badge`, `Label`, `Skeleton`, `Spinner`, `CardSectionLabel` |
+| `molecules/` | Pequeno grupo que funciona como unidade. Compõe átomos ou primitivos Radix | `Card`, `PageHeader`, `StatusBadge`, `Select`, `Popover`, `Tooltip`, `entity-card/*`, `FloatingThemeToggle` |
+| `organisms/` | Seção complexa, com estado ou layout próprio | `DataTable`, `TableContainer`, `FormLayout`, `FilterBar`, `ChoiceGroup` |
+| `templates/` | Esqueleto de página: moldura e slots, sem conteúdo de domínio | `CenteredPageFrame` |
+
+Decisões fechadas, para não reabrir a discussão a cada componente novo:
+
+- **`Input` é átomo, não molécula.** A API é `ComponentProps<'input'>`, ele não importa outro
+  componente, e os adornos são *slots*. O toggle de senha é comportamento do próprio controle,
+  como o date picker nativo — não promove o tier.
+- **A molécula de formulário é `FormField`/`InputField`** (em `form-fields/`, fora de `ui/`):
+  rótulo + controle + erro + dica. Se `Input` fosse molécula, os dois níveis colapsariam.
+- **Rótulo é tier, não tamanho.** `ChoiceGroup` é organismo por ter estado, busca e subcomponentes
+  internos; `Card` é molécula apesar de 6 exports, porque não compõe nada.
+
+A escada é **executada por lint**, não é convenção de pasta: `no-restricted-imports` em
+`eslint.config.mjs` (`UI_TIER_ORDER` / `uiTierRule`) rejeita import ascendente em qualquer forma —
+alias (`@/shared/components/ui/organisms/...`) ou relativa (`../../organisms/...`). Para inverter
+uma dependência, o tier de cima compõe o de baixo passando conteúdo por prop/slot.
+
+Dentro de `ui/`, **nunca** importar `@/shared/components` nem `@/shared/components/ui`: um membro do
+barril a passar pelo próprio barril fecha um ciclo. Use o caminho relativo do tier
+(`../../atoms/button`). O lint também bloqueia isto.
+
+---
+
 ## 6. Estado, dados e comunicação com o servidor
 
 | Tópico | Expectativa |
@@ -295,6 +329,7 @@ Copy de utilizador final em **português (Brasil)**; identificadores de código 
 
 | Versão | Mudança |
 | ------ | ------- |
+| 3.2.0 | Atomic design em `shared/components/ui` (§5.2): quatro tiers com critério objectivo, `Input` fixado como átomo, e a escada de dependência executada por `no-restricted-imports` em vez de convenção de pasta |
 | 3.1.0 | Layout canónico de formulário (§8.1): ações no `FormHeader`, grid responsivo por `FormSection`/`FormRow`/`FormCol`, com os anti-padrões correspondentes |
 | 3.0.0 | Movida para `.claude/skills/` (passa a ser carregável); resolvida a contradição sobre E2E de browser (§10) que a marcava como inexistente; acrescentados cookie httpOnly, contrato `userType`, política única de rota, secção de validação com comandos reais e anti-padrões correspondentes |
 | 2.1.0 | `service/` por feature, regras de Server vs Client com `cacheComponents`, componentes canónicos de loading, infra Cucumber |

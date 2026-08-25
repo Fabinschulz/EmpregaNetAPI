@@ -1,7 +1,6 @@
 'use client';
 
-import { Button } from '@/shared/components';
-import { X } from 'lucide-react';
+import { actionIcons, IconButton } from '@/shared/components';
 import Link from 'next/link';
 import styles from './sidebar.module.scss';
 
@@ -17,16 +16,14 @@ export function SidebarHeader({ onNavigate, onCloseMobile }: SidebarHeaderProps)
         EmpregaUAI
       </Link>
       <div className={styles.headerActions}>
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
+        <IconButton
+          icon={actionIcons.close}
+          label="Fechar menu"
           className={styles.mobileClose}
-          aria-label="Fechar menu"
+          iconStyleOverrides={styles.headerIcon}
+          showTooltip={false}
           onClick={onCloseMobile}
-        >
-          <X className={styles.headerIcon} aria-hidden />
-        </Button>
+        />
       </div>
     </div>
   );

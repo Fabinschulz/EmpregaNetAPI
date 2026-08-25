@@ -1,11 +1,14 @@
 'use client';
 
-import { FormSubmitButton, InputField, StandalonePageFormActions, StandalonePageFormGrid } from '@/shared/components';
-import { useFormContext } from '@/shared/context';
+import {
+  actionIcons,
+  FormSubmitButton,
+  InputField,
+  StandalonePageFormActions,
+  StandalonePageFormGrid
+} from '@/shared/components';
 
 export function ResetPasswordFormFields() {
-  const { submitting } = useFormContext();
-
   return (
     <StandalonePageFormGrid>
       <InputField name="newPassword" label="Nova senha" type="password" autoComplete="new-password" required />
@@ -17,7 +20,9 @@ export function ResetPasswordFormFields() {
         required
       />
       <StandalonePageFormActions>
-        <FormSubmitButton variant="primary">{submitting ? 'Salvando...' : 'Redefinir senha'}</FormSubmitButton>
+        <FormSubmitButton variant="primary" icon={actionIcons.password}>
+          Redefinir senha
+        </FormSubmitButton>
       </StandalonePageFormActions>
     </StandalonePageFormGrid>
   );

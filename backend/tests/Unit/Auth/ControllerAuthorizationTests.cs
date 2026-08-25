@@ -3,6 +3,7 @@ using EmpregaNet.Api.Controllers.Admin;
 using EmpregaNet.Api.Controllers.Auth;
 using EmpregaNet.Api.Controllers.Candidates;
 using EmpregaNet.Api.Controllers.Companies;
+using EmpregaNet.Api.Controllers.Dashboard;
 using EmpregaNet.Api.Controllers.JobApplications;
 using EmpregaNet.Api.Controllers.Jobs;
 using EmpregaNet.Api.Controllers.Users;
@@ -32,7 +33,8 @@ public sealed class ControllerAuthorizationTests
     [
         (typeof(AdminController), Constants.AuthPolicies.Administrador),
         (typeof(CompaniesController), Constants.AuthPolicies.Administrador),
-        (typeof(CandidatesController), Constants.AuthPolicies.Recrutamento)
+        (typeof(CandidatesController), Constants.AuthPolicies.Recrutamento),
+        (typeof(DashboardController), Constants.AuthPolicies.Recrutamento)
     ];
 
     /// <summary>

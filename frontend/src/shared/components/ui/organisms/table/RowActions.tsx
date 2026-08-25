@@ -1,10 +1,12 @@
 'use client';
 
 import { cn } from '@/shared/utils/lib';
-import { MoreVertical, type LucideIcon } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
 import { Button } from '../../atoms/button';
+import { actionIcons } from '../../icons';
+import { IconButton } from '../../molecules/icon-button';
 import { Popover, PopoverContent, PopoverTrigger } from '../../molecules/popover';
 import styles from './RowActions.module.scss';
 
@@ -79,9 +81,7 @@ export function RowActions({ actions, maxInline = 2, className }: RowActionsProp
       {menuActions.length > 0 ? (
         <Popover open={menuOpen} onOpenChange={setMenuOpen}>
           <PopoverTrigger asChild>
-            <Button type="button" variant="ghost" size="icon" aria-label="Mais ações">
-              <MoreVertical aria-hidden />
-            </Button>
+            <IconButton icon={actionIcons.more} label="Mais ações" />
           </PopoverTrigger>
           <PopoverContent align="end" className={styles.menu}>
             {menuActions.map((action) => {

@@ -1,10 +1,10 @@
 'use client';
 
-import * as React from 'react';
+import { cn } from '@/shared/utils/lib';
 import { Slot } from '@radix-ui/react-slot';
 import { cva, type VariantProps } from 'class-variance-authority';
 import type { LucideIcon } from 'lucide-react';
-import { cn } from '@/shared/utils/lib';
+import * as React from 'react';
 import styles from './Button.module.scss';
 
 const buttonVariants = cva(styles.root, {
@@ -56,6 +56,13 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     ref
   ) => {
     const Comp = asChild ? Slot : 'button';
+
+    if (process.env.NODE_ENV !== 'production' && asChild && (StartIcon || EndIcon)) {
+      console.warn(
+        '[Button] `startIcon`/`endIcon` são ignorados com `asChild`. Renderize o ícone dentro do filho: ' +
+          '<Button asChild><Link href={href}><actionIcons.back aria-hidden />Voltar</Link></Button>'
+      );
+    }
     const showIcons = !asChild && (!!StartIcon || !!EndIcon);
     return (
       <Comp className={cn(buttonVariants({ variant, size }), className)} ref={ref} {...props}>

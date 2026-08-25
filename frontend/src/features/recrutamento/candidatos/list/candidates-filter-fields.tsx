@@ -2,6 +2,7 @@
 
 import {
   AutocompleteField,
+  actionIcons,
   Button,
   FilterBar,
   FilterField,
@@ -16,7 +17,6 @@ import {
   type CandidatesFilterFormValues
 } from './candidates-filter-schema';
 import { LIST_ORDER_BY_OPTIONS, type CandidatesListQueryParams } from '@/shared/schema';
-import { X } from 'lucide-react';
 
 type CandidatesFilterParams = Pick<CandidatesListQueryParams, 'search' | 'orderBy'>;
 
@@ -37,8 +37,12 @@ export function CandidatesFilterFields({ onChange, searchOptions, searchLoading 
   return (
     <FilterBar
       actions={
-        <Button type="button" variant="outline" onClick={() => reset(defaultCandidatesFilter)}>
-          <X aria-hidden />
+        <Button
+          type="button"
+          variant="outline"
+          startIcon={actionIcons.clearFilters}
+          onClick={() => reset(defaultCandidatesFilter)}
+        >
           Limpar
         </Button>
       }

@@ -1,8 +1,7 @@
 'use client';
 
-import { Button } from '@/shared/components';
+import { actionIcons, Button, IconButton } from '@/shared/components';
 import { useHasMounted } from '@/shared/hooks';
-import { Menu, Moon, Sun } from 'lucide-react';
 import Link from 'next/link';
 import { UserAvatar } from '../user-avatar';
 import { firstName, formatGreetingDateParts } from '../utils/greeting';
@@ -37,18 +36,16 @@ export function MainHeader({
   return (
     <header className={styles.topbar}>
       <div className={styles.left}>
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
+        <IconButton
+          icon={actionIcons.menu}
+          label="Abrir menu de navegação"
+          showTooltip={false}
           className={styles.menuToggle}
-          aria-label="Abrir menu de navegação"
+          iconStyleOverrides={styles.headerIcon}
           aria-expanded={mobileMenuOpen}
           aria-controls="app-sidebar"
           onClick={onOpenMobileMenu}
-        >
-          <Menu className={styles.headerIcon} aria-hidden />
-        </Button>
+        />
 
         <p className={styles.greeting} suppressHydrationWarning>
           Olá
@@ -70,25 +67,18 @@ export function MainHeader({
       </div>
 
       <div className={styles.right}>
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
-          aria-label={
+        <IconButton
+          icon={themeMounted && resolvedTheme === 'dark' ? actionIcons.themeLight : actionIcons.themeDark}
+          label={
             !themeMounted
               ? 'Alternar tema'
               : resolvedTheme === 'dark'
                 ? 'Alternar para tema claro'
                 : 'Alternar para tema escuro'
           }
+          iconStyleOverrides={styles.headerIcon}
           onClick={onToggleTheme}
-        >
-          {themeMounted && resolvedTheme === 'dark' ? (
-            <Sun className={styles.headerIcon} aria-hidden />
-          ) : (
-            <Moon className={styles.headerIcon} aria-hidden />
-          )}
-        </Button>
+        />
 
         {isAuthenticated ? (
           <Link href="/conta/perfil" className={styles.avatarLink} title={profileTitle}>
@@ -97,7 +87,10 @@ export function MainHeader({
           </Link>
         ) : (
           <Button variant="primary" size="sm" asChild>
-            <Link href="/login">Entrar</Link>
+            <Link href="/login">
+              <actionIcons.signIn aria-hidden />
+              Entrar
+            </Link>
           </Button>
         )}
       </div>

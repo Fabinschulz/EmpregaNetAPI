@@ -1,7 +1,6 @@
 'use client';
 
-import { Popover, PopoverContent, PopoverTrigger } from '@/shared/components';
-import { ChevronDown } from 'lucide-react';
+import { actionIcons, Popover, PopoverContent, PopoverTrigger } from '@/shared/components';
 import type { ReactNode } from 'react';
 import styles from './filter-pill.module.scss';
 
@@ -20,7 +19,7 @@ export function FilterPill({ label, activeCount, children }: FilterPillProps) {
         <button type="button" className={styles.pill} data-active={isActive || undefined}>
           {label}
           {isActive ? <span className={styles.count}>{activeCount}</span> : null}
-          <ChevronDown className={styles.chevron} aria-hidden />
+          <actionIcons.expand className={styles.chevron} aria-hidden />
         </button>
       </PopoverTrigger>
 

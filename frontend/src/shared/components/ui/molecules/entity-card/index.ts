@@ -4,4 +4,3 @@ export { InfoItem, InfoList, type InfoItemProps, type InfoListProps } from './In
 export { TagList, type TagListProps } from './TagList';
 export { toCardTags, type CardTag } from './card-tags';
 export { entityInitials } from './entity-initials';
-export { CardSectionLabel, type CardSectionLabelProps } from './CardSectionLabel';

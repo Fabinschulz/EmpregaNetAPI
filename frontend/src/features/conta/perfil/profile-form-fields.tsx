@@ -1,7 +1,14 @@
 'use client';
 
-import { FormActions, FormGrid, FormRow, FormSubmitButton, InputField, PhoneField } from '@/shared/components';
-import { Save } from 'lucide-react';
+import {
+  actionIcons,
+  FormActions,
+  FormGrid,
+  FormRow,
+  FormSubmitButton,
+  InputField,
+  PhoneField
+} from '@/shared/components';
 
 export function ProfileFormFields() {
   return (
@@ -12,8 +19,7 @@ export function ProfileFormFields() {
       </FormRow>
       <PhoneField name="phoneNumber" label="Telefone" />
       <FormActions>
-        <FormSubmitButton variant="primary">
-          <Save aria-hidden />
+        <FormSubmitButton variant="primary" icon={actionIcons.save}>
           Salvar alterações
         </FormSubmitButton>
       </FormActions>

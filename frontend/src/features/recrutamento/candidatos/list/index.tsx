@@ -1,11 +1,17 @@
 'use client';
 
-import { ApiQueryBoundary, PageHeader, TableContainer, TableFilters, type DataTableColumn } from '@/shared/components';
+import {
+  actionIcons,
+  ApiQueryBoundary,
+  PageHeader,
+  TableContainer,
+  TableFilters,
+  type DataTableColumn
+} from '@/shared/components';
 import { FormProvider } from '@/shared/context';
 import { useListRefresh, usePersistedTablePagination } from '@/shared/hooks';
 import { type CandidatesListQueryParams, type UserResponse } from '@/shared/schema';
 import { formatDate } from '@/shared/utils';
-import { Eye } from 'lucide-react';
 import { useCallback, useMemo, useState } from 'react';
 import { useCandidatesListQuery } from '../service';
 import { CandidatesFilterFields } from './candidates-filter-fields';
@@ -25,7 +31,7 @@ const CANDIDATES_COLUMNS: DataTableColumn<UserResponse>[] = [
     key: 'actions',
     type: 'actions',
     getActions: (candidate) => [
-      { key: 'detail', label: 'Detalhes', icon: Eye, href: `/recrutamento/candidatos/${candidate.id}` }
+      { key: 'detail', label: 'Detalhes', icon: actionIcons.details, href: `/recrutamento/candidatos/${candidate.id}` }
     ]
   }
 ];

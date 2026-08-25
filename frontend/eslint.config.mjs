@@ -50,6 +50,63 @@ const NO_EXPORT_STAR = {
     '`export *` proibido na fronteira pública do módulo de feature: use exports nomeados, para que a superfície pública do módulo seja explícita e não dependa de barrel intermediário.'
 };
 
+/**
+ * Atomic design em `shared/components/ui`: a dependência aponta sempre para baixo na
+ * escada `atoms <- molecules <- organisms <- templates` (as "pages" são as rotas em
+ * `src/app`).
+ */
+const UI_TIER_ORDER = ['atoms', 'molecules', 'organisms', 'templates'];
+
+const uiTierSpecifiers = (tier) => [
+  `@/shared/components/ui/${tier}`,
+  `@/shared/components/ui/${tier}/*`,
+  `@/shared/components/ui/${tier}/**`,
+  `../${tier}`,
+  `../${tier}/*`,
+  `../${tier}/**`,
+  `../../${tier}`,
+  `../../${tier}/*`,
+  `../../${tier}/**`
+];
+
+const noTiersAbove = (tier) => {
+  const above = UI_TIER_ORDER.slice(UI_TIER_ORDER.indexOf(tier) + 1);
+  if (above.length === 0) return null;
+  return {
+    group: above.flatMap(uiTierSpecifiers),
+    message: `Import ascendente no atomic design: \`${tier}/\` não pode depender de ${above
+      .map((t) => `\`${t}/\``)
+      .join(' nem ')}. Inverta a dependência - o nivel de cima compõe o de baixo, passando o conteúdo por prop/slot.`
+  };
+};
+
+
+const NO_UI_BARRELS_INSIDE_UI = [
+  {
+    name: '@/shared/components',
+    message:
+      'Dentro de shared/components/ui, importe o nível concreto por caminho relativo (ex: `../../atoms/button`). Passar pelo barrel raiz cria um ciclo entre o barrel e os seus próprios membros.'
+  },
+  {
+    name: '@/shared/components/ui',
+    message:
+      'Dentro de shared/components/ui, importe o nível concreto por caminho relativo (ex: `../../molecules/popover`) em vez do barrel do próprio módulo.'
+  }
+];
+
+const uiTierRule = (tier) => ({
+  files: [`src/shared/components/ui/${tier}/**/*.{ts,tsx}`],
+  rules: {
+    'no-restricted-imports': [
+      'error',
+      {
+        patterns: [NO_FEATURES_FROM_SHARED, NO_APP_FROM_SHARED, noTiersAbove(tier)].filter(Boolean),
+        paths: [NO_AXIOS_IN_COMPONENT, NO_SHARED_MEGA_BARREL, ...NO_UI_BARRELS_INSIDE_UI]
+      }
+    ]
+  }
+});
+
 const eslintConfig = defineConfig([
   ...nextVitals,
   ...nextTs,
@@ -149,7 +206,9 @@ const eslintConfig = defineConfig([
     rules: {
       'no-restricted-syntax': ['error', NO_EXPORT_STAR]
     }
-  }
+  },
+
+  ...UI_TIER_ORDER.map(uiTierRule)
 ]);
 
 export default eslintConfig;

@@ -1,11 +1,14 @@
 'use client';
 
-import { FormSubmitButton, InputField, StandalonePageFormActions, StandalonePageFormGrid } from '@/shared/components';
-import { useFormContext } from '@/shared/context';
+import {
+  actionIcons,
+  FormSubmitButton,
+  InputField,
+  StandalonePageFormActions,
+  StandalonePageFormGrid
+} from '@/shared/components';
 
 export function RegisterFormFields() {
-  const { submitting } = useFormContext();
-
   return (
     <StandalonePageFormGrid>
       <InputField name="username" label="Nome de usuário" autoComplete="username" required />
@@ -19,7 +22,9 @@ export function RegisterFormFields() {
         required
       />
       <StandalonePageFormActions>
-        <FormSubmitButton variant="primary">{submitting ? 'Criando conta...' : 'Criar conta'}</FormSubmitButton>
+        <FormSubmitButton variant="primary" icon={actionIcons.signUp}>
+          Criar conta
+        </FormSubmitButton>
       </StandalonePageFormActions>
     </StandalonePageFormGrid>
   );

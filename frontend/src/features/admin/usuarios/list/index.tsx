@@ -1,6 +1,7 @@
 'use client';
 
 import {
+    actionIcons,
     ApiQueryBoundary,
     ConfirmDialog,
     PageHeader,
@@ -15,7 +16,6 @@ import { FormProvider } from '@/shared/context';
 import { useListRefresh, usePersistedTablePagination } from '@/shared/hooks';
 import { type AdminUsersListQueryParams, type UserResponse } from '@/shared/schema';
 import { formatDate, userTypeLabel } from '@/shared/utils';
-import { Eye } from 'lucide-react';
 import { useCallback, useMemo, useState } from 'react';
 import { adminUsersRoutes } from '../admin-users-routes';
 import { useAdminUsersListQuery, useDeleteAdminUserMutation } from '../service';
@@ -86,7 +86,7 @@ export function AdminUsersPage() {
         type: 'actions',
         getActions: (user) => {
           const actions: RowAction[] = [
-            { key: 'detail', label: 'Detalhes', icon: Eye, href: adminUsersRoutes.detail(user.id) }
+            { key: 'detail', label: 'Detalhes', icon: actionIcons.details, href: adminUsersRoutes.detail(user.id) }
           ];
 
           const deleteAction = user.isDeleted ? null : getDeleteAction(user);

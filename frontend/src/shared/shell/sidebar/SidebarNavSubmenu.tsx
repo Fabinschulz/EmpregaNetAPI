@@ -1,8 +1,8 @@
 'use client';
 
-import { Button } from '@/shared/components';
+import { actionIcons, Button } from '@/shared/components';
 import clsx from 'clsx';
-import { ChevronDown } from 'lucide-react';
+
 import Link from 'next/link';
 import { useId, useState } from 'react';
 import type { ShellNavItem } from '../hooks/use-app-shell-navigation';
@@ -31,8 +31,6 @@ export function SidebarNavSubmenu({ item, pathname, onNavigate }: SidebarNavSubm
   const [open, setOpen] = useState(hasActiveChild);
   const [wasActive, setWasActive] = useState(hasActiveChild);
 
-  // OBS: Entrar na seção (por navegação externa ao submenu) reabre o grupo, ajuste feito
-  // durante a renderização (padrão React), sem useEffect nem re-render extra.
   if (hasActiveChild !== wasActive) {
     setWasActive(hasActiveChild);
     if (hasActiveChild) setOpen(true);
@@ -50,7 +48,7 @@ export function SidebarNavSubmenu({ item, pathname, onNavigate }: SidebarNavSubm
       >
         <Icon className={styles.navIcon} aria-hidden />
         <span className={styles.navLabel}>{item.label}</span>
-        <ChevronDown className={clsx(styles.submenuChevron, open && styles.submenuChevronOpen)} aria-hidden />
+        <actionIcons.expand className={clsx(styles.submenuChevron, open && styles.submenuChevronOpen)} aria-hidden />
       </Button>
 
       {open ? (

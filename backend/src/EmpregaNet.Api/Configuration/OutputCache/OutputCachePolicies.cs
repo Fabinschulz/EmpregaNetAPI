@@ -17,4 +17,15 @@ public static class OutputCachePolicies
 
     /// <summary>GET autenticado do perfil do utilizador (<c>/users/me</c>).</summary>
     public const string UserProfileRead = "UserProfileRead";
+
+    /// <summary>
+    /// GET de métricas do dashboard: TTL próprio, curto, com variação por utilizador.
+    /// </summary>
+    /// <remarks>
+    /// Separada de <see cref="AuthenticatedRead"/> por causa do tempo de vida. As leituras de
+    /// entidade toleram 90 minutos; um painel de métricas com essa idade mostraria "última
+    /// atualização" de uma hora e meia atrás e o utilizador clicaria em atualizar sem efeito.
+    /// A variação por utilizador é obrigatória: o escopo dos números depende de quem pergunta.
+    /// </remarks>
+    public const string DashboardRead = "DashboardRead";
 }

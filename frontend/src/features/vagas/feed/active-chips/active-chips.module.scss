@@ -42,13 +42,25 @@
 }
 
 .clearAll {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
   padding: 4px 6px;
   border: 0;
   background: transparent;
   color: var(--muted);
   font-size: 0.8125rem;
-  text-decoration: underline;
   cursor: pointer;
+}
+
+.clearAllLabel {
+  text-decoration: underline;
+}
+
+.clearAllIcon {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
 }
 
 .clearAll:hover {

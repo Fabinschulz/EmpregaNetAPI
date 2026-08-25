@@ -1,11 +1,17 @@
 'use client';
 
-import { ApiQueryBoundary, PageHeader, TableContainer, TableFilters, type DataTableColumn } from '@/shared/components';
+import {
+  actionIcons,
+  ApiQueryBoundary,
+  PageHeader,
+  TableContainer,
+  TableFilters,
+  type DataTableColumn
+} from '@/shared/components';
 import { FormProvider } from '@/shared/context';
 import { useListRefresh, usePersistedTablePagination } from '@/shared/hooks';
 import { type JobApplicationsListQueryParams } from '@/shared/schema';
 import { formatDate } from '@/shared/utils';
-import { Eye } from 'lucide-react';
 import { useCallback, useState } from 'react';
 import { ApplicationStatusBadge } from '../application-status-badge';
 import { useMyJobApplicationsQuery, type JobApplicationResponse } from '../service';
@@ -31,7 +37,7 @@ const MY_APPLICATIONS_COLUMNS: DataTableColumn<JobApplicationResponse>[] = [
     key: 'actions',
     type: 'actions',
     getActions: (application) =>
-      application.jobId ? [{ key: 'view-job', label: 'Ver vaga', icon: Eye, href: `/vagas/${application.jobId}` }] : []
+      application.jobId ? [{ key: 'view-job', label: 'Ver vaga', icon: actionIcons.details, href: `/vagas/${application.jobId}` }] : []
   }
 ];
 

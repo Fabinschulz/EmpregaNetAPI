@@ -1,6 +1,7 @@
 'use client';
 
 import {
+    actionIcons,
     ApiQueryBoundary,
     Button,
     ConfirmDialog,
@@ -16,7 +17,6 @@ import { FormProvider } from '@/shared/context';
 import { useListRefresh, usePersistedTablePagination } from '@/shared/hooks';
 import { type JobsListQueryParams } from '@/shared/schema';
 import { formatDate } from '@/shared/utils';
-import { Pencil, Plus } from 'lucide-react';
 import Link from 'next/link';
 import { useCallback, useMemo, useState } from 'react';
 import { jobsRoutes } from '../jobs-routes';
@@ -80,7 +80,7 @@ export function RecruitmentJobsPage() {
         type: 'actions',
         getActions: (job) => {
           const actions: RowAction[] = [
-            { key: 'edit', label: 'Editar', icon: Pencil, href: jobsRoutes.detail(job.id) }
+            { key: 'edit', label: 'Editar', icon: actionIcons.edit, href: jobsRoutes.detail(job.id) }
           ];
 
           const deleteAction = getDeleteAction(job);
@@ -109,7 +109,7 @@ export function RecruitmentJobsPage() {
           actions={
             <Button variant="primary" asChild>
               <Link href={jobsRoutes.new}>
-                <Plus aria-hidden />
+                <actionIcons.create aria-hidden />
                 Nova vaga
               </Link>
             </Button>

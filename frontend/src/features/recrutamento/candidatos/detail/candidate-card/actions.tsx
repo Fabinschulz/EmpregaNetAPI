@@ -1,6 +1,5 @@
-import { Button } from '@/shared/components';
+import { actionIcons, Button, entityIcons } from '@/shared/components';
 import { formatDate } from '@/shared/utils';
-import { Mail, Phone, UserRound } from 'lucide-react';
 import styles from './candidate-card.module.scss';
 import type { CandidateContact } from './candidate-contact';
 
@@ -21,7 +20,7 @@ export function CandidateActions({ contact, name, updatedAt }: CandidateActionsP
         {contact.telHref ? (
           <Button variant="outline" asChild>
             <a href={contact.telHref} aria-label={`Ligar para ${name}`}>
-              <Phone aria-hidden />
+              <actionIcons.phone aria-hidden />
               Ligar
             </a>
           </Button>
@@ -30,13 +29,13 @@ export function CandidateActions({ contact, name, updatedAt }: CandidateActionsP
         {contact.mailtoHref ? (
           <Button variant="primary" asChild>
             <a href={contact.mailtoHref} aria-label={`Enviar e-mail para ${name}`}>
-              <Mail aria-hidden />
+              <actionIcons.email aria-hidden />
               Enviar e-mail
             </a>
           </Button>
         ) : (
           <span className={styles.noAction}>
-            <UserRound aria-hidden className={styles.noActionIcon} />
+            <entityIcons.candidate aria-hidden className={styles.noActionIcon} />
             Sem e-mail cadastrado
           </span>
         )}

@@ -1,0 +1,105 @@
+.chartArea {
+  width: 100%;
+  min-width: 0;
+
+  :global(.recharts-surface) {
+    overflow: visible;
+  }
+
+  :global(.recharts-wrapper:focus-visible) {
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+    border-radius: var(--radius);
+  }
+}
+
+.donutLayout {
+  display: grid;
+  grid-template-columns: minmax(180px, 240px) 1fr;
+  align-items: center;
+  gap: 16px;
+  min-width: 0;
+}
+
+.donutChart {
+  position: relative;
+  min-width: 0;
+}
+
+.donutCenter {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  pointer-events: none;
+}
+
+.donutTotal {
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+.donutCaption {
+  font-size: 0.6875rem;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.donutLegend {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  min-width: 0;
+}
+
+.donutLegendItem {
+  display: grid;
+  grid-template-columns: 8px 1fr auto;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.8125rem;
+}
+
+.donutLegendMarker {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.donutLegendLabel {
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.donutLegendValue {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  font-weight: 600;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+.donutLegendShare {
+  font-weight: 500;
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+@media (max-width: 720px) {
+  .donutLayout {
+    grid-template-columns: 1fr;
+  }
+}

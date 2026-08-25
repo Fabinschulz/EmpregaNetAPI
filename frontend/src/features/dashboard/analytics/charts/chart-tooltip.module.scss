@@ -1,0 +1,72 @@
+.tooltip {
+  min-width: 180px;
+  max-width: 260px;
+  padding: 10px 12px;
+  border: 1px solid var(--chart-tooltip-border);
+  border-radius: var(--radius);
+  background: var(--chart-tooltip-bg);
+  box-shadow: var(--shadow-card);
+  font-size: 0.8125rem;
+  line-height: 1.4;
+}
+
+.title {
+  margin: 0 0 8px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.rows {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 8px 1fr auto;
+  align-items: center;
+  gap: 8px;
+}
+
+.marker {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.label {
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.value {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  font-weight: 600;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+.share {
+  font-weight: 500;
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+.footer {
+  margin: 8px 0 0;
+  padding-top: 8px;
+  border-top: 1px solid var(--chart-tooltip-border);
+  font-size: 0.75rem;
+  color: var(--muted);
+}

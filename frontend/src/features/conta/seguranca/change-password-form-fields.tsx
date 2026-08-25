@@ -1,7 +1,6 @@
 'use client';
 
-import { FormActions, FormGrid, FormRow, FormSubmitButton, InputField } from '@/shared/components';
-import { KeyRound } from 'lucide-react';
+import { actionIcons, FormActions, FormGrid, FormRow, FormSubmitButton, InputField } from '@/shared/components';
 
 export function ChangePasswordFormFields() {
   return (
@@ -12,8 +11,7 @@ export function ChangePasswordFormFields() {
         <InputField name="newPasswordConfirmation" label="Confirmar nova senha" type="password" required />
       </FormRow>
       <FormActions>
-        <FormSubmitButton variant="primary">
-          <KeyRound aria-hidden />
+        <FormSubmitButton variant="primary" icon={actionIcons.password}>
           Alterar senha
         </FormSubmitButton>
       </FormActions>

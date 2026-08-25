@@ -1,7 +1,7 @@
 'use client';
 
-import { Button, Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shared/components';
-import { type LucideIcon, AlertTriangle, FileQuestion, RefreshCw } from 'lucide-react';
+import { actionIcons, Button, Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shared/components';
+import { type LucideIcon, AlertTriangle, FileQuestion } from 'lucide-react';
 import styles from './error-fallback.module.scss';
 
 export type ErrorFallbackVariant = 'error' | 'service' | 'not-found';
@@ -26,9 +26,9 @@ const VARIANT_DEFAULTS: Record<
   ErrorFallbackVariant,
   { Icon: LucideIcon; buttonText: string; role: 'alert' | 'status' }
 > = {
-  error: { Icon: RefreshCw, buttonText: 'Tentar novamente', role: 'alert' },
-  service: { Icon: RefreshCw, buttonText: 'Recarregar página', role: 'alert' },
-  'not-found': { Icon: RefreshCw, buttonText: 'Voltar para a página inicial', role: 'status' }
+  error: { Icon: actionIcons.retry, buttonText: 'Tentar novamente', role: 'alert' },
+  service: { Icon: actionIcons.refresh, buttonText: 'Recarregar página', role: 'alert' },
+  'not-found': { Icon: actionIcons.back, buttonText: 'Voltar para a página inicial', role: 'status' }
 };
 
 const STATUS_ICON: Record<ErrorFallbackVariant, LucideIcon> = {

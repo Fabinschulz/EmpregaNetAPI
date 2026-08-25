@@ -1,9 +1,8 @@
 'use client';
 
-import { FormActions, FormGrid, FormSubmitButton, SelectField } from '@/shared/components';
+import { actionIcons, FormActions, FormGrid, FormSubmitButton, SelectField } from '@/shared/components';
 import { useFormContext } from '@/shared/context';
 import { USER_TYPE_OPTIONS } from '@/shared/utils';
-import { Save } from 'lucide-react';
 
 type AdminUserFormFieldsProps = {
   backHref: string;
@@ -21,8 +20,7 @@ export function AdminUserFormFields({ backHref }: AdminUserFormFieldsProps) {
         placeholder="Selecione o tipo de usuário"
       />
       <FormActions backHref={backHref}>
-        <FormSubmitButton variant="primary" disabled={readOnly}>
-          <Save aria-hidden />
+        <FormSubmitButton variant="primary" icon={actionIcons.save} disabled={readOnly}>
           Salvar
         </FormSubmitButton>
       </FormActions>

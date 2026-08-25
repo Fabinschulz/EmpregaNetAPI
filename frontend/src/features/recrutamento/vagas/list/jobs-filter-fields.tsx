@@ -2,6 +2,7 @@
 
 import {
   AutocompleteField,
+  actionIcons,
   Button,
   FilterBar,
   FilterField,
@@ -12,7 +13,6 @@ import { useFormContext } from '@/shared/context';
 import { useFilterFormSync } from '@/shared/hooks';
 import { defaultJobsFilter, jobsFilterToParams, type JobsFilterFormValues } from './jobs-filter-schema';
 import type { JobsListQueryParams } from '@/shared/schema';
-import { X } from 'lucide-react';
 
 const STATUS_OPTIONS = [
   { label: 'Todas', value: 'all' },
@@ -39,8 +39,12 @@ export function JobsFilterFields({ onChange, searchOptions, searchLoading }: Job
   return (
     <FilterBar
       actions={
-        <Button type="button" variant="outline" onClick={() => reset(defaultJobsFilter)}>
-          <X aria-hidden />
+        <Button
+          type="button"
+          variant="outline"
+          startIcon={actionIcons.clearFilters}
+          onClick={() => reset(defaultJobsFilter)}
+        >
           Limpar
         </Button>
       }

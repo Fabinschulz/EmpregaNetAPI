@@ -1,7 +1,8 @@
 'use client';
 
 import { isAdmin, isRecruitmentStaff } from '@/shared/utils/lib';
-import { type LucideIcon, Briefcase, Building2, FileText, LayoutDashboard, UserCircle, Users } from 'lucide-react';
+import { entityIcons } from '@/shared/components';
+import type { LucideIcon } from 'lucide-react';
 import { useMemo } from 'react';
 
 export type ShellNavChild = {
@@ -28,13 +29,13 @@ export type ShellNavGroup = {
 export function useAppShellNavigation(roles: string[], isAuthenticated: boolean) {
   return useMemo(() => {
     const principal: ShellNavItem[] = [
-      { href: '/dashboard', label: 'Painel', icon: LayoutDashboard, visible: isAuthenticated },
-      { href: '/vagas', label: 'Vagas', icon: Briefcase, visible: true },
-      { href: '/candidaturas', label: 'Minhas candidaturas', icon: FileText, visible: isAuthenticated },
+      { href: '/dashboard', label: 'Painel', icon: entityIcons.dashboard, visible: isAuthenticated },
+      { href: '/vagas', label: 'Vagas', icon: entityIcons.job, visible: true },
+      { href: '/candidaturas', label: 'Minhas candidaturas', icon: entityIcons.application, visible: isAuthenticated },
       {
         href: '/conta/perfil',
         label: 'Conta',
-        icon: UserCircle,
+        icon: entityIcons.profile,
         visible: isAuthenticated,
         children: [
           { href: '/conta/perfil', label: 'Perfil', visible: true },
@@ -44,19 +45,19 @@ export function useAppShellNavigation(roles: string[], isAuthenticated: boolean)
     ];
 
     const recruitment: ShellNavItem[] = [
-      { href: '/recrutamento/vagas', label: 'Vagas (equipe)', icon: Briefcase, visible: isRecruitmentStaff(roles) },
+      { href: '/recrutamento/vagas', label: 'Vagas (equipe)', icon: entityIcons.job, visible: isRecruitmentStaff(roles) },
       {
         href: '/recrutamento/candidaturas',
         label: 'Candidaturas',
-        icon: FileText,
+        icon: entityIcons.application,
         visible: isRecruitmentStaff(roles)
       },
-      { href: '/recrutamento/candidatos', label: 'Candidatos', icon: Users, visible: isRecruitmentStaff(roles) }
+      { href: '/recrutamento/candidatos', label: 'Candidatos', icon: entityIcons.candidates, visible: isRecruitmentStaff(roles) }
     ];
 
     const admin: ShellNavItem[] = [
-      { href: '/admin/usuarios', label: 'Usuários', icon: Users, visible: isAdmin(roles) },
-      { href: '/admin/empresas', label: 'Empresas', icon: Building2, visible: isAdmin(roles) }
+      { href: '/admin/usuarios', label: 'Usuários', icon: entityIcons.users, visible: isAdmin(roles) },
+      { href: '/admin/empresas', label: 'Empresas', icon: entityIcons.company, visible: isAdmin(roles) }
     ];
 
     const groups: ShellNavGroup[] = [{ id: 'main', title: 'Principal', items: principal }];

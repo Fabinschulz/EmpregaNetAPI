@@ -1,7 +1,6 @@
 'use client';
 
-import { ApiQueryBoundary, Button, DetailPageSkeleton, PageHeader } from '@/shared/components';
-import { ArrowLeft } from 'lucide-react';
+import { actionIcons, ApiQueryBoundary, Button, DetailPageSkeleton, PageHeader } from '@/shared/components';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useMemo } from 'react';
@@ -30,7 +29,7 @@ export function CandidateDetailPage() {
           actions={
             <Button variant="outline" asChild>
               <Link href="/recrutamento/candidatos">
-                <ArrowLeft aria-hidden />
+                <actionIcons.back aria-hidden />
                 Voltar
               </Link>
             </Button>

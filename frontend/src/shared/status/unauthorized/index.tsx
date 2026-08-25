@@ -1,6 +1,6 @@
 'use client';
 
-import { Alert, Button } from '@/shared/components';
+import { Alert, Button, entityIcons } from '@/shared/components';
 import { useAuth } from '@/shared/context';
 import {
   StandalonePageFooterPrompt,
@@ -9,7 +9,6 @@ import {
   StandalonePage
 } from '@/shared/components';
 import { DEFAULT_POST_LOGIN_PATH, isSafeInternalPath, startRouterTransition } from '@/shared/utils';
-import { LayoutDashboard } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 export function Unauthorized() {
@@ -48,7 +47,7 @@ export function Unauthorized() {
       </Alert>
 
       <StandalonePageFormActions>
-        <Button type="button" variant="primary" startIcon={LayoutDashboard} onClick={handleGoDashboard}>
+        <Button type="button" variant="primary" startIcon={entityIcons.dashboard} onClick={handleGoDashboard}>
           Ir para o painel
         </Button>
       </StandalonePageFormActions>

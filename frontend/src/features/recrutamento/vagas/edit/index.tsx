@@ -1,16 +1,17 @@
 'use client';
 
 import {
+  actionIcons,
   Alert,
   ApiQueryBoundary,
   Button,
+  entityIcons,
   FormFieldsSkeleton,
   FormHeader,
   FormNotice,
   PageHeader
 } from '@/shared/components';
 import { FormProvider } from '@/shared/context';
-import { Archive, Users } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useMemo } from 'react';
@@ -62,12 +63,16 @@ export function RecruitmentEditJobPage() {
           <FormHeader {...HEADING} backHref={jobsRoutes.list} submitLabel="Salvar">
             <Button variant="outline" asChild>
               <Link href={jobsRoutes.candidates(jobId)}>
-                <Users aria-hidden />
+                <entityIcons.candidates aria-hidden />
                 Ver candidatos
               </Link>
             </Button>
-            <Button type="button" onClick={() => close()} disabled={isUpdating || isClosing}>
-              <Archive aria-hidden />
+            <Button
+              type="button"
+              startIcon={actionIcons.archive}
+              onClick={() => close()}
+              disabled={isUpdating || isClosing}
+            >
               Encerrar vaga
             </Button>
           </FormHeader>

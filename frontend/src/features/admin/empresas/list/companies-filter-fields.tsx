@@ -2,6 +2,7 @@
 
 import {
   AutocompleteField,
+  actionIcons,
   Button,
   FilterBar,
   FilterField,
@@ -11,7 +12,6 @@ import {
 import { useFormContext } from '@/shared/context';
 import { useFilterFormSync } from '@/shared/hooks';
 import { LIST_ORDER_BY_OPTIONS, type CompaniesListQueryParams } from '@/shared/schema';
-import { X } from 'lucide-react';
 import {
   companiesFilterToParams,
   defaultCompaniesFilter,
@@ -42,8 +42,12 @@ export function CompaniesFilterFields({ onChange, searchOptions, searchLoading }
   return (
     <FilterBar
       actions={
-        <Button type="button" variant="outline" onClick={() => reset(defaultCompaniesFilter)}>
-          <X aria-hidden />
+        <Button
+          type="button"
+          variant="outline"
+          startIcon={actionIcons.clearFilters}
+          onClick={() => reset(defaultCompaniesFilter)}
+        >
           Limpar
         </Button>
       }

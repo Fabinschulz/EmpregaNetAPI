@@ -3,43 +3,45 @@
 import { useApplyToJobMutation } from '@/features/candidaturas/service';
 import type { JobResponse } from '@/features/recrutamento/vagas/service';
 import {
-  Alert,
-  Button,
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardSectionLabel,
-  CardTitle,
-  InfoItem,
-  InfoList,
-  StatusBadge,
-  TagList,
-  toCardTags
+    actionIcons,
+    Alert,
+    Button,
+    Card,
+    CardContent,
+    CardFooter,
+    CardHeader,
+    CardSectionLabel,
+    CardTitle,
+    InfoItem,
+    InfoList,
+    Spinner,
+    StatusBadge,
+    TagList,
+    toCardTags
 } from '@/shared/components';
 import { useAuth } from '@/shared/context';
 import { useRelativeTime } from '@/shared/hooks';
 import {
-  experienceLevelVocabulary,
-  jobAreaVocabulary,
-  jobTypeVocabulary,
-  normalizeUf,
-  workModelVocabulary,
-  workShiftVocabulary
+    experienceLevelVocabulary,
+    jobAreaVocabulary,
+    jobTypeVocabulary,
+    normalizeUf,
+    workModelVocabulary,
+    workShiftVocabulary
 } from '@/shared/schema';
 import { formatSalaryRange } from '@/shared/utils';
-import {
-  Accessibility,
-  Banknote,
-  Briefcase,
-  Building2,
-  CalendarDays,
-  Clock,
-  GraduationCap,
-  LayoutGrid,
-  MapPin
-} from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
+import {
+    Accessibility,
+    Banknote,
+    Briefcase,
+    Building2,
+    CalendarDays,
+    Clock,
+    GraduationCap,
+    LayoutGrid,
+    MapPin
+} from 'lucide-react';
 import styles from './job-detail.module.scss';
 
 type JobDetailPageProps = {
@@ -66,7 +68,7 @@ export function JobDetailPage({ job }: JobDetailPageProps) {
     void mutateAsync();
   }
 
-  const applyLabel = !isAuthenticated ? 'Faça login para se candidatar' : isApplying ? 'Enviando...' : 'Candidatar-me';
+  const applyLabel = isAuthenticated ? 'Candidatar-me' : 'Faça login para se candidatar';
 
   const meta: MetaItem[] = [];
 
@@ -175,7 +177,14 @@ export function JobDetailPage({ job }: JobDetailPageProps) {
         </CardContent>
 
         <CardFooter className={styles.footer}>
-          <Button variant="primary" onClick={onApply} disabled={!isAuthenticated || isApplying}>
+          <Button variant="primary" onClick={onApply} disabled={!isAuthenticated || isApplying} aria-busy={isApplying}>
+            {isApplying ? (
+              <Spinner size="sm" label={null} />
+            ) : isAuthenticated ? (
+              <actionIcons.apply aria-hidden />
+            ) : (
+              <actionIcons.signIn aria-hidden />
+            )}
             {applyLabel}
           </Button>
           {!isAuthenticated ? (

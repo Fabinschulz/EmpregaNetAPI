@@ -3,9 +3,9 @@
 import type { UseTablePaginationResult } from '@/shared/hooks';
 import { clampPage, computeTotalPages } from '@/shared/schema';
 import { cn } from '@/shared/utils/lib';
-import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
 import { useEffect } from 'react';
-import { Button } from '../../atoms/button';
+import { actionIcons } from '../../icons';
+import { IconButton } from '../../molecules/icon-button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../molecules/select';
 import styles from './TablePagination.module.scss';
 
@@ -64,49 +64,33 @@ export function TablePagination({ pagination, totalItems, className }: TablePagi
       </span>
 
       <div className={styles.actions}>
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
+        <IconButton
+          icon={actionIcons.firstPage}
+          label="Primeira página"
           onClick={() => setPage(1)}
           disabled={!canGoBack}
-          aria-label="Primeira página"
-        >
-          <ChevronsLeft aria-hidden />
-        </Button>
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
+        />
+        <IconButton
+          icon={actionIcons.previousPage}
+          label="Página anterior"
           onClick={() => setPage(page - 1)}
           disabled={!canGoBack}
-          aria-label="Página anterior"
-        >
-          <ChevronLeft aria-hidden />
-        </Button>
+        />
         <span className={styles.pageIndicator}>{totalPages === undefined ? page : `${page} / ${totalPages}`}</span>
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
+        <IconButton
+          icon={actionIcons.nextPage}
+          label="Próxima página"
           onClick={() => setPage(page + 1)}
           disabled={!canGoForward}
-          aria-label="Próxima página"
-        >
-          <ChevronRight aria-hidden />
-        </Button>
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
+        />
+        <IconButton
+          icon={actionIcons.lastPage}
+          label="Última página"
           onClick={() => {
             if (totalPages !== undefined) setPage(totalPages);
           }}
           disabled={!canGoForward}
-          aria-label="Última página"
-        >
-          <ChevronsRight aria-hidden />
-        </Button>
+        />
       </div>
     </div>
   );

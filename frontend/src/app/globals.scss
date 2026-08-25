@@ -158,6 +158,24 @@ html {
   --font-sans:
     ui-sans-serif, system-ui, -apple-system, 'SF Pro Text', 'Segoe UI', Roboto, Ubuntu, Cantarell, 'Helvetica Neue',
     Arial, 'Apple Color Emoji', 'Segoe UI Emoji';
+
+  --chart-1: #60a5fa;
+  --chart-2: #34d399;
+  --chart-3: #fbbf24;
+  --chart-4: #f472b6;
+  --chart-5: #a78bfa;
+  --chart-6: #22d3ee;
+
+  --chart-rest: var(--gray-500);
+  --chart-positive: var(--success);
+  --chart-negative: var(--danger);
+  --chart-warning: var(--warning);
+  --chart-neutral: var(--gray-500);
+  --chart-grid: rgba(255, 255, 255, 0.08);
+  --chart-axis: var(--gray-500);
+  --chart-tooltip-bg: var(--gray-800);
+  --chart-tooltip-border: var(--gray-600);
+  --chart-track: rgba(255, 255, 255, 0.07);
 }
 
 html[data-theme='light'] {
@@ -277,6 +295,25 @@ html[data-theme='light'] {
   /* Auth (login, registo, etc.) */
   --auth-shell-bg: var(--bg);
   --auth-outline-btn-bg: var(--control-bg);
+
+  --chart-1: #2563eb;
+  --chart-2: #059669;
+  --chart-3: #d97706;
+  --chart-4: #db2777;
+  --chart-5: #7c3aed;
+  --chart-6: #0891b2;
+
+  --chart-rest: #8e8e93;
+  --chart-positive: #15803d;
+  --chart-negative: var(--danger);
+  --chart-warning: var(--warning);
+  --chart-neutral: #8e8e93;
+
+  --chart-grid: rgba(0, 0, 0, 0.08);
+  --chart-axis: #8e8e93;
+  --chart-tooltip-bg: #ffffff;
+  --chart-tooltip-border: rgba(0, 0, 0, 0.12);
+  --chart-track: rgba(0, 0, 0, 0.06);
 }
 
 * {

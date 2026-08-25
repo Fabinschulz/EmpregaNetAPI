@@ -14,4 +14,15 @@ public sealed class OutputCacheOptions
 
     /// <summary>Respostas acima deste tamanho não são cacheadas (MB). Default Microsoft: 100.</summary>
     public int MaximumBodySizeMegabytes { get; set; } = 100;
+
+    /// <summary>
+    /// Expiração das leituras do dashboard, em segundos.
+    /// </summary>
+    /// <remarks>
+    /// Cinco minutos equilibra as duas pressões: cada resposta custa uma dezena de agregações, e o
+    /// cabeçalho da tela mostra ao utilizador a idade do dado. Mais que isso e o "última atualização"
+    /// fica velho a ponto de o botão de atualizar parecer quebrado; menos e o cache deixa de aliviar
+    /// o banco nos horários de pico.
+    /// </remarks>
+    public int DashboardExpirationSeconds { get; set; } = 300;
 }

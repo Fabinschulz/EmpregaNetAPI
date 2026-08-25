@@ -1,6 +1,7 @@
 'use client';
 
 import {
+    actionIcons,
     ApiQueryBoundary,
     Button,
     ConfirmDialog,
@@ -15,7 +16,6 @@ import { FormProvider } from '@/shared/context';
 import { useListRefresh, usePersistedTablePagination } from '@/shared/hooks';
 import { type CompaniesListQueryParams } from '@/shared/schema';
 import { formatDate } from '@/shared/utils';
-import { Pencil, Plus } from 'lucide-react';
 import Link from 'next/link';
 import { useCallback, useMemo, useState } from 'react';
 import { companiesRoutes } from '../companies-routes';
@@ -73,7 +73,7 @@ export function AdminCompaniesPage() {
         type: 'actions',
         getActions: (company) => {
           const actions: RowAction[] = [
-            { key: 'edit', label: 'Editar', icon: Pencil, href: companiesRoutes.detail(company.id) }
+            { key: 'edit', label: 'Editar', icon: actionIcons.edit, href: companiesRoutes.detail(company.id) }
           ];
 
           const deleteAction = getDeleteAction(company);
@@ -102,7 +102,7 @@ export function AdminCompaniesPage() {
           actions={
             <Button variant="primary" asChild>
               <Link href={companiesRoutes.new}>
-                <Plus aria-hidden />
+                <actionIcons.create aria-hidden />
                 Nova empresa
               </Link>
             </Button>

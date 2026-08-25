@@ -1,6 +1,6 @@
 'use client';
 
-import { Button } from '@/shared/components';
+import { actionIcons, Button } from '@/shared/components';
 import { SearchX } from 'lucide-react';
 import styles from './empty-state.module.scss';
 
@@ -30,7 +30,7 @@ export function FeedEmptyState({ hasFilters, onClearFilters }: FeedEmptyStatePro
       </p>
 
       {hasFilters ? (
-        <Button type="button" variant="primary" onClick={onClearFilters}>
+        <Button type="button" variant="primary" startIcon={actionIcons.clearFilters} onClick={onClearFilters}>
           Limpar filtros
         </Button>
       ) : null}

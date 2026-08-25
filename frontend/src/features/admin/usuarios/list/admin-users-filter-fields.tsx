@@ -2,6 +2,7 @@
 
 import {
   AutocompleteField,
+  actionIcons,
   Button,
   FilterBar,
   FilterField,
@@ -16,7 +17,6 @@ import {
   type AdminUsersFilterFormValues
 } from './admin-users-filter-schema';
 import { LIST_ORDER_BY_OPTIONS, type AdminUsersListQueryParams } from '@/shared/schema';
-import { X } from 'lucide-react';
 
 const SITUATION_OPTIONS = [
   { label: 'Todos', value: 'all' },
@@ -44,8 +44,12 @@ export function AdminUsersFilterFields({ onChange, searchOptions, searchLoading 
   return (
     <FilterBar
       actions={
-        <Button type="button" variant="outline" onClick={() => reset(defaultAdminUsersFilter)}>
-          <X aria-hidden />
+        <Button
+          type="button"
+          variant="outline"
+          startIcon={actionIcons.clearFilters}
+          onClick={() => reset(defaultAdminUsersFilter)}
+        >
           Limpar
         </Button>
       }

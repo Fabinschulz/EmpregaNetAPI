@@ -1,7 +1,6 @@
 'use client';
 
-import { Button } from '@/shared/components';
-import { PanelLeft, PanelLeftClose } from 'lucide-react';
+import { actionIcons, Button, IconButton } from '@/shared/components';
 import Link from 'next/link';
 import styles from './sidebar.module.scss';
 
@@ -13,31 +12,29 @@ type SidebarFooterProps = {
 };
 
 export function SidebarFooter({ collapsed, isAuthenticated, onToggleCollapsed, onLogout }: SidebarFooterProps) {
+  const SignOutIcon = collapsed ? undefined : actionIcons.signOut;
+
   return (
     <div className={styles.footer}>
       <div className={styles.footerRailSlot}>
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
+        <IconButton
+          icon={collapsed ? actionIcons.expandSidebar : actionIcons.collapseSidebar}
+          label={collapsed ? 'Expandir menu lateral' : 'Compactar menu lateral'}
           className={styles.desktopRailToggle}
-          aria-label={collapsed ? 'Expandir menu lateral' : 'Compactar menu lateral'}
+          iconStyleOverrides={styles.headerIcon}
           onClick={onToggleCollapsed}
-        >
-          {collapsed ? (
-            <PanelLeft className={styles.headerIcon} aria-hidden />
-          ) : (
-            <PanelLeftClose className={styles.headerIcon} aria-hidden />
-          )}
-        </Button>
+        />
       </div>
       {isAuthenticated ? (
-        <Button variant="outline" size="sm" className={styles.logoutBtn} onClick={onLogout}>
+        <Button variant="outline" size="sm" className={styles.logoutBtn} startIcon={SignOutIcon} onClick={onLogout}>
           Sair
         </Button>
       ) : (
         <Button variant="primary" size="sm" className={styles.logoutBtn} asChild>
-          <Link href="/login">Entrar</Link>
+          <Link href="/login">
+            {collapsed ? null : <actionIcons.signIn aria-hidden />}
+            Entrar
+          </Link>
         </Button>
       )}
     </div>

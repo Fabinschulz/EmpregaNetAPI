@@ -1,0 +1,150 @@
+
+.kpiGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 12px;
+}
+
+.kpiCard {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: var(--entity-card-padding);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--card-bg);
+}
+
+.kpiIcon {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius);
+}
+
+.kpiLabel {
+  width: 55%;
+  height: 12px;
+}
+
+.kpiValue {
+  width: 40%;
+  height: 30px;
+}
+
+.kpiDelta {
+  width: 70%;
+  height: 12px;
+}
+
+.chart {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.chartBars {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: flex-end;
+  gap: 10px;
+  min-height: 0;
+}
+
+.chartBar {
+  flex: 1 1 0;
+  border-radius: 6px 6px 2px 2px;
+}
+
+.chartAxis {
+  height: 10px;
+  width: 100%;
+  flex: 0 0 auto;
+}
+
+.jobs {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.jobRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.jobMain {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.jobTitle {
+  width: 55%;
+  height: 14px;
+}
+
+.jobMeta {
+  width: 80%;
+  height: 11px;
+}
+
+.jobMetric {
+  width: 72px;
+  height: 28px;
+  flex: 0 0 auto;
+}
+
+.insights {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.insightRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.insightIcon {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  flex: 0 0 auto;
+}
+
+.insightText {
+  height: 12px;
+}
+
+.funnel {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.funnelRow {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.funnelLabel {
+  width: 40%;
+  height: 11px;
+}
+
+.funnelBar {
+  height: 26px;
+  border-radius: var(--radius);
+}

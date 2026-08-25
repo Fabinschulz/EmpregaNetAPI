@@ -1,7 +1,7 @@
 'use client';
 
-import { Spinner } from '@/shared/components';
-import { Search, X } from 'lucide-react';
+import { actionIcons, Spinner } from '@/shared/components';
+
 import styles from './search-bar.module.scss';
 
 type FeedSearchBarProps = {
@@ -17,7 +17,7 @@ export function FeedSearchBar({ value, onChange, isPending }: FeedSearchBarProps
         Buscar vagas por cargo, empresa, tecnologia ou cidade
       </label>
 
-      <Search className={styles.searchIcon} aria-hidden />
+      <actionIcons.search className={styles.searchIcon} aria-hidden />
 
       <input
         id="jobs-feed-search"
@@ -34,7 +34,7 @@ export function FeedSearchBar({ value, onChange, isPending }: FeedSearchBarProps
 
         {value ? (
           <button type="button" className={styles.searchClear} onClick={() => onChange('')} aria-label="Limpar busca">
-            <X aria-hidden />
+            <actionIcons.clearInput aria-hidden />
           </button>
         ) : null}
       </span>

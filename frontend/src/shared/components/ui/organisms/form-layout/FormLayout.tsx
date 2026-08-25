@@ -2,12 +2,13 @@
 
 import { useFormContext } from '@/shared/context';
 import { cn } from '@/shared/utils';
-import { ArrowLeft, Save } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 import Link from 'next/link';
 import type { CSSProperties, ReactNode } from 'react';
 import { FormSubmitButton } from '../../../common/form-submit-btn';
-import { Button } from '../../atoms/button/Button';
-import { PageHeader } from '../page-header/PageHeader';
+import { Button } from '../../atoms/button';
+import { actionIcons } from '../../icons';
+import { PageHeader } from '../../molecules/page-header';
 import styles from './FormLayout.module.scss';
 
 export type FormColumns = 1 | 2 | 3 | 4;
@@ -106,7 +107,7 @@ export type FormHeaderProps = {
   backLabel?: string;
   submitLabel: string;
   /** Ícone da ação primária (padrão: disquete). Dá lugar ao `Spinner` durante o envio. */
-  submitIcon?: ReactNode;
+  submitIcon?: LucideIcon;
   submitDisabled?: boolean;
   /** Ações secundárias do formulário (ex.: "Encerrar vaga"), entre Voltar e a ação primária. */
   children?: ReactNode;
@@ -134,22 +135,25 @@ export function FormHeader({
   sticky = true,
   className
 }: FormHeaderProps) {
-  const { submitting, readOnly, reset } = useFormContext();
+  const { readOnly, reset } = useFormContext();
 
   const actions = (
     <>
       {backHref ? (
         <Button type="button" variant="outline" asChild>
           <Link href={backHref} onClick={() => setTimeout(() => reset())}>
-            <ArrowLeft aria-hidden />
+            <actionIcons.back aria-hidden />
             {backLabel}
           </Link>
         </Button>
       ) : null}
       {children}
 
-      <FormSubmitButton variant="primary" disabled={!!submitDisabled || !!readOnly}>
-        {submitting ? null : (submitIcon ?? <Save aria-hidden />)}
+      <FormSubmitButton
+        variant="primary"
+        icon={submitIcon ?? actionIcons.save}
+        disabled={!!submitDisabled || !!readOnly}
+      >
         {submitLabel}
       </FormSubmitButton>
     </>
@@ -182,7 +186,7 @@ export function FormActions({ children, className, backHref, backLabel = 'Voltar
       {backHref ? (
         <Button type="button" variant="outline" className={styles.back} asChild>
           <Link href={backHref} onClick={() => setTimeout(() => reset())}>
-            <ArrowLeft aria-hidden />
+            <actionIcons.back aria-hidden />
             {backLabel}
           </Link>
         </Button>

@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { FloatingThemeToggle } from './FloatingThemeToggle';
+import { FloatingThemeToggle } from '../../molecules/theme-toggle';
 import styles from './page-frame.module.scss';
 
 type CenteredPageFrameProps = {

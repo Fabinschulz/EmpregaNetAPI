@@ -1,0 +1,56 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 14px;
+  font-size: 0.8125rem;
+  color: var(--muted);
+}
+
+.metaItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.metaStrong {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.metaIcon {
+  width: 14px;
+  height: 14px;
+  flex: 0 0 auto;
+}
+
+.metaUpdated {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+  font-variant-numeric: tabular-nums;
+}
+
+.chip {
+  padding: 2px 9px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  font-size: 0.6875rem;
+  color: var(--muted);
+}
+
+@media (max-width: 900px) {
+  .metaUpdated {
+    margin-left: 0;
+    width: 100%;
+  }
+}

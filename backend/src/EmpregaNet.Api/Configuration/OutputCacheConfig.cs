@@ -47,6 +47,8 @@ public static class OutputCacheConfig
                 builder => builder.AddPolicy<AuthenticatedReadOutputCachePolicy>());
             options.AddPolicy(OutputCachePolicies.UserProfileRead,
                 builder => builder.AddPolicy<UserProfileReadOutputCachePolicy>());
+            options.AddPolicy(OutputCachePolicies.DashboardRead,
+                builder => builder.AddPolicy<DashboardReadOutputCachePolicy>());
         });
 
         services.AddSingleton<IOutputCacheManager, OutputCacheManager>();

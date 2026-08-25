@@ -2,9 +2,10 @@
 
 import type { UseTablePaginationResult } from '@/shared/hooks';
 import { cn } from '@/shared/utils/lib';
-import { RefreshCw } from 'lucide-react';
+
 import * as React from 'react';
 import { ListRowsSkeleton } from '../../../common/loading/list-rows-skeleton';
+import { actionIcons } from '../../icons';
 import { Alert } from '../../molecules/alert';
 import { Button } from '../../atoms/button';
 import { DataTable, type DataTableColumn } from './DataTable';
@@ -78,7 +79,7 @@ export function TableContainer<TItem>({
               type="button"
               variant="outline"
               size="sm"
-              startIcon={RefreshCw}
+              startIcon={actionIcons.refresh}
               iconStyleOverrides={isRefreshing ? styles.spinning : undefined}
               onClick={onRefresh}
               disabled={isRefreshing}

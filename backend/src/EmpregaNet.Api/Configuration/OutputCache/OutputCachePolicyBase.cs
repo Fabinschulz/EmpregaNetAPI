@@ -74,10 +74,9 @@ internal static class OutputCachePolicyHelpers
 /// <summary>
 /// Base das políticas: aplica TTL configurável e regras padrão do ASP.NET Core na resposta (200, sem cookies).
 /// </summary>
-internal abstract class OutputCachePolicyBase(IOptions<OutputCacheOptions> options) : IOutputCachePolicy
+internal abstract class OutputCachePolicyBase(TimeSpan expiration) : IOutputCachePolicy
 {
-    protected TimeSpan Expiration { get; } =
-        TimeSpan.FromMinutes(Math.Max(1, options.Value.DefaultExpirationMinutes));
+    protected TimeSpan Expiration { get; } = expiration;
 
     public ValueTask CacheRequestAsync(OutputCacheContext context, CancellationToken cancellationToken)
     {
@@ -120,7 +119,7 @@ internal abstract class OutputCachePolicyBase(IOptions<OutputCacheOptions> optio
 
 /// <summary>Catálogo público: GET/HEAD anónimo; tags de entidade para invalidação.</summary>
 internal sealed class PublicCatalogOutputCachePolicy(IOptions<OutputCacheOptions> options)
-    : OutputCachePolicyBase(options)
+    : OutputCachePolicyBase(TimeSpan.FromMinutes(Math.Max(1, options.Value.DefaultExpirationMinutes)))
 {
     protected override bool ShouldCacheRequest(OutputCacheContext context)
         => OutputCachePolicyHelpers.IsReadMethod(context.HttpContext);
@@ -140,7 +139,7 @@ internal sealed class PublicCatalogOutputCachePolicy(IOptions<OutputCacheOptions
 
 /// <summary>CRUD genérico autenticado: vary por utilizador + query; tags de entidade dinâmicas.</summary>
 internal sealed class EntityReadOutputCachePolicy(IOptions<OutputCacheOptions> options)
-    : OutputCachePolicyBase(options)
+    : OutputCachePolicyBase(TimeSpan.FromMinutes(Math.Max(1, options.Value.DefaultExpirationMinutes)))
 {
     protected override bool ShouldCacheRequest(OutputCacheContext context)
         => OutputCachePolicyHelpers.IsReadMethod(context.HttpContext)
@@ -163,7 +162,27 @@ internal sealed class EntityReadOutputCachePolicy(IOptions<OutputCacheOptions> o
 /// Leitura autenticada genérica. Tags de invalidação vêm do atributo <c>[OutputCache(Tags = ...)]</c> no endpoint.
 /// </summary>
 internal sealed class AuthenticatedReadOutputCachePolicy(IOptions<OutputCacheOptions> options)
-    : OutputCachePolicyBase(options)
+    : OutputCachePolicyBase(TimeSpan.FromMinutes(Math.Max(1, options.Value.DefaultExpirationMinutes)))
+{
+    protected override bool ShouldCacheRequest(OutputCacheContext context)
+        => OutputCachePolicyHelpers.IsReadMethod(context.HttpContext)
+           && OutputCachePolicyHelpers.IsAuthenticated(context.HttpContext);
+
+    protected override void ConfigureCache(OutputCacheContext context)
+        => OutputCachePolicyHelpers.ApplyAuthenticatedVaryRules(context);
+}
+
+/// <summary>
+/// Métricas do dashboard: vary por utilizador + query, com TTL próprio e curto.
+/// </summary>
+/// <remarks>
+/// A invalidação é por tempo e não por tag. Toda candidatura, vaga ou registo novo altera algum
+/// número do painel, então uma invalidação por evento esvaziaria o cache continuamente e as
+/// consultas agregadas voltariam a correr a cada pedido, exatamente o que o cache existe para
+/// evitar. Um painel de tendências tolera minutos de atraso; o que ele não tolera é demorar.
+/// </remarks>
+internal sealed class DashboardReadOutputCachePolicy(IOptions<OutputCacheOptions> options)
+    : OutputCachePolicyBase(TimeSpan.FromSeconds(Math.Max(30, options.Value.DashboardExpirationSeconds)))
 {
     protected override bool ShouldCacheRequest(OutputCacheContext context)
         => OutputCachePolicyHelpers.IsReadMethod(context.HttpContext)
@@ -175,7 +194,7 @@ internal sealed class AuthenticatedReadOutputCachePolicy(IOptions<OutputCacheOpt
 
 /// <summary>Perfil do utilizador autenticado: vary por userId; tag dinâmica para invalidação de /users/me.</summary>
 internal sealed class UserProfileReadOutputCachePolicy(IOptions<OutputCacheOptions> options)
-    : OutputCachePolicyBase(options)
+    : OutputCachePolicyBase(TimeSpan.FromMinutes(Math.Max(1, options.Value.DefaultExpirationMinutes)))
 {
     protected override bool ShouldCacheRequest(OutputCacheContext context)
     {

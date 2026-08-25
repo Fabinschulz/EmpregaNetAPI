@@ -11,7 +11,7 @@ import {
   workModelVocabulary,
   workShiftVocabulary
 } from '@/shared/schema';
-import { X } from 'lucide-react';
+import { actionIcons } from '@/shared/components';
 import styles from './active-chips.module.scss';
 import type { JobsFeedFiltersController } from '../filters';
 
@@ -102,14 +102,15 @@ export function FeedActiveChips({ controller }: FeedActiveChipsProps) {
               aria-label={`Remover filtro ${chip.label}`}
             >
               {chip.label}
-              <X className={styles.activeChipIcon} aria-hidden />
+              <actionIcons.close className={styles.activeChipIcon} aria-hidden />
             </button>
           </li>
         ))}
       </ul>
 
       <button type="button" className={styles.clearAll} onClick={clearAll}>
-        Limpar tudo
+        <actionIcons.clearFilters className={styles.clearAllIcon} aria-hidden />
+        <span className={styles.clearAllLabel}>Limpar tudo</span>
       </button>
     </div>
   );

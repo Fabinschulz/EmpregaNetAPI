@@ -1,6 +1,6 @@
 'use client';
 
-import { Button, FilterBar, SelectField } from '@/shared/components';
+import { actionIcons, Button, FilterBar, SelectField } from '@/shared/components';
 import { useFormContext } from '@/shared/context';
 import { APPLICATION_STATUSES, applicationStatusLabels } from '../domain';
 import {
@@ -9,7 +9,6 @@ import {
   type MyApplicationsFilterFormValues
 } from './my-applications-filter-schema';
 import { DATE_ORDER_BY_OPTIONS, type JobApplicationsListQueryParams } from '@/shared/schema';
-import { X } from 'lucide-react';
 import { useEffect, useRef } from 'react';
 
 const STATUS_OPTIONS = [
@@ -41,8 +40,12 @@ export function MyApplicationsFilterFields({ onChange }: MyApplicationsFilterFie
   return (
     <FilterBar
       actions={
-        <Button type="button" variant="outline" onClick={() => reset(defaultMyApplicationsFilter)}>
-          <X aria-hidden />
+        <Button
+          type="button"
+          variant="outline"
+          startIcon={actionIcons.clearFilters}
+          onClick={() => reset(defaultMyApplicationsFilter)}
+        >
           Limpar
         </Button>
       }

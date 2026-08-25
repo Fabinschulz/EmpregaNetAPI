@@ -1,6 +1,7 @@
 'use client';
 
 import {
+  actionIcons,
   ApiQueryBoundary,
   Button,
   ConfirmDialog,
@@ -16,6 +17,7 @@ import { FormProvider } from '@/shared/context';
 import { ApplicationStatusBadge } from '@/features/candidaturas/application-status-badge';
 import {
   applicationStatusTransitions,
+  applicationTransitionIcons,
   applicationTransitionLabels,
   parseApplicationStatus,
   type ApplicationStatus
@@ -29,7 +31,6 @@ import {
 } from '@/features/candidaturas/service';
 import { usePersistedTablePagination } from '@/shared/hooks';
 import { formatDate } from '@/shared/utils';
-import { Ban, CheckCircle2, Flag, Pencil, PlayCircle, RotateCcw, XCircle, type LucideIcon } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useCallback, useMemo, useState } from 'react';
@@ -41,18 +42,6 @@ import {
   defaultCandidatesFilter,
   type CandidatesFilterParams
 } from './candidates-filter-fields';
-
-/** Ícone da ação que leva a candidatura para cada status alvo. */
-const TRANSITION_ICON: Record<ApplicationStatus, LucideIcon> = {
-  Pending: RotateCcw,
-  Processing: PlayCircle,
-  Approved: CheckCircle2,
-  Rejected: XCircle,
-  Canceled: Ban,
-  Finished: Flag,
-  Timeout: Ban,
-  Error: Ban
-};
 
 /** Transições que exigem confirmação por serem terminais/negativas. */
 const DESTRUCTIVE_TRANSITIONS: ReadonlySet<ApplicationStatus> = new Set<ApplicationStatus>(['Rejected', 'Canceled']);
@@ -127,7 +116,7 @@ export function CandidatesByJobPage() {
             return {
               key: target,
               label: applicationTransitionLabels[target],
-              icon: TRANSITION_ICON[target],
+              icon: applicationTransitionIcons[target],
               variant: destructive ? 'destructive' : 'default',
               disabled: isChangingStatus || isDeleting,
               onSelect: destructive
@@ -169,7 +158,7 @@ export function CandidatesByJobPage() {
           actions={
             <Button variant="outline" asChild>
               <Link href={jobsRoutes.detail(jobId)}>
-                <Pencil aria-hidden />
+                <actionIcons.edit aria-hidden />
                 Editar vaga
               </Link>
             </Button>

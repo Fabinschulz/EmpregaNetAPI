@@ -1,8 +1,11 @@
 'use client';
 
 import * as AlertDialogPrimitive from '@radix-ui/react-alert-dialog';
+import type { LucideIcon } from 'lucide-react';
 import * as React from 'react';
 import { Button } from '../../atoms/button';
+import { Spinner } from '../../atoms/spinner';
+import { actionIcons } from '../../icons';
 import styles from './alert-dialog.module.scss';
 
 export type ConfirmDialogProps = {
@@ -12,6 +15,7 @@ export type ConfirmDialogProps = {
   description?: React.ReactNode;
   confirmLabel?: string;
   cancelLabel?: string;
+  confirmIcon?: LucideIcon;
   tone?: 'default' | 'destructive';
   loading?: boolean;
   onConfirm: () => void | Promise<void>;
@@ -24,6 +28,7 @@ export function ConfirmDialog({
   description,
   confirmLabel = 'Confirmar',
   cancelLabel = 'Cancelar',
+  confirmIcon,
   tone = 'default',
   loading = false,
   onConfirm
@@ -31,6 +36,8 @@ export function ConfirmDialog({
   const handleConfirm = () => {
     void onConfirm();
   };
+
+  const ConfirmIcon = confirmIcon ?? actionIcons.confirm;
 
   return (
     <AlertDialogPrimitive.Root open={open} onOpenChange={onOpenChange}>
@@ -46,17 +53,20 @@ export function ConfirmDialog({
 
           <div className={styles.actions}>
             <AlertDialogPrimitive.Cancel asChild>
-              <Button type="button" variant="outline" disabled={loading}>
+              <Button type="button" variant="outline" startIcon={actionIcons.cancel} disabled={loading}>
                 {cancelLabel}
               </Button>
             </AlertDialogPrimitive.Cancel>
+
             <Button
               type="button"
               variant={tone === 'destructive' ? 'destructive' : 'primary'}
               disabled={loading}
+              aria-busy={loading}
               onClick={handleConfirm}
             >
-              {loading ? 'Aguarde…' : confirmLabel}
+              {loading ? <Spinner size="sm" label={null} /> : <ConfirmIcon aria-hidden />}
+              {confirmLabel}
             </Button>
           </div>
         </AlertDialogPrimitive.Content>

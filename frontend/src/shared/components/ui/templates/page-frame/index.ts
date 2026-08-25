@@ -1,0 +1,1 @@
+export { CenteredPageFrame } from './CenteredPageFrame';

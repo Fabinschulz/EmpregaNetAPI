@@ -6,6 +6,7 @@ using EmpregaNet.Infra.Cache;
 using EmpregaNet.Infra.Extensions;
 using EmpregaNet.Infra.Persistence.Database;
 using EmpregaNet.Infra.Persistence.Repositories;
+using EmpregaNet.Infra.Persistence.Repositories.Dashboard;
 using EmpregaNet.Infra.Email;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity.UI.Services;
@@ -129,6 +130,7 @@ public static class DependencyInjection
         services.AddScoped<ICompanyRepository, CompanyRepository>();
         services.AddScoped<IJobRepository, JobRepository>();
         services.AddScoped<IJobApplicationRepository, JobApplicationRepository>();
+        services.AddScoped<IDashboardAnalyticsRepository, DashboardAnalyticsRepository>();
         #endregion
     }
 

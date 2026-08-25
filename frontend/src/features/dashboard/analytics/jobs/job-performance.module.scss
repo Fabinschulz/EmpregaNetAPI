@@ -1,0 +1,190 @@
+.baseline {
+  margin: 0 0 10px;
+  font-size: 0.8125rem;
+  color: var(--muted);
+
+  strong {
+    color: var(--text);
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.item {
+  border-bottom: 1px solid var(--border);
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.link {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto 16px;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 8px;
+  margin: 0 -8px;
+  border-radius: var(--radius);
+  color: inherit;
+  transition: background 140ms ease;
+
+  &:hover {
+    background: var(--surface-hover);
+  }
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
+  }
+}
+
+.main {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.titleRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.title {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.meta,
+.timeline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--muted);
+}
+
+.timeline {
+  font-size: 0.75rem;
+}
+
+.metrics {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 1px;
+  flex: 0 0 auto;
+  text-align: right;
+}
+
+.metricValue {
+  font-size: 1.25rem;
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+.metricLabel {
+  font-size: 0.6875rem;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.metricTotal {
+  margin-top: 2px;
+  font-size: 0.75rem;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.performance {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  margin-top: 2px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.performanceIcon {
+  width: 13px;
+  height: 13px;
+}
+
+.above {
+  color: var(--chart-positive);
+}
+
+.below {
+  color: var(--chart-negative);
+}
+
+.average,
+.none {
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.chevron {
+  width: 16px;
+  height: 16px;
+  color: var(--muted);
+  flex: 0 0 auto;
+}
+
+@media (max-width: 720px) {
+  .link {
+    grid-template-columns: minmax(0, 1fr) 16px;
+    grid-template-areas:
+      'main chevron'
+      'metrics metrics';
+    row-gap: 8px;
+  }
+
+  .main {
+    grid-area: main;
+  }
+
+  .metrics {
+    grid-area: metrics;
+    flex-direction: row;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 8px;
+    text-align: left;
+  }
+
+  .chevron {
+    grid-area: chevron;
+    align-self: start;
+  }
+
+  .metricValue {
+    font-size: 1.0625rem;
+  }
+
+  .metricLabel {
+    text-transform: none;
+    letter-spacing: normal;
+    font-size: 0.75rem;
+  }
+}

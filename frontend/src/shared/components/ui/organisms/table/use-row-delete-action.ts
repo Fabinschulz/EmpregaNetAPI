@@ -2,7 +2,7 @@
 
 import { usePermissions } from '@/shared/hooks';
 import type { Permission } from '@/shared/utils/lib';
-import { Trash2 } from 'lucide-react';
+import { actionIcons } from '../../icons';
 import { useCallback, useState } from 'react';
 import type { ConfirmDialogProps } from '../../molecules/alert-dialog';
 import type { RowAction } from './RowActions';
@@ -45,7 +45,7 @@ export function useRowDeleteAction<TItem>({
         ? {
             key: 'delete',
             label: 'Excluir',
-            icon: Trash2,
+            icon: actionIcons.delete,
             variant: 'destructive',
             disabled: isDeleting,
             onSelect: () => setPending(item)
@@ -66,6 +66,7 @@ export function useRowDeleteAction<TItem>({
     title: `Excluir ${resource}`,
     description: pending ? describe(pending) : undefined,
     confirmLabel: 'Excluir',
+    confirmIcon: actionIcons.delete,
     cancelLabel: 'Cancelar',
     tone: 'destructive',
     loading: isDeleting,

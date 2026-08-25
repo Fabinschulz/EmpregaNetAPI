@@ -1,6 +1,6 @@
 'use client';
 
-import { ChevronDown } from 'lucide-react';
+import { actionIcons } from '@/shared/components';
 import { useId, useState, type ReactNode } from 'react';
 import styles from './filter-section.module.scss';
 
@@ -40,7 +40,7 @@ export function FilterSection({ title, activeCount, summary, defaultOpen, childr
 
           {!open && summary ? <span className={styles.summary}>{summary}</span> : null}
 
-          <ChevronDown className={styles.chevron} aria-hidden />
+          <actionIcons.expand className={styles.chevron} aria-hidden />
         </button>
       </h3>
 

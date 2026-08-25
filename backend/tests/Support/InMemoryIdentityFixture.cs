@@ -1,9 +1,12 @@
 using EmpregaNet.Application.Auth.Configuration;
 using EmpregaNet.Application.Abstraction;
 using EmpregaNet.Application.Auth.Commands;
+using EmpregaNet.Application.Dashboard.UseCase;
 using EmpregaNet.Application.Users.Commands;
 using EmpregaNet.Domain.Entities;
+using EmpregaNet.Domain.Interfaces;
 using EmpregaNet.Infra.Persistence.Database;
+using EmpregaNet.Infra.Persistence.Repositories;
 using FluentValidation;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -89,6 +92,11 @@ public sealed class InMemoryIdentityFixture : IDisposable
         services.AddScoped<ResetPasswordHandler>();
         services.AddScoped<ChangeMyPasswordHandler>();
         services.AddScoped<LoginWithGoogleHandler>();
+
+        // Escopo do dashboard: precisa do Identity real (papéis do utilizador) e do repositório de
+        // empresas, por isso vive aqui e não num teste unitário com UserManager falsificado.
+        services.AddScoped<ICompanyRepository, CompanyRepository>();
+        services.AddScoped<IDashboardScopeAccess, DashboardScopeAccess>();
 
         Services = services.BuildServiceProvider();
 

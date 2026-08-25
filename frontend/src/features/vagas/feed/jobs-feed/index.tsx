@@ -1,6 +1,6 @@
 'use client';
 
-import { Alert, Button, PageHeader } from '@/shared/components';
+import { actionIcons, Alert, Button, PageHeader } from '@/shared/components';
 import {
   emptyJobVocabulary,
   useJobFeedInteractionsQuery,
@@ -11,7 +11,6 @@ import {
 } from '@/features/vagas/service';
 import type { JobsFeedFilters } from '../filters/jobs-feed-filters';
 import { useInfiniteScroll } from '@/shared/hooks';
-import { RefreshCw } from 'lucide-react';
 import { useMemo } from 'react';
 import { FeedActiveChips } from '../active-chips';
 import { FeedEmptyState } from '../empty-state';
@@ -84,7 +83,7 @@ export function JobsFeed({ initialPage, initialFilters, initialVocabulary }: Job
                 type="button"
                 variant="outline"
                 size="sm"
-                startIcon={RefreshCw}
+                startIcon={actionIcons.retry}
                 onClick={() => void refetch()}
                 disabled={isFetching}
               >

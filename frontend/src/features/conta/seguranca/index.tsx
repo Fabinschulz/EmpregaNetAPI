@@ -1,6 +1,7 @@
 'use client';
 
 import {
+  actionIcons,
   Alert,
   Button,
   Card,
@@ -17,7 +18,6 @@ import {
   defaultChangeMyPasswordForm,
   type ChangeMyPasswordFormValues
 } from './change-password-form-schema';
-import { Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import styles from '../conta.module.scss';
 import { ChangePasswordFormFields } from './change-password-form-fields';
@@ -82,12 +82,22 @@ export function SecurityPage() {
               </Alert>
             ) : null}
             <div className={styles.dangerActions}>
-              <Button type="button" variant="destructive" onClick={handleDelete} disabled={deleteMutation.isPending}>
-                <Trash2 aria-hidden />
+              <Button
+                type="button"
+                variant="destructive"
+                startIcon={confirmingDelete ? actionIcons.confirm : actionIcons.delete}
+                onClick={handleDelete}
+                disabled={deleteMutation.isPending}
+              >
                 {confirmingDelete ? 'Confirmar encerramento' : 'Encerrar minha conta'}
               </Button>
               {confirmingDelete && !deleteMutation.isPending ? (
-                <Button type="button" variant="outline" onClick={() => setConfirmingDelete(false)}>
+                <Button
+                  type="button"
+                  variant="outline"
+                  startIcon={actionIcons.cancel}
+                  onClick={() => setConfirmingDelete(false)}
+                >
                   Cancelar
                 </Button>
               ) : null}

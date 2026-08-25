@@ -1,3 +1,4 @@
+import { Ban, CheckCircle2, Flag, PlayCircle, RotateCcw, XCircle, type LucideIcon } from 'lucide-react';
 import { z } from 'zod';
 
 export const APPLICATION_STATUSES = [
@@ -51,4 +52,15 @@ export const applicationTransitionLabels: Record<ApplicationStatus, string> = {
   Canceled: 'Cancelar',
   Error: 'Marcar erro',
   Finished: 'Concluir'
+};
+
+export const applicationTransitionIcons: Record<ApplicationStatus, LucideIcon> = {
+  Pending: RotateCcw,
+  Processing: PlayCircle,
+  Approved: CheckCircle2,
+  Rejected: XCircle,
+  Canceled: Ban,
+  Finished: Flag,
+  Timeout: Ban,
+  Error: Ban
 };

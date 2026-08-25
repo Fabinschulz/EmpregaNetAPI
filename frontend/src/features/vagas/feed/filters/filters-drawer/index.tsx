@@ -1,9 +1,8 @@
 'use client';
 
-import { Button } from '@/shared/components';
+import { actionIcons, Button, IconButton } from '@/shared/components';
 import type { JobVocabularyResponse } from '@/features/vagas/service';
 import * as Dialog from '@radix-ui/react-dialog';
-import { SlidersHorizontal, X } from 'lucide-react';
 import { useState } from 'react';
 import { FeedFiltersForm } from '../filters-form';
 import styles from '../filters.module.scss';
@@ -25,7 +24,7 @@ export function FeedFiltersDrawer({ controller, vocabulary, totalItems }: FeedFi
     <Dialog.Root open={open} onOpenChange={setOpen}>
       <Dialog.Trigger asChild>
         <Button type="button" variant="outline" size="sm" className={styles.drawerTrigger}>
-          <SlidersHorizontal aria-hidden />
+          <actionIcons.filter aria-hidden />
           Todos os filtros
           {activeCount > 0 ? <span className={styles.drawerCount}>{activeCount}</span> : null}
         </Button>
@@ -49,9 +48,7 @@ export function FeedFiltersDrawer({ controller, vocabulary, totalItems }: FeedFi
             </div>
 
             <Dialog.Close asChild>
-              <Button type="button" variant="ghost" size="icon" aria-label="Fechar filtros">
-                <X aria-hidden />
-              </Button>
+              <IconButton icon={actionIcons.close} label="Fechar filtros" showTooltip={false} />
             </Dialog.Close>
           </div>
 
@@ -68,6 +65,7 @@ export function FeedFiltersDrawer({ controller, vocabulary, totalItems }: FeedFi
               type="button"
               variant="outline"
               className={styles.drawerClear}
+              startIcon={actionIcons.clearFilters}
               onClick={clearAll}
               disabled={activeCount === 0}
             >
@@ -75,7 +73,7 @@ export function FeedFiltersDrawer({ controller, vocabulary, totalItems }: FeedFi
             </Button>
 
             <Dialog.Close asChild>
-              <Button type="button" variant="primary" className={styles.drawerSubmit}>
+              <Button type="button" variant="primary" className={styles.drawerSubmit} startIcon={actionIcons.confirm}>
                 Ver {resultLabel}
               </Button>
             </Dialog.Close>
