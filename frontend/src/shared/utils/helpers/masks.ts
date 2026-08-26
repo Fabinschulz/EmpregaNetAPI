@@ -47,3 +47,57 @@ export function isValidBrazilCellPhone(value: string | null | undefined): boolea
   const d = onlyDigits(value);
   return d.length === 11 && isValidBrazilPhone(d);
 }
+
+/** Quantidade de dígitos de um CPF. */
+const CPF_LENGTH = 11;
+
+/** Aplica a máscara de CPF conforme o usuário digita: `000.000.000-00`. */
+export function maskCpf(value: string | null | undefined): string {
+  const d = onlyDigits(value).slice(0, CPF_LENGTH);
+  if (d.length <= 3) return d;
+  if (d.length <= 6) return `${d.slice(0, 3)}.${d.slice(3)}`;
+  if (d.length <= 9) return `${d.slice(0, 3)}.${d.slice(3, 6)}.${d.slice(6)}`;
+  return `${d.slice(0, 3)}.${d.slice(3, 6)}.${d.slice(6, 9)}-${d.slice(9)}`;
+}
+
+/**
+ * Valida um CPF pelos dígitos verificadores, espelhando `BrazilianDocument.IsValidCpf` do backend.
+ *
+ * Conferir o comprimento não bastaria: `111.111.111-11` satisfaz a aritmética do módulo 11, por isso
+ * a sequência de dígitos repetidos é recusada explicitamente — igual à guarda do backend.
+ */
+export function isValidCpf(value: string | null | undefined): boolean {
+  const d = onlyDigits(value);
+  if (d.length !== CPF_LENGTH) return false;
+  if (/^(\d)\1+$/.test(d)) return false;
+
+  const checkDigit = (length: number): number => {
+    let sum = 0;
+    for (let i = 0; i < length; i += 1) {
+      sum += Number(d[i]) * (length + 1 - i);
+    }
+    const remainder = (sum * 10) % 11;
+    return remainder === 10 ? 0 : remainder;
+  };
+
+  return Number(d[9]) === checkDigit(9) && Number(d[10]) === checkDigit(10);
+}
+
+/** Forma de e-mail: um único `@`, com conteúdo dos dois lados e sem espaços. */
+export function isEmailShaped(value: string | null | undefined): boolean {
+  const text = (value ?? '').trim();
+  const at = text.indexOf('@');
+  return at > 0 && at === text.lastIndexOf('@') && at < text.length - 1 && !/\s/.test(text);
+}
+
+/**
+ * Identificador aceito no login: CPF **ou** e-mail, nunca nome de usuário.
+ *
+ * O critério é o mesmo do `LoginUserCommandValidator` do backend — a presença de `@` decide qual das
+ * duas regras se aplica — para que a mensagem de erro apareça no formulário e não só na resposta HTTP.
+ */
+export function isValidLoginIdentifier(value: string | null | undefined): boolean {
+  const text = (value ?? '').trim();
+  if (text.length === 0) return false;
+  return text.includes('@') ? isEmailShaped(text) : isValidCpf(text);
+}

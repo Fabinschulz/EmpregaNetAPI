@@ -105,12 +105,33 @@ public static class BrazilianDocument
         return $"{cnpj[..2]}.{cnpj[2..5]}.{cnpj[5..8]}/{cnpj[8..12]}-{cnpj[12..]}";
     }
 
+    /// <summary>Quantidade de dígitos de um CPF.</summary>
+    public const int CpfLength = 11;
+
+    /// <summary>
+    /// Forma canónica do CPF: apenas dígitos, sem máscara.
+    /// </summary>
+    public static string NormalizeCpf(string? value) => OnlyDigits(value);
+
+    /// <summary>Aplica a máscara <c>000.000.000-00</c>; devolve o valor original se não tiver 11 dígitos.</summary>
+    public static string FormatCpf(string? value)
+    {
+        var cpf = NormalizeCpf(value);
+
+        if (cpf.Length != CpfLength)
+        {
+            return value?.Trim() ?? string.Empty;
+        }
+
+        return $"{cpf[..3]}.{cpf[3..6]}.{cpf[6..9]}-{cpf[9..]}";
+    }
+
     /// <summary>Valida um CPF, aceitando máscara. CPF permanece exclusivamente numérico.</summary>
     public static bool IsValidCpf(string? value)
     {
-        var digits = OnlyDigits(value);
+        var digits = NormalizeCpf(value);
 
-        if (digits.Length != 11 || AllCharactersEqual(digits))
+        if (digits.Length != CpfLength || AllCharactersEqual(digits))
         {
             return false;
         }

@@ -52,6 +52,7 @@ public sealed class ResetPasswordHandlerIntegrationTests : IDisposable
                 new RegisterUserCommand(
                     TestDataFactory.UniqueUsername("reset"),
                     email,
+                    TestDataFactory.UniqueCpf(),
                     AuthIntegrationTestHelper.DefaultPassword,
                     AuthIntegrationTestHelper.DefaultPassword,
                     TestDataFactory.UniqueBrazilianCell()),

@@ -99,4 +99,33 @@ public sealed class BrazilianDocumentTests
         // 111.111.111-11 produz DV 1 e 1 pelo algoritmo: é o caso que só a guarda explícita pega.
         BrazilianDocument.IsValidCpf("11111111111").Should().BeFalse();
     }
+
+    [Theory]
+    [InlineData("529.982.247-25")]
+    [InlineData("52998224725")]
+    [InlineData("  529 982 247 25  ")]
+    public void NormalizeCpf_MascarasDiferentes_DevemConvergirParaAMesmaChave(string cpf)
+    {
+        // É o que garante que a máscara não crie um segundo utilizador com o mesmo CPF.
+        BrazilianDocument.NormalizeCpf(cpf).Should().Be("52998224725");
+    }
+
+    [Fact]
+    public void NormalizeCpf_ValorNulo_DeveDevolverVazio()
+    {
+        BrazilianDocument.NormalizeCpf(null).Should().BeEmpty();
+    }
+
+    [Fact]
+    public void FormatCpf_OnzeDigitos_DeveAplicarMascara()
+    {
+        BrazilianDocument.FormatCpf("52998224725").Should().Be("529.982.247-25");
+    }
+
+    [Fact]
+    public void FormatCpf_ComprimentoInesperado_DeveDevolverOValorOriginal()
+    {
+        // Não inventa máscara sobre dado incompleto: devolver o original deixa o defeito visível.
+        BrazilianDocument.FormatCpf(" 12345 ").Should().Be("12345");
+    }
 }

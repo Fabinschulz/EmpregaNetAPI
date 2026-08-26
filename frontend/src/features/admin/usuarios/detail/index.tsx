@@ -15,7 +15,7 @@ import {
   entityInitials
 } from '@/shared/components';
 import { FormProvider } from '@/shared/context';
-import { formatDateTime, roleLabel, userTypeLabel } from '@/shared/utils';
+import { formatDateTime, maskCpf, roleLabel, userTypeLabel } from '@/shared/utils';
 import { useParams } from 'next/navigation';
 import { useMemo, type ReactNode } from 'react';
 import { useAdminUserQuery, useUpdateAdminUserMutation } from '../service';
@@ -100,6 +100,7 @@ export function AdminUserDetailPage() {
               <CardContent>
                 <dl className={styles.meta}>
                   <MetaItem label="ID" value={user.id} />
+                  <MetaItem label="CPF" value={user.cpf ? maskCpf(user.cpf) : '-'} />
                   <MetaItem label="Telefone" value={user.phoneNumber?.trim() ? user.phoneNumber : '-'} />
                   <MetaItem label="Criado em" value={formatDateTime(user.createdAt)} />
                   <MetaItem label="Atualizado em" value={formatDateTime(user.updatedAt)} />

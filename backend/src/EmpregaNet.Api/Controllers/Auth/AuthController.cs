@@ -22,7 +22,7 @@ public class AuthController : ControllerBase
         _authCookies = authCookies;
     }
 
-    /// <summary>Registra um novo usuário com nome de usuário, e-mail e senha.</summary>
+    /// <summary>Registra um novo usuário com nome de usuário, e-mail, CPF e senha.</summary>
     [HttpPost("register")]
     [ProducesResponseType(typeof(string), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(DomainError))]

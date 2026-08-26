@@ -2,6 +2,7 @@
 
 import {
   actionIcons,
+  CpfField,
   FormSubmitButton,
   InputField,
   StandalonePageFormActions,
@@ -13,6 +14,7 @@ export function RegisterFormFields() {
     <StandalonePageFormGrid>
       <InputField name="username" label="Nome de usuário" autoComplete="username" required />
       <InputField name="email" label="E-mail" type="email" autoComplete="email" required />
+      <CpfField name="cpf" label="CPF" required hint="Também serve para entrar na sua conta." />
       <InputField name="password" label="Senha" type="password" autoComplete="new-password" required />
       <InputField
         name="passwordConfirmation"

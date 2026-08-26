@@ -65,6 +65,7 @@ public sealed class ResendEmailConfirmationHandlerIntegrationTests : IDisposable
                 new RegisterUserCommand(
                     TestDataFactory.UniqueUsername("resend_pend"),
                     email,
+                    TestDataFactory.UniqueCpf(),
                     AuthIntegrationTestHelper.DefaultPassword,
                     AuthIntegrationTestHelper.DefaultPassword,
                     TestDataFactory.UniqueBrazilianCell()),

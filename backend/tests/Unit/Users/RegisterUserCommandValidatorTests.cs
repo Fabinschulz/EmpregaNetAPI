@@ -80,6 +80,39 @@ public sealed class RegisterUserCommandValidatorTests
         result.IsValid.Should().BeTrue();
     }
 
+    [Theory]
+    [InlineData("52998224725", "sem máscara")]
+    [InlineData("529.982.247-25", "com máscara")]
+    public void Validate_CpfValido_DevePassarComOuSemMascara(string cpf, string forma)
+    {
+        // Arrange
+        var cmd = CreateValidCommand() with { Cpf = cpf };
+
+        // Act
+        var result = _sut.Validate(cmd);
+
+        // Assert
+        result.IsValid.Should().BeTrue(forma);
+    }
+
+    [Theory]
+    [InlineData("52998224726", "dígito verificador errado")]
+    [InlineData("1234567890", "10 dígitos")]
+    [InlineData("11111111111", "dígitos repetidos")]
+    [InlineData("", "vazio")]
+    public void Validate_CpfInvalido_DeveFalhar(string cpf, string motivo)
+    {
+        // Arrange
+        var cmd = CreateValidCommand() with { Cpf = cpf };
+
+        // Act
+        var result = _sut.Validate(cmd);
+
+        // Assert
+        result.IsValid.Should().BeFalse(motivo);
+        result.Errors.Should().Contain(e => e.PropertyName == nameof(RegisterUserCommand.Cpf));
+    }
+
     [Fact]
     public void Validate_TelefoneVazio_DeveIgnorarRegraDeCelularEPassar()
     {
@@ -97,6 +130,7 @@ public sealed class RegisterUserCommandValidatorTests
         new(
             Username: "candidato1",
             Email: "candidato@test.local",
+            Cpf: "52998224725",
             Password: "Abcd@123",
             PasswordConfirmation: "Abcd@123",
             PhoneNumber: null);

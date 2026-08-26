@@ -1,14 +1,19 @@
 using EmpregaNet.Application.Auth.ViewModel;
 using EmpregaNet.Application.Common.Exceptions;
 using EmpregaNet.Application.Abstraction;
+using EmpregaNet.Application.Utils.CustomValidation;
 using EmpregaNet.Domain.Entities;
 using EmpregaNet.Domain.Enums;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace EmpregaNet.Application.Auth.Commands;
 
-public sealed record LoginUserCommand(string Login, string Password) : IRequest<UserLoggedViewModel>;
+/// <summary>
+/// Autenticação por senha. <paramref name="Identifier"/> aceita <b>CPF ou e-mail</b>.
+/// </summary>
+public sealed record LoginUserCommand(string Identifier, string Password) : IRequest<UserLoggedViewModel>;
 
 public sealed class LoginUserHandler : IRequestHandler<LoginUserCommand, UserLoggedViewModel>
 {
@@ -34,22 +39,14 @@ public sealed class LoginUserHandler : IRequestHandler<LoginUserCommand, UserLog
 
     public async Task<UserLoggedViewModel> Handle(LoginUserCommand request, CancellationToken cancellationToken)
     {
-        User? user;
-        if (request.Login.Contains('@'))
-        {
-            user = await _userManager.FindByEmailAsync(request.Login);
-        }
-        else
-        {
-            user = await _userManager.FindByNameAsync(request.Login);
-        }
+        var user = await FindByIdentifierAsync(request.Identifier, cancellationToken);
 
         if (user is null || user.IsDeleted)
         {
             _logger.LogWarning("Tentativa de login para conta inexistente ou excluída.");
 
             throw new ValidationAppException(
-                nameof(request.Login),
+                nameof(request.Identifier),
                 "Usuário e/ou senha inválidos.",
                 DomainErrorEnum.INVALID_PASSWORD);
         }
@@ -60,7 +57,7 @@ public sealed class LoginUserHandler : IRequestHandler<LoginUserCommand, UserLog
             _logger.LogWarning("Login bloqueado por lockout para o usuário {UserId}.", user.Id);
 
             throw new ValidationAppException(
-                nameof(request.Login),
+                nameof(request.Identifier),
                 "Conta temporariamente bloqueada por tentativas falhadas. Tente novamente mais tarde.",
                 DomainErrorEnum.INVALID_ACTION_FOR_STATUS);
         }
@@ -70,7 +67,7 @@ public sealed class LoginUserHandler : IRequestHandler<LoginUserCommand, UserLog
             _logger.LogWarning("Login exigiu segundo fator, não suportado, para o usuário {UserId}.", user.Id);
 
             throw new ValidationAppException(
-                nameof(request.Login),
+                nameof(request.Identifier),
                 "Esta conta requer autenticação em dois passos; contacte o suporte.",
                 DomainErrorEnum.UNSUPPORTED_OPERATION);
         }
@@ -80,7 +77,7 @@ public sealed class LoginUserHandler : IRequestHandler<LoginUserCommand, UserLog
             _logger.LogWarning("Login não permitido (e-mail não confirmado) para o usuário {UserId}.", user.Id);
 
             throw new ValidationAppException(
-                nameof(request.Login),
+                nameof(request.Identifier),
                 "Confirme o seu e-mail antes de iniciar sessão. Verifique a caixa de entrada ou solicite um novo link de confirmação.",
                 DomainErrorEnum.INVALID_ACTION_FOR_RECORD);
         }
@@ -100,5 +97,25 @@ public sealed class LoginUserHandler : IRequestHandler<LoginUserCommand, UserLog
         var vm = await _jwtBuilder.BuildUserTokenAsync(user);
         vm.RefreshToken = await _refreshTokens.IssueAsync(user.Id, cancellationToken);
         return vm;
+    }
+
+    /// <summary>
+    /// Decide entre CPF e e-mail pelo formato do valor e devolve o utilizador correspondente.
+    /// </summary>
+    private async Task<User?> FindByIdentifierAsync(string identifier, CancellationToken cancellationToken)
+    {
+        var candidate = identifier.Trim();
+        var cpf = BrazilianDocument.NormalizeCpf(candidate);
+
+        if (cpf.Length == BrazilianDocument.CpfLength)
+        {
+            return BrazilianDocument.IsValidCpf(cpf)
+                ? await _userManager.Users.FirstOrDefaultAsync(u => u.Cpf == cpf, cancellationToken)
+                : null;
+        }
+
+        return candidate.Contains('@')
+            ? await _userManager.FindByEmailAsync(candidate)
+            : null;
     }
 }

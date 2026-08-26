@@ -36,6 +36,7 @@ public sealed class RegisterUserRoleIntegrationTests
             new RegisterUserCommand(
                 username,
                 email,
+                TestDataFactory.UniqueCpf(),
                 AuthIntegrationTestHelper.DefaultPassword,
                 AuthIntegrationTestHelper.DefaultPassword,
                 TestDataFactory.UniqueBrazilianCell()),

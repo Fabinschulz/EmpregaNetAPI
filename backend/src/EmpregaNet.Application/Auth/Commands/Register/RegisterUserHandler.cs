@@ -2,11 +2,13 @@ using EmpregaNet.Application.Auth.Configuration;
 using EmpregaNet.Application.Common.Exceptions;
 using EmpregaNet.Application.Abstraction;
 using EmpregaNet.Application.Users.Identity;
+using EmpregaNet.Application.Utils.CustomValidation;
 using EmpregaNet.Domain.Entities;
 using EmpregaNet.Domain.Enums;
 using EmpregaNet.Domain.Interfaces;
 using FluentValidation;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -28,6 +30,7 @@ namespace EmpregaNet.Application.Auth.Commands;
 public sealed record RegisterUserCommand(
     string Username,
     string Email,
+    string Cpf,
     string Password,
     string PasswordConfirmation,
     string? PhoneNumber
@@ -86,10 +89,22 @@ public sealed class RegisterUserHandler : IRequestHandler<RegisterUserCommand, l
                 DomainErrorEnum.RESOURCE_ALREADY_EXISTS);
         }
 
+        var cpf = BrazilianDocument.NormalizeCpf(request.Cpf);
+        var existingByCpf = await _userManager.Users.AnyAsync(u => u.Cpf == cpf, cancellationToken);
+        if (existingByCpf)
+        {
+            _logger.LogWarning("Registo recusado: o CPF informado já está associado a uma conta.");
+
+            throw ValidationAppException.ForBusinessRule(
+                "Não foi possível concluir o cadastro com os dados informados. Entre em contato com o suporte.",
+                DomainErrorEnum.RESOURCE_CREATION_FAILED);
+        }
+
         var user = new User
         {
             UserName = request.Username,
             Email = request.Email,
+            Cpf = cpf,
             PhoneNumber = request.PhoneNumber,
             UserType = UserTypeEnum.Candidate
         };

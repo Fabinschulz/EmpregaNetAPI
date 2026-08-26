@@ -49,6 +49,7 @@ public sealed class ConfirmEmailHandlerIntegrationTests : IDisposable
                 new RegisterUserCommand(
                     TestDataFactory.UniqueUsername("ce_bad"),
                     email,
+                    TestDataFactory.UniqueCpf(),
                     AuthIntegrationTestHelper.DefaultPassword,
                     AuthIntegrationTestHelper.DefaultPassword,
                     TestDataFactory.UniqueBrazilianCell()),
@@ -77,6 +78,7 @@ public sealed class ConfirmEmailHandlerIntegrationTests : IDisposable
                 new RegisterUserCommand(
                     TestDataFactory.UniqueUsername("ce_ok"),
                     email,
+                    TestDataFactory.UniqueCpf(),
                     AuthIntegrationTestHelper.DefaultPassword,
                     AuthIntegrationTestHelper.DefaultPassword,
                     TestDataFactory.UniqueBrazilianCell()),

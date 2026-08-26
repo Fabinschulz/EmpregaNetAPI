@@ -1,23 +1,23 @@
 'use client';
 
 import {
-  Alert,
-  ApiQueryBoundary,
-  Badge,
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-  FormFieldsSkeleton,
-  PageHeader
+    Alert,
+    ApiQueryBoundary,
+    Badge,
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
+    FormFieldsSkeleton,
+    PageHeader
 } from '@/shared/components';
 import { FormProvider } from '@/shared/context';
 import { roleLabel } from '@/shared/utils';
-import { useMeQuery, useUpdateMyProfileMutation } from '../service';
-import { profileFormSchema, profileFormValuesFromResponse, type ProfileFormValues } from './profile-form-schema';
 import styles from '../conta.module.scss';
+import { useMeQuery, useUpdateMyProfileMutation } from '../service';
 import { ProfileFormFields } from './profile-form-fields';
+import { profileFormSchema, profileFormValuesFromResponse, type ProfileFormValues } from './profile-form-schema';
 
 export function ProfilePage() {
   const { data: user, isPending, isError, error, refetch } = useMeQuery();

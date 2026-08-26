@@ -16,6 +16,11 @@ public sealed class RegisterUserCommandValidator : AbstractValidator<RegisterUse
             .NotEmpty().WithMessage("E-mail é obrigatório.")
             .EmailAddress().WithMessage("E-mail inválido.");
 
+        RuleFor(x => x.Cpf)
+            .Cascade(CascadeMode.Stop)
+            .NotEmpty().WithMessage("CPF é obrigatório.")
+            .IsCpf();
+
         RuleFor(x => x.Password).ApplyNewPassword();
 
         RuleFor(x => x.PasswordConfirmation)

@@ -9,6 +9,10 @@ public sealed class UserViewModel
     public long Id { get; set; }
     public string Username { get; set; } = string.Empty;
     public string Email { get; set; } = string.Empty;
+
+    /// <summary>CPF sem máscara; nulo em contas criadas antes de o campo existir. A formatação é da apresentação.</summary>
+    public string? Cpf { get; set; }
+
     public string? PhoneNumber { get; set; }
     public required string UserType { get; set; }
     public IReadOnlyList<string> Roles { get; set; } = [];
@@ -27,6 +31,7 @@ public static class UserMapper
             Id = user.Id,
             Username = user.UserName ?? string.Empty,
             Email = user.Email ?? string.Empty,
+            Cpf = user.Cpf,
             PhoneNumber = user.PhoneNumber,
             UserType = user.UserType.ToDescription(),
             CreatedAt = user.CreatedAt,

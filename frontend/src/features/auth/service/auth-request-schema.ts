@@ -1,8 +1,9 @@
 import { existingPasswordSchema, newPasswordSchema } from '@/shared/auth/password-schema';
+import { isValidCpf, isValidLoginIdentifier } from '@/shared/utils';
 import { z } from 'zod';
 
 export const loginRequestSchema = z.object({
-  login: z.email({ message: 'E-mail inválido.' }),
+  identifier: z.string().trim().refine(isValidLoginIdentifier, { message: 'Informe um CPF ou e-mail válido.' }),
   password: existingPasswordSchema
 });
 
@@ -13,6 +14,7 @@ export const registerRequestSchema = z.object({
     .min(3, { message: 'O nome de usuário deve ter pelo menos 3 caracteres.' })
     .max(100, { message: 'O nome de usuário deve ter no máximo 100 caracteres.' }),
   email: z.email({ message: 'E-mail inválido.' }),
+  cpf: z.string().trim().refine(isValidCpf, { message: 'CPF inválido.' }),
   password: newPasswordSchema,
   passwordConfirmation: z.string().min(1),
   phoneNumber: z.string().nullable().optional()

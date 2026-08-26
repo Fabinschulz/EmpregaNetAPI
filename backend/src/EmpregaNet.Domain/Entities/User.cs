@@ -16,8 +16,11 @@ namespace EmpregaNet.Domain.Entities
         public DateTimeOffset? BirthDate { get; set; }
         public ICollection<JobApplication> Applications { get; set; } = new List<JobApplication>();
         public CivilStatusEnum CivilStatus { get; set; }
+
+        /// <summary>CPF em forma canónica (11 dígitos, sem máscara); nulo em contas criadas antes da sua exigência.</summary>
+        public string? Cpf { get; set; }
         public GenderEnum? Gender { get; set; }
-        public UserTypeEnum UserType { get; set; } = UserTypeEnum.Candidate; // converter para Roles depois
+        public UserTypeEnum UserType { get; set; } = UserTypeEnum.Candidate;
 
         /// <summary>Empresa à qual o recrutador/gestor está vinculado (admin global deixa nulo).</summary>
         public long? EmployerCompanyId { get; set; }

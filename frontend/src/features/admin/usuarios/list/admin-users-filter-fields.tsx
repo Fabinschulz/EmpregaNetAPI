@@ -58,7 +58,7 @@ export function AdminUsersFilterFields({ onChange, searchOptions, searchLoading 
         <AutocompleteField
           name="search"
           label="Buscar"
-          placeholder="Nome ou e-mail"
+          placeholder="Nome, e-mail ou CPF"
           options={searchOptions}
           loading={searchLoading}
         />

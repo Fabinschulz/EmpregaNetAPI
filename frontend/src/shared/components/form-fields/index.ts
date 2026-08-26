@@ -1,4 +1,5 @@
 export * from './autocomplete';
+export * from './cpf';
 export * from './field';
 export * from './input';
 export * from './multi-select';

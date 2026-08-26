@@ -36,6 +36,12 @@ namespace EmpregaNet.Infra.Persistence.Repositories
                    .IsUnique()
                    .HasDatabaseName("IX_Users_PhoneNumber");
 
+            builder.Property(x => x.Cpf).HasMaxLength(11);
+
+            builder.HasIndex(x => x.Cpf)
+                   .IsUnique()
+                   .HasDatabaseName("IX_Users_Cpf");
+
             builder.HasIndex(x => x.Id)
                    .HasDatabaseName("IX_Users_Id");
 

@@ -1,29 +1,29 @@
 'use client';
 
 import {
-    actionIcons,
-    ApiQueryBoundary,
-    ConfirmDialog,
-    FilterSection,
-    PageHeader,
-    StatusBadge,
-    TableContainer,
-    useRowDeleteAction,
-    type DataTableColumn,
-    type RowAction
+  actionIcons,
+  ApiQueryBoundary,
+  ConfirmDialog,
+  FilterSection,
+  PageHeader,
+  StatusBadge,
+  TableContainer,
+  useRowDeleteAction,
+  type DataTableColumn,
+  type RowAction
 } from '@/shared/components';
 import { FormProvider } from '@/shared/context';
 import { useListRefresh, usePersistedTablePagination } from '@/shared/hooks';
 import { type AdminUsersListQueryParams, type UserResponse } from '@/shared/schema';
-import { formatDate, userTypeLabel } from '@/shared/utils';
+import { formatDate, maskCpf, userTypeLabel } from '@/shared/utils';
 import { useCallback, useMemo, useState } from 'react';
 import { adminUsersRoutes } from '../admin-users-routes';
 import { useAdminUsersListQuery, useDeleteAdminUserMutation } from '../service';
 import { AdminUsersFilterFields } from './admin-users-filter-fields';
 import {
-    adminUsersFilterFormSchema,
-    adminUsersFilterToParams,
-    defaultAdminUsersFilter
+  adminUsersFilterFormSchema,
+  adminUsersFilterToParams,
+  defaultAdminUsersFilter
 } from './admin-users-filter-schema';
 
 type AdminUsersFilterParams = Pick<AdminUsersListQueryParams, 'search' | 'isDeleted' | 'orderBy'>;
@@ -72,6 +72,7 @@ export function AdminUsersPage() {
     () => [
       { key: 'username', header: 'Usuário', render: (user) => <strong>{user.username}</strong> },
       { key: 'email', header: 'E-mail', render: (user) => user.email },
+      { key: 'cpf', header: 'CPF', render: (user) => (user.cpf ? maskCpf(user.cpf) : '-') },
       { key: 'userType', header: 'Tipo', render: (user) => userTypeLabel(user.userType) },
       {
         key: 'situation',
@@ -123,7 +124,7 @@ export function AdminUsersPage() {
           emptyTitle="Nenhum usuário"
           emptyMessage="Nenhum usuário encontrado para os filtros informados."
           filters={
-            <FilterSection title="Buscar usuários" description="Filtre por nome/e-mail, situação e ordenação.">
+            <FilterSection title="Buscar usuários" description="Filtre por nome/e-mail/CPF, situação e ordenação.">
               <FormProvider
                 validationSchema={adminUsersFilterFormSchema}
                 defaultValues={defaultAdminUsersFilter}

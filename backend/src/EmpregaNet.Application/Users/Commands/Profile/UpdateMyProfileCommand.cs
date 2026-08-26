@@ -8,7 +8,9 @@ using Microsoft.Extensions.Logging;
 
 namespace EmpregaNet.Application.Users.Commands;
 
-/// <summary>Dados que o próprio usuário pode alterar (sem mudar tipo/perfil administrativo).</summary>
+/// <summary>
+/// Dados que o próprio usuário pode alterar (sem mudar tipo/perfil administrativo).
+/// </summary>
 public sealed record UpdateMyProfileCommand(
     string? Email,
     string? Username,
@@ -128,4 +130,5 @@ public sealed class UpdateMyProfileHandler : IRequestHandler<UpdateMyProfileComm
             }
         }
     }
+
 }
