@@ -74,4 +74,4 @@ Anti-padrões ao escrever um agent:
 
 - **Idioma:** respostas e artefactos em português (Brasil); identificadores de código em inglês.
 - **Modelo:** `inherit` por omissão, para respeitar a escolha do utilizador. Fixar um modelo só com motivo (o `e2e-qa-engineer` usa `sonnet` por ser execução longa e mecânica).
-- **Ao adicionar um agent:** criar em `.claude/agents/`, seguir o padrão acima, e acrescentar linha na tabela deste índice, na de [`../skills/README.md`](../skills/README.md) se houver skill associada, na tabela de roteamento do `meta-agent` e no [`CLAUDE.md`](../../CLAUDE.md).
+- **Ao adicionar um agent:** criar em `.claude/agents/`, seguir o padrão acima, e acrescentar linha na tabela deste índice, na de [`../skills/README.md`](../skills/README.md) se houver skill associada, na tabela de roteamento do `meta-agent` e no [`CLAUDE.md`](../../.claude/CLAUDE.md).

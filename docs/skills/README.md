@@ -55,4 +55,4 @@ Regras:
 - Não declarar como existente uma ferramenta que não está instalada (ex.: Jest, Playwright).
 
 **Ao adicionar uma skill:** criar em `.claude/skills/<nome>/SKILL.md`, seguir o padrão, e acrescentar linha
-neste índice, na tabela de roteamento do `meta-agent` e no [`CLAUDE.md`](../../CLAUDE.md).
+neste índice, na tabela de roteamento do `meta-agent` e no [`CLAUDE.md`](../../.claude/CLAUDE.md).

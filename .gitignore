@@ -22,3 +22,5 @@ yarn.lock
 Thumbs.db
 *.log
 tsconfig.tsbuildinfo
+
+.claude/worktrees/

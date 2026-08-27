@@ -161,7 +161,7 @@ Os prompts em `.claude/agents/` são **perfis cognitivos** especializados. Use-o
 | Performance com números ou suspeita forte | `performance-optimizer` |
 | Pedido vago ou multi-domínio | `meta-agent` |
 
-O ficheiro [`CLAUDE.md`](../../CLAUDE.md) na raiz garante que este SDD e as skills façam parte do contexto em sessões de edição.
+O ficheiro [`CLAUDE.md`](../../.claude/CLAUDE.md) (em `.claude/`, na raiz) garante que este SDD e as skills façam parte do contexto em sessões de edição.
 
 Índice geral dos documentos desta pasta: [`../README.md`](../README.md).
 
@@ -190,7 +190,7 @@ O ficheiro [`CLAUDE.md`](../../CLAUDE.md) na raiz garante que este SDD e as skil
 | Recurso | Path |
 | --------- | ------ |
 | Índice `docs/` (mapa repo + comandos) | [`../README.md`](../README.md) |
-| Contexto sempre aplicável | [`CLAUDE.md`](../../CLAUDE.md) (raiz do repositório) |
+| Contexto sempre aplicável | [`CLAUDE.md`](../../.claude/CLAUDE.md) (`.claude/`, raiz do repositório) |
 | Guia de onboarding (arquitectura, setup, fluxos) | [`README.md`](../../README.md) (raiz do repositório) |
 | Agentes | `.claude/agents/*.md` (índice em `docs/agents/README.md`) |
 | Skills | `.claude/skills/*/SKILL.md` (índice em `docs/skills/README.md`) |

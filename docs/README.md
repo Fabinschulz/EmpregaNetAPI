@@ -1,6 +1,6 @@
 # Documentação EmpregaNet (`docs/`)
 
-Índice **canónico** para IA e equipe alinharem ao produto neste monorepo. O contexto sempre aplicável está em [`../CLAUDE.md`](../CLAUDE.md), na raiz do repositório.
+Índice **canónico** para IA e equipe alinharem ao produto neste monorepo. O contexto sempre aplicável está em [`../.claude/CLAUDE.md`](../.claude/CLAUDE.md), na raiz do repositório.
 
 > O guia de onboarding completo (arquitectura, diagramas, fluxos, setup, convenções) é o [`README.md`](../README.md) da raiz. Esta pasta cobre **processo** (SDD, ADRs, agentes, skills).
 
