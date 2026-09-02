@@ -68,7 +68,15 @@ public sealed class ChangeJobApplicationStatusCommandHandler :
                 DomainErrorEnum.INVALID_PARAMS);
         }
 
-        application.ChangeStatus(newStatus);
+        try
+        {
+            application.ChangeStatus(newStatus);
+        }
+        catch (InvalidOperationException ex)
+        {
+            throw ValidationAppException.ForBusinessRule(ex.Message, DomainErrorEnum.INVALID_ACTION_FOR_STATUS);
+        }
+
         await _jobApplicationRepository.UpdateAsync(application, cancellationToken);
 
 

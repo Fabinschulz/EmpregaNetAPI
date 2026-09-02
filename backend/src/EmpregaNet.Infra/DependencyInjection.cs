@@ -41,8 +41,9 @@ public static class DependencyInjection
 
         if (smtp.Enabled && !string.IsNullOrWhiteSpace(smtp.Host) && !string.IsNullOrWhiteSpace(smtp.FromEmail))
             builder.Services.AddTransient<IEmailSender, SmtpEmailSender>();
+        else if (builder.Environment.IsDevelopment())
+            builder.Services.AddTransient<IEmailSender, DevelopmentLogEmailSender>();
         else
-            //OBS: Em desenvolvimento, ou se Smtp:Enabled=false, usa um no-op para evitar erros de configuração.
             builder.Services.AddTransient<IEmailSender, NoOpEmailSender>();
 
         builder.Services.AddScoped<IGoogleIdTokenValidator, GoogleIdTokenValidator>();

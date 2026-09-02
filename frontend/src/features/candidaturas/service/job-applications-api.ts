@@ -1,21 +1,21 @@
 import { axiosApi, createAxiosConfig } from '@/shared/api';
 import {
-  createdIdResponseSchema,
-  type CreatedId,
-  type JobApplicationsAdminListQueryParams,
-  type JobApplicationsListQueryParams
+    createdIdResponseSchema,
+    type CreatedId,
+    type JobApplicationsAdminListQueryParams,
+    type JobApplicationsListQueryParams
 } from '@/shared/schema';
 import {
-  applyToJobRequestSchema,
-  changeApplicationStatusRequestSchema,
-  type ApplyToJobRequest,
-  type ChangeApplicationStatusRequest
+    applyToJobRequestSchema,
+    changeApplicationStatusRequestSchema,
+    type ApplyToJobRequest,
+    type ChangeApplicationStatusRequest
 } from './job-applications-request-schema';
 import {
-  jobApplicationResponseSchema,
-  jobApplicationsListResponseSchema,
-  type JobApplicationResponse,
-  type JobApplicationsListResponse
+    jobApplicationResponseSchema,
+    jobApplicationsListResponseSchema,
+    type JobApplicationResponse,
+    type JobApplicationsListResponse
 } from './job-applications-response-schema';
 
 export async function applyToJob(request: ApplyToJobRequest): Promise<CreatedId> {
@@ -53,4 +53,9 @@ export async function changeStatus(
 
 export async function deleteApplication(id: number): Promise<void> {
   await axiosApi.delete(`/api/jobapplications/${id}`, createAxiosConfig());
+}
+
+export async function cancelJobApplication(id: number): Promise<JobApplicationResponse> {
+  const res = await axiosApi.put<unknown>(`/api/jobapplications/${id}/cancel`, undefined, createAxiosConfig());
+  return jobApplicationResponseSchema.parse(res.data);
 }

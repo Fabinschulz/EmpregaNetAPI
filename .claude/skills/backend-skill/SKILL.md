@@ -1,6 +1,6 @@
 ---
 name: backend-skill
-description: Convenções canónicas do backend .NET do EmpregaNet — Clean Architecture (Domain/Application/Infra/Api), mediator interno EmpregaNet.Domain.Libs.Mediator (não MediatR), EF Core, FluentValidation, separação Auth vs dados do utilizador, e testes xUnit/FluentAssertions/Moq com fixture in-memory. Use ao ler, escrever ou revisar qualquer coisa em backend/src ou backend/tests, ou ao definir contratos HTTP consumidos pelo Bff/frontend. Não use para trabalho de UI (frontend-skill) nem para especificação de feature antes de código (sdd-orchestrator).
+description: Convenções canónicas do backend .NET do EmpregaNet — Clean Architecture (Domain/Application/Infra/Api), mediator interno EmpregaNet.Domain.Libs.Mediator (não MediatR), EF Core, FluentValidation, separação Auth vs dados do utilizador, YAGNI aplicado (quatro custos, custos assimétricos de contrato HTTP e migration destrutiva) e testes xUnit/FluentAssertions/Moq com fixture in-memory. Use ao ler, escrever ou revisar qualquer coisa em backend/src ou backend/tests, ao definir contratos HTTP consumidos pelo Bff/frontend, e ao decidir se uma abstracção, flag ou coluna se constrói agora ou se adia. Não use para trabalho de UI (frontend-skill) nem para especificação de feature antes de código (sdd-orchestrator).
 ---
 
 # Backend (.NET — EmpregaNet API)
@@ -44,10 +44,61 @@ antes de divergir; registar desvios pragmáticos nas *deviation notes* do `tasks
 | Princípio | Como se traduz aqui |
 | --------- | ------------------- |
 | **Domínio no centro** | Regras e invariantes no Domain; nomenclatura alinhada à linguagem de negócio. |
-| **Menos poder útil** | KISS/YAGNI: um handler por comando/query; não adicionar camadas "para o futuro". |
+| **Menos poder útil** | KISS/YAGNI: um handler por comando/query; não adicionar camadas "para o futuro" (§3.1). |
 | **SOLID / coesão** | Tipos pequenos com responsabilidade clara; DRY só quando a duplicação tiver custo real. |
 | **Testabilidade** | Handlers com colaboradores mockáveis no Unit; fluxos via Api/providers no Integration. |
 | **Fonte única de contratos** | Mudança de contrato HTTP acompanha o consumidor (Bff/front) quando o incremento assim o define. |
+
+### 3.1 YAGNI — o que não se constrói agora
+
+Critério de **Martin Fowler** ([`martinfowler.com/bliki/Yagni.html`](https://martinfowler.com/bliki/Yagni.html)),
+aplicado a este backend. **Feature presumida** é capacidade construída hoje para uma necessidade suposta
+amanhã — e YAGNI aplica-se só a isso.
+
+Quatro custos, não só o primeiro:
+
+| Custo | O que é | Sintoma aqui |
+| ----- | ------- | ------------ |
+| **Construir** | Esforço gasto na capacidade presumida | Handler, endpoint ou repositório que ninguém chama |
+| **Atraso** | O que ficou por entregar enquanto se construía a presunção | Incremento do `tasks.md` que escorregou de release |
+| **Carregar** | A complexidade extra torna **todo o resto** mais caro de mudar | Interface com uma implementação; camada que cada mudança obriga a atravessar |
+| **Reparar** | Quando a necessidade chega diferente do presumido, desfazer custa mais do que nunca ter feito | Abstracção que se torce para caber; migration de correcção |
+
+Ambos os desfechos perdem: se não for precisa, paga-se construir + carregar; se for precisa mas diferente,
+paga-se construir + carregar + reparar, e a versão errada ainda enviesa a solução certa. O custo de **carregar**
+é o que ninguém atribui à decisão que o originou.
+
+**Limite do princípio — YAGNI corta capacidade, nunca qualidade.** Fowler é explícito: cobre capacidade para
+feature presumida, **não** o esforço de manter o software fácil de modificar. Não serve para cortar testes de
+comportamento, validação de input, RBAC explícito, tratamento de erro, coesão ou nomes claros — isso é o que
+baixa o custo de mudar depois. Adiar só é barato onde há teste a proteger o comportamento e fronteira de camada
+respeitada; se faltarem, a decisão honesta é criar a rede primeiro, não construir por precaução.
+
+**Custos assimétricos — aqui adiar é mais caro que construir**, e a decisão fica registada:
+
+| Decisão | Porque adiar é caro |
+| ------- | ------------------- |
+| **Contrato HTTP** já consumido pelo Bff/frontend | Mudar depois é breaking change fora da camada dona (§7) |
+| **Migration com `rename`/`drop`** | Release é forward-only; o canário aplica e o rollback não recupera dados (§6) |
+| **Captura de dados** (auditoria, analytics, timestamps) | Dado não recolhido não se obtém retroactivamente |
+| **Autenticação, autorização e cookies** | Falha aberta em produção não se compensa depois (§7) |
+
+Fora desta lista, presunção vai para o backlog, não para o código. Casos concretos que **não** se constroem
+por antecipação: CQRS/Event Sourcing/Saga/Outbox sem requisito (§8); repositório genérico ou interface com uma
+única implementação; segundo barramento ao lado do mediator interno; parâmetro, flag ou coluna nullable "para
+o futuro"; cache sem número de base e sem política de invalidação.
+
+**Teste de decisão** — para cada peça sem consumidor hoje, uma resposta fraca basta para adiar:
+
+1. Quem consome isto hoje? "Ninguém, mas..." é feature presumida.
+2. Quanto custa acrescentar quando a necessidade chegar? Se cai na tabela acima, decidir agora com fundamento.
+3. O que esta peça torna mais caro enquanto existir? É o custo de carregar — nomeá-lo.
+4. Qual o gatilho concreto que a traz de volta? Sem gatilho nomeável, a necessidade é imaginada.
+
+Registar a recusa numa linha, no PR ou no `tasks.md`:
+
+> **Adiado:** `<capacidade>` — sem consumidor hoje; custo de adicionar depois é local a `<ficheiro/módulo>`;
+> gatilho de retorno: `<evento concreto>`.
 
 ---
 
@@ -181,6 +232,7 @@ dotnet build Bff/EmpregaNet.Bff.sln
 5. [ ] Unit tests nos handlers críticos; Integration quando tocar pipeline real (Identity, persistência).
 6. [ ] Sem referências de Domain a tipos de Infra; sem `DbContext` na Application.
 7. [ ] `dotnet build` + `dotnet test` verdes (§10).
+8. [ ] Toda abstracção, flag ou coluna introduzida tem **consumidor no mesmo diff**; o que foi adiado está registado com gatilho de retorno (§3.1).
 
 ---
 
@@ -194,6 +246,9 @@ dotnet build Bff/EmpregaNet.Bff.sln
 | Segundo barramento CQRS paralelo ao mediator interno | Duplica inconsistência |
 | `DbContext` injectado num handler da Application | Quebra a fronteira de camada |
 | Tratar `SerializeObject` como contrato HTTP | PascalCase falso; a API responde camelCase |
+| Interface com uma implementação, flag nunca alternada, coluna "para o futuro" | Custo de carregar sem consumidor (§3.1) |
+| "Já que estamos a mexer aqui, deixo preparado" | Presunção disfarçada de eficiência (§3.1) |
+| Invocar YAGNI contra teste, validação, RBAC ou tratamento de erro | Fora do âmbito do princípio: corta capacidade, não qualidade (§3.1) |
 
 ---
 
@@ -207,5 +262,6 @@ Mensagens de utilizador e logs de negócio: **português (Brasil)**. Identificad
 
 | Versão | Mudança |
 | ------ | ------- |
+| 3.1.0 | YAGNI deixa de ser uma linha de tabela e passa a critério aplicável (§3.1): quatro custos de Fowler, limite do princípio, custos assimétricos deste backend (contrato HTTP, migration destrutiva, captura de dados, autorização) e teste de decisão, com item de checklist e anti-padrões correspondentes |
 | 3.0.0 | Movida para `.claude/skills/` (passa a ser carregável); separada de comportamento (agents); acrescentados camelCase, cookie httpOnly, OData, migrations forward-only, limitação do InMemory e secção de validação com comandos reais |
 | 2.0.0 | Estrutura alinhada a skills de referência mantendo mediator interno e camadas |

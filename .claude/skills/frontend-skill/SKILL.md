@@ -1,6 +1,6 @@
 ---
 name: frontend-skill
-description: Convenções canónicas do frontend Next.js do EmpregaNet — App Router com cacheComponents, TypeScript strict sem any, SCSS Modules + Radix/ShadCN adaptado (sem Tailwind), Zod + React Hook Form, service por feature, auth por cookie httpOnly e RBAC compartilhado entre proxy e guard, componentes canónicos de loading e testes BDD com Cucumber. Use ao ler, escrever ou revisar qualquer coisa em frontend/, incluindo páginas, componentes, hooks, cliente HTTP, estilos e acessibilidade. Não use para backend .NET (backend-skill) nem para regressão pela UI real (e2e-qa-skill).
+description: Convenções canónicas do frontend Next.js do EmpregaNet — App Router com cacheComponents, TypeScript strict sem any, SCSS Modules + Radix/ShadCN adaptado (sem Tailwind), Zod + React Hook Form, service por feature, auth por cookie httpOnly e RBAC compartilhado entre proxy e guard, YAGNI aplicado (quatro custos, quando promover um componente a primitivo partilhado), componentes canónicos de loading e testes BDD com Cucumber. Use ao ler, escrever ou revisar qualquer coisa em frontend/, incluindo páginas, componentes, hooks, cliente HTTP, estilos e acessibilidade, e ao decidir se uma abstracção, variante ou primitivo se cria agora ou se adia. Não use para backend .NET (backend-skill) nem para regressão pela UI real (e2e-qa-skill).
 ---
 
 # Frontend (Next.js — monorepo EmpregaNet)
@@ -42,8 +42,60 @@ O comportamento de implementação está no agent `frontend-engineer`, que carre
 | **SRP nos componentes** | Componente faz **uma** parcela óbvia de UI; dados/efeitos vão para hooks/services. |
 | **Backend é fonte de verdade** | Não re-implementar regras densas já garantidas pela API; duplicação só para ergonomia, com paridade Zod na fronteira. |
 | **Inversão de dependência na fronteira** | Páginas/hooks chamam o `service/` da feature dona — sem `fetch`/axios disperso em componentes. |
-| **KISS/YAGNI** | Não criar `core/domain/` profundo antes de haver comportamento repetido com valor claro — mas isolá-lo **antes** da segunda duplicação real. |
+| **KISS/YAGNI** | Não criar `core/domain/` profundo antes de haver comportamento repetido com valor claro — mas isolá-lo **antes** da segunda duplicação real (§3.1). |
 | **Type safety** | TypeScript `strict`; **proibido `any`**; `unknown` + narrowing quando necessário. |
+
+### 3.1 YAGNI — o que não se constrói agora
+
+Critério de **Martin Fowler** ([`martinfowler.com/bliki/Yagni.html`](https://martinfowler.com/bliki/Yagni.html)),
+aplicado a este frontend. **Feature presumida** é capacidade construída hoje para uma necessidade suposta
+amanhã — e YAGNI aplica-se só a isso.
+
+Quatro custos, não só o primeiro:
+
+| Custo | O que é | Sintoma aqui |
+| ----- | ------- | ------------ |
+| **Construir** | Esforço gasto na capacidade presumida | Componente, hook ou variante que nenhuma tela usa |
+| **Atraso** | O que ficou por entregar enquanto se construía a presunção | Tela que escorregou porque se generalizou primeiro |
+| **Carregar** | A complexidade extra torna **todo o resto** mais caro de mudar | Prop de configuração que cada consumidor tem de entender; abstracção atravessada em toda a alteração |
+| **Reparar** | Quando a necessidade chega diferente do presumido, desfazer custa mais do que nunca ter feito | Primitivo partilhado que se torce para caber no segundo caso |
+
+Ambos os desfechos perdem: se não for precisa, paga-se construir + carregar; se for precisa mas diferente,
+paga-se construir + carregar + reparar, e a versão errada ainda enviesa a solução certa. O custo de **carregar**
+é o que ninguém atribui à decisão que o originou.
+
+**Limite do princípio — YAGNI corta capacidade, nunca qualidade.** Fowler é explícito: cobre capacidade para
+feature presumida, **não** o esforço de manter o software fácil de modificar. Não serve para cortar estados de
+carregamento/erro/vazio, acessibilidade, `strict` sem `any`, paridade Zod na fronteira ou o guard de rota —
+isso é o comportamento real da tela, não capacidade futura.
+
+**Custos assimétricos — aqui adiar é mais caro que construir:**
+
+| Decisão | Porque adiar é caro |
+| ------- | ------------------- |
+| **Schema Zod na fronteira** de um `service/` | Schema errado propaga-se por toda a feature; validar depois obriga a refazer os tipos derivados |
+| **Classificação Server vs Client** de uma página | Trocar depois arrasta a árvore de componentes e o comportamento de `cacheComponents` (§5.1) |
+| **Política de rota e RBAC** | Página sensível exposta não se compensa depois; a política é única e partilhada entre proxy e guard (§7) |
+| **Semântica e a11y da estrutura** | Retrofitar acessibilidade custa mais do que nascer correcta (§8) |
+
+Fora desta lista, presunção vai para o backlog, não para o código. Casos concretos que **não** se constroem
+por antecipação: `core/domain/` profundo antes de comportamento repetido; promover um componente a primitivo
+de `shared/` enquanto houver **um** consumidor — enquanto houver um, vive na feature dona; estado global ou
+Context antes de existir estado partilhado por mais de uma árvore; prop de configuração ou variante que
+nenhuma tela passa hoje; generalizar na primeira variação, quando são duas ocorrências concretas que ensinam
+a forma certa.
+
+**Teste de decisão** — para cada peça sem consumidor hoje, uma resposta fraca basta para adiar:
+
+1. Quem consome isto hoje? "Ninguém, mas..." é feature presumida.
+2. Quanto custa acrescentar quando a necessidade chegar? Se cai na tabela acima, decidir agora com fundamento.
+3. O que esta peça torna mais caro enquanto existir? É o custo de carregar — nomeá-lo.
+4. Qual o gatilho concreto que a traz de volta? Sem gatilho nomeável, a necessidade é imaginada.
+
+Registar a recusa numa linha, no PR ou no `tasks.md`:
+
+> **Adiado:** `<capacidade>` — sem consumidor hoje; custo de adicionar depois é local a `<ficheiro/módulo>`;
+> gatilho de retorno: `<evento concreto>`.
 
 ---
 
@@ -296,6 +348,7 @@ Se o diff tocou renderização, conferir a classificação de rota no output do 
 5. [ ] a11y: navegação por teclado, foco em overlays, `prefers-reduced-motion`.
 6. [ ] Rota nova → `isPublicPath`/`canAccessPath` actualizados; proxy e guard continuam a usar `evaluateRouteAccess`.
 7. [ ] `lint` + `test` + `build` verdes (§11); classificação de rota conferida se tocou renderização.
+8. [ ] Todo componente partilhado, prop ou variante introduzida tem **consumidor no mesmo diff**; o que foi adiado está registado com gatilho de retorno (§3.1).
 8. [ ] Cenários Cucumber criados/actualizados quando há lógica pura nova.
 
 ---
@@ -315,6 +368,9 @@ Se o diff tocou renderização, conferir a classificação de rota no output do 
 | Terceira implementação de política de rota | Proxy e guard partilham `evaluateRouteAccess` |
 | Token de auth em JS / `js-cookie` para sessão | A API já emite `httpOnly`; duplicar cria cookie fantasma |
 | `any` em TypeScript | `strict` é regra do projecto |
+| Promover a `shared/` um componente com **um** consumidor; prop ou variante que nenhuma tela passa | Custo de carregar sem consumidor (§3.1) |
+| Generalizar na primeira variação | Uma ocorrência mais uma hipótese ensina a forma errada (§3.1) |
+| Invocar YAGNI contra a11y, estados de erro, `strict` ou paridade Zod | Fora do âmbito do princípio: corta capacidade, não qualidade (§3.1) |
 | Texto de UI em português europeu | Produto é **pt-BR**, incluindo `sr-only` e mensagens de erro |
 
 ---
@@ -329,6 +385,7 @@ Copy de utilizador final em **português (Brasil)**; identificadores de código 
 
 | Versão | Mudança |
 | ------ | ------- |
+| 3.3.0 | YAGNI deixa de ser uma linha de tabela e passa a critério aplicável (§3.1): quatro custos de Fowler, limite do princípio, custos assimétricos deste frontend (schema Zod, classificação Server/Client, política de rota, a11y) e teste de decisão, com item de checklist e anti-padrões correspondentes |
 | 3.2.0 | Atomic design em `shared/components/ui` (§5.2): quatro tiers com critério objectivo, `Input` fixado como átomo, e a escada de dependência executada por `no-restricted-imports` em vez de convenção de pasta |
 | 3.1.0 | Layout canónico de formulário (§8.1): ações no `FormHeader`, grid responsivo por `FormSection`/`FormRow`/`FormCol`, com os anti-padrões correspondentes |
 | 3.0.0 | Movida para `.claude/skills/` (passa a ser carregável); resolvida a contradição sobre E2E de browser (§10) que a marcava como inexistente; acrescentados cookie httpOnly, contrato `userType`, política única de rota, secção de validação com comandos reais e anti-padrões correspondentes |

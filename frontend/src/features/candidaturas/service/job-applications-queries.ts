@@ -1,18 +1,26 @@
 'use client';
 
-import { useAuth } from '@/shared/context';
 import { jobsFeedKeys } from '@/features/vagas/service';
+import { useAuth } from '@/shared/context';
 import {
-  withDefaultListParams,
-  type JobApplicationsAdminListQueryParams,
-  type JobApplicationsListQueryParams
+    withDefaultListParams,
+    type JobApplicationsAdminListQueryParams,
+    type JobApplicationsListQueryParams
 } from '@/shared/schema';
 import { reportMutationApiError, toastSuccess } from '@/shared/utils';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
-import { applyToJob, changeStatus, deleteApplication, listAll, listByJob, listMine } from './job-applications-api';
-import { jobApplicationsKeys } from './job-applications-keys';
 import { applicationStatusLabels, type ApplicationStatus } from '../domain';
+import {
+    applyToJob,
+    cancelJobApplication,
+    changeStatus,
+    deleteApplication,
+    listAll,
+    listByJob,
+    listMine
+} from './job-applications-api';
+import { jobApplicationsKeys } from './job-applications-keys';
 
 export function useMyJobApplicationsQuery(params?: JobApplicationsListQueryParams) {
   const { isAuthenticated } = useAuth();
@@ -80,6 +88,25 @@ export function useApplyToJobMutation(jobId: number) {
     },
     onError: (err) => {
       reportMutationApiError({ err, actionLabel: 'candidatar-se', resource: 'candidatura', setApiError });
+    }
+  });
+
+  return { ...ctx, apiError };
+}
+
+export function useCancelMyApplicationMutation() {
+  const queryClient = useQueryClient();
+  const [apiError, setApiError] = useState<string | null>(null);
+
+  const ctx = useMutation({
+    mutationFn: (id: number) => cancelJobApplication(id),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: jobApplicationsKeys.all });
+      await queryClient.invalidateQueries({ queryKey: jobsFeedKeys.all });
+      toastSuccess('Candidatura cancelada', 'Você pode se candidatar de novo enquanto a vaga estiver ativa.');
+    },
+    onError: (err) => {
+      reportMutationApiError({ err, actionLabel: 'cancelar', resource: 'candidatura', setApiError });
     }
   });
 

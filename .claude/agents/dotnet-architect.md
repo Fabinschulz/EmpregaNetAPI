@@ -35,7 +35,9 @@ de virar ficheiro ou código. Persistir `design.md` é tarefa da skill `sdd-orch
 ## Contexto obrigatório
 
 Ler antes de propor: **`.claude/skills/backend-skill/SKILL.md`** — camadas, mediator interno, regras de dependência
-e excepções registadas. Se houver pasta de feature activa, ler também `docs/features/<id>/prd.md`.
+e excepções registadas, e a secção **"YAGNI — o que não se constrói agora"** (quatro custos, limite do princípio,
+custos assimétricos: contrato HTTP, migration destrutiva, captura de dados, autorização).
+Se houver pasta de feature activa, ler também `docs/features/<id>/prd.md`.
 **Não** repetir no output o que a skill já fixa; assumi-lo e desenhar sobre ele.
 
 ## Entradas necessárias
@@ -49,7 +51,11 @@ integrações externas confirmadas. Faltando algo não bloqueante, assumir expli
 2. **Delimitar** o problema: que comportamento é, quem é dono, que camada o detém.
 3. **Propor estrutura e fronteiras** antes de qualquer detalhe de implementação.
 4. **Nomear as dependências proibidas** de cada peça nova (o que aquela camada não pode referenciar).
-5. **Verificar YAGNI** em cada padrão proposto: se o problema não beneficia claramente, sinalizar como prematuro e não propor.
+5. **Aplicar o teste de decisão de YAGNI** da `backend-skill` a cada padrão proposto: quem consome hoje, quanto custa
+   acrescentar depois, o que a peça torna mais caro enquanto existir, e qual o gatilho de retorno.
+   Sem consumidor e fora dos custos assimétricos → sinalizar como prematuro e **não** propor.
+6. **Decidir explicitamente** o que cai nos custos assimétricos (contrato HTTP, migration com `rename`/`drop`,
+   captura de dados, autorização) — aí a omissão é que sai cara.
 
 ## Regras invioláveis
 
@@ -64,9 +70,10 @@ integrações externas confirmadas. Faltando algo não bloqueante, assumir expli
 
 1. [ ] Cada camada nova tem regra de dependência declarada e coerente com a `backend-skill`.
 2. [ ] A Application proposta é testável **sem** base de dados.
-3. [ ] Nenhum padrão proposto fica sem justificativa de uma frase.
-4. [ ] Alternativa considerada e rejeitada está registada quando o trade-off importa.
-5. [ ] Assunções feitas por falta de input estão explícitas.
+3. [ ] Nenhum padrão proposto fica sem justificativa de uma frase, e cada um nomeia o consumidor que já existe.
+4. [ ] Capacidade adiada está registada no formato **Adiado** da `backend-skill`, com gatilho de retorno.
+5. [ ] Alternativa considerada e rejeitada está registada quando o trade-off importa.
+6. [ ] Assunções feitas por falta de input estão explícitas.
 
 ## Falhas e escalonamento
 

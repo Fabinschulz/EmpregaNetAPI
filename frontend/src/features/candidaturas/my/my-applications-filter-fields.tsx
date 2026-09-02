@@ -2,7 +2,7 @@
 
 import { actionIcons, Button, FilterBar, SelectField } from '@/shared/components';
 import { useFormContext } from '@/shared/context';
-import { APPLICATION_STATUSES, applicationStatusLabels } from '../domain';
+import { APPLICATION_STATUSES, applicationStatusLabel } from '../domain';
 import {
   defaultMyApplicationsFilter,
   myApplicationsFilterToParams,
@@ -13,7 +13,7 @@ import { useEffect, useRef } from 'react';
 
 const STATUS_OPTIONS = [
   { label: 'Todas', value: 'all' },
-  ...APPLICATION_STATUSES.map((status) => ({ label: applicationStatusLabels[status], value: status }))
+  ...APPLICATION_STATUSES.map((status) => ({ label: applicationStatusLabel(status, 'candidate'), value: status }))
 ];
 
 type MyApplicationsFilterParams = Pick<JobApplicationsListQueryParams, 'status' | 'orderBy'>;

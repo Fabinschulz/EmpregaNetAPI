@@ -103,4 +103,43 @@ Sem secrets no repo. Os templates versionados são `backend/src/EmpregaNet.Api/a
 
 ---
 
+## E-mail em desenvolvimento
+
+Em **`Development`** e sem SMTP configurado (`Smtp:Enabled=false`, ou sem `Smtp:Host`/`Smtp:FromEmail`), a
+API resolve `IEmailSender` para `DevelopmentLogEmailSender` (`backend/src/EmpregaNet.Infra/Email/`): nada é
+entregue e a mensagem vai para o log com o prefixo `[E-MAIL DEV]`.
+
+```jsonc
+// backend/src/EmpregaNet.Api/appsettings.Development.json
+"Smtp": { "Enabled": false }
+```
+
+Ou por variável de ambiente, sem tocar no ficheiro:
+
+```bash
+Smtp__Enabled=false dotnet run --project backend/src/EmpregaNet.Api
+```
+
+Dois níveis, de propósito:
+
+| Nível | O que sai |
+|-------|-----------|
+| `Information` | Destinatário e assunto |
+| `Debug` | Corpo HTML completo |
+
+O corpo fica em `Debug` porque carrega **tokens vivos** de reset de senha e confirmação de conta: um link
+registado é um link utilizável por quem leia o log. Para o inspecionar, baixe o nível localmente:
+
+```bash
+Logging__LogLevel__EmpregaNet.Infra.Email=Debug dotnet run --project backend/src/EmpregaNet.Api
+```
+
+Fora de `Development` este transporte **não** é usado: sem SMTP, os outros ambientes ficam com o no-op
+silencioso, e `Production` nem sobe com `Smtp:Enabled=false`.
+
+Serve para verificar pela UI real o conteúdo de e-mails transacionais (reset de senha, confirmação de
+conta e as notificações de andamento de candidatura) sem servidor SMTP e sem caixa de correio.
+
+---
+
 *Este README deve manter-se alinhado à estrutura real do código; atualiza ao mudar layouts de solução ou pastas principais.*

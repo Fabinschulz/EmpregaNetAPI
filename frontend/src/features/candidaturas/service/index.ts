@@ -2,6 +2,7 @@ export {
   useAllJobApplicationsQuery,
   useApplicationsByJobQuery,
   useApplyToJobMutation,
+  useCancelMyApplicationMutation,
   useChangeApplicationStatusMutation,
   useDeleteApplicationMutation,
   useMyJobApplicationsQuery

@@ -34,7 +34,9 @@ sem sobre-abstracção, e verificada por lint/test/build.
 
 Ler antes de escrever: **`.claude/skills/frontend-skill/SKILL.md`** — pastas, `service/` por feature,
 Server vs Client Components com `cacheComponents`, auth por cookie `httpOnly`, política única de rota,
-componentes canónicos de loading, infra de testes Cucumber e anti-padrões.
+componentes canónicos de loading, infra de testes Cucumber e anti-padrões, e a secção
+**"YAGNI — o que não se constrói agora"**, que decide quando promover um componente a primitivo partilhado,
+quando adiar abstracção e variante, e o que **não** se corta em nome do princípio (a11y, validação, estados de erro).
 Se houver pasta de feature activa, ler `docs/features/<id>/design.md`.
 
 Antes de criar um componente, **procurar o primitivo existente** (`src/shared/components/ui/`, `form-fields/`,

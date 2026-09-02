@@ -24,3 +24,4 @@ Thumbs.db
 tsconfig.tsbuildinfo
 
 .claude/worktrees/
+docs/qa/

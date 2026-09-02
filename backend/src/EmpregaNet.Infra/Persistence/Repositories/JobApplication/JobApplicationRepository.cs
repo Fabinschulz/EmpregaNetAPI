@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using EmpregaNet.Domain.Common;
 using EmpregaNet.Domain.Entities;
 using EmpregaNet.Domain.Enums;
@@ -9,17 +10,34 @@ namespace EmpregaNet.Infra.Persistence.Repositories;
 
 public class JobApplicationRepository : BaseRepository<JobApplication>, IJobApplicationRepository
 {
+    /// <summary>
+    /// O que conta como candidatura <b>activa</b> para efeito de duplicata e de "já candidatado".
+    /// </summary>
+    /// <remarks>
+    /// Predicado único, e não a mesma condição escrita em dois <c>Where</c>: quem decide se pode
+    /// candidatar-se (<see cref="ExistsActiveAsync"/>) e quem decide se o feed mostra o botão
+    /// (<see cref="GetAppliedJobIdsAsync"/>) têm de responder sempre o mesmo. Divergirem significa a
+    /// API aceitar uma candidatura que a tela bloqueia, ou o contrário.
+    /// </remarks>
+    private static readonly Expression<Func<JobApplication, bool>> IsActiveApplication =
+        a => !a.IsDeleted && a.Status != ApplicationStatusEnum.CanceledByCandidate;
+
     public JobApplicationRepository(PostgreSqlContext context) : base(context)
     {
     }
 
-    public async Task<bool> ExistsAsync(long jobId, long userId, CancellationToken cancellationToken)
+    public async Task<bool> ExistsActiveAsync(long jobId, long userId, CancellationToken cancellationToken)
     {
         return await _context.JobApplications
             .AsNoTracking()
-            .AnyAsync(a => a.JobId == jobId && a.UserId == userId && !a.IsDeleted, cancellationToken);
+            .Where(IsActiveApplication)
+            .AnyAsync(a => a.JobId == jobId && a.UserId == userId, cancellationToken);
     }
 
+    /// <summary>
+    /// Vagas, entre as consultadas, em que o utilizador tem candidatura activa, é o que faz o feed
+    /// mostrar "Já candidatado" em vez do botão de candidatura.
+    /// </summary>
     public async Task<IReadOnlyList<long>> GetAppliedJobIdsAsync(
         long userId,
         IReadOnlyCollection<long> jobIds,
@@ -34,7 +52,8 @@ public class JobApplicationRepository : BaseRepository<JobApplication>, IJobAppl
 
         return await _context.JobApplications
             .AsNoTracking()
-            .Where(a => a.UserId == userId && !a.IsDeleted && ids.Contains(a.JobId))
+            .Where(IsActiveApplication)
+            .Where(a => a.UserId == userId && ids.Contains(a.JobId))
             .Select(a => a.JobId)
             .Distinct()
             .ToListAsync(cancellationToken);

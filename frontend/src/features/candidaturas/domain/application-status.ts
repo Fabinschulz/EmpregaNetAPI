@@ -9,12 +9,14 @@ export const APPLICATION_STATUSES = [
   'Timeout',
   'Canceled',
   'Error',
-  'Finished'
+  'Finished',
+  'CanceledByCandidate'
 ] as const;
 
 export const applicationStatusSchema = z.enum(APPLICATION_STATUSES);
 
 export type ApplicationStatus = z.infer<typeof applicationStatusSchema>;
+export type ApplicationStatusAudience = 'candidate' | 'recruiter';
 
 export function parseApplicationStatus(status: string | null | undefined): ApplicationStatus | null {
   const parsed = applicationStatusSchema.safeParse(status);
@@ -29,8 +31,21 @@ export const applicationStatusLabels: Record<ApplicationStatus, string> = {
   Timeout: 'Prazo expirado',
   Canceled: 'Cancelada',
   Error: 'Erro',
-  Finished: 'Concluída'
+  Finished: 'Concluída',
+  CanceledByCandidate: 'Cancelada pelo candidato'
 };
+
+const candidateStatusLabelOverrides: Partial<Record<ApplicationStatus, string>> = {
+  CanceledByCandidate: 'Cancelada por você'
+};
+
+export function applicationStatusLabel(status: ApplicationStatus, audience: ApplicationStatusAudience): string {
+  if (audience === 'candidate') {
+    return candidateStatusLabelOverrides[status] ?? applicationStatusLabels[status];
+  }
+
+  return applicationStatusLabels[status];
+}
 
 export const applicationStatusTransitions: Record<ApplicationStatus, ApplicationStatus[]> = {
   Pending: ['Processing', 'Canceled'],
@@ -40,7 +55,8 @@ export const applicationStatusTransitions: Record<ApplicationStatus, Application
   Timeout: [],
   Canceled: [],
   Error: [],
-  Finished: []
+  Finished: [],
+  CanceledByCandidate: []
 };
 
 export const applicationTransitionLabels: Record<ApplicationStatus, string> = {
@@ -51,7 +67,8 @@ export const applicationTransitionLabels: Record<ApplicationStatus, string> = {
   Timeout: 'Expirar',
   Canceled: 'Cancelar',
   Error: 'Marcar erro',
-  Finished: 'Concluir'
+  Finished: 'Concluir',
+  CanceledByCandidate: 'Cancelar pelo candidato'
 };
 
 export const applicationTransitionIcons: Record<ApplicationStatus, LucideIcon> = {
@@ -62,5 +79,14 @@ export const applicationTransitionIcons: Record<ApplicationStatus, LucideIcon> =
   Canceled: Ban,
   Finished: Flag,
   Timeout: Ban,
-  Error: Ban
+  Error: Ban,
+  CanceledByCandidate: Ban
 };
+
+/** Estados em que o candidato ainda pode cancelar a própria candidatura. */
+export const CANDIDATE_CANCELABLE_STATUSES: readonly ApplicationStatus[] = ['Pending', 'Processing'];
+
+export function canCandidateCancelApplication(status: string | null | undefined): boolean {
+  const parsed = parseApplicationStatus(status);
+  return parsed !== null && CANDIDATE_CANCELABLE_STATUSES.includes(parsed);
+}

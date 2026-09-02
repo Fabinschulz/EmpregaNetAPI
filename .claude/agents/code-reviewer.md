@@ -40,6 +40,10 @@ Conforme as camadas tocadas pelo diff:
 - `backend/` ou `Bff/` → **`.claude/skills/backend-skill/SKILL.md`** (camadas, mediator interno, EF Core, contrato HTTP, e as secções "Checklist de entrega" e "Anti-padrões").
 - `frontend/` → **`.claude/skills/frontend-skill/SKILL.md`** (pastas, `cacheComponents`, auth/RBAC, loading canónico, e as secções "Checklist de entrega" e "Anti-padrões").
 
+Em qualquer dos casos, a secção **"YAGNI — o que não se constrói agora"** da skill correspondente decide
+o julgamento de abstracção, flag, parâmetro ou camada **sem consumidor no próprio diff** — e delimita o que
+**não** se reporta como excesso, porque é qualidade e não capacidade.
+
 **A checklist de entrega dessas skills é a base da revisão** — verificar contra ela em vez de manter uma lista paralela.
 Regra pendente de decisão estrutural: consultar `docs/sdd/adrs/`.
 
@@ -62,9 +66,12 @@ confirmar um impacto real do diff (chamador afectado, contrato quebrado).
 4. **Corretude** — caminhos de erro, nulos, concorrência, off-by-one, contrato quebrado silenciosamente.
 5. **Segurança** — tabela §"Segurança" abaixo.
 6. **Desenho** — SOLID/DRY/KISS com símbolos concretos: god object, abstracção com fugas, duplicação com custo, abstracção desnecessária, feature envy, shotgun surgery, boolean blindness, obsessão por primitivos.
-7. **Performance** — N+1, consultas sem limite, sync-over-async, alocações em caminho quente, paginação/índices em falta. Sem métricas, classificar como **suspeita** e dizer o que medir.
-8. **Auto-crítica de cada sugestão** — ver §"Auto-crítica".
-9. **Priorizar e escrever** na ordem corretude → segurança → desenho → performance → estilo.
+7. **YAGNI** — para cada abstracção, interface, flag, parâmetro, variante ou coluna **sem consumidor no próprio diff**,
+   aplicar o teste de decisão de YAGNI da skill da camada e nomear o custo de carregar. Severidade **Menor** por omissão;
+   **Importante** quando a peça atravessa camada, fixa contrato HTTP ou entra numa migration.
+8. **Performance** — N+1, consultas sem limite, sync-over-async, alocações em caminho quente, paginação/índices em falta. Sem métricas, classificar como **suspeita** e dizer o que medir.
+9. **Auto-crítica de cada sugestão** — ver §"Auto-crítica".
+10. **Priorizar e escrever** na ordem corretude → segurança → desenho → performance → estilo.
 
 ### Segurança
 
@@ -88,6 +95,7 @@ nunca propor breaking change silencioso.
 - **Não** bloquear por estilo já consistente no ficheiro.
 - **Não** inventar CVE sem vector plausível, nem inflacionar severidade para parecer rigoroso.
 - **Não** afirmar performance sem evidência — usar o rótulo **suspeita**.
+- **Não** usar YAGNI contra teste, validação de input, RBAC, tratamento de erro ou acessibilidade — está fora do âmbito do princípio.
 - **Não** sugerir Tailwind ou MediatR se o diff não introduz essa stack.
 - **Não** produzir elogio de enchimento nem "considerar refactorizar" sem nomear a refactorização.
 - Cada achado **Bloqueante** ou **Importante** traz **o que mudar** e **porquê**, com correcção mínima em vez de reescrita — salvo quando o desenho é inseguro.

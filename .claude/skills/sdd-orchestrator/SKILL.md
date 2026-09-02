@@ -63,6 +63,12 @@ Regras de execução em cada fase:
 4. **Sem duplicação entre artefactos:** o `spec.md` não repete endpoints nem tabelas (isso é `design.md`) e não dilui passos de implementação (isso é `tasks.md`).
 5. **Dependências reais:** não inventar integrações ou assinaturas externas — exigir confirmação humana ou código existente no repositório.
 6. **Simetria de domínio:** operações reversíveis (cancelar, despublicar, remover) modeladas com o mesmo rigor que as construtivas.
+7. **YAGNI por fase** — o escopo corta-se aqui, onde é mais barato, antes de existir código: requisito sem utilizador
+   e sem critério de aceite verificável fica fora do `prd.md`; mecanismo sem requisito do PRD que o obrigue não é
+   desenhado no `design.md`; o que for adiado entra no `tasks.md` como **Adiado**, com gatilho de retorno.
+   Excepção: os custos assimétricos — contrato HTTP, migration destrutiva, captura de dados, autorização — decidem-se
+   agora, com fundamento. Critério completo na secção "YAGNI — o que não se constrói agora" da
+   [`backend-skill`](../backend-skill/SKILL.md) e da [`frontend-skill`](../frontend-skill/SKILL.md).
 
 ### 3.1 Gate de código (regra inviolável)
 
@@ -120,6 +126,7 @@ Uma pasta por feature. Não misturar features no mesmo ficheiro nem na raiz de `
 4. [ ] Critérios de aceite são **verificáveis** (observáveis, não aspiracionais).
 5. [ ] Non-goals declarados no `prd.md`.
 6. [ ] Nenhum código de produção foi tocado (§3.1).
+7. [ ] Capacidade conscientemente adiada está registada como **Adiado**, com gatilho de retorno (§3 regra 7).
 
 ---
 
@@ -133,5 +140,6 @@ Artefactos e comunicação em **português (Brasil)**; identificadores técnicos
 
 | Versão | Mudança |
 | ------ | ------- |
+| 2.1.0 | Regra de YAGNI por fase (§3 regra 7) e item de validação para capacidade adiada, apoiados na secção "YAGNI — o que não se constrói agora" das skills de backend e frontend |
 | 2.0.0 | Deixa de ser lista de ponteiros: passa a executor com entradas obrigatórias, tabela de fases com gates, gate de código accionável, regra de version bump, mapa de delegação e checklist de validação por fase. Movida para `.claude/skills/` |
 | 1.0.0 | Redirecção para os documentos SDD |

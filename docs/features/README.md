@@ -25,6 +25,7 @@ Regras de *version bump*: [`../sdd/SDD-USAGE-GUIDE.md`](../sdd/SDD-USAGE-GUIDE.m
 | ------- | ------ | ------ |
 | [`emp-feed-vagas/`](emp-feed-vagas/prd.md) | Feed público de vagas: agregado `Job` enriquecido, busca full-text, filtros combináveis na URL, scroll infinito | `prd` · `design` · `spec` · `tasks` |
 | [`emp-dashboard-analytics/`](emp-dashboard-analytics/design.md) | Dashboard de métricas: cinco endpoints agregados, escopo por empresa, séries temporais, funil, distribuições e insights derivados | `design` |
+| [`emp-acompanhamento-candidatura/`](emp-acompanhamento-candidatura/prd.md) | Notificação do andamento da candidatura ao candidato por e-mail, cancelamento pelo próprio candidato e encerramento de vaga como estado terminal | `prd` · `design` · `spec` · `tasks` |
 
 Prioridades de alto nível ficam no issue tracker. Um índice textual opcional pode viver em
 `../sdd/FEATURES-BACKLOG.md`, sem substituir as issues.

@@ -26,6 +26,7 @@ internal class JobApplicationConfiguration : IEntityTypeConfiguration<JobApplica
 
         builder.HasIndex(x => new { x.JobId, x.UserId })
                .IsUnique()
+               .HasFilter("\"Status\" <> 9")
                .HasDatabaseName("IX_JobApplications_JobId_UserId");
 
         builder.HasIndex(x => x.JobId)

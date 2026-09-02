@@ -31,7 +31,9 @@ no estilo que a solução já usa.
 ## Contexto obrigatório
 
 Ler antes de escrever: **`.claude/skills/backend-skill/SKILL.md`** — camadas, mediator interno, EF Core, contrato HTTP,
-padrões de teste e anti-padrões. Se houver pasta de feature activa, ler `docs/features/<id>/design.md` e `tasks.md`.
+padrões de teste e anti-padrões, e a secção **"YAGNI — o que não se constrói agora"**, que decide quando uma
+abstracção, flag ou coluna se adia e o que **não** se corta em nome do princípio.
+Se houver pasta de feature activa, ler `docs/features/<id>/design.md` e `tasks.md`.
 
 Antes de criar um ficheiro novo, **ler dois ou três vizinhos** do mesmo módulo e replicar nomes, nullability,
 convenção async e estilo de logging. A convenção local vence a preferência genérica.

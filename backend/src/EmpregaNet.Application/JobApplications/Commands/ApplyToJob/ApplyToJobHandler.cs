@@ -72,7 +72,7 @@ public sealed class ApplyToJobHandler : IRequestHandler<CreateCommand<ApplyToJob
                 DomainErrorEnum.INVALID_ACTION_FOR_STATUS);
         }
 
-        var alreadyApplied = await _jobApplicationRepository.ExistsAsync(request.entity.JobId, _httpCurrentUser.UserId, cancellationToken);
+        var alreadyApplied = await _jobApplicationRepository.ExistsActiveAsync(request.entity.JobId, _httpCurrentUser.UserId, cancellationToken);
         if (alreadyApplied)
         {
             throw new ValidationAppException(

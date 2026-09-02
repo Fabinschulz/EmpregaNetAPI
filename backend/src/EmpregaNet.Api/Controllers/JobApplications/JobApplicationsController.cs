@@ -99,6 +99,25 @@ public class JobApplicationsController : MainController<ApplyToJobCommand, Chang
     public override Task<IActionResult> Update([FromRoute] long id, [FromBody] ChangeJobApplicationStatusCommand entity)
         => base.Update(id, entity);
 
+    /// <summary>Cancela a candidatura do próprio utilizador autenticado.</summary>
+    /// <remarks>
+    /// Sem a policy de recrutamento: quem cancela é o candidato. Candidatura inexistente e
+    /// candidatura de outra pessoa devolvem o mesmo <c>404</c> ou um <c>403</c> na alheia confirmaria
+    /// que aquele id existe.
+    /// </remarks>
+    [HttpPut("{id:long}/cancel")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(JobApplicationViewModel))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(DomainError))]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(DomainError))]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(DomainError))]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(DomainError))]
+    public async Task<IActionResult> Cancel([FromRoute] long id)
+    {
+        var result = await _mediator.Send(new CancelJobApplicationCommand(id));
+        await InvalidateCacheForEntity(id);
+        return Ok(result);
+    }
+
     /// <summary>Remove uma candidatura (apenas recrutamento).</summary>
     [HttpDelete("{id:long}")]
     [Authorize(Policy = Constants.AuthPolicies.Recrutamento)]

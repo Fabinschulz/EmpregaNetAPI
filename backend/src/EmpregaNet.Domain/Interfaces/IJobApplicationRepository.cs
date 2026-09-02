@@ -6,7 +6,10 @@ namespace EmpregaNet.Domain.Interfaces;
 
 public interface IJobApplicationRepository : IBaseRepository<JobApplication>
 {
-    Task<bool> ExistsAsync(long jobId, long userId, CancellationToken cancellationToken);
+    /// <summary>
+    /// Já existe candidatura <b>activa</b> deste utilizador para esta vaga?
+    /// </summary>
+    Task<bool> ExistsActiveAsync(long jobId, long userId, CancellationToken cancellationToken);
 
     Task<IReadOnlyList<long>> GetAppliedJobIdsAsync(
         long userId,
