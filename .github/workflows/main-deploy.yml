@@ -78,8 +78,6 @@ jobs:
       DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
       JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
       SEED_ADMIN_PASSWORD: ${{ secrets.SEED_ADMIN_PASSWORD }}
-      SMTP_USERNAME: ${{ secrets.SMTP_USERNAME }}
-      SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
       SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
       REDIS_HOST: ${{ secrets.REDIS_HOST }}
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}

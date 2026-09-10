@@ -19,6 +19,7 @@ Registos curtos de decisões **estruturais e duradouras** (stack, limites entre 
 | [0011](0011-notificacoes-de-andamento-fora-do-teto-de-emails.md) | Notificações de andamento de candidatura fora do teto diário de e-mails (delimita o [0003](0003-teto-diario-de-emails-por-destinatario.md)) | Aceite |
 | [0012](0012-despacho-de-eventos-de-dominio-apos-commit.md) | Efeitos colaterais não-transaccionais despachados após o commit, via fila de eventos por requisição | Aceite |
 | [0013](0013-estado-por-tentativa-no-limite-de-retry-transaccional.md) | `ChangeTracker` reposto a partir da segunda tentativa do retry transaccional; handler `ITransactional` sem efeito externo (estende o [0012](0012-despacho-de-eventos-de-dominio-apos-commit.md)) | Aceite |
+| [0014](0014-envio-de-email-via-ses.md) | E-mail transacional pela API do Amazon SES com credencial da IAM role, em vez de relay SMTP com utilizador e palavra-passe | Aceite |
 
 ## Como criar
 

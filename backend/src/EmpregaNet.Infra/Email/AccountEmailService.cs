@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 namespace EmpregaNet.Infra.Email;
 
 /// <summary>
-/// Implementação de e-mails de conta: delega o transporte a <see cref="IEmailSender"/> (NoOp, SMTP, SendGrid, etc.).
+/// Implementação de e-mails de conta: delega o transporte a <see cref="IEmailSender"/> (SES, log de desenvolvimento ou no-op).
 /// </summary>
 public sealed class AccountEmailService : IAccountEmailService
 {

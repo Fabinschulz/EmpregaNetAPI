@@ -35,10 +35,6 @@ on:
         required: true
       SEED_ADMIN_PASSWORD:
         required: false
-      SMTP_USERNAME:
-        required: false
-      SMTP_PASSWORD:
-        required: false
       SENTRY_DSN:
         required: false
       REDIS_HOST:
@@ -77,8 +73,6 @@ jobs:
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
           DB_USERNAME: ${{ secrets.DB_USERNAME }}
           JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
-          SMTP_USERNAME: ${{ secrets.SMTP_USERNAME }}
-          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
         run: |
           FAIL=0
           need_secret() {
@@ -115,10 +109,8 @@ jobs:
           fi
 
           if [ "${{ inputs.aspnetcore_environment }}" = "Production" ]; then
-            need_var SMTP_HOST       "${{ vars.SMTP_HOST }}"
-            need_var SMTP_FROM_EMAIL "${{ vars.SMTP_FROM_EMAIL }}"
-            need_secret SMTP_USERNAME "$SMTP_USERNAME"
-            need_secret SMTP_PASSWORD "$SMTP_PASSWORD"
+            need_var SES_REGION     "${{ vars.SES_REGION || vars.AWS_REGION }}"
+            need_var SES_FROM_EMAIL "${{ vars.SES_FROM_EMAIL }}"
           fi
 
           [ "$FAIL" -eq 0 ] || exit 1
@@ -131,8 +123,6 @@ jobs:
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
           JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
           SEED_ADMIN_PASSWORD: ${{ secrets.SEED_ADMIN_PASSWORD }}
-          SMTP_USERNAME: ${{ secrets.SMTP_USERNAME }}
-          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
           SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
           REDIS_HOST: ${{ secrets.REDIS_HOST }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
@@ -180,14 +170,10 @@ jobs:
 
           put_list GoogleAuth__ClientIds "${{ vars.GOOGLE_CLIENT_IDS }}"
 
-          put Smtp__Enabled   "${{ vars.SMTP_ENABLED || 'true' }}"
-          put Smtp__Host      "${{ vars.SMTP_HOST }}"
-          put Smtp__Port      "${{ vars.SMTP_PORT }}"
-          put Smtp__Security  "${{ vars.SMTP_SECURITY }}"
-          put Smtp__FromEmail "${{ vars.SMTP_FROM_EMAIL }}"
-          put Smtp__FromName  "${{ vars.SMTP_FROM_NAME }}"
-          put Smtp__UserName  "$SMTP_USERNAME"
-          put Smtp__Password  "$SMTP_PASSWORD"
+          put Ses__Enabled   "${{ vars.SES_ENABLED || 'true' }}"
+          put Ses__Region    "${{ vars.SES_REGION || vars.AWS_REGION }}"
+          put Ses__FromEmail "${{ vars.SES_FROM_EMAIL }}"
+          put Ses__FromName  "${{ vars.SES_FROM_NAME }}"
 
           put Seed__AdminEmail    "${{ vars.SEED_ADMIN_EMAIL }}"
           put Seed__AdminUserName "${{ vars.SEED_ADMIN_USERNAME }}"

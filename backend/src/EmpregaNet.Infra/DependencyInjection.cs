@@ -1,3 +1,5 @@
+using Amazon;
+using Amazon.SimpleEmailV2;
 using EmpregaNet.Application.Auth.Configuration;
 using EmpregaNet.Application.Abstraction;
 using EmpregaNet.Domain.Interfaces;
@@ -35,13 +37,16 @@ public static class DependencyInjection
     {
         builder.Services.Configure<AppUrlsOptions>(builder.Configuration.GetSection(AppUrlsOptions.SectionName));
         builder.Services.Configure<GoogleAuthOptions>(builder.Configuration.GetSection(GoogleAuthOptions.SectionName));
-        builder.Services.Configure<SmtpEmailOptions>(builder.Configuration.GetSection(SmtpEmailOptions.SectionName));
+        builder.Services.Configure<SesEmailOptions>(builder.Configuration.GetSection(SesEmailOptions.SectionName));
 
-        var smtp = builder.Configuration.GetSection(SmtpEmailOptions.SectionName).Get<SmtpEmailOptions>() ?? new SmtpEmailOptions();
-        EnsureSmtpConfiguredForProduction(builder.Environment, smtp);
+        var ses = builder.Configuration.GetSection(SesEmailOptions.SectionName).Get<SesEmailOptions>() ?? new SesEmailOptions();
+        EnsureSesConfiguredForProduction(builder.Environment, ses);
 
-        if (smtp.Enabled && !string.IsNullOrWhiteSpace(smtp.Host) && !string.IsNullOrWhiteSpace(smtp.FromEmail))
-            builder.Services.AddTransient<IEmailSender, SmtpEmailSender>();
+        if (ses.Enabled && !string.IsNullOrWhiteSpace(ses.FromEmail))
+        {
+            builder.Services.AddSingleton<IAmazonSimpleEmailServiceV2>(_ => CreateSesClient(ses));
+            builder.Services.AddTransient<IEmailSender, SesEmailSender>();
+        }
         else if (builder.Environment.IsDevelopment())
             builder.Services.AddTransient<IEmailSender, DevelopmentLogEmailSender>();
         else
@@ -93,21 +98,41 @@ public static class DependencyInjection
         }
     }
 
-    private static void EnsureSmtpConfiguredForProduction(IHostEnvironment env, SmtpEmailOptions smtp)
+    private static void EnsureSesConfiguredForProduction(IHostEnvironment env, SesEmailOptions ses)
     {
         if (!env.IsProduction())
             return;
 
-        if (!smtp.Enabled)
+        if (!ses.Enabled)
         {
             throw new InvalidOperationException(
-                "Atenção! Em Produção: Smtp:Enabled deve ser true para envio real de e-mails. Configure as variáveis de ambiente ou ajuste appsettings.");}
-
-        if (string.IsNullOrWhiteSpace(smtp.Host) || string.IsNullOrWhiteSpace(smtp.FromEmail))
-        {
-            throw new InvalidOperationException(
-                "Produção: Smtp:Host e Smtp:FromEmail são obrigatórios quando Smtp:Enabled for true.");
+                "Atenção! Em Produção: Ses:Enabled deve ser true para envio real de e-mails. Configure as variáveis de ambiente ou ajuste appsettings.");
         }
+
+        if (string.IsNullOrWhiteSpace(ses.FromEmail))
+        {
+            throw new InvalidOperationException(
+                "Produção: Ses:FromEmail é obrigatório quando Ses:Enabled for true, e tem de ser uma identidade verificada no SES.");
+        }
+
+        if (string.IsNullOrWhiteSpace(ses.Region))
+        {
+            throw new InvalidOperationException(
+                "Produção: Ses:Region é obrigatório. A identidade do SES é verificada por região; deixar o SDK " +
+                "resolver a região sozinho esconde o erro até o envio falhar em runtime.");
+        }
+    }
+
+    /// <summary>
+    /// Cliente do SES sem credencial explícita: a autenticação usa a cadeia padrão da AWS — IAM role da
+    /// instância em produção, perfil ou variáveis <c>AWS_*</c> localmente. Nenhum segredo de e-mail passa
+    /// pela configuração da aplicação, que era o caso enquanto o transporte foi SMTP.
+    /// </summary>
+    private static IAmazonSimpleEmailServiceV2 CreateSesClient(SesEmailOptions ses)
+    {
+        return string.IsNullOrWhiteSpace(ses.Region)
+            ? new AmazonSimpleEmailServiceV2Client()
+            : new AmazonSimpleEmailServiceV2Client(RegionEndpoint.GetBySystemName(ses.Region));
     }
 
     private static void SetupInfrastructureServices(this WebApplicationBuilder builder)
