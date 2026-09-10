@@ -1,17 +1,17 @@
 'use client';
 
 import {
-    actionIcons,
-    ApiQueryBoundary,
-    Button,
-    ConfirmDialog,
-    FilterSection,
-    PageHeader,
-    StatusBadge,
-    TableContainer,
-    useRowDeleteAction,
-    type DataTableColumn,
-    type RowAction
+  actionIcons,
+  ApiQueryBoundary,
+  Button,
+  ConfirmDialog,
+  FilterSection,
+  PageHeader,
+  StatusBadge,
+  TableContainer,
+  useRowDeleteAction,
+  type DataTableColumn,
+  type RowAction
 } from '@/shared/components';
 import { FormProvider } from '@/shared/context';
 import { useListRefresh, usePersistedTablePagination } from '@/shared/hooks';
@@ -19,6 +19,7 @@ import { type JobsListQueryParams } from '@/shared/schema';
 import { formatDate } from '@/shared/utils';
 import Link from 'next/link';
 import { useCallback, useMemo, useState } from 'react';
+import { jobStatusLabel } from '../close-job-copy';
 import { jobsRoutes } from '../jobs-routes';
 import { useDeleteJobMutation, useJobsListQuery, type JobResponse } from '../service';
 import { JobsFilterFields } from './jobs-filter-fields';
@@ -71,7 +72,7 @@ export function RecruitmentJobsPage() {
         key: 'status',
         header: 'Status',
         render: (job) => (
-          <StatusBadge label={job.isActive ? 'Ativa' : 'Encerrada'} tone={job.isActive ? 'positive' : 'negative'} />
+          <StatusBadge label={jobStatusLabel(job.isActive)} tone={job.isActive ? 'positive' : 'negative'} />
         )
       },
       { key: 'createdAt', header: 'Criado em', render: (job) => formatDate(job.createdAt) },

@@ -1,15 +1,26 @@
 'use client';
 
+import { jobApplicationsKeys } from '@/features/candidaturas/service';
 import { withDefaultListParams, type JobsListQueryParams } from '@/shared/schema';
 import { reportMutationApiError, startRouterTransition, toastSuccess } from '@/shared/utils';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { revalidateJobCache } from './jobs-actions';
-import { closeJob, createJob, deleteJob, getJob, listJobs, listSelectableCompanies, updateJob } from './jobs-api';
-import { jobsKeys } from './jobs-keys';
-import { jobsRoutes } from '../jobs-routes';
+import { closeJobSuccessCopy } from '../close-job-copy';
 import { jobFormToRequest, type JobFormValues } from '../form/job-form-schema';
+import { jobsRoutes } from '../jobs-routes';
+import { revalidateJobCache } from './jobs-actions';
+import {
+    closeJob,
+    createJob,
+    deleteJob,
+    getJob,
+    getOpenApplicationsCount,
+    listJobs,
+    listSelectableCompanies,
+    updateJob
+} from './jobs-api';
+import { jobsKeys } from './jobs-keys';
 
 export function useJobsListQuery(params?: JobsListQueryParams) {
   const listParams = withDefaultListParams(params);
@@ -25,6 +36,16 @@ export function useJobQuery(id: number) {
     queryKey: jobsKeys.detail(id),
     queryFn: () => getJob(id),
     enabled: Number.isFinite(id) && id > 0
+  });
+}
+
+export function useOpenApplicationsCountQuery(jobId: number, options?: { enabled?: boolean }) {
+  return useQuery({
+    queryKey: jobsKeys.openApplicationsCount(jobId),
+    queryFn: () => getOpenApplicationsCount(jobId),
+    enabled: (options?.enabled ?? true) && Number.isFinite(jobId) && jobId > 0,
+    staleTime: 0,
+    gcTime: 0
   });
 }
 
@@ -75,19 +96,28 @@ export function useUpdateJobMutation(jobId: number) {
   return { ...ctx, apiError };
 }
 
+/**
+ * Encerra a vaga. Estado terminal por decisão de produto: não há reabertura, por isso a tela
+ * só chama isto depois da confirmação explícita.
+ *
+ * Além do detalhe e das listas de vagas, invalida as candidaturas: o encerramento move as que
+ * estavam em aberto para "Cancelada" na mesma transacção, e a tela de candidatos da vaga
+ * mostraria o status antigo até ao próximo refetch.
+ */
 export function useCloseJobMutation(jobId: number) {
   const queryClient = useQueryClient();
   const [apiError, setApiError] = useState<string | null>(null);
 
   const ctx = useMutation({
     mutationFn: () => closeJob(jobId),
-    onSuccess: async () => {
+    onSuccess: async (result) => {
       await queryClient.invalidateQueries({ queryKey: jobsKeys.detail(jobId) });
       await queryClient.invalidateQueries({ queryKey: jobsKeys.lists() });
+      await queryClient.invalidateQueries({ queryKey: jobApplicationsKeys.all });
       // Encerrar é o caso mais crítico: sem revalidar, a vaga segue anunciada como
       // aberta na página pública até o cache expirar.
       await revalidateJobCache(jobId);
-      toastSuccess('Vaga encerrada', 'A vaga saiu do feed público e deixou de receber candidaturas.');
+      toastSuccess(closeJobSuccessCopy.title, closeJobSuccessCopy.describe(result.affectedApplications));
     },
     onError: (err) => {
       reportMutationApiError({ err, actionLabel: 'encerrar vaga', resource: 'vaga', setApiError });

@@ -243,4 +243,111 @@ public sealed class GetDashboardOverviewHandlerTests
             x => x.GetApplicationsByStatusAsync(It.IsAny<DashboardFilter>(), It.IsAny<CancellationToken>()),
             Times.Once);
     }
+
+    /// <summary>
+    /// CA-16: candidatura cancelada não conta como activa no funil. Ela saiu do processo e nunca teve
+    /// chance de chegar à aprovação; deixá-la na base infla o denominador e faz a conversão cair sem
+    /// que nada tenha piorado no recrutamento.
+    /// </summary>
+    [Fact]
+    public async Task Handle_CandidaturasCanceladas_NaoDevemEntrarNaBaseDoFunil()
+    {
+        SetupScope(DashboardScope.Platform);
+        SetupData(
+            PlatformTotals,
+            Counters(10, 100, 50),
+            Counters(8, 80, 40),
+            [
+                new DashboardStatusComparison(ApplicationStatusEnum.Processing, 60, 50),
+                new DashboardStatusComparison(ApplicationStatusEnum.Approved, 30, 20),
+                new DashboardStatusComparison(ApplicationStatusEnum.Canceled, 5, 3),
+                new DashboardStatusComparison(ApplicationStatusEnum.CanceledByCandidate, 5, 7)
+            ]);
+
+        var result = await CreateSut().Handle(new GetDashboardOverviewQuery(new DashboardFilterInput()), default);
+
+        // Base = 60 + 30 = 90, e não 100: as 10 canceladas ficam de fora.
+        result.Funnel.Stages.Single(s => s.Key == "applications").Value.Should().Be(90);
+
+        // 30/90 = 33,3%. Com as canceladas na base seriam 30%.
+        result.Funnel.ConversionRate.Should().Be(33.3m);
+    }
+
+    /// <summary>
+    /// A mesma definição vale nos dois períodos. Se o anterior somasse tudo e o atual excluísse os
+    /// cancelados, a seta de variação compararia duas métricas diferentes e mostraria uma queda que
+    /// não aconteceu.
+    /// </summary>
+    [Fact]
+    public async Task Handle_TaxaDoPeriodoAnterior_DeveUsarAMesmaBaseSemCancelados()
+    {
+        SetupScope(DashboardScope.Platform);
+        SetupData(
+            PlatformTotals,
+            Counters(10, 100, 50),
+            Counters(8, 80, 40),
+            [
+                new DashboardStatusComparison(ApplicationStatusEnum.Processing, 70, 60),
+                new DashboardStatusComparison(ApplicationStatusEnum.Approved, 30, 20),
+                new DashboardStatusComparison(ApplicationStatusEnum.CanceledByCandidate, 0, 20)
+            ]);
+
+        var conversion = (await CreateSut().Handle(new GetDashboardOverviewQuery(new DashboardFilterInput()), default))
+            .Kpis.Single(k => k.Key == "conversionRate");
+
+        // Atual: 30/100 = 30%. Anterior: 20/80 = 25% (as 20 canceladas do período anterior saem da
+        // base). Somando tudo no anterior daria 20/100 = 20%, e a comparação inventaria uma subida.
+        conversion.Value.Should().Be(30m);
+        conversion.PreviousValue.Should().Be(25m);
+    }
+
+    [Fact]
+    public async Task Handle_TodasAsCandidaturasCanceladas_NaoDeveInventarTaxaDeConversao()
+    {
+        SetupScope(DashboardScope.Platform);
+        SetupData(
+            PlatformTotals,
+            Counters(10, 10, 5),
+            Counters(8, 8, 4),
+            [
+                new DashboardStatusComparison(ApplicationStatusEnum.CanceledByCandidate, 10, 8)
+            ]);
+
+        var result = await CreateSut().Handle(new GetDashboardOverviewQuery(new DashboardFilterInput()), default);
+
+        // Base zero: a taxa é uma divisão sem denominador, e 0% seria lido como "ninguém aprovado".
+        result.Funnel.Stages.Single(s => s.Key == "applications").Value.Should().Be(0);
+        result.Funnel.ConversionRate.Should().BeNull();
+    }
+
+    [Fact]
+    public async Task Handle_FunilDeveDeclararQueCanceladasFicamForaDaBase()
+    {
+        SetupScope(DashboardScope.Platform);
+        SetupData(PlatformTotals, Counters(10, 100, 50), Counters(8, 80, 40), []);
+
+        var result = await CreateSut().Handle(new GetDashboardOverviewQuery(new DashboardFilterInput()), default);
+
+        // Quem lê o painel tem de conseguir descobrir a definição sem ler o código.
+        result.Funnel.Note.Should().Contain("canceladas");
+    }
+
+    /// <summary>
+    /// O cartão da taxa é o <b>único</b> sítio onde a definição aparece ao lado do número. Se a
+    /// descrição disser "sobre o total recebido" enquanto a base exclui canceladas, quem confere a
+    /// conta à mão obtém outro valor e conclui que o painel está errado.
+    /// </summary>
+    [Fact]
+    public async Task Handle_DescricaoDaTaxa_DeveDizerQueCanceladasFicamForaDaBase()
+    {
+        SetupScope(DashboardScope.Platform);
+        SetupData(PlatformTotals, Counters(10, 100, 50), Counters(8, 80, 40), []);
+
+        var result = await CreateSut().Handle(new GetDashboardOverviewQuery(new DashboardFilterInput()), default);
+
+        var conversion = result.Kpis.Single(k => k.Key == "conversionRate");
+
+        conversion.Hint.Should().Contain("canceladas");
+        conversion.Hint.Should().NotContain("total recebido");
+    }
 }

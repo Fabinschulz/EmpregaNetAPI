@@ -1,6 +1,6 @@
 ---
 name: e2e-qa-skill
-description: Executa uma regressão End-to-End exploratória do frontend do EmpregaNet pela UI real (Browser pane), delegando a execução ao subagent e2e-qa-engineer módulo a módulo e consolidando um relatório versionado. Contém a metodologia canónica — pré-condições de ambiente, matriz de cenários, priorização, escala de severidade e templates de defeito e de relatório. Use quando o utilizador pedir para "testar o frontend", "rodar regressão", "fazer QA de X", "validar essa tela antes de mergear" ou reproduzir um bug relatado, e depois de alterar algo em frontend/src/app ou frontend/src/features. Não use para testes Cucumber (é código — test-engineer) nem para revisão estática de diff (code-reviewer).
+description: Executa uma regressão End-to-End exploratória do frontend do EmpregaNet pela UI real (Browser pane), delegando a execução ao subagent e2e-qa-engineer módulo a módulo e consolidando o resultado num relatório entregue no chat (evidência de execução não é versionada). Contém a metodologia canónica — pré-condições de ambiente, matriz de cenários, priorização, escala de severidade e templates de defeito e de relatório. Use quando o utilizador pedir para "testar o frontend", "rodar regressão", "fazer QA de X", "validar essa tela antes de mergear" ou reproduzir um bug relatado, e depois de alterar algo em frontend/src/app ou frontend/src/features. Não use para testes Cucumber (é código — test-engineer) nem para revisão estática de diff (code-reviewer).
 ---
 
 # Regressão E2E — EmpregaNet (frontend)
@@ -168,7 +168,19 @@ Depois de todos os módulos do escopo, consolidar os relatórios individuais num
 5. **Riscos identificados** — o que a execução não conseguiu garantir.
 6. **Evidências** — referência às capturas, associadas ao ID do cenário/bug.
 
-Gravar em `docs/qa/e2e-regression-<YYYY-MM-DD-HHmm>.md` (criar `docs/qa/` se não existir) e resumir no chat, destacando Bloqueante/Crítica primeiro e apontando o ficheiro.
+**O relatório é entregue no chat, não no repositório.** Resumir na conversa, destacando Bloqueante/Crítica
+primeiro. Se o relatório for longo, gravá-lo no **scratchpad da sessão** (o directório temporário indicado
+no ambiente) e apontar o caminho — nunca em `docs/`.
+
+Porquê: o relatório é **evidência de execução**, não fonte do produto. Cresce a cada bateria, fica obsoleto
+depressa, e uma pasta de relatórios acumulados desorganiza o repositório sem acrescentar nada que o
+próximo leitor precise. Quando existir a camada de testes automatizados, é ela que guarda a evidência —
+versionada, executável e sempre actual. `docs/qa/` está no `.gitignore` como rede de segurança, não como
+destino.
+
+A conclusão que **sobrevive** a uma bateria não é o relatório: é o defeito corrigido, o teste que passou a
+cobri-lo, ou a decisão registada no artefacto SDD da feature. Se um achado merece durar, o seu lugar é
+`docs/features/<id>/` ou um ADR — não um ficheiro de evidência.
 
 ---
 

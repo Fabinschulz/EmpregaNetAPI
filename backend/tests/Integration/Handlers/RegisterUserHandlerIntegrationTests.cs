@@ -1,5 +1,6 @@
 using EmpregaNet.Application.Common.Exceptions;
 using EmpregaNet.Application.Auth.Commands;
+using EmpregaNet.Application.Auth.Events;
 using EmpregaNet.Domain.Entities;
 using EmpregaNet.Domain.Enums;
 using EmpregaNet.Tests.Support;
@@ -61,12 +62,23 @@ public sealed class RegisterUserHandlerIntegrationTests : IDisposable
             .Where(e => e.Code == DomainErrorEnum.RESOURCE_ALREADY_EXISTS);
     }
 
+    /// <summary>
+    /// O registo <b>declara</b> a conta criada e não envia nada: o comando é <c>ITransactional</c> e
+    /// corre dentro da transacção.
+    /// </summary>
+    /// <remarks>
+    /// Enviar aqui tinha dois modos de falha que nenhum rollback desfaz — link enviado para um registo
+    /// que o commit não gravou, e um segundo e-mail por reexecução da tentativa pela estratégia de
+    /// retry. Este teste é o que impede o envio de voltar para dentro da transacção: quem o repuser vê
+    /// o <c>Times.Never</c> falhar. Ver ADR 0013.
+    /// </remarks>
     [Fact]
-    public async Task Handle_RegistoValido_DeveRetornarIdEChamarEnvioDeConfirmacao()
+    public async Task Handle_RegistoValido_DeveRetornarIdEEnfileirarEventoSemEnviarEmail()
     {
         var email = TestDataFactory.UniqueEmail("ok");
         await using var scope = _fx.Services.CreateAsyncScope();
         var sut = scope.ServiceProvider.GetRequiredService<RegisterUserHandler>();
+        var domainEvents = scope.ServiceProvider.GetRequiredService<RecordingDomainEventQueue>();
 
         var id = await sut.Handle(
             new RegisterUserCommand(
@@ -79,9 +91,38 @@ public sealed class RegisterUserHandlerIntegrationTests : IDisposable
             CancellationToken.None);
 
         id.Should().BeGreaterThan(0);
+
+        domainEvents.RecordedOf<UserRegistered>().Should().ContainSingle()
+            .Which.UserId.Should().Be(id);
+
         _fx.AccountEmail.Verify(
-            x => x.SendEmailConfirmationLinkAsync(email, It.Is<string>(link => link.Contains($"userId={id}")), It.IsAny<CancellationToken>()),
-            Times.Once);
+            x => x.SendEmailConfirmationLinkAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()),
+            Times.Never);
+    }
+
+    [Fact]
+    public async Task Handle_RegistoRecusado_NaoDeveEnfileirarEvento()
+    {
+        var email = TestDataFactory.UniqueEmail("dup_evento");
+        await AuthIntegrationTestHelper.RegisterConfirmedUserAsync(_fx.Services, email, "dup_evento");
+
+        await using var scope = _fx.Services.CreateAsyncScope();
+        var sut = scope.ServiceProvider.GetRequiredService<RegisterUserHandler>();
+        var domainEvents = scope.ServiceProvider.GetRequiredService<RecordingDomainEventQueue>();
+
+        var act = async () => await sut.Handle(
+            new RegisterUserCommand(
+                TestDataFactory.UniqueUsername("dup_evento2"),
+                email,
+                TestDataFactory.UniqueCpf(),
+                AuthIntegrationTestHelper.DefaultPassword,
+                AuthIntegrationTestHelper.DefaultPassword,
+                TestDataFactory.UniqueBrazilianCell()),
+            CancellationToken.None);
+
+        await act.Should().ThrowAsync<ValidationAppException>();
+        domainEvents.RecordedOf<UserRegistered>().Should().BeEmpty(
+            "registo recusado não é conta criada, e não pode gerar link de confirmação");
     }
 
     [Fact]

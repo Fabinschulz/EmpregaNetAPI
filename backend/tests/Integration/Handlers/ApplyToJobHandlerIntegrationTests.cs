@@ -2,6 +2,7 @@ using EmpregaNet.Application.Auth.ViewModel;
 using EmpregaNet.Application.Common.Base;
 using EmpregaNet.Application.Common.Exceptions;
 using EmpregaNet.Application.JobApplications.Commands;
+using EmpregaNet.Application.JobApplications.Events;
 using EmpregaNet.Domain.Entities;
 using EmpregaNet.Domain.Enums;
 using EmpregaNet.Infra.Persistence.Database;
@@ -52,7 +53,10 @@ public sealed class ApplyToJobHandlerIntegrationTests
         location: new JobLocation { City = "Extrema", State = UF.MG },
         salaryMin: 2300m);
 
-    private static ApplyToJobHandler CreateApplyHandler(PostgreSqlContext context, long candidateId)
+    private static ApplyToJobHandler CreateApplyHandler(
+        PostgreSqlContext context,
+        long candidateId,
+        RecordingDomainEventQueue? domainEvents = null)
     {
         var currentUser = new Mock<IHttpCurrentUser>();
         currentUser.SetupGet(x => x.UserId).Returns(candidateId);
@@ -74,11 +78,15 @@ public sealed class ApplyToJobHandlerIntegrationTests
             new JobRepository(context),
             new JobApplicationRepository(context),
             currentUser.Object,
+            domainEvents ?? new RecordingDomainEventQueue(),
             new ApplyToJobCommandValidator(),
             NullLogger<ApplyToJobHandler>.Instance);
     }
 
-    private static CancelJobApplicationHandler CreateCancelHandler(PostgreSqlContext context, long candidateId)
+    private static CancelJobApplicationHandler CreateCancelHandler(
+        PostgreSqlContext context,
+        long candidateId,
+        RecordingDomainEventQueue? domainEvents = null)
     {
         var currentUser = new Mock<IHttpCurrentUser>();
         currentUser.SetupGet(x => x.UserId).Returns(candidateId);
@@ -99,6 +107,7 @@ public sealed class ApplyToJobHandlerIntegrationTests
         return new CancelJobApplicationHandler(
             new JobApplicationRepository(context),
             currentUser.Object,
+            domainEvents ?? new RecordingDomainEventQueue(),
             NullLogger<CancelJobApplicationHandler>.Instance);
     }
 
@@ -206,5 +215,51 @@ public sealed class ApplyToJobHandlerIntegrationTests
 
         (await repository.GetAppliedJobIdsAsync(candidateId, [job.Id], CancellationToken.None))
             .Should().BeEmpty();
+    }
+
+    // N1: candidatar-se deixa um evento na fila com a razão "Applied", que é o que dá ao e-mail o
+    // texto de "candidatura recebida" em vez do genérico de mudança de estado.
+    [Fact]
+    public async Task Handle_CandidaturaCriada_DeveEnfileirarEventoDeCandidaturaRecebida()
+    {
+        const long candidateId = 8205;
+        using var scope = _fixture.Services.CreateScope();
+        var context = scope.ServiceProvider.GetRequiredService<PostgreSqlContext>();
+
+        var job = CreateJob(companyId: 4005);
+        await new JobRepository(context).CreateAsync(job, CancellationToken.None);
+
+        var domainEvents = new RecordingDomainEventQueue();
+        var applicationId = await CreateApplyHandler(context, candidateId, domainEvents)
+            .Handle(new CreateCommand<ApplyToJobCommand>(new ApplyToJobCommand(job.Id)), CancellationToken.None);
+
+        var evento = domainEvents.RecordedOf<JobApplicationStatusChanged>().Should().ContainSingle().Subject;
+        evento.JobApplicationId.Should().Be(applicationId);
+        evento.JobId.Should().Be(job.Id);
+        evento.CandidateUserId.Should().Be(candidateId);
+        evento.NewStatus.Should().Be(ApplicationStatusEnum.Pending);
+        evento.Reason.Should().Be(JobApplicationNotificationReason.Applied);
+    }
+
+    [Fact]
+    public async Task Handle_CandidaturaDuplicadaRecusada_NaoDeveEnfileirarEvento()
+    {
+        const long candidateId = 8206;
+        using var scope = _fixture.Services.CreateScope();
+        var context = scope.ServiceProvider.GetRequiredService<PostgreSqlContext>();
+
+        var job = CreateJob(companyId: 4006);
+        await new JobRepository(context).CreateAsync(job, CancellationToken.None);
+
+        await CreateApplyHandler(context, candidateId)
+            .Handle(new CreateCommand<ApplyToJobCommand>(new ApplyToJobCommand(job.Id)), CancellationToken.None);
+
+        var domainEvents = new RecordingDomainEventQueue();
+        var act = async () => await CreateApplyHandler(context, candidateId, domainEvents).Handle(
+            new CreateCommand<ApplyToJobCommand>(new ApplyToJobCommand(job.Id)),
+            CancellationToken.None);
+
+        await act.Should().ThrowAsync<ValidationAppException>();
+        domainEvents.Recorded.Should().BeEmpty();
     }
 }

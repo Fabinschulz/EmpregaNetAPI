@@ -15,8 +15,8 @@ candidatura e **pode agir** sobre ela — além de registar a decisão de produt
 
 Hoje o processo de recrutamento avança sem que o candidato seja informado, e ele não tem nenhum controle
 sobre a própria candidatura. A regressão E2E de 2026-09-01
-constatou, navegando o produto real (relatório em `docs/qa/`, **não versionado** — evidência de execução,
-local à máquina de quem correu a bateria):
+constatou, navegando o produto real (o relatório da bateria é evidência de execução e não é guardado no
+repositório; os quatro achados abaixo são o que sobreviveu dela):
 
 1. **Nenhuma comunicação existe.** Ao mudar o status da candidatura, nada é enviado ao candidato — sem
    e-mail, sem notificação in-app, sem mensagem. O candidato só descobre a decisão se entrar no site e

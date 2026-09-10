@@ -3,6 +3,7 @@ using EmpregaNet.Application.Abstraction;
 using EmpregaNet.Domain.Interfaces;
 using EmpregaNet.Infra.Behaviors;
 using EmpregaNet.Infra.Cache;
+using EmpregaNet.Infra.Events;
 using EmpregaNet.Infra.Extensions;
 using EmpregaNet.Infra.Persistence.Database;
 using EmpregaNet.Infra.Persistence.Repositories;
@@ -48,6 +49,7 @@ public static class DependencyInjection
 
         builder.Services.AddScoped<IGoogleIdTokenValidator, GoogleIdTokenValidator>();
         builder.Services.AddScoped<IAccountEmailService, AccountEmailService>();
+        builder.Services.AddScoped<IJobApplicationEmailService, JobApplicationEmailService>();
         builder.Services.AddScoped<IRefreshTokenService, RefreshTokenService>();
 
         // Teto diário de e-mails por destinatário (anti-abuso de forgot-password/resend-confirmation).
@@ -119,11 +121,31 @@ public static class DependencyInjection
         // builder.Services.SetupAWSCloudWatchLogging(builder.Configuration);
     }
 
-    private static void SetupDependencyInjection(this IServiceCollection services)
+    /// <summary>
+    /// Registra os behaviors do pipeline CQRS. <b>A ordem destas quatro linhas é o mecanismo</b>, não
+    /// um detalhe de arrumação.
+    /// </summary>
+    /// <remarks>
+    /// O pipeline é montado de trás para frente (<c>Mediator.RequestHandlerWrapperImpl</c>), logo o
+    /// <b>primeiro registado é a camada mais externa</b>. <c>NotificationDispatchBehavior</c> tem de
+    /// ficar <b>antes</b> de <c>TransactionBehavior</c> para observar o resultado já commitado; trocar
+    /// as duas linhas compila e passa em qualquer teste de caminho feliz, mas passa a enviar e-mail de
+    /// dentro da transacção, e um rollback deixaria o candidato informado de uma aprovação que não
+    /// existe.
+    /// </remarks>
+    internal static void AddPipelineBehaviors(this IServiceCollection services)
     {
         services.AddScoped(typeof(IPipelineBehavior<,>), typeof(PerformanceBehaviour<,>));
         services.AddScoped(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+        services.AddScoped(typeof(IPipelineBehavior<,>), typeof(NotificationDispatchBehavior<,>));
         services.AddScoped(typeof(IPipelineBehavior<,>), typeof(TransactionBehavior<,>));
+    }
+
+    private static void SetupDependencyInjection(this IServiceCollection services)
+    {
+        services.AddPipelineBehaviors();
+
+        services.AddScoped<IDomainEventQueue, DomainEventQueue>();
         services.AddScoped<IUnityOfWork, UnityOfWork>();
 
         #region Repositories

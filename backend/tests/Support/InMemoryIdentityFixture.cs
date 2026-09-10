@@ -1,6 +1,7 @@
 using EmpregaNet.Application.Auth.Configuration;
 using EmpregaNet.Application.Abstraction;
 using EmpregaNet.Application.Auth.Commands;
+using EmpregaNet.Application.Auth.Events;
 using EmpregaNet.Application.Dashboard.UseCase;
 using EmpregaNet.Application.Users.Commands;
 using EmpregaNet.Domain.Entities;
@@ -81,6 +82,12 @@ public sealed class InMemoryIdentityFixture : IDisposable
         // Limite alto para não interferir nos cenários dos testes (os e-mails são únicos por teste).
         services.AddSingleton<IEmailThrottleService>(new InMemoryEmailThrottleService(maxPerDay: 1000));
 
+        // Fila de eventos de domínio: registada como a de produção (Scoped), mas na variante que
+        // guarda histórico. Os handlers `ITransactional` declaram factos aqui em vez de executarem
+        // efeitos externos, e é isso que os testes verificam.
+        services.AddScoped<RecordingDomainEventQueue>();
+        services.AddScoped<IDomainEventQueue>(sp => sp.GetRequiredService<RecordingDomainEventQueue>());
+
         services.AddSingleton<IValidator<RegisterUserCommand>, RegisterUserCommandValidator>();
         services.AddSingleton<IValidator<LoginUserCommand>, LoginUserCommandValidator>();
 
@@ -92,6 +99,7 @@ public sealed class InMemoryIdentityFixture : IDisposable
         services.AddScoped<ResetPasswordHandler>();
         services.AddScoped<ChangeMyPasswordHandler>();
         services.AddScoped<LoginWithGoogleHandler>();
+        services.AddScoped<UserRegisteredEmailHandler>();
 
         // Escopo do dashboard: precisa do Identity real (papéis do utilizador) e do repositório de
         // empresas, por isso vive aqui e não num teste unitário com UserManager falsificado.

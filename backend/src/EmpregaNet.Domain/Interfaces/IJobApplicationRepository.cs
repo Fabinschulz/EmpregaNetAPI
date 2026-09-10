@@ -19,6 +19,19 @@ public interface IJobApplicationRepository : IBaseRepository<JobApplication>
     Task<JobApplicationProjection?> GetProjectionByIdAsync(long id, CancellationToken cancellationToken);
 
     /// <summary>
+    /// Dados de notificação de uma candidatura (vaga, empresa e candidato) resolvidos numa consulta.
+    /// </summary>
+    Task<JobApplicationNotificationProjection?> GetNotificationProjectionAsync(long id, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Candidaturas da vaga cujo processo está em aberto (<see cref="JobApplication.OpenStatuses"/>),
+    /// <b>rastreadas</b> para poderem ser alteradas.
+    /// </summary>
+    Task<IReadOnlyList<JobApplication>> GetOpenByJobIdAsync(long jobId, CancellationToken cancellationToken);
+
+    Task<int> CountOpenByJobIdAsync(long jobId, CancellationToken cancellationToken);
+
+    /// <summary>
     /// Quantas candidaturas activas o utilizador tem em cada status. Agregado no banco: a ficha do
     /// candidato precisa da contagem de candidaturas por status, mas não precisa de todas as candidaturas.
     /// </summary>

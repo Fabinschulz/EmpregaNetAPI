@@ -6,6 +6,7 @@ import {
   jobFormToRequest,
   jobFormValuesFromResponse
 } from '@/features/recrutamento/vagas/form/job-form-schema';
+import { jobStatusLabel } from '@/features/recrutamento/vagas/close-job-copy';
 import { jobResponseSchema } from '@/features/recrutamento/vagas/service/jobs-response-schema';
 import type { BusinessRulesWorld } from '../../support/world';
 import { getByPath } from '../../support/object-path';
@@ -126,6 +127,6 @@ Then(
 
 Then('o rótulo de situação da vaga deve ser {string}', function (this: BusinessRulesWorld, esperado: string) {
   const dto = jobResponseSchema.parse(this.data.rawJob);
-  // Mesma expressão usada na listagem de recrutamento e no detalhe público.
-  expect(dto.isActive ? 'Ativa' : 'Encerrada').to.equal(esperado);
+  // Mesmo rótulo que a listagem e a gestão da vaga exibem, agora a partir da função de produção.
+  expect(jobStatusLabel(dto.isActive)).to.equal(esperado);
 });

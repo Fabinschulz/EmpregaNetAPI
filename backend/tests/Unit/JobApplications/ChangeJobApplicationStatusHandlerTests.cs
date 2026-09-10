@@ -4,9 +4,11 @@ using EmpregaNet.Application.Common.Exceptions;
 using EmpregaNet.Application.JobApplications.Commands;
 using EmpregaNet.Application.JobApplications.ViewModel;
 using EmpregaNet.Domain.Common;
+using EmpregaNet.Application.JobApplications.Events;
 using EmpregaNet.Domain.Entities;
 using EmpregaNet.Domain.Enums;
 using EmpregaNet.Domain.Interfaces;
+using EmpregaNet.Tests.Support;
 using FluentAssertions;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
@@ -28,11 +30,13 @@ public sealed class ChangeJobApplicationStatusHandlerTests
     private readonly Mock<IJobApplicationRepository> _applications = new();
     private readonly Mock<IJobRepository> _jobs = new();
     private readonly Mock<IJobEmployerAccess> _employerAccess = new();
+    private readonly RecordingDomainEventQueue _domainEvents = new();
 
     private ChangeJobApplicationStatusCommandHandler CreateSut() =>
         new(_applications.Object,
             _jobs.Object,
             _employerAccess.Object,
+            _domainEvents,
             NullLogger<ChangeJobApplicationStatusCommandHandler>.Instance);
 
     private static Job CreateJob() => new(
@@ -132,5 +136,43 @@ public sealed class ChangeJobApplicationStatusHandlerTests
 
         var assertion = await act.Should().ThrowAsync<ValidationAppException>();
         assertion.Which.Code.Should().Be(DomainErrorEnum.INVALID_ACTION_FOR_STATUS);
+    }
+
+    // N2-N5: cada transição válida do recrutador tem de deixar exactamente um evento na fila, com a
+    // razão que escolhe o texto do e-mail.
+    [Theory]
+    [InlineData(ApplicationStatusEnum.Processing)]
+    [InlineData(ApplicationStatusEnum.Approved)]
+    [InlineData(ApplicationStatusEnum.Rejected)]
+    [InlineData(ApplicationStatusEnum.Finished)]
+    public async Task Handle_TransicaoValida_DeveEnfileirarUmEventoDeMudancaDeStatus(ApplicationStatusEnum destino)
+    {
+        var application = new JobApplication(JobId, userId: 1);
+        GivenApplication(application);
+
+        await ExecuteAsync(destino.ToString());
+
+        var evento = _domainEvents.RecordedOf<JobApplicationStatusChanged>().Should().ContainSingle().Subject;
+        // A entidade do teste não passou pelo banco, logo Id fica 0; o que interessa aqui é a vaga,
+        // o candidato, os dois estados e a razão — é isso que decide o e-mail.
+        evento.JobId.Should().Be(JobId);
+        evento.CandidateUserId.Should().Be(1);
+        evento.PreviousStatus.Should().Be(ApplicationStatusEnum.Pending);
+        evento.NewStatus.Should().Be(destino);
+        evento.Reason.Should().Be(JobApplicationNotificationReason.StatusChanged);
+    }
+
+    // CA-04: repetir a mesma transição não pode gerar um segundo e-mail. A recusa acontece antes do
+    // enfileiramento, portanto não há evento para publicar.
+    [Fact]
+    public async Task Handle_TransicaoRecusada_NaoDeveEnfileirarEvento()
+    {
+        var application = new JobApplication(JobId, userId: 1);
+        GivenApplication(application);
+
+        var act = async () => await ExecuteAsync(nameof(ApplicationStatusEnum.Pending));
+        await act.Should().ThrowAsync<ValidationAppException>();
+
+        _domainEvents.Recorded.Should().BeEmpty();
     }
 }

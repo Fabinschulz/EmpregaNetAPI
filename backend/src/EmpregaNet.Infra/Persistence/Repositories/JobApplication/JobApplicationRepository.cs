@@ -65,6 +65,52 @@ public class JobApplicationRepository : BaseRepository<JobApplication>, IJobAppl
             .FirstOrDefaultAsync(cancellationToken);
     }
 
+    public async Task<JobApplicationNotificationProjection?> GetNotificationProjectionAsync(
+        long id,
+        CancellationToken cancellationToken)
+    {
+        var query =
+            from application in _context.JobApplications.AsNoTracking()
+            where application.Id == id
+            join job in _context.Jobs.AsNoTracking() on application.JobId equals job.Id into jobs
+            from job in jobs.DefaultIfEmpty()
+            join company in _context.Companies.AsNoTracking() on job.CompanyId equals company.Id into companies
+            from company in companies.DefaultIfEmpty()
+            join user in _context.Users.AsNoTracking() on application.UserId equals user.Id into candidates
+            from candidate in candidates.DefaultIfEmpty()
+            select new JobApplicationNotificationProjection(
+                application.Id,
+                application.JobId,
+                job != null ? job.Title : string.Empty,
+                company != null ? company.CompanyName : string.Empty,
+                application.UserId,
+                candidate != null ? (candidate.UserName ?? string.Empty) : string.Empty,
+                candidate != null ? (candidate.Email ?? string.Empty) : string.Empty);
+
+        return await query.FirstOrDefaultAsync(cancellationToken);
+    }
+
+    public async Task<IReadOnlyList<JobApplication>> GetOpenByJobIdAsync(long jobId, CancellationToken cancellationToken)
+    {
+        return await _context.JobApplications
+            .Where(a => a.JobId == jobId
+                        && !a.IsDeleted
+                        && JobApplication.OpenStatuses.Contains(a.Status))
+            .OrderBy(a => a.Id)
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<int> CountOpenByJobIdAsync(long jobId, CancellationToken cancellationToken)
+    {
+        return await _context.JobApplications
+            .AsNoTracking()
+            .CountAsync(
+                a => a.JobId == jobId
+                     && !a.IsDeleted
+                     && JobApplication.OpenStatuses.Contains(a.Status),
+                cancellationToken);
+    }
+
     public async Task<IReadOnlyDictionary<ApplicationStatusEnum, int>> GetStatusCountsByUserAsync(
         long userId,
         CancellationToken cancellationToken)

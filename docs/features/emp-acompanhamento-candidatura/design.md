@@ -1,5 +1,5 @@
 ---
-version: 1.1.0
+version: 1.3.0
 date: 2026-09-01
 status: Approved
 ---
@@ -154,7 +154,7 @@ Se o e-mail falhar, o comando já está commitado e a resposta ao recrutador é 
 
 | Peça | Camada | Responsabilidade |
 | ---- | ------ | ---------------- |
-| `IDomainEventQueue` | Application/Abstractions | Fila *scoped* por requisição: `Enqueue`, `Drain` |
+| `IDomainEventQueue` | Application/Abstractions | Fila *scoped* por requisição: `Enqueue` (**idempotente** — ver abaixo), `Drain` |
 | `DomainEventQueue` | Infra | Implementação em memória, ciclo de vida *scoped* |
 | `NotificationDispatchBehavior<TRequest,TResponse>` | Infra/Behaviors | Após `next()` com sucesso, drena a fila e faz `Publish`. Registado **antes** de `TransactionBehavior` |
 | `JobApplicationStatusChangedEmailHandler` | Application/JobApplications/Events | `INotificationHandler<JobApplicationStatusChanged>`; monta o payload e chama o serviço de e-mail; **captura toda excepção e regista** (W1/W2) |
@@ -183,9 +183,27 @@ O link usa `AppUrlsOptions.PublicAppBaseUrl` (já existente). É preciso **acres
 | N6 vaga encerrada | `CloseJobHandler` (um evento por candidatura afectada) | `JobClosed` |
 | N7 cancelada pelo candidato | `CancelJobApplicationHandler` | `CanceledByCandidate` |
 
-**Idempotência (W3):** garantida pelo domínio, sem tabela de controlo. `ChangeStatus` já lança quando o
-status é igual ao actual, e `CancelByCandidate` recusa a partir de estado não cancelável — uma segunda
-tentativa da mesma transição falha antes de enfileirar o evento.
+**Idempotência (W3)** *(reforçado em v1.2.0 — a v1.1.0 era incompleta)*: a primeira linha de defesa é o
+domínio, sem tabela de controlo. `ChangeStatus` já lança quando o status é igual ao actual, e
+`CancelByCandidate` recusa a partir de estado não cancelável — uma segunda tentativa da mesma transição
+falha antes de enfileirar o evento.
+
+Isso, porém, **não cobria o retry de infraestrutura**. `EnableRetryOnFailure` está activo na configuração
+do EF, e `UnityOfWork.ExecuteInTransactionAsync` reexecuta o delegate — incluindo o `Enqueue` — quando há
+falha transitória de banco. O `Drain` corre uma vez, fora da transacção: a tentativa falhada deixa o evento
+na fila e a bem-sucedida acrescenta outro, e o candidato recebia **o mesmo e-mail duas vezes**. Não é dado
+errado, mas contraria CA-04 directamente.
+
+**Decisão:** `Enqueue` tem **semântica de conjunto**, por identidade do evento (candidatura + status novo +
+`Reason`). Um retry re-enfileira o mesmo evento e a fila descarta-o.
+
+Alternativa rejeitada: limpar a fila no início de cada tentativa, dentro do `TransactionBehavior`. Resolveria
+o mesmo problema ao custo de o behavior transaccional passar a conhecer a fila de eventos — precisamente o
+acoplamento que a separação dos dois behaviors existe para evitar. A idempotência na fila resolve sem que
+nada precise de saber que houve retry.
+
+Isto é seguro porque não há caso legítimo de dois eventos idênticos na mesma requisição: as guardas do
+domínio impedem a transição repetida, e no `JobClosed` cada evento tem `JobApplicationId` distinto.
 
 ### 3.5 Teto de envio
 
@@ -243,7 +261,11 @@ Passa a, na mesma transacção: encerrar a vaga (já faz) **e** mover as candida
 (`Pending`, `Processing`) para `Canceled`, enfileirando um evento `JobClosed` por candidatura (V3, N6).
 Candidaturas em `Approved`, `Finished`, `Rejected` ou canceladas não são tocadas.
 
-Resposta passa de `bool` para um corpo com o efeito da operação, porque a UI precisa de o comunicar:
+Resposta passa a um corpo com o efeito da operação, porque a UI precisa de o comunicar. *(Corrigido em
+v1.2.0: a v1.0.0 afirmava que a resposta anterior era `bool`, e estava errada — o comando devolvia `bool`
+internamente, mas o endpoint respondia `200` com a **string** `"Vaga encerrada com sucesso."`. O frontend
+recebia-a sem parse e descartava-a, montando um toast fixo; por isso a troca não deixou consumidor para
+trás. Confirmado na implementação, dos dois lados.)*
 
 ```json
 { "jobId": 36, "closedAt": "2026-09-01T20:11:04Z", "affectedApplications": 3 }
@@ -251,10 +273,26 @@ Resposta passa de `bool` para um corpo com o efeito da operação, porque a UI p
 
 ### 4.4 Alterado — detalhe da vaga
 
-`JobViewModel` ganha **`openApplicationsCount`** (candidaturas em `Pending` + `Processing`). É o que
-alimenta a confirmação exigida por CA-17 *antes* de encerrar. Campo acrescentado, nada removido nem
-renomeado — compatível com os consumidores actuais
-([ADR 0009](../../sdd/adrs/0009-contratos-request-response-no-frontend.md)).
+*(Reescrito em v1.3.0. A v1.1.0 mandava acrescentar `openApplicationsCount` ao `JobViewModel`, e isso
+estava errado: `GET /api/jobs/{id}` é `[AllowAnonymous]` com `OutputCache` de 5 minutos. O campo saía para
+qualquer anónimo — quantas pessoas disputam cada vaga — e chegava ao recrutador com atraso, ao ponto de a
+confirmação poder afirmar "Nenhuma candidatura em aberto será cancelada" sobre uma vaga com fila. Era a
+mesma classe de defeito que esta feature existe para corrigir, a entrar por outra porta.)*
+
+A contagem vive num endpoint próprio:
+
+```http
+GET /api/jobs/{id}/open-applications-count      → { "jobId": 36, "openApplicationsCount": 3 }
+```
+
+- `[Authorize(Policy = Recrutamento)]` e **sem `OutputCache`** — o número é lido no instante da decisão.
+- Aplica também `IJobEmployerAccess.EnsureCanManageCompanyAsync`: pertencer ao recrutamento não dá direito
+  à vaga de outra empresa, e sem esta verificação o endpoint mediria a procura das vagas de um concorrente.
+- O frontend consulta-o **ao abrir a confirmação**, não ao carregar a página — é o que mantém o número
+  fresco no momento em que ele sustenta uma decisão irreversível.
+
+`JobViewModel` fica **inalterado**, e a §5 deixa de valer no ponto em que dizia não haver nada a invalidar
+no output cache: não há, porque a contagem deixou de passar por lá.
 
 ## 5. Impacto nas leituras existentes
 

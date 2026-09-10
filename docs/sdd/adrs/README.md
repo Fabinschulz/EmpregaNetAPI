@@ -16,6 +16,9 @@ Registos curtos de decisões **estruturais e duradouras** (stack, limites entre 
 | [0008](0008-formato-de-erro-da-api.md) | Erro da API com lista tipada de falhas por campo | Aceite |
 | [0009](0009-contratos-request-response-no-frontend.md) | Contratos do frontend nomeados por direção (Request / Response / FormValues) | Aceite |
 | [0010](0010-analytics-por-secao-com-escopo-no-servidor.md) | Analytics em endpoints por seção; escopo de empresa resolvido no servidor e lacunas de domínio declaradas na resposta | Aceite |
+| [0011](0011-notificacoes-de-andamento-fora-do-teto-de-emails.md) | Notificações de andamento de candidatura fora do teto diário de e-mails (delimita o [0003](0003-teto-diario-de-emails-por-destinatario.md)) | Aceite |
+| [0012](0012-despacho-de-eventos-de-dominio-apos-commit.md) | Efeitos colaterais não-transaccionais despachados após o commit, via fila de eventos por requisição | Aceite |
+| [0013](0013-estado-por-tentativa-no-limite-de-retry-transaccional.md) | `ChangeTracker` reposto a partir da segunda tentativa do retry transaccional; handler `ITransactional` sem efeito externo (estende o [0012](0012-despacho-de-eventos-de-dominio-apos-commit.md)) | Aceite |
 
 ## Como criar
 

@@ -1,6 +1,6 @@
-using EmpregaNet.Application.Auth.Configuration;
 using EmpregaNet.Application.Common.Exceptions;
 using EmpregaNet.Application.Abstraction;
+using EmpregaNet.Application.Auth.Events;
 using EmpregaNet.Application.Users.Identity;
 using EmpregaNet.Application.Utils.CustomValidation;
 using EmpregaNet.Domain.Entities;
@@ -10,7 +10,6 @@ using FluentValidation;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 
 namespace EmpregaNet.Application.Auth.Commands;
 
@@ -22,10 +21,12 @@ namespace EmpregaNet.Application.Auth.Commands;
 /// Antes, uma falha na role deixava o utilizador criado <b>sem role nenhuma</b>, de forma
 /// permanente, nenhum login posterior repetia a tentativa.
 ///
-/// <para><b>Ressalva:</b> o envio do e-mail de confirmação é um efeito colateral que não faz
-/// rollback. Ele acontece antes do commit, portanto uma falha no commit pode deixar um e-mail
-/// enviado para um registo que não existe, o link falha e o utilizador repete o registo. Foi
-/// aceite em troca da atomicidade de utilizador + role, que é um problema permanente de dados.</para>
+/// <para><b>O e-mail de confirmação não sai daqui.</b> O handler apenas declara
+/// <see cref="UserRegistered"/> na fila de eventos de domínio; o envio corre no
+/// <c>UserRegisteredEmailHandler</c>, já depois do commit. Dentro da transacção havia dois modos de
+/// falha que nenhum rollback desfaz: um commit falhado deixava um link de confirmação enviado para
+/// um registo que não existe, e uma reexecução da tentativa pela estratégia de retry mandava um
+/// segundo e-mail.</para>
 /// </remarks>
 public sealed record RegisterUserCommand(
     string Username,
@@ -40,23 +41,20 @@ public sealed class RegisterUserHandler : IRequestHandler<RegisterUserCommand, l
 {
     private readonly UserManager<User> _userManager;
     private readonly RoleManager<Role> _roleManager;
-    private readonly IAccountEmailService _accountEmail;
-    private readonly AppUrlsOptions _urls;
+    private readonly IDomainEventQueue _domainEvents;
     private readonly ILogger<RegisterUserHandler> _logger;
     private readonly IValidator<RegisterUserCommand> _validator;
 
     public RegisterUserHandler(
         UserManager<User> userManager,
         RoleManager<Role> roleManager,
-        IAccountEmailService accountEmail,
-        IOptions<AppUrlsOptions> urlsOptions,
+        IDomainEventQueue domainEvents,
         ILogger<RegisterUserHandler> logger,
         IValidator<RegisterUserCommand> validator)
     {
         _userManager = userManager;
         _roleManager = roleManager;
-        _accountEmail = accountEmail;
-        _urls = urlsOptions.Value;
+        _domainEvents = domainEvents;
         _logger = logger;
         _validator = validator;
     }
@@ -131,19 +129,7 @@ public sealed class RegisterUserHandler : IRequestHandler<RegisterUserCommand, l
                 DomainErrorEnum.RESOURCE_CREATION_FAILED);
         }
 
-        try
-        {
-            var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-            var safeToken = Uri.EscapeDataString(token);
-            var baseUrl = _urls.PublicAppBaseUrl.TrimEnd('/');
-            var path = _urls.EmailConfirmationPath.StartsWith('/') ? _urls.EmailConfirmationPath : "/" + _urls.EmailConfirmationPath;
-            var link = $"{baseUrl}{path}?userId={user.Id}&token={safeToken}";
-            await _accountEmail.SendEmailConfirmationLinkAsync(user.Email!, link, cancellationToken);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Falha ao enviar e-mail de confirmação para o utilizador {UserId}.", user.Id);
-        }
+        _domainEvents.Enqueue(new UserRegistered(user.Id));
 
         return user.Id;
     }

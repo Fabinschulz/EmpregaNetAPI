@@ -46,7 +46,7 @@ public sealed class GetDashboardOverviewHandler
 
         var funnel = BuildFunnel(byStatus);
         var previousConversion = ConversionRate(
-            byStatus.Sum(item => item.Previous),
+            EffectiveApplications(byStatus, previousPeriod: true),
             CountOf(byStatus, ApplicationStatusEnum.Approved, previousPeriod: true)
                 + CountOf(byStatus, ApplicationStatusEnum.Finished, previousPeriod: true));
 
@@ -108,8 +108,9 @@ public sealed class GetDashboardOverviewHandler
                 "Taxa de aprovação",
                 conversionRate,
                 previousConversionRate,
-                "Candidaturas do período que chegaram à aprovação (aprovadas ou concluídas), sobre o "
-                + "total recebido. Não é taxa de contratação: o domínio não registra contratação.",
+                "Candidaturas do período que chegaram à aprovação (aprovadas ou concluídas), sobre as "
+                + "que participaram do processo, e foram canceladas, pela empresa ou pelo candidato, ficam "
+                + "fora da base. Não é taxa de contratação: o domínio não registra contratação.",
                 unit: "percent")
         };
 
@@ -134,10 +135,21 @@ public sealed class GetDashboardOverviewHandler
     /// atual: quem foi aprovado e depois concluído hoje aparece como concluído. Contar só o status
     /// <c>Approved</c> faria a etapa encolher justamente quando o processo avança, o funil mostraria
     /// piora onde houve progresso.</para>
+    ///
+    /// <para><b>A base exclui as canceladas</b> — <c>Canceled</c> (a empresa encerrou a vaga ou
+    /// descartou) e <c>CanceledByCandidate</c> (o candidato desistiu). Uma candidatura cancelada saiu
+    /// do processo e nunca teve chance de chegar à aprovação; mantê-la na base infla o denominador e
+    /// faz a taxa de conversão cair sem que nada tenha piorado no recrutamento. Com o cancelamento
+    /// pelo candidato disponível na plataforma, esse volume passou a existir de verdade.</para>
+    ///
+    /// <para><b>Consequência a comunicar:</b> os números do funil e a taxa de conversão <b>mudam</b>
+    /// face ao que o dashboard exibia antes - a base fica menor e a conversão sobe. Não é correcção de
+    /// bug de cálculo, é mudança de definição da métrica, e quem acompanha a série histórica precisa
+    /// de saber a data do corte.</para>
     /// </remarks>
     private static DashboardFunnelViewModel BuildFunnel(IReadOnlyList<DashboardStatusComparison> byStatus)
     {
-        var applications = byStatus.Sum(item => item.Current);
+        var applications = EffectiveApplications(byStatus);
         var reachedApproval =
             CountOf(byStatus, ApplicationStatusEnum.Approved) + CountOf(byStatus, ApplicationStatusEnum.Finished);
         var finished = CountOf(byStatus, ApplicationStatusEnum.Finished);
@@ -153,7 +165,20 @@ public sealed class GetDashboardOverviewHandler
             stages,
             ConversionRate(applications, reachedApproval),
             "O funil começa na candidatura: a plataforma não registra visualizações de vaga. "
+            + "Candidaturas canceladas (pela empresa ou pelo candidato) não entram na base. "
             + "A última etapa é a conclusão do processo, que não distingue contratação de encerramento sem contratação.");
+    }
+
+    /// <summary>
+    /// Base do funil: candidaturas que participaram do processo, sem as que saíram por cancelamento.
+    /// </summary>
+    private static int EffectiveApplications(
+        IReadOnlyList<DashboardStatusComparison> byStatus,
+        bool previousPeriod = false)
+    {
+        return byStatus
+            .Where(item => item.Status is not (ApplicationStatusEnum.Canceled or ApplicationStatusEnum.CanceledByCandidate))
+            .Sum(item => previousPeriod ? item.Previous : item.Current);
     }
 
     private static int CountOf(

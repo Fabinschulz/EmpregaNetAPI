@@ -16,6 +16,9 @@ public sealed class AppUrlsOptions
     /// <summary>Caminho da página que confirma o e-mail (ex.: /auth/confirm-email).</summary>
     public string EmailConfirmationPath { get; set; } = "/auth/confirm-email";
 
+    /// <summary>Caminho da área onde o candidato acompanha as suas candidaturas (ex.: /candidaturas).</summary>
+    public string ApplicationsPath { get; set; } = "/candidaturas";
+
     /// <summary>Origens permitidas no CORS (front-end que consome a API).</summary>
     public string[] CorsAllowedOrigins { get; set; } = ["http://localhost:3000", "https://localhost:3000"];
 

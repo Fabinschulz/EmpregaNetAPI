@@ -2,10 +2,12 @@ using EmpregaNet.Application.Auth;
 using EmpregaNet.Application.Auth.ViewModel;
 using EmpregaNet.Application.Common.Exceptions;
 using EmpregaNet.Application.JobApplications.Commands;
+using EmpregaNet.Application.JobApplications.Events;
 using EmpregaNet.Domain.Common;
 using EmpregaNet.Domain.Entities;
 using EmpregaNet.Domain.Enums;
 using EmpregaNet.Domain.Interfaces;
+using EmpregaNet.Tests.Support;
 using FluentAssertions;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
@@ -25,9 +27,10 @@ public sealed class CancelJobApplicationHandlerTests
 
     private readonly Mock<IJobApplicationRepository> _repository = new();
     private readonly Mock<IHttpCurrentUser> _currentUser = new();
+    private readonly RecordingDomainEventQueue _domainEvents = new();
 
     private CancelJobApplicationHandler CreateSut() =>
-        new(_repository.Object, _currentUser.Object, NullLogger<CancelJobApplicationHandler>.Instance);
+        new(_repository.Object, _currentUser.Object, _domainEvents, NullLogger<CancelJobApplicationHandler>.Instance);
 
     private void GivenAuthenticatedUser(long userId, params string[] roles)
     {
@@ -183,5 +186,34 @@ public sealed class CancelJobApplicationHandlerTests
 
         var assertion = await act.Should().ThrowAsync<ValidationAppException>();
         assertion.Which.Code.Should().Be(DomainErrorEnum.MISSING_RESOURCE_PERMISSION);
+    }
+
+    // N7: o cancelamento confirmado deixa exactamente um evento na fila, com a razão própria do ato
+    // do candidato — é o que dá ao e-mail o texto de confirmação em vez do genérico de mudança.
+    [Fact]
+    public async Task Handle_CancelamentoConfirmado_DeveEnfileirarEventoDoAtoDoCandidato()
+    {
+        GivenAuthenticatedUser(CandidateId);
+        GivenStoredApplication(CreateApplication(CandidateId, ApplicationStatusEnum.Processing));
+
+        await CreateSut().Handle(new CancelJobApplicationCommand(ApplicationId), CancellationToken.None);
+
+        var evento = _domainEvents.RecordedOf<JobApplicationStatusChanged>().Should().ContainSingle().Subject;
+        evento.CandidateUserId.Should().Be(CandidateId);
+        evento.PreviousStatus.Should().Be(ApplicationStatusEnum.Processing);
+        evento.NewStatus.Should().Be(ApplicationStatusEnum.CanceledByCandidate);
+        evento.Reason.Should().Be(JobApplicationNotificationReason.CanceledByCandidate);
+    }
+
+    [Fact]
+    public async Task Handle_CancelamentoRecusado_NaoDeveEnfileirarEvento()
+    {
+        GivenAuthenticatedUser(CandidateId);
+        GivenStoredApplication(CreateApplication(CandidateId, ApplicationStatusEnum.Approved));
+
+        var act = async () => await CreateSut().Handle(new CancelJobApplicationCommand(ApplicationId), CancellationToken.None);
+        await act.Should().ThrowAsync<ValidationAppException>();
+
+        _domainEvents.Recorded.Should().BeEmpty();
     }
 }

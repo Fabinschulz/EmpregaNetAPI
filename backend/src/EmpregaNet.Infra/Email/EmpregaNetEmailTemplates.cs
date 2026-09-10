@@ -1,4 +1,6 @@
 using System.Net;
+using EmpregaNet.Domain.Enums;
+using EmpregaNet.Application.JobApplications.Events;
 
 namespace EmpregaNet.Infra.Email;
 
@@ -42,6 +44,126 @@ internal static class EmpregaNetEmailTemplates
             accentSoft: "#ecfdf3",
             iconGlyph: "&#9993;",
             footerHint: $"Se não criou uma conta em {ProductName}, pode ignorar este e-mail com segurança.");
+    }
+
+    /// <summary>
+    /// Notificação de alteração do estado da candidatura: o assunto, o tom visual e o corpo variam
+    /// conforme a razão do aviso e o novo estado; o conteúdo central (vaga, empresa, estado e data)
+    /// permanece igual em todos os cenários.
+    /// </summary>
+    public static (string Subject, string HtmlBody) JobApplicationStatus(
+        string candidateName,
+        string jobTitle,
+        string companyName,
+        string statusDescription,
+        ApplicationStatusEnum newStatus,
+        string occurredAt,
+        string applicationsLink,
+        JobApplicationNotificationReason reason)
+    {
+        var safeLink = WebUtility.HtmlEncode(applicationsLink);
+        var safeJob = WebUtility.HtmlEncode(jobTitle);
+        var safeCompany = WebUtility.HtmlEncode(companyName);
+        var safeStatus = WebUtility.HtmlEncode(statusDescription);
+        var safeDate = WebUtility.HtmlEncode(occurredAt);
+
+        var (subjectSuffix, headline, intro, accent, accentSoft, iconGlyph) = reason switch
+        {
+            JobApplicationNotificationReason.Applied => (
+                $"Candidatura enviada - {jobTitle}",
+                "Candidatura recebida",
+                $"Recebemos a sua candidatura para <strong>{safeJob}</strong>. Ela já está registada e você acompanha cada mudança por aqui.",
+                "#2563eb", "#eff6ff", "&#128221;"),
+
+            JobApplicationNotificationReason.JobClosed => (
+                $"Vaga encerrada - {jobTitle}",
+                "A vaga foi encerrada",
+                $"A empresa encerrou a vaga <strong>{safeJob}</strong>, e por isso a sua candidatura foi finalizada. Continuam disponíveis outras vagas na plataforma.",
+                "#d97706", "#fffbeb", "&#128683;"),
+
+            JobApplicationNotificationReason.CanceledByCandidate => (
+                $"Candidatura cancelada - {jobTitle}",
+                "Candidatura cancelada",
+                $"Confirmamos o cancelamento da sua candidatura para <strong>{safeJob}</strong>. Se mudar de ideia e a vaga continuar aberta, pode candidatar-se de novo.",
+                "#6b7280", "#f3f4f6", "&#10006;"),
+
+            _ => StatusChangeTreatment(newStatus, jobTitle, safeJob, safeStatus)
+        };
+
+        var greeting = string.IsNullOrWhiteSpace(candidateName)
+            ? string.Empty
+            : $"Olá, {WebUtility.HtmlEncode(candidateName.Trim())}! ";
+
+        var details = $"""
+            {greeting}{intro}
+            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="margin:20px 0 0;text-align:left;">
+              <tr>
+                <td style="padding:6px 0;font-size:13px;color:#8e8e93;width:38%;">Vaga</td>
+                <td style="padding:6px 0;font-size:14px;color:#1c1c1e;font-weight:600;">{safeJob}</td>
+              </tr>
+              <tr>
+                <td style="padding:6px 0;font-size:13px;color:#8e8e93;">Empresa</td>
+                <td style="padding:6px 0;font-size:14px;color:#1c1c1e;">{safeCompany}</td>
+              </tr>
+              <tr>
+                <td style="padding:6px 0;font-size:13px;color:#8e8e93;">Situação</td>
+                <td style="padding:6px 0;font-size:14px;color:#1c1c1e;font-weight:600;">{safeStatus}</td>
+              </tr>
+              <tr>
+                <td style="padding:6px 0;font-size:13px;color:#8e8e93;">Atualizado em</td>
+                <td style="padding:6px 0;font-size:14px;color:#1c1c1e;">{safeDate}</td>
+              </tr>
+            </table>
+            """;
+
+        return Build(
+            subjectSuffix: subjectSuffix,
+            preheader: $"{statusDescription} - {jobTitle}",
+            headline: headline,
+            body: details,
+            ctaLabel: "Ver minhas candidaturas",
+            actionLink: safeLink,
+            accent: accent,
+            accentSoft: accentSoft,
+            iconGlyph: iconGlyph,
+            footerHint: "Você recebe este aviso porque tem uma candidatura ativa na EmpregaUAI.");
+    }
+    
+    private static (string SubjectSuffix, string Headline, string Intro, string Accent, string AccentSoft, string IconGlyph)
+        StatusChangeTreatment(ApplicationStatusEnum newStatus, string jobTitle, string safeJob, string safeStatus)
+    {
+        return newStatus switch
+        {
+            ApplicationStatusEnum.Approved => (
+                $"Você avançou no processo - {jobTitle}",
+                "Sua candidatura foi aprovada",
+                $"Boa notícia: a sua candidatura para <strong>{safeJob}</strong> foi <strong>aprovada</strong>. A empresa entrará em contato com os próximos passos.",
+                "#16a34a", "#ecfdf3", "&#127881;"),
+
+            ApplicationStatusEnum.Rejected => (
+                $"Atualização da candidatura - {jobTitle}",
+                "Sua candidatura não seguiu no processo",
+                $"A empresa concluiu a avaliação da sua candidatura para <strong>{safeJob}</strong> e decidiu não seguir com ela desta vez. Isto não impede novas candidaturas a outras vagas.",
+                "#dc2626", "#fef2f2", "&#128533;"),
+
+            ApplicationStatusEnum.Processing => (
+                $"Sua candidatura está em análise - {jobTitle}",
+                "Sua candidatura está em análise",
+                $"A empresa começou a analisar a sua candidatura para <strong>{safeJob}</strong>. Avisamos aqui assim que houver uma decisão.",
+                "#2563eb", "#eff6ff", "&#128269;"),
+
+            ApplicationStatusEnum.Finished => (
+                $"Processo concluído - {jobTitle}",
+                "O processo foi concluído",
+                $"O processo seletivo da vaga <strong>{safeJob}</strong> foi concluído. Obrigado por ter participado.",
+                "#6b7280", "#f3f4f6", "&#9989;"),
+
+            _ => (
+                $"Atualização da candidatura - {jobTitle}",
+                "Sua candidatura mudou de estado",
+                $"Há novidade na sua candidatura para <strong>{safeJob}</strong>. O estado atual é <strong>{safeStatus}</strong>.",
+                "#6b7280", "#f3f4f6", "&#128276;")
+        };
     }
 
     private static (string Subject, string HtmlBody) Build(

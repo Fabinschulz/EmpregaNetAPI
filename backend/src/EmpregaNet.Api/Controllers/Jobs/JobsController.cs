@@ -156,12 +156,29 @@ public class JobsController : MainController<CreateJobCommand, UpdateJobCommand,
     public override Task<IActionResult> Delete([FromRoute] long id) => base.Delete(id);
 
     /// <summary>
-    /// Encerra uma vaga por ID, marcando-a como inativa e removendo-a dos resultados de busca, mas mantendo os dados para histórico e relatórios. 
-    /// Apenas para perfis de recrutamento.
+    /// Quantas candidaturas da vaga ainda estão em aberto (recebidas ou em análise). Apenas para
+    /// perfis de recrutamento com acesso à empresa da vaga.
+    /// </summary>
+    [Authorize(Policy = Constants.AuthPolicies.Recrutamento)]
+    [HttpGet("{id:long}/open-applications-count")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(JobOpenApplicationsCountViewModel))]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(DomainError))]
+    [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(DomainError))]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(DomainError))]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(DomainError))]
+    public async Task<IActionResult> GetOpenApplicationsCount([FromRoute] long id)
+    {
+        var result = await _mediator.Send(new GetJobOpenApplicationsCountQuery(id));
+        return Ok(result);
+    }
+
+    /// <summary>
+    /// Encerra uma vaga por ID: sai dos resultados de busca, os dados ficam para histórico e as
+    /// candidaturas ainda em aberto são canceladas. Apenas para perfis de recrutamento.
     /// </summary>
     [Authorize(Policy = Constants.AuthPolicies.Recrutamento)]
     [HttpPut("{id:long}/close")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CloseJobResult))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(DomainError))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(DomainError))]
     [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(DomainError))]
@@ -169,8 +186,8 @@ public class JobsController : MainController<CreateJobCommand, UpdateJobCommand,
     [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(DomainError))]
     public async Task<IActionResult> Close([FromRoute] long id)
     {
-        await _mediator.Send(new CloseJobCommand(id));
+        var result = await _mediator.Send(new CloseJobCommand(id));
         await InvalidateCacheForEntity(id);
-        return Ok("Vaga encerrada com sucesso.");
+        return Ok(result);
     }
 }

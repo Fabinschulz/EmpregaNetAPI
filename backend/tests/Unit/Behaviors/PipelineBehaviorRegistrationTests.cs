@@ -1,5 +1,8 @@
 using EmpregaNet.Domain.Interfaces;
+using EmpregaNet.Application.Abstraction;
+using EmpregaNet.Infra;
 using EmpregaNet.Infra.Behaviors;
+using EmpregaNet.Infra.Events;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
@@ -34,11 +37,13 @@ public sealed class PipelineBehaviorRegistrationTests
         services.AddLogging(b => b.SetMinimumLevel(LogLevel.Warning));
         services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
         services.AddScoped(_ => new Mock<IUnityOfWork>().Object);
+        services.AddScoped(_ => new Mock<IMediator>().Object);
+        services.AddScoped<IDomainEventQueue, DomainEventQueue>();
 
-        // Mesma ordem do EmpregaNet.Infra.DependencyInjection.
-        services.AddScoped(typeof(IPipelineBehavior<,>), typeof(PerformanceBehaviour<,>));
-        services.AddScoped(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
-        services.AddScoped(typeof(IPipelineBehavior<,>), typeof(TransactionBehavior<,>));
+        // O registo REAL da API, e não uma cópia da ordem. Recopiar as linhas aqui testaria que a
+        // ServiceCollection preserva ordem de inserção — coisa que a plataforma já garante — e
+        // continuaria verde com a produção alterada.
+        services.AddPipelineBehaviors();
 
         return services.BuildServiceProvider();
     }
@@ -50,22 +55,51 @@ public sealed class PipelineBehaviorRegistrationTests
 
         var behaviors = provider.GetServices<IPipelineBehavior<PingQuery, string>>().ToList();
 
-        behaviors.Should().HaveCount(2, "uma query não satisfaz a restrição ITransactional");
+        behaviors.Should().HaveCount(3, "uma query não satisfaz a restrição ITransactional");
         behaviors[0].Should().BeOfType<PerformanceBehaviour<PingQuery, string>>();
         behaviors[1].Should().BeOfType<ValidationBehavior<PingQuery, string>>();
+        behaviors[2].Should().BeOfType<NotificationDispatchBehavior<PingQuery, string>>();
     }
 
     [Fact]
-    public void Command_Transacional_DeveResolverOsTresBehaviors()
+    public void Command_Transacional_DeveResolverOsQuatroBehaviors()
     {
         using var provider = BuildProvider();
 
         var behaviors = provider.GetServices<IPipelineBehavior<PingCommand, string>>().ToList();
 
-        behaviors.Should().HaveCount(3);
+        behaviors.Should().HaveCount(4);
         behaviors[0].Should().BeOfType<PerformanceBehaviour<PingCommand, string>>();
         behaviors[1].Should().BeOfType<ValidationBehavior<PingCommand, string>>();
-        behaviors[2].Should().BeOfType<TransactionBehavior<PingCommand, string>>();
+        behaviors[2].Should().BeOfType<NotificationDispatchBehavior<PingCommand, string>>();
+        behaviors[3].Should().BeOfType<TransactionBehavior<PingCommand, string>>();
+    }
+
+    /// <summary>
+    /// A garantia central da notificação, afirmada sobre o registo <b>de produção</b>: o despacho de
+    /// eventos é mais externo que a transacção.
+    /// </summary>
+    /// <remarks>
+    /// O pipeline é montado de trás para frente, portanto índice menor = camada mais externa = observa
+    /// o commit já feito. Se alguém inverter as duas linhas em <c>AddPipelineBehaviors</c>, o e-mail
+    /// passa a sair de dentro da transacção e um rollback deixa o candidato informado de uma aprovação
+    /// que não existe — este teste é o que falha nesse momento.
+    /// </remarks>
+    [Fact]
+    public void Command_DespachoDeEventos_DeveSerMaisExternoQueATransacao()
+    {
+        using var provider = BuildProvider();
+
+        var behaviors = provider.GetServices<IPipelineBehavior<PingCommand, string>>().ToList();
+
+        var dispatchIndex = behaviors.FindIndex(b => b is NotificationDispatchBehavior<PingCommand, string>);
+        var transactionIndex = behaviors.FindIndex(b => b is TransactionBehavior<PingCommand, string>);
+
+        dispatchIndex.Should().BeGreaterThanOrEqualTo(0);
+        transactionIndex.Should().BeGreaterThanOrEqualTo(0);
+        dispatchIndex.Should().BeLessThan(
+            transactionIndex,
+            "índice menor = registado antes = camada mais externa = observa a transacção já commitada");
     }
 
     /// <summary>

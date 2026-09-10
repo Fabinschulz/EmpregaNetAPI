@@ -31,6 +31,12 @@ export const jobResponseSchema = z.object({
 });
 
 export type JobResponse = z.infer<typeof jobResponseSchema>;
+
+export const openApplicationsCountResponseSchema = z.object({
+  openApplicationsCount: z.number().int().nonnegative()
+});
+export type OpenApplicationsCountResponse = z.infer<typeof openApplicationsCountResponseSchema>;
+
 export const jobsListResponseSchema = createPaginatedResponseSchema(jobResponseSchema);
 export type JobsListResponse = z.infer<typeof jobsListResponseSchema>;
 
@@ -41,3 +47,11 @@ const companyOptionResponseSchema = z.object({
 
 export const companyOptionsResponseSchema = z.array(companyOptionResponseSchema);
 export type CompanyOption = z.infer<typeof companyOptionResponseSchema>;
+
+export const closeJobResponseSchema = z.object({
+  jobId: z.number().int(),
+  closedAt: z.string(),
+  affectedApplications: z.number().int().nonnegative()
+});
+
+export type CloseJobResponse = z.infer<typeof closeJobResponseSchema>;

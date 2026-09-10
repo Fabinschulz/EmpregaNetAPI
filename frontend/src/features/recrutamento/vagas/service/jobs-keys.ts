@@ -7,5 +7,6 @@ export const jobsKeys = {
   list: (params: ListQueryParams) => [...jobsKeys.lists(), params] as const,
   details: () => [...jobsKeys.all, 'detail'] as const,
   detail: (id: number) => [...jobsKeys.details(), id] as const,
+  openApplicationsCount: (id: number) => [...jobsKeys.detail(id), 'open-applications-count'] as const,
   selectableCompanies: () => [...jobsKeys.all, 'selectable-companies'] as const
 };

@@ -10,14 +10,20 @@ namespace EmpregaNet.Domain.Entities
     public class JobApplication : BaseEntity, IAggregateRoot
     {
         /// <summary>
-        /// Estados em que o candidato ainda pode desistir: o processo está em aberto e nenhum
-        /// desfecho foi comunicado.
+        /// Estados em que o processo está <b>em aberto</b>: a candidatura existe e nenhum desfecho foi
+        /// comunicado.
         /// </summary>
-        private static readonly ApplicationStatusEnum[] CancelableByCandidate =
+        public static readonly IReadOnlyList<ApplicationStatusEnum> OpenStatuses =
         [
             ApplicationStatusEnum.Pending,
             ApplicationStatusEnum.Processing
         ];
+
+        /// <summary>
+        /// Estados em que o candidato ainda pode desistir: o processo está em aberto e nenhum
+        /// desfecho foi comunicado.
+        /// </summary>
+        private static readonly IReadOnlyList<ApplicationStatusEnum> CancelableByCandidate = OpenStatuses;
 
         public long JobId { get; private set; }
         public long UserId { get; private set; }

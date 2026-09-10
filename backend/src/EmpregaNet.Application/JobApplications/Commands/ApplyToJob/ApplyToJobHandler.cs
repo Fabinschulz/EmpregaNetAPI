@@ -1,4 +1,6 @@
+using EmpregaNet.Application.Abstraction;
 using EmpregaNet.Application.Auth;
+using EmpregaNet.Application.JobApplications.Events;
 using EmpregaNet.Application.Common.Base;
 using EmpregaNet.Application.Common.Exceptions;
 using EmpregaNet.Domain.Entities;
@@ -17,6 +19,7 @@ public sealed class ApplyToJobHandler : IRequestHandler<CreateCommand<ApplyToJob
     private readonly IJobRepository _jobRepository;
     private readonly IJobApplicationRepository _jobApplicationRepository;
     private readonly IHttpCurrentUser _httpCurrentUser;
+    private readonly IDomainEventQueue _domainEvents;
     private readonly IValidator<CreateCommand<ApplyToJobCommand>> _validator;
     private readonly ILogger<ApplyToJobHandler> _logger;
 
@@ -24,12 +27,14 @@ public sealed class ApplyToJobHandler : IRequestHandler<CreateCommand<ApplyToJob
         IJobRepository jobRepository,
         IJobApplicationRepository jobApplicationRepository,
         IHttpCurrentUser httpCurrentUser,
+        IDomainEventQueue domainEvents,
         IValidator<CreateCommand<ApplyToJobCommand>> validator,
         ILogger<ApplyToJobHandler> logger)
     {
         _jobRepository = jobRepository;
         _jobApplicationRepository = jobApplicationRepository;
         _httpCurrentUser = httpCurrentUser;
+        _domainEvents = domainEvents;
         _validator = validator;
         _logger = logger;
     }
@@ -83,6 +88,16 @@ public sealed class ApplyToJobHandler : IRequestHandler<CreateCommand<ApplyToJob
 
         var application = new JobApplication(request.entity.JobId, _httpCurrentUser.UserId);
         var created = await _jobApplicationRepository.CreateAsync(application, cancellationToken);
+
+        _domainEvents.Enqueue(new JobApplicationStatusChanged(
+            JobApplicationId: created.Id,
+            JobId: created.JobId,
+            CandidateUserId: created.UserId,
+            PreviousStatus: ApplicationStatusEnum.NaoSelecionado,
+            NewStatus: created.Status,
+            OccurredAt: created.AppliedAt,
+            Reason: JobApplicationNotificationReason.Applied));
+
         _logger.LogInformation("Candidatura criada com sucesso. Id: {ApplicationId}", created.Id);
         return created.Id;
     }

@@ -1,5 +1,7 @@
+using EmpregaNet.Application.Abstraction;
 using EmpregaNet.Application.Auth;
 using EmpregaNet.Application.Common.Exceptions;
+using EmpregaNet.Application.JobApplications.Events;
 using EmpregaNet.Application.JobApplications.ViewModel;
 using EmpregaNet.Domain.Enums;
 using EmpregaNet.Domain.Interfaces;
@@ -26,15 +28,18 @@ public sealed class CancelJobApplicationHandler
 
     private readonly IJobApplicationRepository _jobApplicationRepository;
     private readonly IHttpCurrentUser _httpCurrentUser;
+    private readonly IDomainEventQueue _domainEvents;
     private readonly ILogger<CancelJobApplicationHandler> _logger;
 
     public CancelJobApplicationHandler(
         IJobApplicationRepository jobApplicationRepository,
         IHttpCurrentUser httpCurrentUser,
+        IDomainEventQueue domainEvents,
         ILogger<CancelJobApplicationHandler> logger)
     {
         _jobApplicationRepository = jobApplicationRepository;
         _httpCurrentUser = httpCurrentUser;
+        _domainEvents = domainEvents;
         _logger = logger;
     }
 
@@ -72,6 +77,8 @@ public sealed class CancelJobApplicationHandler
             throw new NotFoundException(NotFoundMessage);
         }
 
+        var previousStatus = application.Status;
+
         try
         {
             application.CancelByCandidate();
@@ -82,6 +89,15 @@ public sealed class CancelJobApplicationHandler
         }
 
         await _jobApplicationRepository.UpdateAsync(application, cancellationToken);
+
+        _domainEvents.Enqueue(new JobApplicationStatusChanged(
+            JobApplicationId: application.Id,
+            JobId: application.JobId,
+            CandidateUserId: application.UserId,
+            PreviousStatus: previousStatus,
+            NewStatus: application.Status,
+            OccurredAt: DateTimeOffset.UtcNow,
+            Reason: JobApplicationNotificationReason.CanceledByCandidate));
 
         var canceled = await _jobApplicationRepository.GetProjectionByIdAsync(request.Id, cancellationToken);
         if (canceled is null)

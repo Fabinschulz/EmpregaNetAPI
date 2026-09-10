@@ -9,44 +9,18 @@ import {
   jobApplicationResponseSchema,
   type JobApplicationResponse
 } from '@/features/candidaturas/service/job-applications-response-schema';
-import { axiosApi } from '@/shared/api';
-import { After, Before, Given, Then, When } from '@cucumber/cucumber';
+import { Given, Then, When } from '@cucumber/cucumber';
 import { expect } from 'chai';
+import { putCalls, recordedPuts, respondToPut } from '../../support/axios-double';
 import type { BusinessRulesWorld } from '../../support/world';
 
 /**
  * O fluxo real da tela é: a linha decide se oferece a ação, a confirmação segura o ato
  * (que é terminal) e só então o service fala com a API. Aqui a interação é roteirizada —
  * o Cucumber deste projeto não renderiza React —, mas a regra de disponibilidade, o texto
- * da confirmação e a chamada HTTP são os de produção, não cópias.
+ * da confirmação e a chamada HTTP são os de produção, não cópias. Só o transporte é duplo
+ * (`tests/support/axios-double.ts`), instalado e restaurado por cenário nos hooks.
  */
-
-type PutCall = { url: string; body: unknown };
-
-const putCalls: PutCall[] = [];
-let putFailure: Error | null = null;
-let apiApplication: Record<string, unknown> = {};
-
-/**
- * Duplo do transporte: `cancelJobApplication` e o contrato Zod continuam a correr de verdade.
- * Instalado no início de cada cenário e **restaurado no fim** — o `axiosApi` é um módulo único
- * para todo o processo do Cucumber, e um duplo que sobrevive ao cenário faria um teste futuro
- * passar contra esta resposta em vez da chamada real.
- */
-const originalPut = axiosApi.put;
-
-const putStub = (async (url: string, body: unknown) => {
-  putCalls.push({ url, body });
-  if (putFailure) throw putFailure;
-
-  return {
-    data: { ...apiApplication, status: 'CanceledByCandidate' },
-    status: 200,
-    statusText: 'OK',
-    headers: {},
-    config: {}
-  };
-}) as unknown as typeof axiosApi.put;
 
 /** Estado que a tela mantém entre a escolha da ação e a confirmação. */
 type CancelFlow = {
@@ -60,21 +34,10 @@ function flow(world: BusinessRulesWorld): CancelFlow {
   return world.data.flow as CancelFlow;
 }
 
-Before(function () {
-  putCalls.length = 0;
-  putFailure = null;
-  apiApplication = {};
-  axiosApi.put = putStub;
-});
-
-After(function () {
-  axiosApi.put = originalPut;
-});
-
 Given(
   'que a minha candidatura #{int} está com o status {string}',
   function (this: BusinessRulesWorld, id: number, status: string) {
-    apiApplication = {
+    const apiApplication: Record<string, unknown> = {
       id,
       jobId: 3,
       candidate: { id: 5, name: 'ana.souza', email: 'ana.souza@empreganet.com.br', isDeleted: false },
@@ -85,6 +48,8 @@ Given(
       deletedAt: '',
       isDeleted: false
     };
+
+    respondToPut(`/api/jobapplications/${id}/cancel`, () => ({ ...apiApplication, status: 'CanceledByCandidate' }));
 
     this.data.flow = {
       application: jobApplicationResponseSchema.parse(apiApplication),
@@ -98,8 +63,11 @@ Given(
 Given(
   'que a API vai recusar o cancelamento com o código {int}',
   function (this: BusinessRulesWorld, statusCode: number) {
-    putFailure = Object.assign(new Error(`Request failed with status code ${statusCode}`), {
-      response: { status: statusCode, data: { code: 'INVALID_ACTION_FOR_STATUS' } }
+    // Sobrepõe-se à resposta de sucesso declarada pelo `Dado` anterior para o mesmo endpoint.
+    respondToPut('/cancel', () => {
+      throw Object.assign(new Error(`Request failed with status code ${statusCode}`), {
+        response: { status: statusCode, data: { code: 'INVALID_ACTION_FOR_STATUS' } }
+      });
     });
   }
 );
@@ -175,12 +143,12 @@ Then('o botão que recusa a confirmação não deve se chamar {string}', functio
 });
 
 Then('a API deve ter recebido {string}', function (esperado: string) {
-  const chamadas = putCalls.map((call) => `PUT ${call.url}`);
+  const chamadas = recordedPuts();
   expect(chamadas, `chamadas registradas: ${chamadas.join(', ') || 'nenhuma'}`).to.include(esperado);
 });
 
 Then('a API não deve ter sido chamada', function () {
-  const chamadas = putCalls.map((call) => call.url);
+  const chamadas = recordedPuts();
   expect(chamadas, `chamadas registradas: ${chamadas.join(', ') || 'nenhuma'}`).to.have.length(0);
 });
 

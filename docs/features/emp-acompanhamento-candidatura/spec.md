@@ -72,6 +72,6 @@ contratos ficam no `design.md`; passos de implementação, no `tasks.md`.
 5. **Verificação ponta-a-ponta** (candidato recebe, cancela, recrutador vê) fica com a
    [`e2e-qa-skill`](../../../.claude/skills/e2e-qa-skill/SKILL.md), sobre o ambiente com o sender de
    desenvolvimento activo. Os dados `[QA]` da bateria de 2026-09-01 continuam disponíveis
-   (§3 do relatório de 2026-09-01 em `docs/qa/`, não versionado).
+   (empresa 7, vagas 36–40, utilizador 6 e candidaturas 1–6, criados nas baterias de 2026-09-01 e 09-09).
 6. **Acoplamento de deploy** (design §2.1): não há teste que impeça publicar a API sem o frontend. É
    restrição de release, e fica registada no `tasks.md`.

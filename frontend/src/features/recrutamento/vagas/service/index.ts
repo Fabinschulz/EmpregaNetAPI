@@ -4,6 +4,7 @@ export {
   useDeleteJobMutation,
   useJobQuery,
   useJobsListQuery,
+  useOpenApplicationsCountQuery,
   useSelectableCompaniesQuery,
   useUpdateJobMutation
 } from './jobs-queries';

@@ -28,14 +28,44 @@ public class UnityOfWork : IUnityOfWork
         _context = context ?? throw new ArgumentNullException(nameof(context));
     }
 
+    /// <summary>
+    /// Executa <paramref name="operation"/> em uma transação com retry do provider para tratar falhas transitórias.
+    /// </summary>
+    /// <remarks>
+    /// A estratégia de execução do EF reexecuta a operação inteira quando a falha é classificada como transitória
+    /// (<c>EnableRetryOnFailure(maxRetryCount: 2)</c> em <c>DatabaseConfig</c>).
+    ///
+    /// <para>
+    /// A limpeza do <c>ChangeTracker</c> só ocorre na segunda tentativa. Isso evita reutilizar entidades
+    /// rastreadas com estado sujo da tentativa anterior, o que pode causar guardas falsas ou updates silenciosos
+    /// sem persistência real.
+    /// </para>
+    ///
+    /// <para>
+    /// Esta classe limpa apenas o estado do EF. Efeitos externos, como cache, fila de eventos e e-mails,
+    /// permanecem sob responsabilidade dos handlers, que devem evitar ações que não possam ser desfeitas por um rollback.
+    /// </para>
+    ///
+    /// <para>
+    /// O parâmetro <c>verifySucceeded</c> continua <c>null</c> por decisão de projeto. Se o commit for confirmado
+    /// e a confirmação for perdida, a próxima tentativa verá o estado já persistido e a guarda pode disparar com
+    /// a mensagem correta, mesmo que a operação tenha sido concluída.
+    /// </para>
+    /// </remarks>
     public async Task<TResult> ExecuteInTransactionAsync<TResult>(Func<Task<TResult>> operation, CancellationToken cancellationToken = default)
     {
         var strategy = _context.Database.CreateExecutionStrategy();
+        var attempt = 0;
 
         return await strategy.ExecuteAsync(
             state: _context,
             operation: async (dbContext, context, token) =>
             {
+                if (attempt++ > 0)
+                {
+                    context.ChangeTracker.Clear();
+                }
+
                 await using var transaction = await context.Database.BeginTransactionAsync(token);
 
                 try

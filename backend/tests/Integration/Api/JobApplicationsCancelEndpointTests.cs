@@ -85,6 +85,7 @@ public sealed class JobApplicationsCancelEndpointTests
         return new CancelJobApplicationHandler(
             new JobApplicationRepository(context),
             currentUser.Object,
+            new RecordingDomainEventQueue(),
             NullLogger<CancelJobApplicationHandler>.Instance);
     }
 
@@ -236,6 +237,7 @@ public sealed class JobApplicationsCancelEndpointTests
             var handler = new CancelJobApplicationHandler(
                 new JobApplicationRepository(context),
                 staff.Object,
+                new RecordingDomainEventQueue(),
                 NullLogger<CancelJobApplicationHandler>.Instance);
 
             var error = await ToHttpErrorAsync(() =>

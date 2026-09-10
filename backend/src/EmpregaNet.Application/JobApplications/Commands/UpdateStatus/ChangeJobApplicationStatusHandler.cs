@@ -1,6 +1,7 @@
 using EmpregaNet.Application.Common.Base;
 using EmpregaNet.Application.Common.Exceptions;
 using EmpregaNet.Application.Abstraction;
+using EmpregaNet.Application.JobApplications.Events;
 using EmpregaNet.Application.JobApplications.ViewModel;
 using EmpregaNet.Domain.Enums;
 using EmpregaNet.Domain.Interfaces;
@@ -20,17 +21,20 @@ public sealed class ChangeJobApplicationStatusCommandHandler :
     private readonly IJobApplicationRepository _jobApplicationRepository;
     private readonly IJobRepository _jobRepository;
     private readonly IJobEmployerAccess _jobEmployerAccess;
+    private readonly IDomainEventQueue _domainEvents;
     private readonly ILogger<ChangeJobApplicationStatusCommandHandler> _logger;
 
     public ChangeJobApplicationStatusCommandHandler(
         IJobApplicationRepository jobApplicationRepository,
         IJobRepository jobRepository,
         IJobEmployerAccess jobEmployerAccess,
+        IDomainEventQueue domainEvents,
         ILogger<ChangeJobApplicationStatusCommandHandler> logger)
     {
         _jobApplicationRepository = jobApplicationRepository;
         _jobRepository = jobRepository;
         _jobEmployerAccess = jobEmployerAccess;
+        _domainEvents = domainEvents;
         _logger = logger;
     }
 
@@ -68,6 +72,8 @@ public sealed class ChangeJobApplicationStatusCommandHandler :
                 DomainErrorEnum.INVALID_PARAMS);
         }
 
+        var previousStatus = application.Status;
+
         try
         {
             application.ChangeStatus(newStatus);
@@ -79,6 +85,14 @@ public sealed class ChangeJobApplicationStatusCommandHandler :
 
         await _jobApplicationRepository.UpdateAsync(application, cancellationToken);
 
+        _domainEvents.Enqueue(new JobApplicationStatusChanged(
+            JobApplicationId: application.Id,
+            JobId: application.JobId,
+            CandidateUserId: application.UserId,
+            PreviousStatus: previousStatus,
+            NewStatus: application.Status,
+            OccurredAt: DateTimeOffset.UtcNow,
+            Reason: JobApplicationNotificationReason.StatusChanged));
 
         var updated = await _jobApplicationRepository.GetProjectionByIdAsync(request.Id, cancellationToken);
         if (updated is null)

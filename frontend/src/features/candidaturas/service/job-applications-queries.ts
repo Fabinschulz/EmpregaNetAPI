@@ -3,22 +3,23 @@
 import { jobsFeedKeys } from '@/features/vagas/service';
 import { useAuth } from '@/shared/context';
 import {
-    withDefaultListParams,
-    type JobApplicationsAdminListQueryParams,
-    type JobApplicationsListQueryParams
+  withDefaultListParams,
+  type JobApplicationsAdminListQueryParams,
+  type JobApplicationsListQueryParams
 } from '@/shared/schema';
 import { reportMutationApiError, toastSuccess } from '@/shared/utils';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
+import { applyFeedbackCopy } from '../apply-feedback-copy';
 import { applicationStatusLabels, type ApplicationStatus } from '../domain';
 import {
-    applyToJob,
-    cancelJobApplication,
-    changeStatus,
-    deleteApplication,
-    listAll,
-    listByJob,
-    listMine
+  applyToJob,
+  cancelJobApplication,
+  changeStatus,
+  deleteApplication,
+  listAll,
+  listByJob,
+  listMine
 } from './job-applications-api';
 import { jobApplicationsKeys } from './job-applications-keys';
 
@@ -84,7 +85,7 @@ export function useApplyToJobMutation(jobId: number) {
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: jobApplicationsKeys.all });
       await queryClient.invalidateQueries({ queryKey: jobsFeedKeys.all });
-      toastSuccess('Candidatura enviada', 'A empresa foi notificada da sua candidatura.');
+      toastSuccess(applyFeedbackCopy.title, applyFeedbackCopy.description);
     },
     onError: (err) => {
       reportMutationApiError({ err, actionLabel: 'candidatar-se', resource: 'candidatura', setApiError });
