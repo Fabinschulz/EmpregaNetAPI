@@ -45,14 +45,24 @@ export function useAppShellNavigation(roles: string[], isAuthenticated: boolean)
     ];
 
     const recruitment: ShellNavItem[] = [
-      { href: '/recrutamento/vagas', label: 'Vagas (equipe)', icon: entityIcons.job, visible: isRecruitmentStaff(roles) },
+      {
+        href: '/recrutamento/vagas',
+        label: 'Vagas (equipe)',
+        icon: entityIcons.job,
+        visible: isRecruitmentStaff(roles)
+      },
       {
         href: '/recrutamento/candidaturas',
         label: 'Candidaturas',
         icon: entityIcons.application,
         visible: isRecruitmentStaff(roles)
       },
-      { href: '/recrutamento/candidatos', label: 'Candidatos', icon: entityIcons.candidates, visible: isRecruitmentStaff(roles) }
+      {
+        href: '/recrutamento/candidatos',
+        label: 'Candidatos',
+        icon: entityIcons.candidates,
+        visible: isRecruitmentStaff(roles)
+      }
     ];
 
     const admin: ShellNavItem[] = [

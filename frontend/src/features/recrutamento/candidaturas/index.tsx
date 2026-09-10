@@ -2,28 +2,28 @@
 
 import { ApplicationStatusBadge } from '@/features/candidaturas/application-status-badge';
 import {
-    applicationStatusTransitions,
-    applicationTransitionIcons,
-    applicationTransitionLabels,
-    parseApplicationStatus,
-    type ApplicationStatus
+  applicationStatusTransitions,
+  applicationTransitionIcons,
+  applicationTransitionLabels,
+  parseApplicationStatus,
+  type ApplicationStatus
 } from '@/features/candidaturas/domain';
 import {
-    useAllJobApplicationsQuery,
-    useChangeApplicationStatusMutation,
-    useDeleteApplicationMutation,
-    type JobApplicationResponse
+  useAllJobApplicationsQuery,
+  useChangeApplicationStatusMutation,
+  useDeleteApplicationMutation,
+  type JobApplicationResponse
 } from '@/features/candidaturas/service';
 import {
-    actionIcons,
-    ApiQueryBoundary,
-    ConfirmDialog,
-    FilterSection,
-    PageHeader,
-    TableContainer,
-    useRowDeleteAction,
-    type DataTableColumn,
-    type RowAction
+  actionIcons,
+  ApiQueryBoundary,
+  ConfirmDialog,
+  FilterSection,
+  PageHeader,
+  TableContainer,
+  useRowDeleteAction,
+  type DataTableColumn,
+  type RowAction
 } from '@/shared/components';
 import { FormProvider } from '@/shared/context';
 import { useListRefresh, usePersistedTablePagination } from '@/shared/hooks';
@@ -32,8 +32,8 @@ import { formatDate } from '@/shared/utils';
 import { useCallback, useMemo, useState } from 'react';
 import { RecruitmentApplicationsFilterFields } from './recruitment-applications-filter-fields';
 import {
-    defaultRecruitmentApplicationsFilter,
-    recruitmentApplicationsFilterFormSchema
+  defaultRecruitmentApplicationsFilter,
+  recruitmentApplicationsFilterFormSchema
 } from './recruitment-applications-filter-schema';
 
 /** Transições destrutivas exigem confirmação antes de disparar a mutação. */

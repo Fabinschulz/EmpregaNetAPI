@@ -6,17 +6,16 @@ import type { DashboardSeries } from '../../service';
 import { formatCompact, formatCount } from '../shared/dashboard-format';
 import { ChartA11yTable } from './chart-a11y';
 import {
-    CHART_AXIS_PROPS,
-    CHART_GRID_PROPS,
-    CHART_HEIGHT,
-    CHART_HEIGHT_SPARSE,
-    SPARSE_SERIES_THRESHOLD,
-    seriesColor
+  CHART_AXIS_PROPS,
+  CHART_GRID_PROPS,
+  CHART_HEIGHT,
+  CHART_HEIGHT_SPARSE,
+  SPARSE_SERIES_THRESHOLD,
+  seriesColor
 } from './chart-theme';
 import { ChartTooltip } from './chart-tooltip';
 import styles from './charts.module.scss';
 import type { RechartsTooltipProps } from './recharts-types';
-
 
 export type TrendAreaChartProps = {
   series: DashboardSeries[];

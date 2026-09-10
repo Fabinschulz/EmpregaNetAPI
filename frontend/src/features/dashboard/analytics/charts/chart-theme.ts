@@ -17,7 +17,6 @@ const CHART_SEMANTIC_COLORS = {
   neutral: 'var(--chart-neutral)'
 } as const;
 
-
 export function seriesColor(index: number, key?: string): string {
   if (key === 'Others') return CHART_REST_COLOR;
   return CHART_SERIES_COLORS[index % CHART_SERIES_COLORS.length];

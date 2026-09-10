@@ -2,15 +2,15 @@
 
 import { useMyJobApplicationsQuery } from '@/features/candidaturas/service';
 import {
-    actionIcons,
-    Button,
-    Card,
-    CardContent,
-    CardHeader,
-    CardTitle,
-    entityIcons,
-    PageHeader,
-    Skeleton
+  actionIcons,
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  entityIcons,
+  PageHeader,
+  Skeleton
 } from '@/shared/components';
 import { useAuth } from '@/shared/context';
 import Link from 'next/link';

@@ -3,44 +3,44 @@
 import { useApplyToJobMutation } from '@/features/candidaturas/service';
 import type { JobResponse } from '@/features/recrutamento/vagas/service';
 import {
-    actionIcons,
-    Alert,
-    Button,
-    Card,
-    CardContent,
-    CardFooter,
-    CardHeader,
-    CardSectionLabel,
-    CardTitle,
-    InfoItem,
-    InfoList,
-    Spinner,
-    StatusBadge,
-    TagList,
-    toCardTags
+  actionIcons,
+  Alert,
+  Button,
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardSectionLabel,
+  CardTitle,
+  InfoItem,
+  InfoList,
+  Spinner,
+  StatusBadge,
+  TagList,
+  toCardTags
 } from '@/shared/components';
 import { useAuth } from '@/shared/context';
 import { useRelativeTime } from '@/shared/hooks';
 import {
-    experienceLevelVocabulary,
-    jobAreaVocabulary,
-    jobTypeVocabulary,
-    normalizeUf,
-    workModelVocabulary,
-    workShiftVocabulary
+  experienceLevelVocabulary,
+  jobAreaVocabulary,
+  jobTypeVocabulary,
+  normalizeUf,
+  workModelVocabulary,
+  workShiftVocabulary
 } from '@/shared/schema';
 import { formatSalaryRange } from '@/shared/utils';
 import type { LucideIcon } from 'lucide-react';
 import {
-    Accessibility,
-    Banknote,
-    Briefcase,
-    Building2,
-    CalendarDays,
-    Clock,
-    GraduationCap,
-    LayoutGrid,
-    MapPin
+  Accessibility,
+  Banknote,
+  Briefcase,
+  Building2,
+  CalendarDays,
+  Clock,
+  GraduationCap,
+  LayoutGrid,
+  MapPin
 } from 'lucide-react';
 import styles from './job-detail.module.scss';
 

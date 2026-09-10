@@ -1,12 +1,12 @@
 'use client';
 
 import {
-    actionIcons,
-    ApiQueryBoundary,
-    FilterSection,
-    PageHeader,
-    TableContainer,
-    type DataTableColumn
+  actionIcons,
+  ApiQueryBoundary,
+  FilterSection,
+  PageHeader,
+  TableContainer,
+  type DataTableColumn
 } from '@/shared/components';
 import { FormProvider } from '@/shared/context';
 import { useListRefresh, usePersistedTablePagination } from '@/shared/hooks';
@@ -16,9 +16,9 @@ import { useCallback, useMemo, useState } from 'react';
 import { useCandidatesListQuery } from '../service';
 import { CandidatesFilterFields } from './candidates-filter-fields';
 import {
-    candidatesFilterFormSchema,
-    candidatesFilterToParams,
-    defaultCandidatesFilter
+  candidatesFilterFormSchema,
+  candidatesFilterToParams,
+  defaultCandidatesFilter
 } from './candidates-filter-schema';
 
 type CandidatesFilterParams = Pick<CandidatesListQueryParams, 'search' | 'orderBy'>;

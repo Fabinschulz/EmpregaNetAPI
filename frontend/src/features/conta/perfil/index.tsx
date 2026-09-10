@@ -1,16 +1,16 @@
 'use client';
 
 import {
-    Alert,
-    ApiQueryBoundary,
-    Badge,
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
-    FormFieldsSkeleton,
-    PageHeader
+  Alert,
+  ApiQueryBoundary,
+  Badge,
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  FormFieldsSkeleton,
+  PageHeader
 } from '@/shared/components';
 import { FormProvider } from '@/shared/context';
 import { roleLabel } from '@/shared/utils';

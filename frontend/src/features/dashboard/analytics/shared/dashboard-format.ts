@@ -1,4 +1,3 @@
-
 const countFormatter = new Intl.NumberFormat('pt-BR');
 const decimalFormatter = new Intl.NumberFormat('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
 const compactFormatter = new Intl.NumberFormat('pt-BR', { notation: 'compact', maximumFractionDigits: 1 });

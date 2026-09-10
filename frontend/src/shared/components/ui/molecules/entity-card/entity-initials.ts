@@ -2,21 +2,7 @@
  * Palavras que não caracterizam a entidade: partículas de nome de pessoa e sufixos societários.
  * Sem isto, "Freetech Inovation Ltda" viraria "FL" e "Maria da Silva" viraria "MD".
  */
-const IGNORED_WORDS = new Set([
-  'de',
-  'da',
-  'do',
-  'das',
-  'dos',
-  'e',
-  'ltda',
-  'me',
-  'mei',
-  'epp',
-  'sa',
-  's/a',
-  'eireli'
-]);
+const IGNORED_WORDS = new Set(['de', 'da', 'do', 'das', 'dos', 'e', 'ltda', 'me', 'mei', 'epp', 'sa', 's/a', 'eireli']);
 
 export function entityInitials(name: string): string {
   const words = name

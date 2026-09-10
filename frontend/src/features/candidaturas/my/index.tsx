@@ -1,14 +1,14 @@
 'use client';
 
 import {
-    actionIcons,
-    ApiQueryBoundary,
-    ConfirmDialog,
-    FilterSection,
-    PageHeader,
-    TableContainer,
-    type DataTableColumn,
-    type RowAction
+  actionIcons,
+  ApiQueryBoundary,
+  ConfirmDialog,
+  FilterSection,
+  PageHeader,
+  TableContainer,
+  type DataTableColumn,
+  type RowAction
 } from '@/shared/components';
 import { FormProvider } from '@/shared/context';
 import { useListRefresh, usePersistedTablePagination } from '@/shared/hooks';
@@ -22,9 +22,9 @@ import { useCancelMyApplicationMutation, useMyJobApplicationsQuery, type JobAppl
 import { cancelApplicationDialogCopy } from './cancel-application-dialog-copy';
 import { MyApplicationsFilterFields } from './my-applications-filter-fields';
 import {
-    defaultMyApplicationsFilter,
-    myApplicationsFilterFormSchema,
-    myApplicationsFilterToParams
+  defaultMyApplicationsFilter,
+  myApplicationsFilterFormSchema,
+  myApplicationsFilterToParams
 } from './my-applications-filter-schema';
 
 type MyApplicationsFilterParams = Pick<JobApplicationsListQueryParams, 'status' | 'orderBy'>;

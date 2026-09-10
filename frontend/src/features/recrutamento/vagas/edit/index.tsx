@@ -1,27 +1,27 @@
 'use client';
 
 import {
-    actionIcons,
-    Alert,
-    ApiQueryBoundary,
-    Button,
-    ConfirmDialog,
-    entityIcons,
-    FormFieldsSkeleton,
-    FormHeader,
-    FormNotice,
-    PageHeader,
-    StatusBadge
+  actionIcons,
+  Alert,
+  ApiQueryBoundary,
+  Button,
+  ConfirmDialog,
+  entityIcons,
+  FormFieldsSkeleton,
+  FormHeader,
+  FormNotice,
+  PageHeader,
+  StatusBadge
 } from '@/shared/components';
 import { FormProvider } from '@/shared/context';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useMemo, useState } from 'react';
 import {
-    closeJobDialogCopy,
-    describeCloseJobConfirmation,
-    jobStatusLabel,
-    type OpenApplicationsCount
+  closeJobDialogCopy,
+  describeCloseJobConfirmation,
+  jobStatusLabel,
+  type OpenApplicationsCount
 } from '../close-job-copy';
 import { defaultFormJob, JobFormFields, jobFormSchema, jobFormValuesFromResponse, type JobFormValues } from '../form';
 import { jobsRoutes } from '../jobs-routes';

@@ -2,15 +2,15 @@ import { axiosApi, createAxiosConfig } from '@/shared/api';
 import { createdIdResponseSchema, type CreatedId, type JobsListQueryParams } from '@/shared/schema';
 import { jobRequestSchema, type JobRequest } from './jobs-request-schema';
 import {
-    closeJobResponseSchema,
-    companyOptionsResponseSchema,
-    jobResponseSchema,
-    jobsListResponseSchema,
-    openApplicationsCountResponseSchema,
-    type CloseJobResponse,
-    type CompanyOption,
-    type JobResponse,
-    type JobsListResponse
+  closeJobResponseSchema,
+  companyOptionsResponseSchema,
+  jobResponseSchema,
+  jobsListResponseSchema,
+  openApplicationsCountResponseSchema,
+  type CloseJobResponse,
+  type CompanyOption,
+  type JobResponse,
+  type JobsListResponse
 } from './jobs-response-schema';
 
 export async function listJobs(params?: JobsListQueryParams): Promise<JobsListResponse> {

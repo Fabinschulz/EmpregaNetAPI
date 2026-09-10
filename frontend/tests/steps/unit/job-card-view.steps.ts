@@ -97,12 +97,9 @@ Then('os dados do cartão devem incluir {string}', function (this: BusinessRules
   expect(facts(this).map((fact) => fact.key)).to.include(chave);
 });
 
-Then(
-  'o rótulo de {string} deve ser {string}',
-  function (this: BusinessRulesWorld, chave: string, esperado: string) {
-    expect(facts(this).find((fact) => fact.key === chave)?.label).to.equal(esperado);
-  }
-);
+Then('o rótulo de {string} deve ser {string}', function (this: BusinessRulesWorld, chave: string, esperado: string) {
+  expect(facts(this).find((fact) => fact.key === chave)?.label).to.equal(esperado);
+});
 
 Then('o dado {string} deve estar destacado', function (this: BusinessRulesWorld, chave: string) {
   expect(facts(this).find((fact) => fact.key === chave)?.strong).to.equal(true);

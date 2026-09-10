@@ -16,13 +16,7 @@ export function JobCardFacts({ job }: { job: JobFeedItemResponse }) {
   return (
     <InfoList ariaLabel="Dados da vaga">
       {toJobFacts(job).map((fact) => (
-        <InfoItem
-          key={fact.key}
-          icon={ICONS[fact.icon]}
-          srLabel={fact.srLabel}
-          title={fact.label}
-          strong={fact.strong}
-        >
+        <InfoItem key={fact.key} icon={ICONS[fact.icon]} srLabel={fact.srLabel} title={fact.label} strong={fact.strong}>
           {fact.label}
         </InfoItem>
       ))}

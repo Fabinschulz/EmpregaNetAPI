@@ -2,31 +2,31 @@
 
 import { ApplicationStatusBadge } from '@/features/candidaturas/application-status-badge';
 import {
-    applicationStatusTransitions,
-    applicationTransitionIcons,
-    applicationTransitionLabels,
-    parseApplicationStatus,
-    type ApplicationStatus
+  applicationStatusTransitions,
+  applicationTransitionIcons,
+  applicationTransitionLabels,
+  parseApplicationStatus,
+  type ApplicationStatus
 } from '@/features/candidaturas/domain';
 import {
-    candidateDisplayName,
-    useApplicationsByJobQuery,
-    useChangeApplicationStatusMutation,
-    useDeleteApplicationMutation,
-    type JobApplicationResponse
+  candidateDisplayName,
+  useApplicationsByJobQuery,
+  useChangeApplicationStatusMutation,
+  useDeleteApplicationMutation,
+  type JobApplicationResponse
 } from '@/features/candidaturas/service';
 import {
-    actionIcons,
-    ApiQueryBoundary,
-    Button,
-    ConfirmDialog,
-    FilterBar,
-    FilterSection,
-    PageHeader,
-    TableContainer,
-    useRowDeleteAction,
-    type DataTableColumn,
-    type RowAction
+  actionIcons,
+  ApiQueryBoundary,
+  Button,
+  ConfirmDialog,
+  FilterBar,
+  FilterSection,
+  PageHeader,
+  TableContainer,
+  useRowDeleteAction,
+  type DataTableColumn,
+  type RowAction
 } from '@/shared/components';
 import { FormProvider } from '@/shared/context';
 import { usePersistedTablePagination } from '@/shared/hooks';
@@ -37,10 +37,10 @@ import { useCallback, useMemo, useState } from 'react';
 import { jobsRoutes } from '../jobs-routes';
 import { useJobQuery } from '../service';
 import {
-    CandidatesFilterFields,
-    candidatesFilterSchema,
-    defaultCandidatesFilter,
-    type CandidatesFilterParams
+  CandidatesFilterFields,
+  candidatesFilterSchema,
+  defaultCandidatesFilter,
+  type CandidatesFilterParams
 } from './candidates-filter-fields';
 
 /** Transições que exigem confirmação por serem terminais/negativas. */

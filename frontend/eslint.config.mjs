@@ -80,7 +80,6 @@ const noTiersAbove = (tier) => {
   };
 };
 
-
 const NO_UI_BARRELS_INSIDE_UI = [
   {
     name: '@/shared/components',

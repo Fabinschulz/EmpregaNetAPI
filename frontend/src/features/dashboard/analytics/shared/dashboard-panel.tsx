@@ -1,14 +1,14 @@
 'use client';
 
 import {
-    actionIcons,
-    Button,
-    Card,
-    CardContent,
-    CardHeader,
-    Tooltip,
-    TooltipContent,
-    TooltipTrigger
+  actionIcons,
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger
 } from '@/shared/components';
 import { cn } from '@/shared/utils';
 import { AlertTriangle, ChartNoAxesColumn } from 'lucide-react';

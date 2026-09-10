@@ -26,9 +26,12 @@ When('eu formato a variação {float}', function (this: BusinessRulesWorld, valu
   this.result = formatSignedPercent(value);
 });
 
-When('eu formato o indicador {float} com unidade {string}', function (this: BusinessRulesWorld, value: number, unit: string) {
-  this.result = formatKpiValue(value, unit);
-});
+When(
+  'eu formato o indicador {float} com unidade {string}',
+  function (this: BusinessRulesWorld, value: number, unit: string) {
+    this.result = formatKpiValue(value, unit);
+  }
+);
 
 When('eu formato o indicador {float} sem unidade', function (this: BusinessRulesWorld, value: number) {
   this.result = formatKpiValue(value, null);

@@ -5,17 +5,17 @@ import { FormProvider } from '@/shared/context';
 import { useQueryApiError } from '@/shared/hooks';
 import { useState } from 'react';
 import {
-    defaultDashboardFilters,
-    useDashboardInsightsQuery,
-    useDashboardOverviewQuery,
-    useDashboardRefresh,
-    type DashboardFilters
+  defaultDashboardFilters,
+  useDashboardInsightsQuery,
+  useDashboardOverviewQuery,
+  useDashboardRefresh,
+  type DashboardFilters
 } from '../service';
 import styles from './analytics.module.scss';
 import {
-    dashboardFilterFormSchema,
-    defaultDashboardFilterForm,
-    type DashboardFilterFormValues
+  dashboardFilterFormSchema,
+  defaultDashboardFilterForm,
+  type DashboardFilterFormValues
 } from './filters/dashboard-filter-schema';
 import { DashboardFiltersBar } from './filters/dashboard-filters';
 import { RecruitmentFunnel } from './funnel/recruitment-funnel';

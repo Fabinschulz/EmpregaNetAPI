@@ -1,21 +1,21 @@
 import { axiosApi } from '@/shared/api';
 import {
-    dashboardFiltersToParams,
-    type DashboardFilters,
-    type DashboardGranularity,
-    type DashboardJobRanking
+  dashboardFiltersToParams,
+  type DashboardFilters,
+  type DashboardGranularity,
+  type DashboardJobRanking
 } from './dashboard-params';
 import {
-    dashboardDistributionResponseSchema,
-    dashboardInsightsResponseSchema,
-    dashboardJobsResponseSchema,
-    dashboardOverviewResponseSchema,
-    dashboardTrendsResponseSchema,
-    type DashboardDistributionResponse,
-    type DashboardInsightsResponse,
-    type DashboardJobsResponse,
-    type DashboardOverviewResponse,
-    type DashboardTrendsResponse
+  dashboardDistributionResponseSchema,
+  dashboardInsightsResponseSchema,
+  dashboardJobsResponseSchema,
+  dashboardOverviewResponseSchema,
+  dashboardTrendsResponseSchema,
+  type DashboardDistributionResponse,
+  type DashboardInsightsResponse,
+  type DashboardJobsResponse,
+  type DashboardOverviewResponse,
+  type DashboardTrendsResponse
 } from './dashboard-response-schema';
 
 const BASE_URL = '/api/dashboard';

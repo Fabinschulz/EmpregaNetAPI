@@ -45,7 +45,6 @@
   color: var(--muted);
 }
 
-
 .identity {
   display: flex;
   align-items: flex-start;
@@ -156,7 +155,6 @@
   z-index: 1;
 }
 
-
 .iconAction {
   flex: 0 0 auto;
 }
@@ -179,7 +177,6 @@
   height: 15px;
   flex: 0 0 auto;
 }
-
 
 .skeletonLine {
   border-radius: var(--radius);
@@ -212,7 +209,6 @@
   padding-top: var(--entity-card-row-gap);
   border-top: 1px solid color-mix(in srgb, var(--border) 60%, transparent);
 }
-
 
 @media (max-width: 640px) {
   .card {

@@ -1,21 +1,21 @@
 import { axiosApi, createAxiosConfig } from '@/shared/api';
 import {
-    createdIdResponseSchema,
-    type CreatedId,
-    type JobApplicationsAdminListQueryParams,
-    type JobApplicationsListQueryParams
+  createdIdResponseSchema,
+  type CreatedId,
+  type JobApplicationsAdminListQueryParams,
+  type JobApplicationsListQueryParams
 } from '@/shared/schema';
 import {
-    applyToJobRequestSchema,
-    changeApplicationStatusRequestSchema,
-    type ApplyToJobRequest,
-    type ChangeApplicationStatusRequest
+  applyToJobRequestSchema,
+  changeApplicationStatusRequestSchema,
+  type ApplyToJobRequest,
+  type ChangeApplicationStatusRequest
 } from './job-applications-request-schema';
 import {
-    jobApplicationResponseSchema,
-    jobApplicationsListResponseSchema,
-    type JobApplicationResponse,
-    type JobApplicationsListResponse
+  jobApplicationResponseSchema,
+  jobApplicationsListResponseSchema,
+  type JobApplicationResponse,
+  type JobApplicationsListResponse
 } from './job-applications-response-schema';
 
 export async function applyToJob(request: ApplyToJobRequest): Promise<CreatedId> {

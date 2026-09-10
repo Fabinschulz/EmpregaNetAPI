@@ -2,13 +2,13 @@
 
 import { APPLICATION_STATUSES, applicationStatusLabels } from '@/features/candidaturas/domain';
 import {
-    actionIcons,
-    Button,
-    FilterBar,
-    FilterField,
-    InputField,
-    MultiSelectField,
-    SelectField
+  actionIcons,
+  Button,
+  FilterBar,
+  FilterField,
+  InputField,
+  MultiSelectField,
+  SelectField
 } from '@/shared/components';
 import { useFormContext } from '@/shared/context';
 import { useFilterFormSync } from '@/shared/hooks';
@@ -16,10 +16,10 @@ import { jobAreaVocabulary, UF_OPTIONS } from '@/shared/schema';
 import { DASHBOARD_PERIODS, dashboardPeriodLabels, type DashboardFilters } from '../../service';
 import { CompanyFilterField } from './company-filter-field';
 import {
-    ALL_STATUSES_VALUE,
-    dashboardFilterFormToFilters,
-    defaultDashboardFilterForm,
-    type DashboardFilterFormValues
+  ALL_STATUSES_VALUE,
+  dashboardFilterFormToFilters,
+  defaultDashboardFilterForm,
+  type DashboardFilterFormValues
 } from './dashboard-filter-schema';
 
 const PERIOD_OPTIONS = DASHBOARD_PERIODS.map((period) => ({

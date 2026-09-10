@@ -1,8 +1,8 @@
 import {
-    dashboardFiltersToKey,
-    type DashboardFilters,
-    type DashboardGranularity,
-    type DashboardJobRanking
+  dashboardFiltersToKey,
+  type DashboardFilters,
+  type DashboardGranularity,
+  type DashboardJobRanking
 } from './dashboard-params';
 
 export const dashboardKeys = {

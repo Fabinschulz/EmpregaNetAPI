@@ -8,7 +8,6 @@ type CopyFeedback = {
   successDescription?: string;
 };
 
-
 export function useCopyToClipboard({ successTitle, successDescription }: CopyFeedback) {
   return useCallback(
     async (text: string) => {

@@ -11,14 +11,14 @@ import { jobFormToRequest, type JobFormValues } from '../form/job-form-schema';
 import { jobsRoutes } from '../jobs-routes';
 import { revalidateJobCache } from './jobs-actions';
 import {
-    closeJob,
-    createJob,
-    deleteJob,
-    getJob,
-    getOpenApplicationsCount,
-    listJobs,
-    listSelectableCompanies,
-    updateJob
+  closeJob,
+  createJob,
+  deleteJob,
+  getJob,
+  getOpenApplicationsCount,
+  listJobs,
+  listSelectableCompanies,
+  updateJob
 } from './jobs-api';
 import { jobsKeys } from './jobs-keys';
 

@@ -2,10 +2,10 @@
 
 import { StatusBadge, type StatusTone } from '@/shared/components';
 import {
-    applicationStatusLabel,
-    parseApplicationStatus,
-    type ApplicationStatus,
-    type ApplicationStatusAudience
+  applicationStatusLabel,
+  parseApplicationStatus,
+  type ApplicationStatus,
+  type ApplicationStatusAudience
 } from './domain';
 
 const STATUS_TONE: Record<ApplicationStatus, StatusTone> = {

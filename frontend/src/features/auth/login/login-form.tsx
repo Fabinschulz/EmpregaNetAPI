@@ -1,11 +1,11 @@
 'use client';
 
 import {
-    actionIcons,
-    FormSubmitButton,
-    InputField,
-    StandalonePageFormActions,
-    StandalonePageFormGrid
+  actionIcons,
+  FormSubmitButton,
+  InputField,
+  StandalonePageFormActions,
+  StandalonePageFormGrid
 } from '@/shared/components';
 
 export function LoginFormFields() {

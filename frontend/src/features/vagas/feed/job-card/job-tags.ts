@@ -1,10 +1,10 @@
 import type { JobFeedItemResponse } from '@/features/vagas/service';
 import { toCardTags, type CardTag } from '@/shared/components/ui/molecules/entity-card/card-tags';
 import {
-    experienceLevelVocabulary,
-    jobAreaVocabulary,
-    NO_EXPERIENCE_REQUIRED,
-    workShiftVocabulary
+  experienceLevelVocabulary,
+  jobAreaVocabulary,
+  NO_EXPERIENCE_REQUIRED,
+  workShiftVocabulary
 } from '@/shared/schema';
 
 export function toJobTags(job: JobFeedItemResponse): CardTag[] {

@@ -40,12 +40,7 @@ export function JobCard({ job, hasApplied, position, totalItems, className }: Jo
       <footer className={styles.footer}>
         <JobCardStatus publishedAt={job.publishedAt} applicationsCount={job.applicationsCount} />
 
-        <JobCardActions
-          jobId={job.id}
-          jobTitle={job.title}
-          hasApplied={hasApplied}
-          isActive={job.isActive}
-        />
+        <JobCardActions jobId={job.id} jobTitle={job.title} hasApplied={hasApplied} isActive={job.isActive} />
       </footer>
     </article>
   );

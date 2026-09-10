@@ -3,11 +3,11 @@
 import { useQueryApiError } from '@/shared/hooks';
 import { useState } from 'react';
 import {
-    DASHBOARD_JOB_RANKINGS,
-    dashboardJobRankingLabels,
-    useDashboardJobsQuery,
-    type DashboardFilters,
-    type DashboardJobRanking
+  DASHBOARD_JOB_RANKINGS,
+  dashboardJobRankingLabels,
+  useDashboardJobsQuery,
+  type DashboardFilters,
+  type DashboardJobRanking
 } from '../../service';
 import { JobPerformanceList } from '../jobs/job-performance-list';
 import { DashboardPanel, resolvePanelState } from '../shared/dashboard-panel';

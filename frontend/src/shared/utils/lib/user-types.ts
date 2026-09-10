@@ -27,7 +27,6 @@ export function userTypeLabel(input: string | null | undefined): string {
   return USER_TYPES.find((t) => t.value === value)?.label ?? input;
 }
 
-
 export function roleLabel(role: string | null | undefined): string {
   return userTypeLabel(role);
 }

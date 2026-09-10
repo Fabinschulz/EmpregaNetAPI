@@ -10,7 +10,6 @@ export type TagListProps = {
   className?: string;
 };
 
-
 export function TagList({ tags, max, ariaLabel, className }: TagListProps) {
   if (tags.length === 0) return null;
 

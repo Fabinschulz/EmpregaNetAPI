@@ -4,11 +4,11 @@ import { useQueryApiError } from '@/shared/hooks';
 import { cn } from '@/shared/utils';
 import { useMemo, useState } from 'react';
 import {
-    DASHBOARD_GRANULARITIES,
-    dashboardGranularityLabels,
-    useDashboardTrendsQuery,
-    type DashboardFilters,
-    type DashboardGranularity
+  DASHBOARD_GRANULARITIES,
+  dashboardGranularityLabels,
+  useDashboardTrendsQuery,
+  type DashboardFilters,
+  type DashboardGranularity
 } from '../../service';
 import { CHART_HEIGHT_HERO, seriesColor } from '../charts/chart-theme';
 import { TrendAreaChart } from '../charts/trend-area-chart';
@@ -49,7 +49,7 @@ export function TrendsSection({ filters }: { filters: DashboardFilters }) {
   const toggleSeries = (key: string) => {
     setHiddenKeys((current) => {
       const willHide = !current.includes(key);
-      
+
       if (willHide && visibleKeys.length === 1) return current;
       return willHide ? [...current, key] : current.filter((item) => item !== key);
     });

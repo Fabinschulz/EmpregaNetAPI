@@ -5,7 +5,6 @@ function openApplicationsSubject(count: number): string {
   return `${count} candidaturas em aberto`;
 }
 
-
 export function describeOpenApplicationsEffect(count: number): string {
   return `${openApplicationsSubject(count)} ${count > 1 ? 'serão canceladas' : 'será cancelada'}.`;
 }

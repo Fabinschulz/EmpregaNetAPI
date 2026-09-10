@@ -4,11 +4,11 @@ import { notifyApiError, toastSuccess } from '@/shared/utils';
 import { keepPreviousData, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useCallback, useState } from 'react';
 import {
-    fetchDashboardDistribution,
-    fetchDashboardInsights,
-    fetchDashboardJobs,
-    fetchDashboardOverview,
-    fetchDashboardTrends
+  fetchDashboardDistribution,
+  fetchDashboardInsights,
+  fetchDashboardJobs,
+  fetchDashboardOverview,
+  fetchDashboardTrends
 } from './dashboard-api';
 import { dashboardKeys } from './dashboard-keys';
 import type { DashboardFilters, DashboardGranularity, DashboardJobRanking } from './dashboard-params';

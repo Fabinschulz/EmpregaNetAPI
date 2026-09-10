@@ -1,16 +1,16 @@
 'use client';
 
 import {
-    actionIcons,
-    ApiQueryBoundary,
-    Button,
-    ConfirmDialog,
-    FilterSection,
-    PageHeader,
-    TableContainer,
-    useRowDeleteAction,
-    type DataTableColumn,
-    type RowAction
+  actionIcons,
+  ApiQueryBoundary,
+  Button,
+  ConfirmDialog,
+  FilterSection,
+  PageHeader,
+  TableContainer,
+  useRowDeleteAction,
+  type DataTableColumn,
+  type RowAction
 } from '@/shared/components';
 import { FormProvider } from '@/shared/context';
 import { useListRefresh, usePersistedTablePagination } from '@/shared/hooks';

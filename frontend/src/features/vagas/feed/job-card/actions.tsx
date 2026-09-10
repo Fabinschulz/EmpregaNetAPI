@@ -19,7 +19,7 @@ type JobCardActionsProps = {
 export function JobCardActions({ jobId, jobTitle, hasApplied, isActive = true }: JobCardActionsProps) {
   const { isAuthenticated } = useAuth();
   const { mutate, isPending } = useApplyToJobMutation(jobId);
-  
+
   const copyLink = useCopyToClipboard({
     successTitle: 'Link copiado',
     successDescription: 'Cole onde quiser para compartilhar esta vaga.'
