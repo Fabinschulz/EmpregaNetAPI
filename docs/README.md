@@ -103,21 +103,29 @@ Sem secrets no repo. Os templates versionados são `backend/src/EmpregaNet.Api/a
 
 ---
 
-## E-mail em desenvolvimento
+## E-mail
 
-Em **`Development`** e sem SMTP configurado (`Smtp:Enabled=false`, ou sem `Smtp:Host`/`Smtp:FromEmail`), a
-API resolve `IEmailSender` para `DevelopmentLogEmailSender` (`backend/src/EmpregaNet.Infra/Email/`): nada é
-entregue e a mensagem vai para o log com o prefixo `[E-MAIL DEV]`.
+O envio real é feito pela **API do Amazon SES v2** (`SesEmailSender`), autenticada pela cadeia de
+credenciais padrão da AWS — IAM role da instância em produção, perfil ou variáveis `AWS_*` localmente. Não
+há utilizador nem palavra-passe de e-mail na configuração; a role precisa de `ses:SendEmail`, e o
+`Ses:FromEmail` tem de ser uma identidade verificada **na região de `Ses:Region`**. Ver
+[ADR 0014](sdd/adrs/0014-envio-de-email-via-ses.md).
+
+### Em desenvolvimento
+
+Em **`Development`** e sem SES configurado (`Ses:Enabled=false`, ou sem `Ses:FromEmail`), a API resolve
+`IEmailSender` para `DevelopmentLogEmailSender` (`backend/src/EmpregaNet.Infra/Email/`): nada é entregue e a
+mensagem vai para o log com o prefixo `[E-MAIL DEV]`.
 
 ```jsonc
 // backend/src/EmpregaNet.Api/appsettings.Development.json
-"Smtp": { "Enabled": false }
+"Ses": { "Enabled": false }
 ```
 
 Ou por variável de ambiente, sem tocar no ficheiro:
 
 ```bash
-Smtp__Enabled=false dotnet run --project backend/src/EmpregaNet.Api
+Ses__Enabled=false dotnet run --project backend/src/EmpregaNet.Api
 ```
 
 Dois níveis, de propósito:
@@ -134,8 +142,8 @@ registado é um link utilizável por quem leia o log. Para o inspecionar, baixe 
 Logging__LogLevel__EmpregaNet.Infra.Email=Debug dotnet run --project backend/src/EmpregaNet.Api
 ```
 
-Fora de `Development` este transporte **não** é usado: sem SMTP, os outros ambientes ficam com o no-op
-silencioso, e `Production` nem sobe com `Smtp:Enabled=false`.
+Fora de `Development` este transporte **não** é usado: sem SES, os outros ambientes ficam com o no-op
+silencioso, e `Production` nem sobe com `Ses:Enabled=false` — ou sem `Ses:FromEmail` e `Ses:Region`.
 
 Serve para verificar pela UI real o conteúdo de e-mails transacionais (reset de senha, confirmação de
 conta e as notificações de andamento de candidatura) sem servidor SMTP e sem caixa de correio.

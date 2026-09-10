@@ -2,10 +2,9 @@
 
   <ItemGroup>
     <PackageReference Include="AWS.Logger.AspNetCore" Version="4.0.2" />
-    <PackageReference Include="AWSSDK.Core" Version="4.0.8" />
+    <PackageReference Include="AWSSDK.Core" Version="4.0.102.4" />
+    <PackageReference Include="AWSSDK.SimpleEmailV2" Version="4.0.104.2" />
     <PackageReference Include="Google.Apis.Auth" Version="1.75.0" />
-    <PackageReference Include="MailKit" Version="4.17.0" />
-    <PackageReference Include="MimeKit" Version="4.17.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.8" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="10.0.8" />

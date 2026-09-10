@@ -28,13 +28,9 @@
   "GoogleAuth": {
     "ClientIds": []
   },
-  "Smtp": {
+  "Ses": {
     "Enabled": false,
-    "Host": "",
-    "Port": 587,
-    "Security": "StartTls",
-    "UserName": "",
-    "Password": "",
+    "Region": "",
     "FromEmail": "",
     "FromName": "EmpregaNet"
   },
