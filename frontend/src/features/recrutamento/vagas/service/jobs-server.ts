@@ -13,7 +13,15 @@ import { jobResponseSchema, type JobResponse } from './jobs-response-schema';
  * browser). ex.: rede de containers/k8s. Cai de volta para a pública quando não definida.
  */
 function serverApiBaseUrl(): string {
-  return process.env.API_INTERNAL_BASE_URL?.trim() || getPublicEnv().NEXT_PUBLIC_API_BASE_URL;
+  const base = process.env.API_INTERNAL_BASE_URL?.trim() || getPublicEnv().NEXT_PUBLIC_API_BASE_URL;
+
+  if (!base) {
+    throw new Error(
+      'API_INTERNAL_BASE_URL não definido. É obrigatório quando NEXT_PUBLIC_API_BASE_URL está vazio, porque o lado servidor não resolve caminhos relativos.'
+    );
+  }
+
+  return base;
 }
 
 /**

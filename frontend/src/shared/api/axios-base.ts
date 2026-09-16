@@ -6,7 +6,7 @@ export const buildAxiosParams = (): AxiosRequestConfig => {
   const { NEXT_PUBLIC_API_BASE_URL } = getPublicEnv();
 
   return {
-    baseURL: NEXT_PUBLIC_API_BASE_URL,
+    baseURL: NEXT_PUBLIC_API_BASE_URL || undefined,
     responseType: 'json' as const,
     withCredentials: true,
     paramsSerializer: (params: unknown) => Qs.stringify(params as Record<string, unknown>, { arrayFormat: 'repeat' })

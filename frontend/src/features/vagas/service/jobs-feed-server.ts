@@ -4,14 +4,21 @@ import { getPublicEnv } from '@/shared/utils';
 import { cacheLife } from 'next/cache';
 import type { JobsFeedQueryParams } from './jobs-feed-params';
 import {
-  jobVocabularyResponseSchema,
-  jobsFeedResponseSchema,
-  type JobVocabularyResponse,
-  type JobsFeedResponse
+    jobVocabularyResponseSchema,
+    jobsFeedResponseSchema,
+    type JobVocabularyResponse,
+    type JobsFeedResponse
 } from './jobs-feed-response-schema';
 
 function serverApiBaseUrl(): string {
-  return process.env.API_INTERNAL_BASE_URL?.trim() || getPublicEnv().NEXT_PUBLIC_API_BASE_URL;
+  const base = process.env.API_INTERNAL_BASE_URL?.trim() || getPublicEnv().NEXT_PUBLIC_API_BASE_URL;
+  if (!base) {
+    throw new Error(
+      'API_INTERNAL_BASE_URL não definido. É obrigatório quando NEXT_PUBLIC_API_BASE_URL está vazio, porque o lado servidor não resolve caminhos relativos.'
+    );
+  }
+
+  return base;
 }
 
 function buildQueryString(params: JobsFeedQueryParams): string {
