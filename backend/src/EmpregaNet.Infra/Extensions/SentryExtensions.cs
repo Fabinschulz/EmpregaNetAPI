@@ -17,6 +17,10 @@ public static class SentryExtensions
     /// <param name="builder">O WebApplicationBuilder da aplicação.</param>
     public static void SetupSentryLogging(this WebApplicationBuilder builder)
     {
+
+        if (string.IsNullOrWhiteSpace(builder.Configuration["Sentry:Dsn"]))
+            return;
+
         // Configura o Sentry para capturar erros e transações
         builder.WebHost.UseSentry(o =>
         {
@@ -34,6 +38,9 @@ public static class SentryExtensions
     /// <param name="app">O WebApplication da aplicação.</param>
     public static void UseSentryTracingMiddleware(this WebApplication app)
     {
+        if (string.IsNullOrWhiteSpace(app.Configuration["Sentry:Dsn"]))
+            return;
+
         app.UseSentryTracing(); // Para monitoramento de performance (APM)
     }
 }
