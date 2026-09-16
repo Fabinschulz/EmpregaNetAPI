@@ -54,9 +54,6 @@ jobs:
       contents: read
       id-token: write
 
-    outputs:
-      api_env_param: ${{ steps.params.outputs.api_env_param }}
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -257,7 +254,7 @@ jobs:
 
           cat > "$RUNNER_TEMP/head.sh" <<EOF
           AWS_REGION='${{ vars.AWS_REGION }}'
-          API_ENV_PARAM='${{ needs.config.outputs.api_env_param }}'
+          API_ENV_PARAM='/empreganet/${{ inputs.environment }}/api-env'
           IMAGE_URI='${{ inputs.image_uri }}'
           ECR_REGISTRY='${{ inputs.ecr_registry }}'
           CONTAINER='${{ vars.CONTAINER_NAME || 'empreganet-api' }}'
