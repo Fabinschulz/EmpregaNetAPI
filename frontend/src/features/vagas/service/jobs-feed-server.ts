@@ -4,10 +4,10 @@ import { getPublicEnv } from '@/shared/utils';
 import { cacheLife } from 'next/cache';
 import type { JobsFeedQueryParams } from './jobs-feed-params';
 import {
-    jobVocabularyResponseSchema,
-    jobsFeedResponseSchema,
-    type JobVocabularyResponse,
-    type JobsFeedResponse
+  jobVocabularyResponseSchema,
+  jobsFeedResponseSchema,
+  type JobVocabularyResponse,
+  type JobsFeedResponse
 } from './jobs-feed-response-schema';
 
 function serverApiBaseUrl(): string {
