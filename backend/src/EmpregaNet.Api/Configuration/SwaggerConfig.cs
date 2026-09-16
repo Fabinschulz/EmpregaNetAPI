@@ -94,6 +94,7 @@ namespace EmpregaNet.Api.Configuration
                     new() { Name = "Auth", Description = "Autenticação e credenciais: entrar, sair, registrar, renovar sessão e recuperar acesso." },
                     new() { Name = "Candidates", Description = "Listagem e detalhe de candidatos (equipe de recrutamento)." },
                     new() { Name = "Companies", Description = "Endpoints para administração de cadastros corporativos" },
+                    new() { Name = "Dashboard", Description = "Painel de controle do recrutamento (estatísticas, gráficos e indicadores)." },
                     new() { Name = "JobApplications", Description = "Candidaturas e pipeline (candidato e recrutamento)." },
                     new() { Name = "Jobs", Description = "Oportunidades de emprego (leitura pública; mutações com política de recrutamento)." },
                     new() { Name = "Notifications", Description = "Alertas e comunicações (reservado)." },
