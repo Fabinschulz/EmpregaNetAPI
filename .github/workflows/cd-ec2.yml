@@ -46,7 +46,7 @@ permissions: {}
 
 jobs:
   config:
-    name: Publicar configuração cifrada
+    name: Gerar configuração da API
     runs-on: ubuntu-latest
     timeout-minutes: 10
     environment: ${{ inputs.environment }}

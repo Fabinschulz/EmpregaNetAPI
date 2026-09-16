@@ -35,7 +35,8 @@ permissions: {}
 jobs:
   push:
     name: Deploy ECR
-    runs-on: ubuntu-latest
+    # Runners arm64 são gratuitos em repositórios públicos.
+    runs-on: ubuntu-24.04-arm
     timeout-minutes: 20
     environment: ${{ inputs.environment }}
 
@@ -93,7 +94,7 @@ jobs:
           context: image-context
           file: backend/Dockerfile
           target: prebuilt
-          platforms: linux/amd64
+          platforms: linux/arm64
           push: true
           provenance: false
           tags: |
