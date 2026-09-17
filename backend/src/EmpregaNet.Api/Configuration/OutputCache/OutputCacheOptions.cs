@@ -5,11 +5,18 @@ public sealed class OutputCacheOptions
     public const string SectionName = "OutputCache";
 
     /// <summary>
-    /// Tempo padrão de expiração do cache (em minutos). Ignorado quando Redis store está ativo.
+    /// Expiração (em minutos) das políticas <c>PublicCatalog</c>, <c>EntityRead</c>,
+    /// <c>AuthenticatedRead</c> e <c>UserProfileRead</c>, que constroem o próprio
+    /// <c>TimeSpan</c> a partir daqui. Serve ainda de <c>DefaultExpirationTimeSpan</c> para
+    /// políticas sem expiração própria.
     /// </summary>
     public int DefaultExpirationMinutes { get; set; } = 90;
 
-    /// <summary>Limite total do cache in-process (MB). Ignorado quando Redis store está ativo.</summary>
+    /// <summary>
+    /// Limite total do store em memória (MB). Ignorado quando o Redis está ativo, porque
+    /// <c>AddStackExchangeRedisOutputCache</c> substitui o store e o tamanho passa a ser
+    /// governado pelo Redis.
+    /// </summary>
     public int SizeLimitMegabytes { get; set; } = 100;
 
     /// <summary>Respostas acima deste tamanho não são cacheadas (MB). Default Microsoft: 100.</summary>
