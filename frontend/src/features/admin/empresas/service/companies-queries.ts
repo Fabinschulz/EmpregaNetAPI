@@ -41,7 +41,7 @@ export function useCreateCompanyMutation() {
     mutationFn: (formValue: CompanyFormValues) => createCompany(companyFormToRequest(formValue)),
     onSuccess: async (id) => {
       await queryClient.invalidateQueries({ queryKey: companiesKeys.lists() });
-      toastSuccess('Empresa criada', 'Continue de onde parou para completar o cadastro.');
+      toastSuccess('Empresa criada', 'A empresa já está disponível para ser vinculada a vagas.');
       startRouterTransition(() => router.replace(companiesRoutes.detail(id)));
     },
     onError: (err) => {

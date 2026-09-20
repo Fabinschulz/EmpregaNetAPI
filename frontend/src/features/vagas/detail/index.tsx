@@ -2,6 +2,8 @@
 
 import { useApplyToJobMutation } from '@/features/candidaturas/service';
 import type { JobResponse } from '@/features/recrutamento/vagas/service';
+import { AppliedBadge } from '@/features/vagas/applied-badge';
+import { useJobFeedInteractionsQuery } from '@/features/vagas/service';
 import {
   actionIcons,
   Alert,
@@ -61,11 +63,13 @@ type MetaItem = {
 export function JobDetailPage({ job }: JobDetailPageProps) {
   const { isAuthenticated } = useAuth();
   const { apiError, mutateAsync, isPending: isApplying } = useApplyToJobMutation(job.id);
+  const { data: interactions } = useJobFeedInteractionsQuery([job.id]);
+  const hasApplied = interactions?.appliedJobIds.includes(job.id) ?? false;
   const publishedLabel = useRelativeTime(job.publishedAt ?? job.createdAt);
 
   function onApply() {
-    if (!isAuthenticated) return;
-    void mutateAsync();
+    if (!isAuthenticated || hasApplied) return;
+    mutateAsync().catch(() => {});
   }
 
   const applyLabel = isAuthenticated ? 'Candidatar-me' : 'Faça login para se candidatar';
@@ -177,16 +181,25 @@ export function JobDetailPage({ job }: JobDetailPageProps) {
         </CardContent>
 
         <CardFooter className={styles.footer}>
-          <Button variant="primary" onClick={onApply} disabled={!isAuthenticated || isApplying} aria-busy={isApplying}>
-            {isApplying ? (
-              <Spinner size="sm" label={null} />
-            ) : isAuthenticated ? (
-              <actionIcons.apply aria-hidden />
-            ) : (
-              <actionIcons.signIn aria-hidden />
-            )}
-            {applyLabel}
-          </Button>
+          {hasApplied ? (
+            <AppliedBadge />
+          ) : (
+            <Button
+              variant="primary"
+              onClick={onApply}
+              disabled={!isAuthenticated || isApplying}
+              aria-busy={isApplying}
+            >
+              {isApplying ? (
+                <Spinner size="sm" label={null} />
+              ) : isAuthenticated ? (
+                <actionIcons.apply aria-hidden />
+              ) : (
+                <actionIcons.signIn aria-hidden />
+              )}
+              {applyLabel}
+            </Button>
+          )}
           {!isAuthenticated ? (
             <p className={styles.footerHint}>É necessário entrar na conta para enviar sua candidatura.</p>
           ) : null}

@@ -1,0 +1,18 @@
+.appliedBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: var(--radius-pill);
+  background: var(--success-soft);
+  color: var(--success);
+  font-size: var(--entity-card-meta-size);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.appliedIcon {
+  width: 15px;
+  height: 15px;
+  flex: 0 0 auto;
+}

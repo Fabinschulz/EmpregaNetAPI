@@ -65,7 +65,7 @@ export function useCreateJobMutation() {
     mutationFn: (formValue: JobFormValues) => createJob(jobFormToRequest(formValue)),
     onSuccess: async (id) => {
       await queryClient.invalidateQueries({ queryKey: jobsKeys.lists() });
-      toastSuccess('Vaga criada', 'Continue de onde parou para completar a publicação.');
+      toastSuccess('Vaga criada', 'A vaga já está publicada e visível no feed público.');
       startRouterTransition(() => router.replace(jobsRoutes.detail(id)));
     },
     onError: (err) => {

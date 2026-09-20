@@ -1,6 +1,7 @@
 'use client';
 
 import { useApplyToJobMutation } from '@/features/candidaturas/service';
+import { AppliedBadge } from '@/features/vagas/applied-badge';
 import { actionIcons, Button, IconButton, Spinner } from '@/shared/components';
 import { useAuth } from '@/shared/context';
 import { useCopyToClipboard } from '@/shared/hooks';
@@ -43,10 +44,7 @@ export function JobCardActions({ jobId, jobTitle, hasApplied, isActive = true }:
       </Button>
 
       {hasApplied ? (
-        <span className={styles.appliedBadge}>
-          <actionIcons.confirm className={styles.appliedIcon} aria-hidden />
-          Candidatura enviada
-        </span>
+        <AppliedBadge />
       ) : !isActive ? null : isAuthenticated ? (
         <Button
           variant="primary"

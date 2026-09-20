@@ -1,31 +1,38 @@
 'use client';
 
 import {
-  actionIcons,
-  ApiQueryBoundary,
-  ConfirmDialog,
-  FilterSection,
-  PageHeader,
-  TableContainer,
-  type DataTableColumn,
-  type RowAction
+    actionIcons,
+    ApiQueryBoundary,
+    Badge,
+    ConfirmDialog,
+    FilterSection,
+    PageHeader,
+    TableContainer,
+    type DataTableColumn,
+    type RowAction
 } from '@/shared/components';
 import { FormProvider } from '@/shared/context';
 import { useListRefresh, usePersistedTablePagination } from '@/shared/hooks';
 import { type JobApplicationsListQueryParams } from '@/shared/schema';
 import { formatDate } from '@/shared/utils';
 import { Ban } from 'lucide-react';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ApplicationStatusBadge } from '../application-status-badge';
 import { canCandidateCancelApplication } from '../domain';
 import { useCancelMyApplicationMutation, useMyJobApplicationsQuery, type JobApplicationResponse } from '../service';
 import { cancelApplicationDialogCopy } from './cancel-application-dialog-copy';
+import {
+    hasApplicationStatusChanged,
+    markApplicationStatusesAsSeen,
+    readLastSeenApplicationStatuses
+} from './last-seen-application-status';
 import { MyApplicationsFilterFields } from './my-applications-filter-fields';
 import {
-  defaultMyApplicationsFilter,
-  myApplicationsFilterFormSchema,
-  myApplicationsFilterToParams
+    defaultMyApplicationsFilter,
+    myApplicationsFilterFormSchema,
+    myApplicationsFilterToParams
 } from './my-applications-filter-schema';
+import styles from './my-applications.module.scss';
 
 type MyApplicationsFilterParams = Pick<JobApplicationsListQueryParams, 'status' | 'orderBy'>;
 
@@ -42,6 +49,17 @@ export function MyApplicationsPage() {
     size: pagination.pageSize,
     ...filters
   });
+
+  const lastSeenSnapshotRef = useRef<Record<number, string> | null>(null);
+  if (lastSeenSnapshotRef.current === null) {
+    lastSeenSnapshotRef.current = readLastSeenApplicationStatuses();
+  }
+
+  useEffect(() => {
+    const applications = data?.data;
+    if (!applications || applications.length === 0) return;
+    markApplicationStatusesAsSeen(applications.map(({ id, status }) => ({ id, status })));
+  }, [data]);
 
   const handleRefresh = useListRefresh({ refetch, resource: 'candidaturas' });
   const { mutate: cancelApplication, isPending: isCanceling } = useCancelMyApplicationMutation();
@@ -66,7 +84,24 @@ export function MyApplicationsPage() {
       {
         key: 'status',
         header: 'Status',
-        render: (application) => <ApplicationStatusBadge status={application.status} audience="candidate" />
+        render: (application) => {
+          const isUpdated = hasApplicationStatusChanged(
+            lastSeenSnapshotRef.current ?? {},
+            application.id,
+            application.status
+          );
+
+          return (
+            <span className={styles.statusCell}>
+              <ApplicationStatusBadge status={application.status} audience="candidate" />
+              {isUpdated ? (
+                <Badge variant="default" aria-label="Status atualizado desde a última visita">
+                  Atualizado
+                </Badge>
+              ) : null}
+            </span>
+          );
+        }
       },
       { key: 'createdAt', header: 'Enviada em', render: (application) => formatDate(application.createdAt) },
       {
