@@ -1,5 +1,6 @@
 import { createPaginatedResponseSchema } from '@/shared/schema';
 import { z } from 'zod';
+import { jobStatusResponseSchema } from '../domain';
 
 export const jobResponseSchema = z.object({
   id: z.number().int(),
@@ -22,6 +23,12 @@ export const jobResponseSchema = z.object({
   requirements: z.array(z.string()),
   benefits: z.array(z.string()),
   isActive: z.boolean(),
+  positions: z.number().int().positive(),
+  filledPositions: z.number().int().nonnegative(),
+  availablePositions: z.number().int().nonnegative(),
+  status: jobStatusResponseSchema,
+  closedAt: z.string().nullable().optional(),
+  closureReason: z.string().nullable().optional(),
   publicationDate: z.string(),
   publishedAt: z.string(),
   createdAt: z.string().nullable().optional(),

@@ -47,6 +47,7 @@ Carregadas automaticamente quando a situação encaixa, ou por `/<nome>`. Índic
 |------|-------|
 | Convenções backend .NET (conhecimento) | `backend-skill` |
 | Convenções frontend Next.js (conhecimento) | `frontend-skill` |
+| Contrato do Harness — fonte de verdade, confiança, Working Context, orçamento de contexto | `harness-contract` |
 | Pedido vago ou multi-domínio → rotear e encadear | `/meta-agent` |
 | Especificar feature antes de código (gate por fase) | `/sdd-orchestrator` |
 | Regressão E2E pela UI real | `/e2e-qa-skill` |
@@ -58,6 +59,9 @@ recomendar, não delegar.
 
 - **SDD first:** para features novas ou refactors com contrato negócio/técnico, seguir o fluxo SDD (PRD → design → spec/tasks) antes de gerar código.
 - **Human-in-the-loop:** merge e decisões de risco ficam com o humano. Sem secrets no repo.
+- **Contexto relevante > contexto completo:** delegar passando Task Brief, Working Context e caminhos — nunca
+  histórico de conversa, relatório bruto de outro agente ou conteúdo de ficheiro colado. Afirmação importante
+  traz evidência ou vai rotulada como inferência/suposição. Regras completas na skill `harness-contract`.
 - **YAGNI:** capacidade sem consumidor hoje não entra no código — vai para o backlog com gatilho de retorno.
   Excepção: os custos assimétricos (contrato HTTP, migration com `rename`/`drop`, captura de dados, autorização),
   que se decidem agora. YAGNI corta **capacidade**, nunca testes, validação, RBAC ou acessibilidade.

@@ -30,6 +30,27 @@ public sealed class JobViewModel : BaseViewModel
     public DateTimeOffset PublishedAt { get; set; }
     public long CompanyId { get; set; }
     public bool IsActive { get; set; }
+
+    /// <summary>Total de posições que a empresa quer preencher.</summary>
+    public int Positions { get; set; }
+
+    /// <summary>Posições já ocupadas por candidatos aprovados.</summary>
+    public int FilledPositions { get; set; }
+
+    /// <summary>Posições ainda em aberto. Zero numa vaga encerrada por preenchimento.</summary>
+    public int AvailablePositions { get; set; }
+
+    /// <summary>
+    /// Situação da vaga. Distingue encerramento manual de encerramento por preenchimento, coisa
+    /// que <see cref="IsActive"/> sozinho não faz.
+    /// </summary>
+    public JobStatusEnum Status { get; set; }
+
+    /// <summary>Instante do encerramento; <c>null</c> enquanto a vaga estiver activa.</summary>
+    public DateTimeOffset? ClosedAt { get; set; }
+
+    /// <summary>Motivo do encerramento; <c>null</c> enquanto a vaga estiver activa.</summary>
+    public JobClosureReasonEnum? ClosureReason { get; set; }
 }
 
 [ExcludeFromCodeCoverage]
@@ -59,6 +80,12 @@ public static class JobMapper
             Requirements = entity.Requirements,
             Benefits = entity.Benefits,
             IsActive = entity.IsActive,
+            Positions = entity.Positions,
+            FilledPositions = entity.FilledPositions,
+            AvailablePositions = entity.AvailablePositions,
+            Status = entity.Status,
+            ClosedAt = entity.ClosedAt,
+            ClosureReason = entity.ClosureReason,
             PublishedAt = entity.PublishedAt,
             PublicationDate = BrasiliaTime.Format(entity.PublishedAt),
             CreatedAtUtc = entity.CreatedAt,

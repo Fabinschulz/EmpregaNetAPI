@@ -1,9 +1,9 @@
 import {
   closeJobSuccessCopy,
   describeCloseJobConfirmation,
-  jobStatusLabel,
   type OpenApplicationsCount
 } from '@/features/recrutamento/vagas/close-job-copy';
+import { jobStatusLabel, type JobStatus } from '@/features/recrutamento/vagas/domain';
 import { closeJob, getOpenApplicationsCount } from '@/features/recrutamento/vagas/service/jobs-api';
 import {
   closeJobResponseSchema,
@@ -27,6 +27,7 @@ import type { BusinessRulesWorld } from '../../support/world';
 type CloseFlow = {
   jobId: number;
   isActive: boolean;
+  status: JobStatus;
   /** O que a API tem para devolver — a tela só o conhece depois de ler a contagem. */
   openApplicationsOnServer: number;
   managementActions: string[];
@@ -63,6 +64,13 @@ function completeJob(id: number, isActive: boolean): Record<string, unknown> {
     requirements: [],
     benefits: [],
     isActive,
+    positions: 1,
+    filledPositions: isActive ? 0 : 1,
+    availablePositions: isActive ? 1 : 0,
+    // Este fluxo é o do encerramento pelo botão; o encerramento por preenchimento tem tela própria.
+    status: isActive ? 'Active' : 'ClosedManually',
+    closedAt: isActive ? null : '2026-09-01T20:11:04Z',
+    closureReason: isActive ? null : 'Manual',
     publicationDate: '10/01/2026 09:00:00',
     publishedAt: '2026-01-10T12:00:00+00:00',
     createdAt: '10/01/2026 09:00:00',
@@ -90,6 +98,7 @@ function startFlow(this: BusinessRulesWorld, id: number, isActive: boolean, open
   this.data.flow = {
     jobId: job.id,
     isActive: job.isActive,
+    status: job.status,
     openApplicationsOnServer,
     managementActions: [],
     isConfirming: false,
@@ -186,7 +195,7 @@ When('eu leio uma resposta de contagem sem {string}', function (this: BusinessRu
 });
 
 Then('o estado exibido na gestão da vaga deve ser {string}', function (this: BusinessRulesWorld, esperado: string) {
-  expect(jobStatusLabel(flow(this).isActive)).to.equal(esperado);
+  expect(jobStatusLabel(flow(this).status)).to.equal(esperado);
 });
 
 Then('a acção {string} deve estar disponível na gestão', function (this: BusinessRulesWorld, rotulo: string) {

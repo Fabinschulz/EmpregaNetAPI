@@ -30,16 +30,18 @@ public sealed class ChangeJobApplicationStatusHandlerTests
     private readonly Mock<IJobApplicationRepository> _applications = new();
     private readonly Mock<IJobRepository> _jobs = new();
     private readonly Mock<IJobEmployerAccess> _employerAccess = new();
+    private readonly Mock<IJobClosureCascade> _closureCascade = new();
     private readonly RecordingDomainEventQueue _domainEvents = new();
 
     private ChangeJobApplicationStatusCommandHandler CreateSut() =>
         new(_applications.Object,
             _jobs.Object,
             _employerAccess.Object,
+            _closureCascade.Object,
             _domainEvents,
             NullLogger<ChangeJobApplicationStatusCommandHandler>.Instance);
 
-    private static Job CreateJob() => new(
+    private static Job CreateJob(int positions = 5) => new(
         companyId: CompanyId,
         title: "Auxiliar de Produção",
         description: "Linha de montagem.",
@@ -49,9 +51,12 @@ public sealed class ChangeJobApplicationStatusHandlerTests
         experienceLevel: ExperienceLevelEnum.AteUmAno,
         area: JobAreaEnum.Logistica,
         location: new JobLocation { City = "Extrema", State = UF.MG },
+        positions: positions,
         salaryMin: 2100m);
 
-    private void GivenApplication(JobApplication application)
+    private void GivenApplication(JobApplication application) => GivenApplication(application, CreateJob());
+
+    private void GivenApplication(JobApplication application, Job job)
     {
         _applications
             .Setup(x => x.GetByIdAsync(ApplicationId, It.IsAny<CancellationToken>()))
@@ -72,10 +77,21 @@ public sealed class ChangeJobApplicationStatusHandlerTests
                 null,
                 false));
 
-        _jobs.Setup(x => x.GetByIdAsync(It.IsAny<long>(), It.IsAny<CancellationToken>())).ReturnsAsync(CreateJob());
+        // O handler lê a vaga com a linha bloqueada; é este o método que ele chama.
+        _jobs.Setup(x => x.GetByIdForUpdateAsync(It.IsAny<long>(), It.IsAny<CancellationToken>()))
+             .ReturnsAsync(job);
+        _jobs.Setup(x => x.UpdateAsync(It.IsAny<Job>(), It.IsAny<CancellationToken>()))
+             .ReturnsAsync(job);
         _employerAccess
             .Setup(x => x.EnsureCanManageCompanyAsync(It.IsAny<long>(), It.IsAny<CancellationToken>()))
             .Returns(Task.CompletedTask);
+        _closureCascade
+            .Setup(x => x.CancelOpenApplicationsAsync(
+                It.IsAny<long>(),
+                It.IsAny<DateTimeOffset>(),
+                It.IsAny<JobApplicationNotificationReason>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(0);
     }
 
     private Task<JobApplicationViewModel> ExecuteAsync(string status) =>
@@ -174,5 +190,126 @@ public sealed class ChangeJobApplicationStatusHandlerTests
         await act.Should().ThrowAsync<ValidationAppException>();
 
         _domainEvents.Recorded.Should().BeEmpty();
+    }
+
+    // ----------------------------------------------------------------------------------------
+    // Posições da vaga
+    // ----------------------------------------------------------------------------------------
+
+    [Fact]
+    public async Task Handle_Aprovacao_DeveOcuparUmaPosicaoDaVaga()
+    {
+        var job = CreateJob(positions: 3);
+        var application = new JobApplication(JobId, userId: 1);
+        GivenApplication(application, job);
+
+        await ExecuteAsync(nameof(ApplicationStatusEnum.Approved));
+
+        job.FilledPositions.Should().Be(1);
+        job.AvailablePositions.Should().Be(2);
+        job.IsActive.Should().BeTrue("ainda sobram posições");
+        _jobs.Verify(x => x.UpdateAsync(job, It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    // O coração da regra: a última aprovação encerra a vaga e arrasta quem ficou pelo caminho.
+    [Fact]
+    public async Task Handle_UltimaAprovacao_DeveEncerrarAVagaECancelarAsCandidaturasEmAberto()
+    {
+        var job = CreateJob(positions: 1);
+        var application = new JobApplication(JobId, userId: 1);
+        GivenApplication(application, job);
+
+        await ExecuteAsync(nameof(ApplicationStatusEnum.Approved));
+
+        job.AvailablePositions.Should().Be(0);
+        job.IsActive.Should().BeFalse();
+        job.ClosureReason.Should().Be(JobClosureReasonEnum.Fulfilled);
+
+        _closureCascade.Verify(
+            x => x.CancelOpenApplicationsAsync(
+                job.Id,
+                job.ClosedAt!.Value,
+                JobApplicationNotificationReason.JobFilled,
+                It.IsAny<CancellationToken>()),
+            Times.Once);
+    }
+
+    [Fact]
+    public async Task Handle_AprovacaoComPosicoesSobrando_NaoDeveArrastarCandidaturas()
+    {
+        var job = CreateJob(positions: 2);
+        GivenApplication(new JobApplication(JobId, userId: 1), job);
+
+        await ExecuteAsync(nameof(ApplicationStatusEnum.Approved));
+
+        _closureCascade.Verify(
+            x => x.CancelOpenApplicationsAsync(
+                It.IsAny<long>(),
+                It.IsAny<DateTimeOffset>(),
+                It.IsAny<JobApplicationNotificationReason>(),
+                It.IsAny<CancellationToken>()),
+            Times.Never);
+    }
+
+    // Concluir o processo de quem foi aprovado não devolve a posição, senão a vaga reabria sozinha.
+    [Fact]
+    public async Task Handle_AprovadoParaConcluido_NaoDeveLibertarAPosicao()
+    {
+        var job = CreateJob(positions: 2);
+        var application = new JobApplication(JobId, userId: 1);
+        application.ChangeStatus(ApplicationStatusEnum.Approved);
+        job.FillPosition();
+        GivenApplication(application, job);
+
+        await ExecuteAsync(nameof(ApplicationStatusEnum.Finished));
+
+        job.FilledPositions.Should().Be(1);
+        _jobs.Verify(x => x.UpdateAsync(It.IsAny<Job>(), It.IsAny<CancellationToken>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task Handle_AprovadoParaReprovado_DeveLibertarAPosicao()
+    {
+        var job = CreateJob(positions: 2);
+        var application = new JobApplication(JobId, userId: 1);
+        application.ChangeStatus(ApplicationStatusEnum.Approved);
+        job.FillPosition();
+        GivenApplication(application, job);
+
+        await ExecuteAsync(nameof(ApplicationStatusEnum.Rejected));
+
+        job.FilledPositions.Should().Be(0);
+        job.AvailablePositions.Should().Be(2);
+        _jobs.Verify(x => x.UpdateAsync(job, It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    // Uma vaga encerrada não tem posição para dar. A recusa do agregado tem de chegar como 400,
+    // não como 500 nem como conflito genérico.
+    [Fact]
+    public async Task Handle_AprovacaoEmVagaEncerrada_DeveDevolver400ENaoConflito()
+    {
+        var job = CreateJob(positions: 1);
+        job.Close();
+        GivenApplication(new JobApplication(JobId, userId: 1), job);
+
+        var act = async () => await ExecuteAsync(nameof(ApplicationStatusEnum.Approved));
+
+        var assertion = await act.Should().ThrowAsync<ValidationAppException>();
+        assertion.Which.Code.Should().Be(DomainErrorEnum.INVALID_ACTION_FOR_STATUS);
+        _applications.Verify(x => x.UpdateAsync(It.IsAny<JobApplication>(), It.IsAny<CancellationToken>()), Times.Never);
+        _domainEvents.Recorded.Should().BeEmpty();
+    }
+
+    // Transição que não mexe em posições não escreve na vaga: menos uma linha tocada por engano.
+    [Fact]
+    public async Task Handle_TransicaoSemEfeitoEmPosicoes_NaoDeveEscreverNaVaga()
+    {
+        var job = CreateJob(positions: 3);
+        GivenApplication(new JobApplication(JobId, userId: 1), job);
+
+        await ExecuteAsync(nameof(ApplicationStatusEnum.Processing));
+
+        job.FilledPositions.Should().Be(0);
+        _jobs.Verify(x => x.UpdateAsync(It.IsAny<Job>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 }

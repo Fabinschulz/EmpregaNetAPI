@@ -3,10 +3,8 @@ export type VocabularyOption<T extends string = string> = {
   readonly label: string;
 };
 
-/** Cria o par nome→rótulo e o normalizador de um enum do backend, a partir da ordem dele. */
 function createVocabulary<const T extends readonly VocabularyOption[]>(
   options: T,
-  /** Ordem completa do enum no backend, índice 0 = `NaoSelecionado`. Buracos entram como `null`. */
   order: readonly (string | null)[]
 ) {
   const valueSet = new Set<string>(options.map((o) => o.value));
@@ -171,15 +169,6 @@ export type SalaryRange = {
   readonly max?: number;
 };
 
-/**
- * Faixas do filtro, calibradas para o mercado atendido.
- *
- * A escala anterior (até 2k / 2–4k / 4–6k / 6–10k / +10k) achatava justamente a faixa onde está
- * a maior parte das vagas do polo: quase tudo caía nos dois primeiros degraus, o que torna o
- * filtro inútil. Aqui os degraus são estreitos na base e largos no topo.
- *
- * O `value` vai para a URL e precisa ser estável: mudá-lo invalida links já compartilhados.
- */
 export const SALARY_RANGE_OPTIONS: readonly SalaryRange[] = [
   { value: 'ate-1800', label: 'Até R$ 1.800', max: 1800 },
   { value: '1800-2300', label: 'R$ 1.800 a R$ 2.300', min: 1800, max: 2300 },
@@ -192,7 +181,6 @@ export const SALARY_RANGE_OPTIONS: readonly SalaryRange[] = [
 export const findSalaryRange = (value: string | null | undefined): SalaryRange | undefined =>
   value ? SALARY_RANGE_OPTIONS.find((range) => range.value === value) : undefined;
 
-/** Espelha `JobPublishedWindowEnum`. `Today` e `Last24Hours` são janelas diferentes. */
 export const PUBLISHED_WITHIN_OPTIONS = [
   { value: 'Today', label: 'Hoje' },
   { value: 'Last24Hours', label: 'Últimas 24 horas' },
@@ -227,3 +215,5 @@ const JOB_SORT_SET = new Set<string>(JOB_SORT_OPTIONS.map((o) => o.value));
 export const isJobSortValue = (value: string): value is JobSortValue => JOB_SORT_SET.has(value);
 
 export const MAX_VOCABULARY_ITEMS_PER_JOB = 20;
+export const MIN_JOB_POSITIONS = 1;
+export const MAX_JOB_POSITIONS = 999;

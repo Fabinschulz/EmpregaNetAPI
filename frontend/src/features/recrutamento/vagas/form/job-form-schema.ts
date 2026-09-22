@@ -1,12 +1,14 @@
 import {
-  MAX_VOCABULARY_ITEMS_PER_JOB,
-  UF_VALUE_SET,
-  experienceLevelVocabulary,
-  jobAreaVocabulary,
-  jobTypeVocabulary,
-  normalizeUf,
-  workModelVocabulary,
-  workShiftVocabulary
+    MAX_JOB_POSITIONS,
+    MAX_VOCABULARY_ITEMS_PER_JOB,
+    MIN_JOB_POSITIONS,
+    UF_VALUE_SET,
+    experienceLevelVocabulary,
+    jobAreaVocabulary,
+    jobTypeVocabulary,
+    normalizeUf,
+    workModelVocabulary,
+    workShiftVocabulary
 } from '@/shared/schema';
 import { z } from 'zod';
 import type { JobRequest } from '../service/jobs-request-schema';
@@ -45,6 +47,13 @@ export const jobFormSchema = z
     area: z.string().refine((value): boolean => jobAreaVocabulary.has(value), { message: 'Selecione a área.' }),
     city: z.string().trim().min(1, 'Informe a cidade.').max(100, 'A cidade deve ter no máximo 100 caracteres.'),
     state: z.string().refine((s): boolean => UF_VALUE_SET.has(s), { message: 'Selecione o estado.' }),
+
+    positions: z
+      .string()
+      .trim()
+      .refine((s) => /^\d+$/.test(s), { message: 'Informe um número inteiro de vagas.' })
+      .refine((s) => Number(s) >= MIN_JOB_POSITIONS, { message: `Informe ao menos ${MIN_JOB_POSITIONS} vaga.` })
+      .refine((s) => Number(s) <= MAX_JOB_POSITIONS, { message: `Informe no máximo ${MAX_JOB_POSITIONS} vagas.` }),
     pcd: z.enum(['no', 'yes']),
     salaryDisclosure: z.enum(['disclosed', 'undisclosed']),
     salaryMin: optionalMoney,
@@ -76,6 +85,7 @@ export const defaultFormJob: JobFormValues = {
   area: '',
   city: '',
   state: '',
+  positions: String(MIN_JOB_POSITIONS),
   pcd: 'no',
   salaryDisclosure: 'disclosed',
   salaryMin: '',
@@ -109,6 +119,7 @@ export function jobFormValuesFromResponse(job: JobResponse): JobFormValues {
     area: jobAreaVocabulary.normalize(job.area),
     city: job.city,
     state: normalizeUf(job.state),
+    positions: String(job.positions),
     pcd: job.isPcdFriendly ? 'yes' : 'no',
     salaryDisclosure: job.salaryDisclosed ? 'disclosed' : 'undisclosed',
     salaryMin: moneyToInput(job.salaryMin),
@@ -134,6 +145,7 @@ export function jobFormToRequest(values: JobFormValues): JobRequest {
     area: values.area,
     city: values.city.trim(),
     state: values.state,
+    positions: Number(values.positions),
     isPcdFriendly: values.pcd === 'yes',
     salaryDisclosed,
     salaryMin: salaryDisclosed ? toNumber(values.salaryMin) : undefined,

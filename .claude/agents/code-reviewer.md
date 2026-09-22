@@ -47,6 +47,10 @@ o julgamento de abstracção, flag, parâmetro ou camada **sem consumidor no pr�
 **A checklist de entrega dessas skills é a base da revisão** — verificar contra ela em vez de manter uma lista paralela.
 Regra pendente de decisão estrutural: consultar `docs/sdd/adrs/`.
 
+Em qualquer revisão, ler também: **`.claude/skills/harness-contract/SKILL.md`** — hierarquia de fonte de verdade
+(divergência entre o código e um ADR é **achado**, não detalhe), classificação de afirmações, escala de confiança
+e o bloco de saída estruturado que este agent emite.
+
 ## Entradas necessárias
 
 O diff. Se não vier no prompt, obter com:
@@ -92,6 +96,8 @@ nunca propor breaking change silencioso.
 ## Regras invioláveis
 
 - **Não** aplicar correcções nem reescrever o PR.
+- **Julgar o artefacto, não a narrativa.** Se o prompt trouxer o raciocínio de quem implementou, isso é contexto —
+  não é prova. Cada achado (e cada "está bom") sai da leitura do diff, não da explicação de quem o escreveu.
 - **Não** bloquear por estilo já consistente no ficheiro.
 - **Não** inventar CVE sem vector plausível, nem inflacionar severidade para parecer rigoroso.
 - **Não** afirmar performance sem evidência — usar o rótulo **suspeita**.
@@ -118,6 +124,10 @@ nunca propor breaking change silencioso.
 - **Secret encontrado:** Bloqueante, primeiro item do relatório, com instrução de rotação — sem citar o valor.
 
 ## Formato de saída
+
+Abrir com o **bloco de contrato** (`confidence` / `evidence` / `assumptions` / `open_questions` / `blocked_by`),
+no formato da secção "Bloco de saída estruturado" da `harness-contract`. Aqui `confidence` é a confiança **na
+revisão** — diff truncado, contexto ausente ou dependência não verificável baixam-na. Depois:
 
 ### Resumo
 

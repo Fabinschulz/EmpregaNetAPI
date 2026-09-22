@@ -1,3 +1,5 @@
+using EmpregaNet.Domain.Enums;
+
 namespace EmpregaNet.Application.Dashboard.ViewModel;
 
 /// <summary>
@@ -26,6 +28,7 @@ public sealed class DashboardJobPerformanceViewModel
     public required string AreaLabel { get; init; }
     public required bool IsActive { get; init; }
     public required string StatusLabel { get; init; }
+    public required JobStatusEnum Status { get; init; }
     public required string PublishedAt { get; init; }
     public required int DaysActive { get; init; }
     public required int Applications { get; init; }

@@ -20,6 +20,7 @@ Registos curtos de decisões **estruturais e duradouras** (stack, limites entre 
 | [0012](0012-despacho-de-eventos-de-dominio-apos-commit.md) | Efeitos colaterais não-transaccionais despachados após o commit, via fila de eventos por requisição | Aceite |
 | [0013](0013-estado-por-tentativa-no-limite-de-retry-transaccional.md) | `ChangeTracker` reposto a partir da segunda tentativa do retry transaccional; handler `ITransactional` sem efeito externo (estende o [0012](0012-despacho-de-eventos-de-dominio-apos-commit.md)) | Aceite |
 | [0014](0014-envio-de-email-via-ses.md) | E-mail transacional pela API do Amazon SES com credencial da IAM role, em vez de relay SMTP com utilizador e palavra-passe | Aceite |
+| [0015](0015-vaga-com-posicoes-e-encerramento-por-preenchimento.md) | Vaga com total de posições; encerramento automático ao preencher, com motivo e data gravados ao lado de `IsActive` (estende o [0006](0006-agregado-job-enriquecido.md)) | Aceite |
 
 ## Como criar
 

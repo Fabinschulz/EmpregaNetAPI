@@ -14,6 +14,11 @@ public interface IJobRepository : IBaseRepository<Job>
     Task<bool> ExistsByTitleAndCompanyIdAsync(string title, long companyId);
 
     /// <summary>
+    /// Obtém uma vaga de emprego pelo ID para atualização. Retorna null se a vaga não existir.
+    /// </summary>
+    Task<Job?> GetByIdForUpdateAsync(long id, CancellationToken cancellationToken);
+
+    /// <summary>
     /// Lista vagas com filtros opcionais. <paramref name="search"/> busca por título ou descrição.
     /// Usado pela gestão de recrutamento; a descoberta pública usa <see cref="GetFeedAsync"/>.
     /// </summary>

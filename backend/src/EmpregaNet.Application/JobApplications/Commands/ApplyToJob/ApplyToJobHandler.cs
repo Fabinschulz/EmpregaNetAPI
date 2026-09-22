@@ -77,6 +77,14 @@ public sealed class ApplyToJobHandler : IRequestHandler<CreateCommand<ApplyToJob
                 DomainErrorEnum.INVALID_ACTION_FOR_STATUS);
         }
 
+        if (job.AvailablePositions == 0)
+        {
+            throw new ValidationAppException(
+                nameof(request.entity.JobId),
+                "Esta vaga já preencheu todas as posições disponíveis.",
+                DomainErrorEnum.INVALID_ACTION_FOR_STATUS);
+        }
+
         var alreadyApplied = await _jobApplicationRepository.ExistsActiveAsync(request.entity.JobId, _httpCurrentUser.UserId, cancellationToken);
         if (alreadyApplied)
         {

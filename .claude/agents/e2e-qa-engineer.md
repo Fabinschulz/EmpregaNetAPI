@@ -49,6 +49,9 @@ comportamento; aquele é o processo.
 Convenções de UI que definem o comportamento esperado (loading canónico, RBAC, estados):
 `.claude/skills/frontend-skill/SKILL.md`, secções "Autenticação e RBAC" e "UX, estética e acessibilidade".
 
+Ler também: **`.claude/skills/harness-contract/SKILL.md`** — classificação de afirmações (cenário não executado
+é DESCONHECIDO, nunca aprovado), escala de confiança e o bloco de saída estruturado que este agent emite.
+
 ## Entradas necessárias
 
 - Módulo/fluxo em escopo, e os cenários dessa fatia.
@@ -111,6 +114,10 @@ Faltando o escopo, cobrir o mapa de rotas por ordem de prioridade da skill e diz
 - **Aplicação instável a ponto de invalidar a execução:** parar, reportar o que foi coberto até ali e o risco.
 
 ## Formato de saída
+
+Abrir com o **bloco de contrato** (`confidence` / `evidence` / `assumptions` / `open_questions` / `blocked_by`),
+no formato da secção "Bloco de saída estruturado" da `harness-contract` — em `evidence`, as observações reais
+(rota navegada, texto lido, status HTTP, screenshot). Depois:
 
 O relatório definido na skill `e2e-qa-skill`, secção "Consolidação e relatório": resumo executivo com recomendação **apto / apto com ressalvas /
 não apto**, tabela de cenários, bugs por severidade no "Template de defeito", fluxos não testados, riscos, evidências.

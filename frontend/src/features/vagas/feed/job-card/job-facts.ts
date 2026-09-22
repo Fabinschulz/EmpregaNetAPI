@@ -1,8 +1,9 @@
+import { describeAvailablePositions } from '@/features/recrutamento/vagas/domain';
 import type { JobFeedItemResponse } from '@/features/vagas/service';
 import { jobTypeVocabulary, normalizeUf, workModelVocabulary } from '@/shared/schema';
 import { formatSalaryRange } from '@/shared/utils';
 
-export type JobFactIcon = 'location' | 'salary' | 'remote' | 'hybrid' | 'onSite' | 'contract';
+export type JobFactIcon = 'location' | 'salary' | 'remote' | 'hybrid' | 'onSite' | 'contract' | 'positions';
 
 export type JobFact = {
   key: string;
@@ -51,6 +52,16 @@ export function toJobFacts(job: JobFeedItemResponse): JobFact[] {
       icon: 'contract',
       label: jobTypeVocabulary.label(jobType),
       srLabel: 'Contratação'
+    });
+  }
+
+  if (job.positions > 1) {
+    facts.push({
+      key: 'positions',
+      icon: 'positions',
+      label: describeAvailablePositions(job.availablePositions),
+      srLabel: 'Vagas disponíveis',
+      strong: true
     });
   }
 

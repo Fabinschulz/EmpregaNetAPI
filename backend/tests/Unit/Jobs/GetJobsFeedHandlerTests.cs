@@ -37,7 +37,7 @@ public sealed class GetJobsFeedHandlerTests
             new JobFeedSalary(null, null, false),
             JobTypeEnum.Clt, WorkModelEnum.OnSite, WorkShiftEnum.NaoSelecionado,
             ExperienceLevelEnum.NaoSelecionado, JobAreaEnum.NaoSelecionado, false,
-            [], [], DateTimeOffset.UtcNow, 0, true);
+            [], [], DateTimeOffset.UtcNow, 0, true, 1, 0);
 
         _repo
             .Setup(x => x.GetFeedAsync(It.IsAny<JobFeedFilter>(), It.IsAny<CancellationToken>()))
@@ -214,7 +214,9 @@ public sealed class GetJobsFeedHandlerTests
             Benefits: ["Fretado"],
             PublishedAt: new DateTimeOffset(2026, 7, 28, 13, 45, 0, TimeSpan.Zero),
             ApplicationsCount: 12,
-            IsActive: true);
+            IsActive: true,
+            Positions: 5,
+            FilledPositions: 2);
 
         _repo
             .Setup(x => x.GetFeedAsync(It.IsAny<JobFeedFilter>(), It.IsAny<CancellationToken>()))
@@ -231,6 +233,9 @@ public sealed class GetJobsFeedHandlerTests
         item.WorkShift.Should().Be("SegundoTurno");
         item.Requirements.Should().BeEquivalentTo(["Empilhadeira"]);
         item.ApplicationsCount.Should().Be(12);
+        item.Positions.Should().Be(5);
+        item.FilledPositions.Should().Be(2);
+        item.AvailablePositions.Should().Be(3);
         result.TotalItems.Should().Be(1);
     }
 
@@ -244,7 +249,7 @@ public sealed class GetJobsFeedHandlerTests
             new JobFeedSalary(null, null, false),
             JobTypeEnum.Pj, WorkModelEnum.Remote, WorkShiftEnum.TerceiroTurno,
             ExperienceLevelEnum.MaisDeCincoAnos, JobAreaEnum.Manutencao, true,
-            [], [], DateTimeOffset.UtcNow, 0, true);
+            [], [], DateTimeOffset.UtcNow, 0, true, 1, 0);
 
         _repo
             .Setup(x => x.GetFeedAsync(It.IsAny<JobFeedFilter>(), It.IsAny<CancellationToken>()))

@@ -40,6 +40,10 @@ custos assimétricos: contrato HTTP, migration destrutiva, captura de dados, aut
 Se houver pasta de feature activa, ler também `docs/features/<id>/prd.md`.
 **Não** repetir no output o que a skill já fixa; assumi-lo e desenhar sobre ele.
 
+Ler também: **`.claude/skills/harness-contract/SKILL.md`** — hierarquia de fonte de verdade (o desenho segue o
+**eixo B**: ADR acima de `design.md`, `design.md` acima de convenção), classificação de afirmações, escala de
+confiança e o bloco de saída estruturado que este agent emite.
+
 ## Entradas necessárias
 
 Perguntar apenas o que **bloqueia** o desenho: modelo de deploy, metas de latência/throughput, volume esperado,
@@ -82,6 +86,9 @@ integrações externas confirmadas. Faltando algo não bloqueante, assumir expli
 - **O pedido é implementação disfarçada de desenho:** dizê-lo numa frase e encaminhar para `dotnet-implementer`.
 
 ## Formato de saída
+
+Abrir com o **bloco de contrato** (`confidence` / `evidence` / `assumptions` / `open_questions` / `blocked_by`),
+no formato da secção "Bloco de saída estruturado" da `harness-contract`. Depois:
 
 1. **Estrutura** — árvore de projectos/pastas, uma linha por nó explicando o papel.
 2. **Decisões** — lista; cada item = decisão + uma frase de justificativa + dependências proibidas quando aplicável.

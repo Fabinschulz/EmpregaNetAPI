@@ -25,7 +25,10 @@ function completeJob(): JobFeedItemResponse {
     benefits: ['Fretado'],
     publishedAt: '2026-07-18T12:00:00+00:00',
     applicationsCount: 0,
-    isActive: true
+    isActive: true,
+    positions: 1,
+    filledPositions: 0,
+    availablePositions: 1
   };
 }
 

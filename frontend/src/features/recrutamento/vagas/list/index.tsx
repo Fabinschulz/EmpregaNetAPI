@@ -19,7 +19,7 @@ import { type JobsListQueryParams } from '@/shared/schema';
 import { formatDate } from '@/shared/utils';
 import Link from 'next/link';
 import { useCallback, useMemo, useState } from 'react';
-import { jobStatusLabel } from '../close-job-copy';
+import { describePositions, jobStatusLabel, jobStatusTone } from '../domain';
 import { jobsRoutes } from '../jobs-routes';
 import { useDeleteJobMutation, useJobsListQuery, type JobResponse } from '../service';
 import { JobsFilterFields } from './jobs-filter-fields';
@@ -71,9 +71,12 @@ export function RecruitmentJobsPage() {
       {
         key: 'status',
         header: 'Status',
-        render: (job) => (
-          <StatusBadge label={jobStatusLabel(job.isActive)} tone={job.isActive ? 'positive' : 'negative'} />
-        )
+        render: (job) => <StatusBadge label={jobStatusLabel(job.status)} tone={jobStatusTone(job.status)} />
+      },
+      {
+        key: 'positions',
+        header: 'Vagas',
+        render: (job) => describePositions(job.positions, job.filledPositions)
       },
       { key: 'createdAt', header: 'Criado em', render: (job) => formatDate(job.createdAt) },
       {

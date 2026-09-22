@@ -27,7 +27,10 @@ public static class JobFeedMapper
             Benefits = projection.Benefits,
             PublishedAt = projection.PublishedAt,
             ApplicationsCount = projection.ApplicationsCount,
-            IsActive = projection.IsActive
+            IsActive = projection.IsActive,
+            Positions = projection.Positions,
+            FilledPositions = projection.FilledPositions,
+            AvailablePositions = Math.Max(0, projection.Positions - projection.FilledPositions)
         };
     }
 

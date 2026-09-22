@@ -75,6 +75,7 @@ Carregadas automaticamente pela `description`, ou invocadas por `/<nome>`. Padr�
 | ----- | ---- | ---------- |
 | `backend-skill` | Conhecimento | Convenções .NET: camadas, mediator interno, EF Core, contrato HTTP, testes |
 | `frontend-skill` | Conhecimento | Convenções Next.js: `cacheComponents`, SCSS Modules, Zod, auth/RBAC, loading |
+| `harness-contract` | Contrato | Fonte de verdade, facto vs inferência, confiança, Working Context, orçamento e decaimento de contexto |
 | `/meta-agent` | Orquestração | Roteia pedido vago ou multi-domínio para o especialista certo |
 | `/sdd-orchestrator` | Orquestração | PRD → design → spec/tasks com gate humano por fase |
 | `/e2e-qa-skill` | Orquestração + metodologia | Regressão E2E pela UI real |

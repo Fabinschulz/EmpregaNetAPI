@@ -22,6 +22,17 @@ public sealed class JobFeedItemViewModel
     public DateTimeOffset PublishedAt { get; init; } = DateTimeOffset.UtcNow;
     public int ApplicationsCount { get; init; }
     public bool IsActive { get; init; }
+
+    /// <summary>Total de posições da vaga.</summary>
+    public int Positions { get; init; }
+
+    /// <summary>Posições já ocupadas por candidatos aprovados.</summary>
+    public int FilledPositions { get; init; }
+
+    /// <summary>
+    /// Posições ainda em aberto. O feed só devolve vagas activas, logo aqui é sempre maior que zero.
+    /// </summary>
+    public int AvailablePositions { get; init; }
 }
 
 public sealed class JobFeedCompanyViewModel

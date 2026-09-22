@@ -15,6 +15,8 @@ import {
   experienceLevelVocabulary,
   jobAreaVocabulary,
   jobTypeVocabulary,
+  MAX_JOB_POSITIONS,
+  MIN_JOB_POSITIONS,
   UF_SELECT_OPTIONS,
   workModelVocabulary,
   workShiftVocabulary
@@ -23,7 +25,21 @@ import { useMemo } from 'react';
 import { useSelectableCompaniesQuery } from '../service';
 import { PCD_OPTIONS, SALARY_DISCLOSURE_OPTIONS, type JobFormValues } from './job-form-schema';
 
-export function JobFormFields() {
+type JobFormFieldsProps = {
+  /**
+   * Posições já ocupadas por candidatos aprovados. Só existe na edição, e é o que impede o
+   * recrutador de baixar o total para um número que a API vai recusar.
+   */
+  filledPositions?: number;
+
+  /**
+   * Vaga encerrada. O total deixa de ser editável: subi-lo criaria uma vaga encerrada com posição
+   * livre, e a API recusa - o campo desabilitado diz isso antes de o recrutador digitar.
+   */
+  isClosed?: boolean;
+};
+
+export function JobFormFields({ filledPositions, isClosed = false }: JobFormFieldsProps = {}) {
   const { watch } = useFormContext<JobFormValues>();
   const { data: companies, isPending: companiesLoading } = useSelectableCompaniesQuery();
   const { data: vocabulary, isPending: vocabularyLoading } = useJobVocabularyQuery();
@@ -39,6 +55,14 @@ export function JobFormFields() {
   const requirementOptions = useMemo(() => flatten(vocabulary?.requirements), [vocabulary]);
   const benefitOptions = useMemo(() => flatten(vocabulary?.benefits), [vocabulary]);
   const salaryDisclosed = watch('salaryDisclosure') !== 'undisclosed';
+
+  const autoCloseHint = 'A vaga encerra automaticamente quando todas as posições forem preenchidas.';
+  const positionsHint = isClosed
+    ? 'A vaga está encerrada: o total de vagas não pode mais ser alterado.'
+    : filledPositions && filledPositions > 0
+      ? `${filledPositions} ${filledPositions === 1 ? 'vaga já preenchida' : 'vagas já preenchidas'}: ` +
+        `o total não pode ficar abaixo desse número. ${autoCloseHint}`
+      : autoCloseHint;
 
   return (
     <FormGrid>
@@ -66,6 +90,20 @@ export function JobFormFields() {
         <FormCol span="full">
           <TextareaField name="description" label="Descrição" rows={6} required />
         </FormCol>
+      </FormSection>
+
+      <FormSection title="Quantidade de vagas" cols={3}>
+        <InputField
+          name="positions"
+          label="Total de vagas"
+          type="number"
+          min={MIN_JOB_POSITIONS}
+          max={MAX_JOB_POSITIONS}
+          step="1"
+          required
+          disabled={isClosed}
+          hint={positionsHint}
+        />
       </FormSection>
 
       <FormSection title="Jornada e experiência" cols={3}>

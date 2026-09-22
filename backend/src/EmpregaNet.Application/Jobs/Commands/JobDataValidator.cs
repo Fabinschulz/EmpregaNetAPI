@@ -1,3 +1,4 @@
+using EmpregaNet.Domain.Entities;
 using EmpregaNet.Domain.Enums;
 using FluentValidation;
 
@@ -65,6 +66,12 @@ public sealed class JobDataValidator<T> : AbstractValidator<T> where T : IJobCom
             .WithMessage("O estado da vaga é obrigatório.")
             .Must(value => IsSelectedEnum(value, UF.NaoSelecionado))
             .WithMessage("Estado inválido.");
+
+        RuleFor(x => x.Positions)
+            .GreaterThanOrEqualTo(Job.MinPositions)
+            .WithMessage($"A vaga precisa de pelo menos {Job.MinPositions} posição.")
+            .LessThanOrEqualTo(Job.MaxPositions)
+            .WithMessage($"A vaga não pode ter mais de {Job.MaxPositions} posições.");
 
         // Salário divulgado exige ao menos um limite: marcar como divulgado sem informar valor
         // colocaria a vaga em filtros de faixa salarial sem ter faixa nenhuma.

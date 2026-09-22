@@ -1,6 +1,6 @@
 import type { JobFeedItemResponse } from '@/features/vagas/service';
 import { InfoItem, InfoList } from '@/shared/components';
-import { Banknote, Briefcase, Building2, House, MapPin, type LucideIcon } from 'lucide-react';
+import { Banknote, Briefcase, Building2, House, MapPin, Users, type LucideIcon } from 'lucide-react';
 import { toJobFacts, type JobFactIcon } from './job-facts';
 
 const ICONS: Record<JobFactIcon, LucideIcon> = {
@@ -9,7 +9,8 @@ const ICONS: Record<JobFactIcon, LucideIcon> = {
   remote: House,
   hybrid: Building2,
   onSite: MapPin,
-  contract: Briefcase
+  contract: Briefcase,
+  positions: Users
 };
 
 export function JobCardFacts({ job }: { job: JobFeedItemResponse }) {

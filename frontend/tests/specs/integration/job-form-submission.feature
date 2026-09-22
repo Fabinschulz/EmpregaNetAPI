@@ -164,20 +164,46 @@ Funcionalidade: Fluxo completo do formulário de vaga (leitura da API até reenv
     Quando eu valido esses dados contra o contrato de leitura de vaga
     Então a validação do contrato de vaga deve falhar no campo "isActive"
 
-  Cenário: vaga encerrada deve ser rotulada como Encerrada
+  Cenário: vaga encerrada pela empresa deve dizer que foi a empresa que a encerrou
     Dado que a API devolveu os dados desta vaga cadastrada:
       """
       {
         "id": 6,
-        "title": "Vaga já preenchida",
+        "title": "Vaga cancelada",
         "description": "Encerrada pela empresa.",
         "companyId": 7,
         "salaryMin": 2200,
         "jobType": "Clt",
-        "isActive": false
+        "isActive": false,
+        "status": "ClosedManually",
+        "closureReason": "Manual",
+        "closedAt": "2026-09-01T20:11:04Z"
       }
       """
-    Então o rótulo de situação da vaga deve ser "Encerrada"
+    Então o rótulo de situação da vaga deve ser "Encerrada pela empresa"
+
+  # Encerrar por ter contratado toda a gente é o desfecho bem-sucedido e não pode ser lido como
+  # desistência da empresa: é a distinção que `isActive` sozinho não conseguia fazer.
+  Cenário: vaga encerrada por preenchimento deve ser rotulada pelas vagas preenchidas
+    Dado que a API devolveu os dados desta vaga cadastrada:
+      """
+      {
+        "id": 8,
+        "title": "Vaga já preenchida",
+        "description": "Todas as posições foram preenchidas.",
+        "companyId": 7,
+        "salaryMin": 2200,
+        "jobType": "Clt",
+        "isActive": false,
+        "positions": 3,
+        "filledPositions": 3,
+        "availablePositions": 0,
+        "status": "ClosedByFulfillment",
+        "closureReason": "Fulfilled",
+        "closedAt": "2026-09-01T20:11:04Z"
+      }
+      """
+    Então o rótulo de situação da vaga deve ser "Vagas preenchidas"
 
   Cenário: vaga aberta deve ser rotulada como Ativa
     Dado que a API devolveu os dados desta vaga cadastrada:
@@ -193,3 +219,21 @@ Funcionalidade: Fluxo completo do formulário de vaga (leitura da API até reenv
       }
       """
     Então o rótulo de situação da vaga deve ser "Ativa"
+
+  # Um `status` que o frontend ainda não conhece (a API ganhou um motivo de encerramento novo) não
+  # pode derrubar o parse da resposta inteira: cai em encerrada, o lado seguro do erro.
+  Cenário: status de vaga desconhecido não deve reprovar o contrato
+    Dado que a API devolveu os dados desta vaga cadastrada:
+      """
+      {
+        "id": 9,
+        "title": "Vaga com status futuro",
+        "description": "Motivo de encerramento que o frontend ainda não conhece.",
+        "companyId": 7,
+        "salaryMin": 2200,
+        "jobType": "Clt",
+        "isActive": false,
+        "status": "ClosedByLegalReview"
+      }
+      """
+    Então o rótulo de situação da vaga deve ser "Encerrada pela empresa"

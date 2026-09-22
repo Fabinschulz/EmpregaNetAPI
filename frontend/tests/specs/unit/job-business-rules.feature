@@ -144,3 +144,31 @@ Funcionalidade: Regras de negócio do formulário de vaga
       | valor |
       | no    |
       | yes   |
+
+  # A quantidade de vagas decide quando o processo se encerra sozinho: zero faria a vaga nascer já
+  # preenchida, e valor não inteiro não descreve pessoas a contratar.
+  Esquema do Cenário: rejeitar quantidade de vagas inválida
+    Dado que o campo "positions" do formulário de vaga é "<valor>"
+    Quando eu valido os dados do formulário de vaga
+    Então os dados da vaga devem ser rejeitados
+
+    Exemplos:
+      | valor |
+      | 0     |
+      | -1    |
+      | 1,5   |
+      | 2.5   |
+      | muito |
+      |       |
+      | 1000  |
+
+  Esquema do Cenário: aceitar quantidade de vagas dentro do intervalo
+    Dado que o campo "positions" do formulário de vaga é "<valor>"
+    Quando eu valido os dados do formulário de vaga
+    Então os dados da vaga devem ser aceitos
+
+    Exemplos:
+      | valor |
+      | 1     |
+      | 12    |
+      | 999   |

@@ -37,7 +37,10 @@ export const jobFeedItemResponseSchema = z.object({
   benefits: z.array(z.string()),
   publishedAt: z.string(),
   applicationsCount: z.number().int().nonnegative(),
-  isActive: z.boolean()
+  isActive: z.boolean(),
+  positions: z.number().int().positive(),
+  filledPositions: z.number().int().nonnegative(),
+  availablePositions: z.number().int().nonnegative()
 });
 
 export type JobFeedItemResponse = z.infer<typeof jobFeedItemResponseSchema>;

@@ -6,7 +6,7 @@ import {
   jobFormToRequest,
   jobFormValuesFromResponse
 } from '@/features/recrutamento/vagas/form/job-form-schema';
-import { jobStatusLabel } from '@/features/recrutamento/vagas/close-job-copy';
+import { jobStatusLabel } from '@/features/recrutamento/vagas/domain';
 import { jobResponseSchema } from '@/features/recrutamento/vagas/service/jobs-response-schema';
 import type { BusinessRulesWorld } from '../../support/world';
 import { getByPath } from '../../support/object-path';
@@ -42,6 +42,12 @@ function completeJobResponse(): Record<string, unknown> {
     requirements: [],
     benefits: [],
     isActive: true,
+    positions: 1,
+    filledPositions: 0,
+    availablePositions: 1,
+    status: 'Active',
+    closedAt: null,
+    closureReason: null,
     publicationDate: '10/01/2026 09:00:00',
     publishedAt: '2026-01-10T12:00:00+00:00',
     createdAt: '10/01/2026 09:00:00',
@@ -128,5 +134,5 @@ Then(
 Then('o rótulo de situação da vaga deve ser {string}', function (this: BusinessRulesWorld, esperado: string) {
   const dto = jobResponseSchema.parse(this.data.rawJob);
   // Mesmo rótulo que a listagem e a gestão da vaga exibem, agora a partir da função de produção.
-  expect(jobStatusLabel(dto.isActive)).to.equal(esperado);
+  expect(jobStatusLabel(dto.status)).to.equal(esperado);
 });

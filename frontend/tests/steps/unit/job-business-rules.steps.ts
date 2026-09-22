@@ -19,6 +19,7 @@ function validJobFormData(): JobFormValues {
     area: 'Logistica',
     city: 'Extrema',
     state: 'MG',
+    positions: '3',
     pcd: 'no',
     salaryDisclosure: 'disclosed',
     salaryMin: '2300',

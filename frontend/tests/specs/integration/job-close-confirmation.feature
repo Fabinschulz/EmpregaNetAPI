@@ -21,7 +21,7 @@ Funcionalidade: Encerrar vaga com confirmação
   Cenário: vaga encerrada mostra o estado e não oferece encerrar
     Dado que a vaga #36 está encerrada
     Quando eu abro a gestão da vaga
-    Então o estado exibido na gestão da vaga deve ser "Encerrada"
+    Então o estado exibido na gestão da vaga deve ser "Encerrada pela empresa"
     E a acção "Encerrar vaga" não deve estar disponível na gestão
 
   # CA-17: a confirmação diz o efeito antes de executar.

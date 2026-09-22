@@ -32,6 +32,8 @@ não espelhos frágeis da implementação — e prova-os a correr.
 
 - Backend: **`.claude/skills/backend-skill/SKILL.md`**, secção "Testes" — stack real, convenções de nomeação, regras de `Collection("Integration")`, fixture in-memory e as suas limitações.
 - Frontend: **`.claude/skills/frontend-skill/SKILL.md`**, secção "Testes" — **só Cucumber existe**; Testing Library, Jest, Cypress e Playwright **não estão instalados**.
+- Transversal: **`.claude/skills/harness-contract/SKILL.md`** — hierarquia de fonte de verdade, classificação de
+  afirmações, escala de confiança e o bloco de saída estruturado que este agent emite.
 
 Antes de escrever, ler testes vizinhos do mesmo módulo e replicar estrutura, helpers e fixtures existentes.
 
@@ -86,6 +88,9 @@ ele falha quando devia falhar — um teste que passa sempre não protege nada. R
 - **Suite pré-existente já vermelha:** reportar com o output antes de acrescentar.
 
 ## Formato de saída
+
+Abrir com o **bloco de contrato** (`confidence` / `evidence` / `assumptions` / `open_questions` / `blocked_by`),
+no formato da secção "Bloco de saída estruturado" da `harness-contract`. Depois:
 
 1. **Código de teste** — completo e executável (classes, usings/imports, atributos), no padrão do projecto, com blocos **Arrange / Act / Assert** claros e nomes descritivos.
 2. **Resultado da execução** — contagem de testes, passados/falhados.

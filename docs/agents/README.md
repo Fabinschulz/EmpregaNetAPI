@@ -22,6 +22,7 @@ recomendar, não delegar. Vive como skill — ver [`../skills/README.md`](../ski
 | ----------- | --------- |
 | **Orquestração** — rotear e encadear | skills `meta-agent`, `sdd-orchestrator` (thread principal, tem a Agent tool) |
 | **Conhecimento** — convenções e fatos do projecto | skills `backend-skill`, `frontend-skill`, `e2e-qa-skill` |
+| **Contrato** — fonte de verdade, confiança, Working Context, orçamento de contexto | skill `harness-contract` (lida pela thread principal **e** por todos os agents) |
 | **Execução** — produzir a mudança | agents `dotnet-implementer`, `frontend-engineer`, `test-engineer`, `debug-specialist`, `performance-optimizer` |
 | **Validação** — julgar sem alterar | agents `code-reviewer`, `dotnet-architect`, `e2e-qa-engineer` (read-only ou sem escrita em código) |
 
@@ -50,13 +51,13 @@ Corpo, nesta ordem, sem secções vazias:
 | ------ | -------- |
 | `## Papel` | 2–3 linhas. Quem é e o que entrega. |
 | `## Use quando` / `## Não use quando` | Gatilhos, e tabela de encaminhamento para os casos que não são dele. |
-| `## Contexto obrigatório` | Skills a ler no arranque. Não recopiar o conteúdo delas. |
+| `## Contexto obrigatório` | Skills a ler no arranque — a do domínio **e** a `harness-contract`. Não recopiar o conteúdo delas. |
 | `## Entradas necessárias` | O que precisa; o que fazer quando falta (perguntar vs assumir e declarar). |
 | `## Processo` | Passos numerados e determinísticos. |
 | `## Regras invioláveis` | Restrições duras, redigidas como proibições verificáveis. |
 | `## Validação` | Como prova o próprio resultado — **comandos reais**, não boas intenções. |
 | `## Falhas e escalonamento` | O que fazer quando bloqueia, e para quem passa. |
-| `## Formato de saída` | Contrato de output. |
+| `## Formato de saída` | Contrato de output. Abre sempre com o **bloco de contrato** (`confidence` / `evidence` / `assumptions` / `open_questions` / `blocked_by`) definido na `harness-contract`, seguido do relatório legível. |
 
 Anti-padrões ao escrever um agent:
 

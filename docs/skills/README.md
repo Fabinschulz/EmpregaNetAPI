@@ -7,6 +7,10 @@ automático ou `/<nome>`) e pelos agents, que as leem com `Read` no arranque.
 | ----- | ------- |
 | [`backend-skill`](../../.claude/skills/backend-skill/SKILL.md) | Camadas .NET, mediator interno, EF Core, contrato HTTP, testes xUnit |
 | [`frontend-skill`](../../.claude/skills/frontend-skill/SKILL.md) | Next.js App Router com `cacheComponents`, SCSS Modules, Zod, auth/RBAC, loading canónico, Cucumber |
+| [`harness-contract`](../../.claude/skills/harness-contract/SKILL.md) | Como o trabalho circula entre agentes: hierarquia de fonte de verdade, facto vs inferência vs suposição, escala de confiança, bloco de saída estruturado, Working Context, orçamento e decaimento de contexto |
+
+As duas primeiras descrevem o **produto**; a `harness-contract` descreve o **Harness**. Um agente lê a do seu
+domínio mais a transversal — e nenhuma das três é recopiada no prompt dele.
 
 ## Skills de orquestração
 

@@ -17,6 +17,9 @@ public interface IJobCommand
     string Area { get; }
     string City { get; }
     string State { get; }
+
+    /// <summary>Quantas pessoas a empresa quer contratar nesta vaga. Mínimo 1.</summary>
+    int Positions { get; }
     decimal? SalaryMin { get; }
     decimal? SalaryMax { get; }
     bool SalaryDisclosed { get; }

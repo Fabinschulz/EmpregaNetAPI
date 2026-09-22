@@ -3,6 +3,7 @@ using EmpregaNet.Application.Auth.ViewModel;
 using EmpregaNet.Application.Common.Exceptions;
 using EmpregaNet.Application.JobApplications.Events;
 using EmpregaNet.Application.Jobs.Commands;
+using EmpregaNet.Application.Jobs.UseCase;
 using EmpregaNet.Domain.Entities;
 using EmpregaNet.Domain.Enums;
 using EmpregaNet.Infra.Persistence.Database;
@@ -77,10 +78,14 @@ public sealed class CloseJobHandlerIntegrationTests
             .Setup(x => x.EnsureCanManageCompanyAsync(It.IsAny<long>(), It.IsAny<CancellationToken>()))
             .Returns(Task.CompletedTask);
 
-        return new CloseJobHandler(
-            new JobRepository(context),
+        var closureCascade = new JobClosureCascade(
             new JobApplicationRepository(context),
             domainEvents,
+            NullLogger<JobClosureCascade>.Instance);
+
+        return new CloseJobHandler(
+            new JobRepository(context),
+            closureCascade,
             new CloseJobCommandValidator(),
             NullLogger<CloseJobHandler>.Instance,
             currentUser.Object,

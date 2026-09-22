@@ -29,6 +29,7 @@ public sealed record DashboardJobPerformance(
     UF State,
     JobAreaEnum Area,
     bool IsActive,
+    JobClosureReasonEnum? ClosureReason,
     DateTimeOffset PublishedAt,
     int Applications,
     int TotalApplications,

@@ -1,5 +1,6 @@
 'use client';
 
+import { jobStatusTone } from '@/features/recrutamento/vagas/domain';
 import { jobsRoutes } from '@/features/recrutamento/vagas/jobs-routes';
 import { StatusBadge } from '@/shared/components';
 import { cn } from '@/shared/utils';
@@ -28,7 +29,7 @@ export function JobPerformanceList({ items, averageApplicationsPerJob }: JobPerf
               <div className={styles.main}>
                 <div className={styles.titleRow}>
                   <span className={styles.title}>{job.title}</span>
-                  <StatusBadge label={job.statusLabel} tone={job.isActive ? 'positive' : 'negative'} />
+                  <StatusBadge label={job.statusLabel} tone={jobStatusTone(job.status)} />
                 </div>
 
                 <p className={styles.meta}>

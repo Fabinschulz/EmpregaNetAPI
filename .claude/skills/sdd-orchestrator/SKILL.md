@@ -15,6 +15,7 @@ que esta skill **aplica** em vez de reescrever.
 | [`docs/sdd/SDD-USAGE-GUIDE.md`](../../../docs/sdd/SDD-USAGE-GUIDE.md) | Templates de acionamento, *version bump*, geração de `state.md` |
 | [`docs/sdd/EMPREGANET-SDD.md`](../../../docs/sdd/EMPREGANET-SDD.md) | Filosofia e fases A–E do produto |
 | [`docs/sdd/adrs/`](../../../docs/sdd/adrs/) | Decisões estruturais duradouras |
+| [`harness-contract`](../harness-contract/SKILL.md) | Contrato de circulação: fonte de verdade, confiança, Working Context, orçamento de contexto |
 
 Ler o primeiro **antes** de gerar qualquer artefacto.
 
@@ -100,6 +101,30 @@ Ao alterar um artefacto já aprovado, subir a versão no frontmatter e actualiza
 Passar ao agent o caminho de `docs/features/<id>/design.md` e `tasks.md` — não recopiar o conteúdo no prompt.
 Decisão estrutural que sobreviva à feature: registar um **ADR** em `docs/sdd/adrs/`.
 
+O prompt de delegação leva o **Working Context** da `harness-contract` — com os `ACCEPTANCE_CRITERIA` vindos do
+`spec.md` — e não o histórico das fases 1 a 3. O PRD e as discussões de desenho já estão condensados nos
+artefactos aprovados; reenviá-los é pagar duas vezes pela mesma decisão.
+
+### 4.1 Verificação contra a matriz de aceite
+
+A tarefa **não** fecha por um agente dizer que terminou. Cada linha da matriz *critério de aceite → local de
+verificação* do `spec.md` recebe um estado, com evidência:
+
+| Estado | Significado |
+| ------ | ----------- |
+| **Verificado** | Comando corrido, teste verde, ou cenário navegado — com a evidência anexa |
+| **Não verificado** | Implementado, mas sem prova nesta execução — dizer o que falta correr |
+| **Não implementado** | Fora do que foi entregue — vai para `tasks.md` com o motivo |
+
+Regras:
+
+1. Nenhuma linha fica sem estado. Omissão silenciosa é a forma mais comum de dar por concluída uma feature incompleta.
+2. Quem verifica não é quem implementou: `code-reviewer` para o diff, `test-engineer` para a rede de regressão,
+   `e2e-qa-skill` para o comportamento pela UI.
+3. Uma linha **Não verificado** impede confiança `HIGH` no fecho da feature — a entrega sai com a incerteza nomeada.
+4. Divergência entre o implementado e o `design.md` é **achado**, não ajuste silencioso: ou o código corrige-se,
+   ou o `design.md` sobe de versão (§3.2) com a decisão registada.
+
 ---
 
 ## 5. Estrutura canónica
@@ -140,6 +165,7 @@ Artefactos e comunicação em **português (Brasil)**; identificadores técnicos
 
 | Versão | Mudança |
 | ------ | ------- |
+| 2.2.0 | Fase 4 passa a delegar com o Working Context da `harness-contract` em vez do histórico das fases anteriores, e ganha §4.1: verificação linha a linha da matriz de aceite do `spec.md`, com estado e evidência por critério, verificada por agente diferente de quem implementou |
 | 2.1.0 | Regra de YAGNI por fase (§3 regra 7) e item de validação para capacidade adiada, apoiados na secção "YAGNI — o que não se constrói agora" das skills de backend e frontend |
 | 2.0.0 | Deixa de ser lista de ponteiros: passa a executor com entradas obrigatórias, tabela de fases com gates, gate de código accionável, regra de version bump, mapa de delegação e checklist de validação por fase. Movida para `.claude/skills/` |
 | 1.0.0 | Redirecção para os documentos SDD |

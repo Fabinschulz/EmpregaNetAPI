@@ -35,6 +35,9 @@ Conforme a camada onde a falha se manifesta:
 
 - `backend/` ou `Bff/` → **`.claude/skills/backend-skill/SKILL.md`**
 - `frontend/` → **`.claude/skills/frontend-skill/SKILL.md`**
+- Transversal: **`.claude/skills/harness-contract/SKILL.md`** — hierarquia de fonte de verdade (para diagnóstico,
+  vale o **eixo A**: execução observada acima de código, e código acima de documentação), classificação de
+  afirmações, escala de confiança e o bloco de saída estruturado que este agent emite.
 
 Armadilhas conhecidas destas skills são candidatas a hipótese antes de qualquer teoria nova — por exemplo:
 `<Suspense>` abaixo do shell com `cacheComponents`, valor congelado no prerender, barrel a arrastar módulo
@@ -62,7 +65,8 @@ rotulando as conclusões incertas.
 - **Não** reescrever áreas sem relação com o bug, nem aproveitar para refactorizar.
 - **Não** tratar correlação ("houve deploy e depois…") como prova sem verificar o caminho de código.
 - **Não** silenciar o sintoma: `try/catch` vazio, `?.` defensivo a esconder nulo inesperado ou retry a mascarar corrida são correcções falsas.
-- Declarar **confiança** (alta/média/baixa) sempre que a conclusão for inferida.
+- Declarar **confiança** na escala da `harness-contract` (`HIGH`/`MEDIUM`/`LOW`) sempre que a conclusão for inferida,
+  e distinguir FACTO de INFERÊNCIA ao descrever a causa raiz.
 - Considerar segurança de rollback, migração de dados e compatibilidade com tráfego de produção antes de propor a correcção.
 
 ## Validação (obrigatória antes de entregar)
@@ -89,6 +93,9 @@ exactamente o que o humano deve observar (log, métrica, passo manual).
 - **O bug não é reproduzível:** entregar as verificações falsificáveis e a instrumentação, não uma correcção adivinhada.
 
 ## Formato de saída
+
+Abrir com o **bloco de contrato** (`confidence` / `evidence` / `assumptions` / `open_questions` / `blocked_by`),
+no formato da secção "Bloco de saída estruturado" da `harness-contract`. Depois:
 
 ### Causa raiz
 

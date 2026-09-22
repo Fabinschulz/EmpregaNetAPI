@@ -1,6 +1,7 @@
 'use client';
 
 import { useApplyToJobMutation } from '@/features/candidaturas/service';
+import { describeAvailablePositions, jobStatusLabel, jobStatusTone } from '@/features/recrutamento/vagas/domain';
 import type { JobResponse } from '@/features/recrutamento/vagas/service';
 import { AppliedBadge } from '@/features/vagas/applied-badge';
 import { useJobFeedInteractionsQuery } from '@/features/vagas/service';
@@ -42,7 +43,8 @@ import {
   Clock,
   GraduationCap,
   LayoutGrid,
-  MapPin
+  MapPin,
+  Users
 } from 'lucide-react';
 import styles from './job-detail.module.scss';
 
@@ -73,7 +75,6 @@ export function JobDetailPage({ job }: JobDetailPageProps) {
   }
 
   const applyLabel = isAuthenticated ? 'Candidatar-me' : 'Faça login para se candidatar';
-
   const meta: MetaItem[] = [];
 
   const city = job.city?.trim();
@@ -134,6 +135,18 @@ export function JobDetailPage({ job }: JobDetailPageProps) {
     meta.push({ key: 'pcd', icon: Accessibility, label: 'Vaga afirmativa para PcD' });
   }
 
+  // Numa vaga de posição única a frase não acrescenta nada; com várias, quantas restam é o dado
+  // que decide se vale a pena candidatar-se hoje.
+  if (job.positions > 1) {
+    meta.push({
+      key: 'positions',
+      icon: Users,
+      label: `${describeAvailablePositions(job.availablePositions)} de ${job.positions}`,
+      strong: job.isActive,
+      srLabel: 'Vagas disponíveis'
+    });
+  }
+
   if (job.publishedAt ?? job.createdAt) {
     meta.push({ key: 'published', icon: CalendarDays, label: `Publicada ${publishedLabel}`, srLabel: 'Publicação' });
   }
@@ -147,7 +160,7 @@ export function JobDetailPage({ job }: JobDetailPageProps) {
         <CardHeader>
           <div className={styles.headerRow}>
             <CardTitle>{job.title}</CardTitle>
-            <StatusBadge label={job.isActive ? 'Ativa' : 'Encerrada'} tone={job.isActive ? 'positive' : 'negative'} />
+            <StatusBadge label={jobStatusLabel(job.status, 'candidate')} tone={jobStatusTone(job.status)} />
           </div>
 
           {job.summary?.trim() ? <p className={styles.summary}>{job.summary}</p> : null}

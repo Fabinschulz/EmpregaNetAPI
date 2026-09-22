@@ -1,5 +1,7 @@
 import {
+  MAX_JOB_POSITIONS,
   MAX_VOCABULARY_ITEMS_PER_JOB,
+  MIN_JOB_POSITIONS,
   UF_VALUE_SET,
   experienceLevelVocabulary,
   jobAreaVocabulary,
@@ -34,6 +36,11 @@ export const jobRequestSchema = z
     state: z.string().refine((value) => UF_VALUE_SET.has(value), {
       message: '"state" fora da lista de UFs aceita pela API.'
     }),
+    positions: z
+      .number()
+      .int()
+      .min(MIN_JOB_POSITIONS, { message: `"Total de vagas" precisa de ao menos ${MIN_JOB_POSITIONS}.` })
+      .max(MAX_JOB_POSITIONS, { message: `"Total de vagas" excede o máximo de ${MAX_JOB_POSITIONS} aceito pela API.` }),
     salaryMin: z.number().nonnegative().optional(),
     salaryMax: z.number().nonnegative().optional(),
     salaryDisclosed: z.boolean(),

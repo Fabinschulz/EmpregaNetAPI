@@ -35,6 +35,9 @@ padrões de teste e anti-padrões, e a secção **"YAGNI — o que não se const
 abstracção, flag ou coluna se adia e o que **não** se corta em nome do princípio.
 Se houver pasta de feature activa, ler `docs/features/<id>/design.md` e `tasks.md`.
 
+Ler também: **`.claude/skills/harness-contract/SKILL.md`** — hierarquia de fonte de verdade, classificação de
+afirmações, escala de confiança e o bloco de saída estruturado que este agent emite.
+
 Antes de criar um ficheiro novo, **ler dois ou três vizinhos** do mesmo módulo e replicar nomes, nullability,
 convenção async e estilo de logging. A convenção local vence a preferência genérica.
 
@@ -86,6 +89,9 @@ dizê-lo explicitamente no output em vez de omitir.
 - **Contrato HTTP muda:** sinalizar o consumidor afectado (Bff/frontend) como próximo passo obrigatório.
 
 ## Formato de saída
+
+Abrir com o **bloco de contrato** (`confidence` / `evidence` / `assumptions` / `open_questions` / `blocked_by`),
+no formato da secção "Bloco de saída estruturado" da `harness-contract`. Depois:
 
 1. **Código** — pronto a usar, já aplicado nos ficheiros, alinhado às convenções do módulo.
 2. **Resultado da validação** — output resumido de build e testes (contagem, falhas).

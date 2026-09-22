@@ -2,6 +2,7 @@ using EmpregaNet.Application.Dashboard.UseCase;
 using EmpregaNet.Application.Dashboard.ViewModel;
 using EmpregaNet.Application.Utils.Helpers;
 using EmpregaNet.Domain.Common.Dashboard;
+using EmpregaNet.Domain.Enums;
 using EmpregaNet.Domain.Interfaces;
 using Microsoft.Extensions.Logging;
 
@@ -85,6 +86,8 @@ public sealed class GetDashboardJobsHandler : IRequestHandler<GetDashboardJobsQu
             ? Math.Round((job.TotalApplications - (decimal)average) * 100m / (decimal)average, 0, MidpointRounding.AwayFromZero)
             : (decimal?)null;
 
+        var status = JobStatus.Resolve(job.IsActive, job.ClosureReason);
+
         return new DashboardJobPerformanceViewModel
         {
             Id = job.JobId,
@@ -96,7 +99,13 @@ public sealed class GetDashboardJobsHandler : IRequestHandler<GetDashboardJobsQu
             Area = job.Area.ToString(),
             AreaLabel = job.Area.ToDescription(),
             IsActive = job.IsActive,
-            StatusLabel = job.IsActive ? "Ativa" : "Encerrada",
+            Status = status,
+            StatusLabel = status switch
+            {
+                JobStatusEnum.ClosedByFulfillment => "Vagas preenchidas",
+                JobStatusEnum.ClosedManually => "Encerrada",
+                _ => "Ativa"
+            },
             PublishedAt = BrasiliaTime.Format(job.PublishedAt, "dd/MM/yyyy"),
             DaysActive = WholeDaysBetween(job.PublishedAt, reference),
             Applications = job.Applications,

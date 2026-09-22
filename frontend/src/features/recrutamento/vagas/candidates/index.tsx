@@ -23,6 +23,7 @@ import {
   FilterBar,
   FilterSection,
   PageHeader,
+  StatusBadge,
   TableContainer,
   useRowDeleteAction,
   type DataTableColumn,
@@ -34,8 +35,14 @@ import { formatDate } from '@/shared/utils';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useCallback, useMemo, useState } from 'react';
+import {
+  approveLastPositionDialogCopy,
+  describeApproveLastPositionConfirmation,
+  type OpenApplicationsCount
+} from '../close-job-copy';
+import { describePositions, jobStatusLabel, jobStatusTone } from '../domain';
 import { jobsRoutes } from '../jobs-routes';
-import { useJobQuery } from '../service';
+import { useJobQuery, useOpenApplicationsCountQuery } from '../service';
 import {
   CandidatesFilterFields,
   candidatesFilterSchema,
@@ -65,6 +72,21 @@ export function CandidatesByJobPage() {
 
   const { mutate: changeStatus, isPending: isChangingStatus } = useChangeApplicationStatusMutation();
   const { mutate: deleteApplication, isPending: isDeleting } = useDeleteApplicationMutation();
+
+  const isLastPositionAvailable = job?.status === 'Active' && job.availablePositions === 1;
+  const isPendingLastPositionApproval = pending?.target === 'Approved';
+
+  const {
+    data: openApplicationsCount,
+    isPending: isCountingOpenApplications,
+    isError: isCountUnavailable
+  } = useOpenApplicationsCountQuery(jobId, { enabled: isPendingLastPositionApproval });
+
+  const otherOpenApplications: OpenApplicationsCount = isCountUnavailable
+    ? { status: 'unavailable' }
+    : openApplicationsCount === undefined
+      ? { status: 'counting' }
+      : { status: 'ready', count: Math.max(0, openApplicationsCount - 1) };
 
   const { getDeleteAction, confirmDialogProps: deleteDialogProps } = useRowDeleteAction<JobApplicationResponse>({
     permission: 'jobApplication.delete',
@@ -112,13 +134,16 @@ export function CandidatesByJobPage() {
           const transitions = status ? applicationStatusTransitions[status] : [];
 
           const actions: RowAction[] = transitions.map((target) => {
-            const destructive = DESTRUCTIVE_TRANSITIONS.has(target);
+            const isDoomedApproval = target === 'Approved' && job !== undefined && job.availablePositions === 0;
+            const destructive =
+              DESTRUCTIVE_TRANSITIONS.has(target) || (target === 'Approved' && isLastPositionAvailable);
+
             return {
               key: target,
               label: applicationTransitionLabels[target],
               icon: applicationTransitionIcons[target],
               variant: destructive ? 'destructive' : 'default',
-              disabled: isChangingStatus || isDeleting,
+              disabled: isChangingStatus || isDeleting || isDoomedApproval,
               onSelect: destructive
                 ? () => setPending({ application, target })
                 : () => changeStatus({ id: application.id, status: target })
@@ -132,7 +157,7 @@ export function CandidatesByJobPage() {
         }
       }
     ],
-    [changeStatus, isChangingStatus, isDeleting, getDeleteAction]
+    [changeStatus, isChangingStatus, isDeleting, isLastPositionAvailable, job, getDeleteAction]
   );
 
   const pendingLabel = pending ? applicationTransitionLabels[pending.target] : '';
@@ -154,7 +179,17 @@ export function CandidatesByJobPage() {
       <section>
         <PageHeader
           title={job?.title ? `Candidatos: ${job.title}` : 'Candidatos da vaga'}
-          description="Acompanhe, avance e gerencie as candidaturas desta vaga."
+          description={
+            <>
+              Acompanhe, avance e gerencie as candidaturas desta vaga.{' '}
+              {job ? (
+                <>
+                  <StatusBadge label={jobStatusLabel(job.status)} tone={jobStatusTone(job.status)} />{' '}
+                  <StatusBadge label={describePositions(job.positions, job.filledPositions)} tone="neutral" />
+                </>
+              ) : null}
+            </>
+          }
           actions={
             <Button variant="outline" asChild>
               <Link href={jobsRoutes.detail(jobId)}>
@@ -197,14 +232,18 @@ export function CandidatesByJobPage() {
           onOpenChange={(open) => {
             if (!open) setPending(null);
           }}
-          title={`${pendingLabel} candidatura`}
+          title={isPendingLastPositionApproval ? approveLastPositionDialogCopy.title : `${pendingLabel} candidatura`}
           description={
-            pending ? `Confirmar "${pendingLabel}" para a candidatura #${pending.application.id}?` : undefined
+            isPendingLastPositionApproval
+              ? describeApproveLastPositionConfirmation(otherOpenApplications)
+              : pending
+                ? `Confirmar "${pendingLabel}" para a candidatura #${pending.application.id}?`
+                : undefined
           }
-          confirmLabel={pendingLabel}
-          cancelLabel="Voltar"
+          confirmLabel={isPendingLastPositionApproval ? approveLastPositionDialogCopy.confirmLabel : pendingLabel}
+          cancelLabel={isPendingLastPositionApproval ? approveLastPositionDialogCopy.cancelLabel : 'Voltar'}
           tone="destructive"
-          loading={isChangingStatus}
+          loading={isChangingStatus || (isPendingLastPositionApproval && isCountingOpenApplications)}
           onConfirm={handleConfirmTransition}
         />
 

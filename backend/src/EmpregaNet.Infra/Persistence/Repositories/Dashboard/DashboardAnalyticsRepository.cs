@@ -213,6 +213,7 @@ public sealed class DashboardAnalyticsRepository : IDashboardAnalyticsRepository
                 State = job.Location.State,
                 job.Area,
                 job.IsActive,
+                job.ClosureReason,
                 job.PublishedAt,
                 ApplicationsInRange = applications.Count(a =>
                     a.JobId == job.Id &&
@@ -252,6 +253,7 @@ public sealed class DashboardAnalyticsRepository : IDashboardAnalyticsRepository
             row.State,
             row.Area,
             row.IsActive,
+            row.ClosureReason,
             row.PublishedAt,
             row.ApplicationsInRange,
             row.ApplicationsTotal,

@@ -19,10 +19,11 @@ import { useParams } from 'next/navigation';
 import { useMemo, useState } from 'react';
 import {
   closeJobDialogCopy,
+  closedJobNoticeCopy,
   describeCloseJobConfirmation,
-  jobStatusLabel,
   type OpenApplicationsCount
 } from '../close-job-copy';
+import { describePositions, jobStatusLabel, jobStatusTone } from '../domain';
 import { defaultFormJob, JobFormFields, jobFormSchema, jobFormValuesFromResponse, type JobFormValues } from '../form';
 import { jobsRoutes } from '../jobs-routes';
 import { useCloseJobMutation, useJobQuery, useOpenApplicationsCountQuery, useUpdateJobMutation } from '../service';
@@ -59,7 +60,9 @@ export function RecruitmentEditJobPage() {
       ? { status: 'counting' }
       : { status: 'ready', count: openApplicationsCount };
 
-  const isJobActive = job?.isActive ?? false;
+  const jobStatus = job?.status ?? 'Active';
+  const isJobActive = jobStatus === 'Active';
+  const closedNotice = isJobActive ? null : closedJobNoticeCopy[jobStatus];
 
   return (
     <ApiQueryBoundary
@@ -86,8 +89,10 @@ export function RecruitmentEditJobPage() {
             title={HEADING.title}
             description={
               <>
-                {HEADING.description}{' '}
-                <StatusBadge label={jobStatusLabel(isJobActive)} tone={isJobActive ? 'positive' : 'negative'} />
+                {HEADING.description} <StatusBadge label={jobStatusLabel(jobStatus)} tone={jobStatusTone(jobStatus)} />{' '}
+                {job ? (
+                  <StatusBadge label={describePositions(job.positions, job.filledPositions)} tone="neutral" />
+                ) : null}
               </>
             }
             backHref={jobsRoutes.list}
@@ -117,15 +122,12 @@ export function RecruitmentEditJobPage() {
               </Alert>
             </FormNotice>
           ) : null}
-          {!isJobActive ? (
+          {closedNotice ? (
             <FormNotice>
-              <Alert title="Vaga encerrada">
-                Esta vaga saiu do feed público e não recebe candidaturas. O encerramento não tem retorno: a vaga não
-                pode ser reativada.
-              </Alert>
+              <Alert title={closedNotice.title}>{closedNotice.body}</Alert>
             </FormNotice>
           ) : null}
-          <JobFormFields />
+          <JobFormFields filledPositions={job?.filledPositions} isClosed={!isJobActive} />
 
           <ConfirmDialog
             open={isConfirmingClose}

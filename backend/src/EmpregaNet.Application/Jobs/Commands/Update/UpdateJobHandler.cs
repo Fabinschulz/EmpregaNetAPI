@@ -31,6 +31,7 @@ namespace EmpregaNet.Application.Jobs.Commands
         string City,
         [EnumDataType(typeof(UF))]
         string State,
+        int Positions,
         string? Summary = null,
         decimal? SalaryMin = null,
         decimal? SalaryMax = null,
@@ -83,7 +84,7 @@ namespace EmpregaNet.Application.Jobs.Commands
                         DomainErrorEnum.RESOURCE_ID_NOT_FOUND);
                 }
 
-                var job = await _jobRepository.GetByIdAsync(request.Id);
+                var job = await _jobRepository.GetByIdForUpdateAsync(request.Id, cancellationToken);
 
                 if (job is null)
                 {
@@ -116,7 +117,16 @@ namespace EmpregaNet.Application.Jobs.Commands
 
                 await _jobEmployerAccess.EnsureCanManageCompanyAsync(job.CompanyId, cancellationToken);
 
-                var updatedJob = JobFactory.Update(job, request.entity);
+                Job updatedJob;
+                try
+                {
+                    updatedJob = JobFactory.Update(job, request.entity);
+                }
+                catch (InvalidOperationException ex)
+                {
+                    throw ValidationAppException.ForBusinessRule(ex.Message, DomainErrorEnum.INVALID_ACTION_FOR_STATUS);
+                }
+
                 await _jobRepository.UpdateAsync(updatedJob, cancellationToken);
 
                 return updatedJob.ToViewModel();

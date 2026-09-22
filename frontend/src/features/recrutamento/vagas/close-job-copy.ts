@@ -1,3 +1,5 @@
+import type { JobStatus } from './domain';
+
 /** "3 candidaturas em aberto" / "1 candidatura em aberto" / "Nenhuma candidatura em aberto". */
 function openApplicationsSubject(count: number): string {
   if (count === 0) return 'Nenhuma candidatura em aberto';
@@ -38,9 +40,20 @@ export const closeJobSuccessCopy = {
     )}`
 } as const;
 
-export function jobStatusLabel(isActive: boolean): string {
-  return isActive ? 'Ativa' : 'Encerrada';
-}
+export const closedJobNoticeCopy: Record<Exclude<JobStatus, 'Active'>, { title: string; body: string }> = {
+  ClosedManually: {
+    title: 'Vaga encerrada',
+    body:
+      'Esta vaga saiu do feed público e não recebe candidaturas. O encerramento não tem retorno: a vaga não ' +
+      'pode ser reativada.'
+  },
+  ClosedByFulfillment: {
+    title: 'Vagas preenchidas',
+    body:
+      'Todas as vagas foram preenchidas, e por isso a vaga saiu do feed público e deixou de receber ' +
+      'candidaturas. O encerramento não tem retorno: para contratar mais pessoas, publique uma nova vaga.'
+  }
+};
 
 export type OpenApplicationsCount =
   | { status: 'counting' }
@@ -51,4 +64,31 @@ export function describeCloseJobConfirmation(count: OpenApplicationsCount): stri
   if (count.status === 'unavailable') return closeJobDialogCopy.describeWithoutCount();
   if (count.status === 'counting') return closeJobDialogCopy.describeWhileCounting();
   return closeJobDialogCopy.describe(count.count);
+}
+
+/**
+ * Diálogo de confirmação ao aprovar a **última** posição em aberto de uma vaga.
+ */
+export const approveLastPositionDialogCopy = {
+  title: 'Aprovar a última vaga?',
+  confirmLabel: 'Aprovar e encerrar vaga',
+  cancelLabel: 'Voltar',
+  warning:
+    'Esta é a última posição em aberto: aprovar encerra a vaga automaticamente. ' +
+    'A vaga sai do feed público e o encerramento não tem retorno.',
+
+  describe: (openApplicationsCount: number): string =>
+    `${approveLastPositionDialogCopy.warning} ${describeOpenApplicationsEffect(openApplicationsCount)}`,
+  describeWhileCounting: (): string =>
+    `${approveLastPositionDialogCopy.warning} Verificando quantas outras candidaturas em aberto serão ` +
+    'canceladas...',
+  describeWithoutCount: (): string =>
+    `${approveLastPositionDialogCopy.warning} Não foi possível verificar quantas outras candidaturas em ` +
+    'aberto serão canceladas. Se houver, elas serão canceladas mesmo assim.'
+} as const;
+
+export function describeApproveLastPositionConfirmation(count: OpenApplicationsCount): string {
+  if (count.status === 'unavailable') return approveLastPositionDialogCopy.describeWithoutCount();
+  if (count.status === 'counting') return approveLastPositionDialogCopy.describeWhileCounting();
+  return approveLastPositionDialogCopy.describe(count.count);
 }

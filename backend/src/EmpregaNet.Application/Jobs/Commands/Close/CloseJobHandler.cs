@@ -21,14 +21,8 @@ public sealed record CloseJobResult(long JobId, DateTimeOffset ClosedAt, int Aff
 
 public sealed class CloseJobHandler : IRequestHandler<CloseJobCommand, CloseJobResult>
 {
-    /// <summary>
-    /// Acima disto, o encerramento escreve em muitas linhas dentro de uma transacção e vale registar.
-    /// </summary>
-    private const int LargeBatchWarningThreshold = 200;
-
     private readonly IJobRepository _jobRepository;
-    private readonly IJobApplicationRepository _jobApplicationRepository;
-    private readonly IDomainEventQueue _domainEvents;
+    private readonly IJobClosureCascade _closureCascade;
     private readonly IValidator<CloseJobCommand> _validator;
     private readonly ILogger<CloseJobHandler> _logger;
     private readonly IHttpCurrentUser _httpCurrentUser;
@@ -36,16 +30,14 @@ public sealed class CloseJobHandler : IRequestHandler<CloseJobCommand, CloseJobR
 
     public CloseJobHandler(
         IJobRepository jobRepository,
-        IJobApplicationRepository jobApplicationRepository,
-        IDomainEventQueue domainEvents,
+        IJobClosureCascade closureCascade,
         IValidator<CloseJobCommand> validator,
         ILogger<CloseJobHandler> logger,
         IHttpCurrentUser httpCurrentUser,
         IJobEmployerAccess jobEmployerAccess)
     {
         _jobRepository = jobRepository;
-        _jobApplicationRepository = jobApplicationRepository;
-        _domainEvents = domainEvents;
+        _closureCascade = closureCascade;
         _validator = validator;
         _logger = logger;
         _httpCurrentUser = httpCurrentUser;
@@ -80,38 +72,19 @@ public sealed class CloseJobHandler : IRequestHandler<CloseJobCommand, CloseJobR
         job.Close();
         await _jobRepository.UpdateAsync(job, cancellationToken);
 
-        var closedAt = DateTimeOffset.UtcNow;
-        var openApplications = await _jobApplicationRepository.GetOpenByJobIdAsync(request.JobId, cancellationToken);
+        var closedAt = job.ClosedAt!.Value;
 
-        if (openApplications.Count >= LargeBatchWarningThreshold)
-        {
-            _logger.LogWarning(
-                "Encerramento da vaga {JobId} vai cancelar {Count} candidaturas na mesma transação.",
-                request.JobId,
-                openApplications.Count);
-        }
-
-        foreach (var application in openApplications)
-        {
-            var previousStatus = application.Status;
-
-            application.ChangeStatus(ApplicationStatusEnum.Canceled);
-
-            _domainEvents.Enqueue(new JobApplicationStatusChanged(
-                JobApplicationId: application.Id,
-                JobId: application.JobId,
-                CandidateUserId: application.UserId,
-                PreviousStatus: previousStatus,
-                NewStatus: application.Status,
-                OccurredAt: closedAt,
-                Reason: JobApplicationNotificationReason.JobClosed));
-        }
+        var affected = await _closureCascade.CancelOpenApplicationsAsync(
+            request.JobId,
+            closedAt,
+            JobApplicationNotificationReason.JobClosed,
+            cancellationToken);
 
         _logger.LogInformation(
-            "Vaga {JobId} encerrada. Candidaturas canceladas por arrasto: {Count}.",
+            "Vaga {JobId} encerrada manualmente. Candidaturas canceladas por arrasto: {Count}.",
             request.JobId,
-            openApplications.Count);
+            affected);
 
-        return new CloseJobResult(request.JobId, closedAt, openApplications.Count);
+        return new CloseJobResult(request.JobId, closedAt, affected);
     }
 }

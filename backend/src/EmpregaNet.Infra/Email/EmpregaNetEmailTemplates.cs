@@ -78,8 +78,14 @@ internal static class EmpregaNetEmailTemplates
             JobApplicationNotificationReason.JobClosed => (
                 $"Vaga encerrada - {jobTitle}",
                 "A vaga foi encerrada",
-                $"A empresa encerrou a vaga <strong>{safeJob}</strong>, e por isso a sua candidatura foi finalizada. Continuam disponíveis outras vagas na plataforma.",
+                $"A empresa encerrou a vaga <strong>{safeJob}</strong>, e por isso a sua candidatura foi finalizada. Continue a explorar outras oportunidades na plataforma.",
                 "#d97706", "#fffbeb", "&#128683;"),
+
+            JobApplicationNotificationReason.JobFilled => (
+                $"Vaga preenchida - {jobTitle}",
+                "As posições da vaga foram preenchidas",
+                $"A vaga <strong>{safeJob}</strong> preencheu todas as posições disponíveis e deixou de receber candidaturas, por isso o seu processo foi encerrado. Continue a explorar outras oportunidades na plataforma.",
+                "#d97706", "#fffbeb", "&#128101;"),
 
             JobApplicationNotificationReason.CanceledByCandidate => (
                 $"Candidatura cancelada - {jobTitle}",

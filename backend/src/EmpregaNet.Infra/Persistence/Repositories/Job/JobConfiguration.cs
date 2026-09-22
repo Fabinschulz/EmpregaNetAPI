@@ -12,7 +12,13 @@ internal class JobConfiguration : IEntityTypeConfiguration<Job>
 {
        public void Configure(EntityTypeBuilder<Job> builder)
        {
-              builder.ToTable("Jobs");
+              builder.ToTable("Jobs", table =>
+              {
+                     table.HasCheckConstraint("CK_Jobs_Positions", "\"Positions\" >= 1");
+                     table.HasCheckConstraint(
+                            "CK_Jobs_FilledPositions",
+                            "\"FilledPositions\" >= 0 AND \"FilledPositions\" <= \"Positions\"");
+              });
 
               builder.HasKey(x => x.Id);
 
@@ -76,6 +82,27 @@ internal class JobConfiguration : IEntityTypeConfiguration<Job>
 
               builder.Property(x => x.IsActive)
                      .IsRequired();
+
+              // Posições: total pedido pela empresa e quantas já estão ocupadas por aprovados.
+              // O default cobre as linhas anteriores à feature, que valem por uma posição.
+              builder.Property(x => x.Positions)
+                     .IsRequired()
+                     .HasDefaultValue(Job.MinPositions);
+
+              builder.Property(x => x.FilledPositions)
+                     .IsRequired()
+                     .HasDefaultValue(0);
+
+              // Nulos enquanto a vaga está activa: é o que distingue "aberta" de "encerrada", e o
+              // motivo separa encerramento manual de encerramento por preenchimento das posições.
+              builder.Property(x => x.ClosedAt);
+
+              builder.Property(x => x.ClosureReason);
+
+              // Derivadas do estado persistido: calculadas em memória, nunca colunas.
+              builder.Ignore(x => x.AvailablePositions);
+              builder.Ignore(x => x.IsOpenForApplications);
+              builder.Ignore(x => x.Status);
 
               builder.Property(x => x.CompanyId)
                      .IsRequired();

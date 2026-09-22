@@ -5,9 +5,13 @@ description: Roteia um pedido de desenvolvimento para o especialista certo do Em
 
 # Roteador de especialistas — EmpregaNet
 
-Orquestra: decide o caminho de especialista **mais curto e efectivo**, delega via **Agent tool**, funde as saídas
-numa resposta coesa. Vive como skill (não como agent) por um motivo funcional: a orquestração precisa da
+Orquestra: decide o caminho de especialista **mais curto e efectivo**, delega via **Agent tool**, sintetiza as
+saídas e decide se avança. Vive como skill (não como agent) por um motivo funcional: a orquestração precisa da
 Agent tool, disponível na thread principal e não dentro de um subagent.
+
+O contrato de circulação de informação — hierarquia de fonte de verdade, escala de confiança, bloco de saída
+dos agentes, Working Context, orçamento por etapa — está na [`harness-contract`](../harness-contract/SKILL.md).
+Esta skill **aplica-o**; não o repete.
 
 ---
 
@@ -29,6 +33,7 @@ Encaminhar **não** é obrigatório: se um único agent basta, delegar uma vez e
 
 | Preocupação | Especialista | Gatilhos típicos |
 | ----------- | ------------ | ---------------- |
+| Localizar código ou responder "onde vive X?" antes de rotear | agent `Explore` (read-only) | alvo do trabalho ainda não identificado |
 | Arquitectura, layering, forma da API, estrutura greenfield | agent [`dotnet-architect`](../../agents/dotnet-architect.md) | "como estruturar isto?", refactor que muda fronteiras |
 | Código .NET concreto (handlers, EF, endpoints) | agent [`dotnet-implementer`](../../agents/dotnet-implementer.md) | implementar, ligar, migrar |
 | UI Next.js/React (componentes, estado, a11y) | agent [`frontend-engineer`](../../agents/frontend-engineer.md) | telas, estilos, comportamento no cliente |
@@ -53,33 +58,122 @@ Encaminhar **não** é obrigatório: se um único agent basta, delegar uma vez e
 
 ---
 
-## 4. Processo
+## 4. Processo — o ciclo
 
-1. **Decompor** o pedido em passos ordenados; cada passo tem **um** especialista principal.
-2. **Executar a cadeia mínima** — sem agents extra "por cobertura". Passos independentes podem correr em paralelo numa só mensagem; passos dependentes esperam.
-3. **Passar contexto por referência**, não por cópia: indicar ficheiros, `docs/features/<id>/` e a skill que o agent deve ler. Não recopiar convenções no prompt — cada agent já carrega a sua skill.
-4. **Fundir** as saídas numa resposta única: remover duplicação; resolver contradições em favor do especialista cujo domínio corresponde ao conflito.
+```text
+PLANEAR → RECUPERAR → EXECUTAR → SINTETIZAR → VERIFICAR → DECIDIR
+                ↑                                            │
+                └────────── replanear com causa ─────────────┘
+```
+
+Etapas sem trabalho a fazer saltam-se: pedido claro não precisa de RECUPERAR, mudança trivial não precisa de
+VERIFICAR por agente. O ciclo é a ordem, não uma quota de passos.
+
+### 4.1 Planear
+
+Decompor em passos ordenados, **um** especialista principal por passo, e escrever um **Task Brief** curto antes
+de delegar — ele é a entrada do executor e a base do Working Context:
+
+```text
+OBJECTIVO        # o resultado observável que encerra a tarefa
+ESCOPO           # o que entra e, explicitamente, o que fica de fora
+RESTRIÇÕES       # arquitectura, stack fechada, RBAC, YAGNI, gate SDD
+CRITÉRIOS        # como se sabe que está feito — verificáveis
+FALTA SABER      # o que precisa de resposta antes de executar
+NÃO É PRECISO    # informação disponível que este passo não deve arrastar
+```
+
+A linha **NÃO É PRECISO** não é decoração: é onde se corta o contexto que existiria por inércia
+("toda a conversa anterior", "o relatório do arquitecto", "os outros módulos da feature").
+
+### 4.2 Recuperar
+
+Só quando o alvo do trabalho não está identificado. Delegar ao agent `Explore` uma pergunta delimitada;
+o retorno é **lista de caminhos**, não conteúdo. Cada especialista faz a sua própria leitura profunda dentro
+do seu contexto isolado — recuperar aqui é decidir *para onde apontá-lo*, não pré-digerir o trabalho dele.
+
+### 4.3 Executar
+
+Executar a cadeia mínima — sem agents extra "por cobertura". Passos independentes correm em paralelo numa só
+mensagem; passos dependentes esperam.
+
+O prompt de delegação leva **apenas**: Task Brief, Working Context, caminhos relevantes, e a skill a ler.
+
+Nunca leva: o histórico da conversa, relatórios brutos de agentes anteriores, convenções recopiadas
+(cada agent carrega a sua skill), nem o raciocínio de outro agente sobre o mesmo artefacto.
+
+### 4.4 Sintetizar
+
+Depois de cada passo, **extrair — não concatenar**. Do relatório do agente sai a actualização do Working Context:
+
+1. Ler o **bloco de contrato** do agente (`confidence` / `evidence` / `assumptions` / `open_questions` / `blocked_by`).
+2. Promover a `FACTS`/`DECISIONS` o que tem evidência; manter `ASSUMPTIONS` como suposição — nunca promover.
+3. Remover o que foi superado: pergunta respondida sai de `OPEN_QUESTIONS`; risco que não se aplica sai.
+4. Resolver conflitos pela hierarquia da `harness-contract` — e quando o conflito é entre eixos
+   (o código faz X, o ADR manda Y), registá-lo como achado em vez de escolher em silêncio.
+5. **Descartar o texto bruto.** A partir daqui o relatório é referenciado, não recolado.
+
+Sem este passo, cada delegação seguinte herda tudo o que veio antes — que é exactamente como a janela degrada.
+
+### 4.5 Verificar
+
+O verificador (`code-reviewer`, `dotnet-architect`, `e2e-qa-skill`) recebe o artefacto, o Working Context e os
+critérios de aceite — **não** recebe o raciocínio de quem executou. Verificador que lê a narrativa do executor
+tende a validar a narrativa.
+
+### 4.6 Decidir
+
+Aplicar o gate (§5) e fundir numa resposta única, deduplicada: o utilizador recebe o resultado integrado,
+nunca os handoffs em bruto.
 
 ---
 
-## 5. Regras
+## 5. Gate de confiança e replaneamento
+
+Decisão baseada no `confidence` do bloco de contrato e no resultado da verificação:
+
+| Situação | Decisão |
+| -------- | ------- |
+| `HIGH`, sem bloqueante | Avançar ou finalizar |
+| `MEDIUM` | Avançar **nomeando** a incerteza no output; se ela toca custo assimétrico (contrato HTTP, migration destrutiva, autorização, captura de dados), tratar como `LOW` |
+| `LOW`, ou verificação reprovada, ou `blocked_by` preenchido | **Não avançar.** Recuperar a evidência em falta → verificar → replanear |
+
+**Replanear é diferente de repetir.** Cada nova tentativa corrige uma causa nomeada:
+
+1. Extrair a causa concreta de `blocked_by` ou do achado da verificação.
+2. Recuperar só o que falta (`Explore`, ficheiro específico, ADR, ou pergunta ao humano).
+3. Actualizar o Task Brief com a correcção — e devolver **só o delta** ao executor, não a tarefa inteira.
+4. Reexecutar apenas o passo afectado.
+
+Reenviar o mesmo prompt após falha é proibido: sem causa identificada, a segunda tentativa tem a mesma
+probabilidade de falhar que a primeira, e o dobro do contexto.
+
+**Decisão que é do humano continua a ser do humano:** conflito entre fontes sem resolução óbvia, custo
+assimétrico em zona cinzenta, ou `LOW` que persiste depois de recuperar — parar e perguntar, não insistir.
+
+---
+
+## 6. Regras
 
 - Não substituir um especialista por conselho genérico quando a delegação melhoraria materialmente o resultado.
 - Não empilhar agents em tarefas de uma frase.
 - Não delegar duas vezes a mesma pergunta a agents diferentes para "comparar".
 - Nunca apresentar handoffs em bruto: o utilizador recebe o resultado integrado.
+- Não carregar o Working Context com informação que não muda nenhuma decisão do passo seguinte.
+- Em sessão longa e multi-fase, marcar transição de fase (capítulo) em vez de deixar a sessão crescer como bloco único.
 
 ---
 
-## 6. Formato de saída
+## 7. Formato de saída
 
 1. **Roteamento** — uma linha: qual/quais especialistas e porquê. Omitir se for handoff trivial de um só agent.
 2. **Resultado** — a entrega principal, já fundida e deduplicada.
-3. **Notas** — só trade-offs, riscos ou próximos passos não óbvios; poucos bullets.
+3. **Confiança** — o nível agregado (o do elo mais fraco) e, quando não for `HIGH`, a incerteza concreta.
+4. **Notas** — só trade-offs, riscos ou próximos passos não óbvios; poucos bullets.
 
 ---
 
-## 7. Idioma
+## 8. Idioma
 
 Português (Brasil).
 
@@ -89,5 +183,6 @@ Português (Brasil).
 
 | Versão | Mudança |
 | ------ | ------- |
+| 3.0.0 | Ciclo explícito PLANEAR → RECUPERAR → EXECUTAR → SINTETIZAR → VERIFICAR → DECIDIR. Separa o planeamento (Task Brief, com a linha "não é preciso") da síntese (extracção para Working Context e descarte do texto bruto), que antes estavam fundidos num passo de "fundir saídas". Acrescenta `Explore` como recuperação de pré-rota, gate de confiança com replaneamento por causa nomeada, independência do verificador, e a proibição de reenviar o mesmo prompt após falha |
 | 2.0.0 | Convertido de agent para skill: como agent não tinha acesso à Agent tool e só podia recomendar, não delegar. Tabela de roteamento completada com `e2e-qa-skill` (antes ausente) e com a regra de validar na UI após mudança de frontend |
 | 1.0.0 | Versão agent (`docs/agents/meta-agent.md`) |

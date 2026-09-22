@@ -24,7 +24,9 @@ public sealed record JobFeedProjection(
     List<string> Benefits,
     DateTimeOffset PublishedAt,
     int ApplicationsCount,
-    bool IsActive);
+    bool IsActive,
+    int Positions,
+    int FilledPositions);
 
 public sealed record JobFeedCompany(long Id, string Name);
 public sealed record JobFeedLocation(string City, UF State, string Country);

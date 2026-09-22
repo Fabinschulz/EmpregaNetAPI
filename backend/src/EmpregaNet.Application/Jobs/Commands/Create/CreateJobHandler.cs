@@ -27,6 +27,7 @@ public sealed record CreateJobCommand(
     string City,
     [EnumDataType(typeof(UF))]
     string State,
+    int Positions,
     string? Summary = null,
     decimal? SalaryMin = null,
     decimal? SalaryMax = null,

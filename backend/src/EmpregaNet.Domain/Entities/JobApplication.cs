@@ -20,10 +20,22 @@ namespace EmpregaNet.Domain.Entities
         ];
 
         /// <summary>
+        /// Estados em que a candidatura <b>ocupa uma posição</b> da vaga.
+        /// </summary>
+        public static readonly IReadOnlyList<ApplicationStatusEnum> PositionHoldingStatuses =
+        [
+            ApplicationStatusEnum.Approved,
+            ApplicationStatusEnum.Finished
+        ];
+
+        /// <summary>
         /// Estados em que o candidato ainda pode desistir: o processo está em aberto e nenhum
         /// desfecho foi comunicado.
         /// </summary>
         private static readonly IReadOnlyList<ApplicationStatusEnum> CancelableByCandidate = OpenStatuses;
+
+        /// <summary>Este estado ocupa uma posição da vaga?</summary>
+        public static bool HoldsPosition(ApplicationStatusEnum status) => PositionHoldingStatuses.Contains(status);
 
         public long JobId { get; private set; }
         public long UserId { get; private set; }

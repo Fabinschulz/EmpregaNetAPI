@@ -5,6 +5,7 @@ using EmpregaNet.Api.Controllers.Core;
 using EmpregaNet.Application.JobApplications.Commands;
 using EmpregaNet.Application.JobApplications.Queries;
 using EmpregaNet.Application.JobApplications.ViewModel;
+using EmpregaNet.Application.Jobs.ViewModel;
 using EmpregaNet.Domain.Common;
 using EmpregaNet.Application.Abstraction;
 using EmpregaNet.Api.Configuration;
@@ -96,8 +97,18 @@ public class JobApplicationsController : MainController<ApplyToJobCommand, Chang
     [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(DomainError))]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(DomainError))]
     [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(DomainError))]
-    public override Task<IActionResult> Update([FromRoute] long id, [FromBody] ChangeJobApplicationStatusCommand entity)
-        => base.Update(id, entity);
+    public override async Task<IActionResult> Update(
+        [FromRoute] long id,
+        [FromBody] ChangeJobApplicationStatusCommand entity)
+    {
+        var result = await _mediator.Send(
+            new UpdateCommand<ChangeJobApplicationStatusCommand, JobApplicationViewModel>(id, entity));
+
+        await InvalidateCacheForEntity(id);
+        await _outputCache.InvalidateEntityAsync(nameof(JobViewModel), result.JobId);
+
+        return Ok(result);
+    }
 
     /// <summary>Cancela a candidatura do próprio utilizador autenticado.</summary>
     /// <remarks>

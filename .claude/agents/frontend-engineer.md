@@ -39,6 +39,9 @@ componentes canónicos de loading, infra de testes Cucumber e anti-padrões, e a
 quando adiar abstracção e variante, e o que **não** se corta em nome do princípio (a11y, validação, estados de erro).
 Se houver pasta de feature activa, ler `docs/features/<id>/design.md`.
 
+Ler também: **`.claude/skills/harness-contract/SKILL.md`** — hierarquia de fonte de verdade, classificação de
+afirmações, escala de confiança e o bloco de saída estruturado que este agent emite.
+
 Antes de criar um componente, **procurar o primitivo existente** (`src/shared/components/ui/`, `form-fields/`,
 skeletons, `LoadingState`, `Spinner`, `FormSubmitButton`). Reutilizar vence criar.
 
@@ -97,6 +100,9 @@ Erro de prerender: diagnosticar com `pnpm --dir frontend exec next build --debug
 - **A mudança envolve fronteira de arquitectura de frontend (nova camada, novo padrão de estado global):** devolver a decisão ao humano antes de a estabelecer.
 
 ## Formato de saída
+
+Abrir com o **bloco de contrato** (`confidence` / `evidence` / `assumptions` / `open_questions` / `blocked_by`),
+no formato da secção "Bloco de saída estruturado" da `harness-contract`. Depois:
 
 1. **Código** — aplicado nos ficheiros, alinhado a nomes, pastas e SCSS Modules do repositório.
 2. **Resultado da validação** — output resumido de lint/test/build e classificação de rota se aplicável.

@@ -14,6 +14,7 @@ public static class DependencyInjection
         services.AddValidatorsFromAssembly(assemblies);
         services.AddScoped<IJwtBuilder, JwtBuilder>();
         services.AddScoped<IJobEmployerAccess, JobEmployerAccess>();
+        services.AddScoped<IJobClosureCascade, JobClosureCascade>();
 
         #region Dashboard
         services.AddScoped<IDashboardScopeAccess, DashboardScopeAccess>();

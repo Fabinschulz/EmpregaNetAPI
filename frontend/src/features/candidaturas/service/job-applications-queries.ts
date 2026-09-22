@@ -1,5 +1,6 @@
 'use client';
 
+import { jobsKeys } from '@/features/recrutamento/vagas/service';
 import { jobsFeedKeys } from '@/features/vagas/service';
 import { useAuth } from '@/shared/context';
 import {
@@ -123,6 +124,8 @@ export function useChangeApplicationStatusMutation() {
     mutationFn: ({ id, status }: { id: number; status: ApplicationStatus }) => changeStatus(id, { status }),
     onSuccess: async (_res, { status }) => {
       await queryClient.invalidateQueries({ queryKey: jobApplicationsKeys.all });
+      await queryClient.invalidateQueries({ queryKey: jobsKeys.all });
+      await queryClient.invalidateQueries({ queryKey: jobsFeedKeys.all });
       toastSuccess('Status atualizado', `Candidatura movida para "${applicationStatusLabels[status]}".`);
     },
     onError: (err) => {

@@ -159,6 +159,12 @@ Regras de execução que o agent aplica (definidas aqui, não repetir no prompt)
 
 ## 8. Passo final — Consolidação e relatório
 
+Consolidar é **extrair**, não empilhar: de cada relatório de módulo sai o bloco de contrato do agente
+(`confidence` / `evidence` / `blocked_by`, ver [`harness-contract`](../harness-contract/SKILL.md)) e os cenários
+com resultado — o texto bruto do módulo não é recolado no relatório final nem arrastado para o módulo seguinte.
+Numa regressão de muitos módulos, é essa disciplina que impede a thread de crescer até degradar o julgamento
+dos últimos cenários.
+
 Depois de todos os módulos do escopo, consolidar os relatórios individuais num único, com esta estrutura obrigatória:
 
 1. **Resumo executivo** — cenários executados / aprovados / reprovados / bloqueados; recomendação final **apto** / **apto com ressalvas** / **não apto** para release, com justificativa de 1–2 frases.

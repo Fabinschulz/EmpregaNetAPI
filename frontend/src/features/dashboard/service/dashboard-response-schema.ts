@@ -1,3 +1,4 @@
+import { jobStatusResponseSchema } from '@/features/recrutamento/vagas/domain';
 import { z } from 'zod';
 
 const dashboardScopeSchema = z.object({
@@ -139,6 +140,7 @@ const dashboardJobPerformanceSchema = z.object({
   areaLabel: z.string(),
   isActive: z.boolean(),
   statusLabel: z.string(),
+  status: jobStatusResponseSchema,
   publishedAt: z.string(),
   daysActive: z.number().int().nonnegative(),
   applications: z.number().int().nonnegative(),

@@ -18,6 +18,8 @@ public abstract class JobFactory
             experienceLevel: Parse<ExperienceLevelEnum>(command.ExperienceLevel),
             area: Parse<JobAreaEnum>(command.Area),
             location: BuildLocation(command),
+
+            positions: command.Positions,
             summary: command.Summary,
             salaryMin: command.SalaryMin,
             salaryMax: command.SalaryMax,
@@ -39,6 +41,8 @@ public abstract class JobFactory
             experienceLevel: Parse<ExperienceLevelEnum>(command.ExperienceLevel),
             area: Parse<JobAreaEnum>(command.Area),
             location: BuildLocation(command),
+
+            positions: command.Positions,
             summary: command.Summary,
             salaryMin: command.SalaryMin,
             salaryMax: command.SalaryMax,

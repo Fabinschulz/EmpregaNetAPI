@@ -23,6 +23,26 @@ public class JobRepository : BaseRepository<Job>, IJobRepository
         return await _context.Jobs.AnyAsync(j => j.Title == title && j.CompanyId == companyId);
     }
 
+    /// <inheritdoc />
+    public async Task<Job?> GetByIdForUpdateAsync(long id, CancellationToken cancellationToken)
+    {
+        // O provider in-memory dos testes não executa SQL bruto, e lá não há concorrência real a
+        // proteger: sem Postgres, degrada para a leitura rastreada normal.
+        if (!_context.Database.IsNpgsql())
+        {
+            return await _context.Jobs.FirstOrDefaultAsync(j => j.Id == id, cancellationToken);
+        }
+
+        // Sem operador LINQ a seguir, o EF executa este SQL tal e qual, que o FOR UPDATE não é
+        // engolido por uma subconsulta. O filtro é pela chave primária, logo devolve no máximo
+        // uma linha.
+        var rows = await _context.Jobs
+            .FromSql($"""SELECT * FROM "Jobs" WHERE "Id" = {id} FOR UPDATE""")
+            .ToListAsync(cancellationToken);
+
+        return rows.FirstOrDefault();
+    }
+
     public async Task<ListDataPagination<Job>> GetAllAsync(
         CancellationToken cancellationToken,
         int page,
@@ -80,7 +100,9 @@ public class JobRepository : BaseRepository<Job>, IJobRepository
                 x.Job.Benefits.ToList(),
                 x.Job.PublishedAt,
                 _context.JobApplications.Count(a => a.JobId == x.Job.Id && !a.IsDeleted),
-                x.Job.IsActive))
+                x.Job.IsActive,
+                x.Job.Positions,
+                x.Job.FilledPositions))
             .ToListAsync(cancellationToken);
 
         return new ListDataPagination<JobFeedProjection>(data, totalItems, filter.Page, filter.Size);

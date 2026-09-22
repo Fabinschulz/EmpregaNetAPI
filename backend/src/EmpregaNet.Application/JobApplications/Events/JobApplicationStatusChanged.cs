@@ -11,6 +11,10 @@ public enum JobApplicationNotificationReason
     StatusChanged,
     /// <summary> Candidatura encerrada pela empresa.</summary>
     JobClosed,
+    /// <summary>
+    /// Vaga encerrada por ter preenchido todas as posições.
+    /// </summary>
+    JobFilled,
     /// <summary> Candidatura cancelada pelo candidato.</summary>
     CanceledByCandidate
 }

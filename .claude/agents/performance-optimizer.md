@@ -31,6 +31,8 @@ nunca micro-optimizações especulativas.
 
 - `backend/` → **`.claude/skills/backend-skill/SKILL.md`** — secções "EF Core" e "API HTTP".
 - `frontend/` → **`.claude/skills/frontend-skill/SKILL.md`** — secções "Renderização: Server vs Client Components" e "Estado, dados e comunicação com o servidor".
+- Transversal: **`.claude/skills/harness-contract/SKILL.md`** — classificação de afirmações (uma optimização
+  sem medição é INFERÊNCIA, reportada como *suspeita*), escala de confiança e o bloco de saída estruturado.
 
 Uma optimização que quebre uma regra dessas skills não é optimização — é dívida. Se o ganho a exigir,
 devolver a decisão ao humano.
@@ -90,6 +92,10 @@ pnpm --dir frontend test
 - **O gargalo está fora do código** (infra, rede, provedor, plano do BD gerido): dizê-lo e parar de optimizar código.
 
 ## Formato de saída
+
+Abrir com o **bloco de contrato** (`confidence` / `evidence` / `assumptions` / `open_questions` / `blocked_by`),
+no formato da secção "Bloco de saída estruturado" da `harness-contract`. Sem re-medição possível, `confidence`
+não pode ser `HIGH`. Depois:
 
 1. **Linha de base** — método de medição e números iniciais.
 2. **Gargalos identificados** — ordenados por impacto; cada um ligado a evidência e à forma de verificar.

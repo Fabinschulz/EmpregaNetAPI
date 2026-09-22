@@ -101,6 +101,12 @@ namespace EmpregaNet.Infra.Persistence.Migrations
                         .HasColumnType("text[]")
                         .HasDefaultValueSql("'{}'::text[]");
 
+                    b.Property<DateTimeOffset?>("ClosedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int?>("ClosureReason")
+                        .HasColumnType("integer");
+
                     b.Property<long>("CompanyId")
                         .HasColumnType("bigint");
 
@@ -118,6 +124,11 @@ namespace EmpregaNet.Infra.Persistence.Migrations
                     b.Property<int>("ExperienceLevel")
                         .HasColumnType("integer");
 
+                    b.Property<int>("FilledPositions")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(0);
+
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean");
 
@@ -131,6 +142,11 @@ namespace EmpregaNet.Infra.Persistence.Migrations
 
                     b.Property<int>("JobType")
                         .HasColumnType("integer");
+
+                    b.Property<int>("Positions")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(1);
 
                     b.Property<DateTimeOffset>("PublishedAt")
                         .HasColumnType("timestamp with time zone");
@@ -212,7 +228,12 @@ namespace EmpregaNet.Infra.Persistence.Migrations
                         .IsDescending(false, false, true)
                         .HasDatabaseName("IX_Jobs_Feed");
 
-                    b.ToTable("Jobs", (string)null);
+                    b.ToTable("Jobs", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_Jobs_FilledPositions", "\"FilledPositions\" >= 0 AND \"FilledPositions\" <= \"Positions\"");
+
+                            t.HasCheckConstraint("CK_Jobs_Positions", "\"Positions\" >= 1");
+                        });
                 });
 
             modelBuilder.Entity("EmpregaNet.Domain.Entities.JobApplication", b =>
