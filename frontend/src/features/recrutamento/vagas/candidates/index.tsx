@@ -30,6 +30,9 @@ import {
   PageHeader,
   StatusBadge,
   TableContainer,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
   useRowDeleteAction,
   type DataTableColumn,
   type RowAction
@@ -37,7 +40,7 @@ import {
 import { FormProvider } from '@/shared/context';
 import { usePersistedTablePagination } from '@/shared/hooks';
 import { formatDate } from '@/shared/utils';
-import { ChevronRight } from 'lucide-react';
+import { MousePointerClick } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useCallback, useMemo, useState } from 'react';
@@ -120,10 +123,15 @@ export function CandidatesByJobPage() {
         key: 'candidate',
         header: 'Candidato',
         render: (application) => (
-          <Link href={`/recrutamento/candidatos/${application.candidate.id}`} className={styles.candidateLink}>
-            {candidateDisplayName(application.candidate)}
-            <ChevronRight className={styles.candidateLinkIcon} aria-hidden />
-          </Link>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Link href={`/recrutamento/candidatos/${application.candidate.id}`} className={styles.candidateLink}>
+                {candidateDisplayName(application.candidate)}
+                <MousePointerClick className={styles.candidateLinkIcon} aria-hidden />
+              </Link>
+            </TooltipTrigger>
+            <TooltipContent>Ver perfil do candidato</TooltipContent>
+          </Tooltip>
         )
       },
       { key: 'candidateEmail', header: 'E-mail', render: (application) => application.candidate.email || '-' },

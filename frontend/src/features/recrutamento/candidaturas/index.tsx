@@ -27,6 +27,9 @@ import {
   FilterSection,
   PageHeader,
   TableContainer,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
   useRowDeleteAction,
   type DataTableColumn,
   type RowAction
@@ -35,7 +38,7 @@ import { FormProvider } from '@/shared/context';
 import { useListRefresh, usePersistedTablePagination } from '@/shared/hooks';
 import { type ListOrderByValue } from '@/shared/schema';
 import { formatDate } from '@/shared/utils';
-import { ChevronRight } from 'lucide-react';
+import { MousePointerClick } from 'lucide-react';
 import Link from 'next/link';
 import { useCallback, useMemo, useState } from 'react';
 import { RecruitmentApplicationsFilterFields } from './recruitment-applications-filter-fields';
@@ -98,10 +101,15 @@ export function RecruitmentApplicationsPage() {
         key: 'candidate',
         header: 'Candidato',
         render: (application) => (
-          <Link href={`/recrutamento/candidatos/${application.candidate.id}`} className={styles.candidateLink}>
-            {candidateDisplayName(application.candidate)}
-            <ChevronRight className={styles.candidateLinkIcon} aria-hidden />
-          </Link>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Link href={`/recrutamento/candidatos/${application.candidate.id}`} className={styles.candidateLink}>
+                {candidateDisplayName(application.candidate)}
+                <MousePointerClick className={styles.candidateLinkIcon} aria-hidden />
+              </Link>
+            </TooltipTrigger>
+            <TooltipContent>Ver perfil do candidato</TooltipContent>
+          </Tooltip>
         )
       },
       { key: 'candidateEmail', header: 'E-mail', render: (application) => application.candidate.email || '-' },
