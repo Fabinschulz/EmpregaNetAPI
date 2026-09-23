@@ -7,6 +7,7 @@ export {
   applicationTransitionIcons,
   applicationTransitionLabels,
   canCandidateCancelApplication,
+  canDeleteApplication,
   parseApplicationStatus
 } from './application-status';
 export type { ApplicationStatus, ApplicationStatusAudience } from './application-status';

@@ -90,3 +90,10 @@ export function canCandidateCancelApplication(status: string | null | undefined)
   const parsed = parseApplicationStatus(status);
   return parsed !== null && CANDIDATE_CANCELABLE_STATUSES.includes(parsed);
 }
+
+const APPLICATION_NON_DELETABLE_STATUSES: readonly ApplicationStatus[] = ['Finished'];
+
+export function canDeleteApplication(status: string | null | undefined): boolean {
+  const parsed = parseApplicationStatus(status);
+  return parsed !== null && !APPLICATION_NON_DELETABLE_STATUSES.includes(parsed);
+}

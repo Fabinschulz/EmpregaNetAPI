@@ -5,6 +5,7 @@ import {
   applicationStatusTransitions,
   applicationTransitionIcons,
   applicationTransitionLabels,
+  canDeleteApplication,
   parseApplicationStatus,
   type ApplicationStatus
 } from '@/features/candidaturas/domain';
@@ -150,7 +151,7 @@ export function CandidatesByJobPage() {
             };
           });
 
-          const deleteAction = getDeleteAction(application);
+          const deleteAction = canDeleteApplication(application.status) ? getDeleteAction(application) : null;
           if (deleteAction) actions.push(deleteAction);
 
           return actions;
