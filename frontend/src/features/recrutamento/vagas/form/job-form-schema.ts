@@ -1,14 +1,14 @@
 import {
-    MAX_JOB_POSITIONS,
-    MAX_VOCABULARY_ITEMS_PER_JOB,
-    MIN_JOB_POSITIONS,
-    UF_VALUE_SET,
-    experienceLevelVocabulary,
-    jobAreaVocabulary,
-    jobTypeVocabulary,
-    normalizeUf,
-    workModelVocabulary,
-    workShiftVocabulary
+  MAX_JOB_POSITIONS,
+  MAX_VOCABULARY_ITEMS_PER_JOB,
+  MIN_JOB_POSITIONS,
+  UF_VALUE_SET,
+  experienceLevelVocabulary,
+  jobAreaVocabulary,
+  jobTypeVocabulary,
+  normalizeUf,
+  workModelVocabulary,
+  workShiftVocabulary
 } from '@/shared/schema';
 import { z } from 'zod';
 import type { JobRequest } from '../service/jobs-request-schema';

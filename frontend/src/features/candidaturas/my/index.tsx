@@ -1,15 +1,15 @@
 'use client';
 
 import {
-    actionIcons,
-    ApiQueryBoundary,
-    Badge,
-    ConfirmDialog,
-    FilterSection,
-    PageHeader,
-    TableContainer,
-    type DataTableColumn,
-    type RowAction
+  actionIcons,
+  ApiQueryBoundary,
+  Badge,
+  ConfirmDialog,
+  FilterSection,
+  PageHeader,
+  TableContainer,
+  type DataTableColumn,
+  type RowAction
 } from '@/shared/components';
 import { FormProvider } from '@/shared/context';
 import { useListRefresh, usePersistedTablePagination } from '@/shared/hooks';
@@ -22,15 +22,15 @@ import { canCandidateCancelApplication } from '../domain';
 import { useCancelMyApplicationMutation, useMyJobApplicationsQuery, type JobApplicationResponse } from '../service';
 import { cancelApplicationDialogCopy } from './cancel-application-dialog-copy';
 import {
-    hasApplicationStatusChanged,
-    markApplicationStatusesAsSeen,
-    readLastSeenApplicationStatuses
+  hasApplicationStatusChanged,
+  markApplicationStatusesAsSeen,
+  readLastSeenApplicationStatuses
 } from './last-seen-application-status';
 import { MyApplicationsFilterFields } from './my-applications-filter-fields';
 import {
-    defaultMyApplicationsFilter,
-    myApplicationsFilterFormSchema,
-    myApplicationsFilterToParams
+  defaultMyApplicationsFilter,
+  myApplicationsFilterFormSchema,
+  myApplicationsFilterToParams
 } from './my-applications-filter-schema';
 import styles from './my-applications.module.scss';
 

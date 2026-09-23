@@ -3,10 +3,7 @@ export type VocabularyOption<T extends string = string> = {
   readonly label: string;
 };
 
-function createVocabulary<const T extends readonly VocabularyOption[]>(
-  options: T,
-  order: readonly (string | null)[]
-) {
+function createVocabulary<const T extends readonly VocabularyOption[]>(options: T, order: readonly (string | null)[]) {
   const valueSet = new Set<string>(options.map((o) => o.value));
   const labels = new Map(options.map((o) => [o.value, o.label]));
   const byLowercase = new Map(options.map((o) => [o.value.toLowerCase(), o.value]));
