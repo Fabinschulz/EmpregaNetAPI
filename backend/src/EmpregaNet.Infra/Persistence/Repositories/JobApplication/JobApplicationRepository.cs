@@ -196,11 +196,14 @@ public class JobApplicationRepository : BaseRepository<JobApplication>, IJobAppl
     private IQueryable<JobApplicationProjection> ProjectWithCandidate(IQueryable<JobApplication> applications)
     {
         return from application in applications
+               join job in _context.Jobs.AsNoTracking() on application.JobId equals job.Id into jobs
+               from job in jobs.DefaultIfEmpty()
                join user in _context.Users.AsNoTracking() on application.UserId equals user.Id into candidates
                from candidate in candidates.DefaultIfEmpty()
                select new JobApplicationProjection(
                    application.Id,
                    application.JobId,
+                   job != null ? job.Title : string.Empty,
                    new JobApplicationCandidate(
                        application.UserId,
                        candidate != null ? (candidate.UserName ?? string.Empty) : string.Empty,

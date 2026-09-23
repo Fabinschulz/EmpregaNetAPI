@@ -14,6 +14,7 @@ export type JobApplicationCandidateResponse = z.infer<typeof jobApplicationCandi
 export const jobApplicationResponseSchema = z.object({
   id: z.number().int(),
   jobId: z.number().int(),
+  jobTitle: z.string(),
   candidate: jobApplicationCandidateResponseSchema,
   status: z.string(),
   appliedAt: z.string(),

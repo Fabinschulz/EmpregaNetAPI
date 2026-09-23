@@ -5,6 +5,7 @@ namespace EmpregaNet.Domain.Common;
 public sealed record JobApplicationProjection(
     long Id,
     long JobId,
+    string JobTitle,
     JobApplicationCandidate Candidate,
     ApplicationStatusEnum Status,
     DateTimeOffset AppliedAt,

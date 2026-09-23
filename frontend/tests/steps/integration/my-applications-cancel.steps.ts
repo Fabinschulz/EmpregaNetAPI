@@ -40,6 +40,7 @@ Given(
     const apiApplication: Record<string, unknown> = {
       id,
       jobId: 3,
+      jobTitle: 'Desenvolvedor Frontend',
       candidate: { id: 5, name: 'ana.souza', email: 'ana.souza@empreganet.com.br', isDeleted: false },
       status,
       appliedAt: '10/01/2026 09:00:00',

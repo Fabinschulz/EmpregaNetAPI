@@ -82,6 +82,7 @@ public sealed class CancelJobApplicationHandlerTests
             .ReturnsAsync(() => new JobApplicationProjection(
                 ApplicationId,
                 application.JobId,
+                "Vaga de teste",
                 new JobApplicationCandidate(application.UserId, "Candidato", "candidato@test.local", false),
                 application.Status,
                 application.AppliedAt,

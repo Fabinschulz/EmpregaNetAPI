@@ -10,6 +10,7 @@ public sealed class JobApplicationViewModel : BaseViewModel
 {
     public long Id { get; set; }
     public long JobId { get; set; }
+    public string JobTitle { get; set; } = string.Empty;
     public required JobApplicationCandidateViewModel Candidate { get; set; }
     public ApplicationStatusEnum Status { get; set; }
     public string AppliedAt { get; set; } = string.Empty;
@@ -33,6 +34,7 @@ public static class JobApplicationMapper
         {
             Id = proj.Id,
             JobId = proj.JobId,
+            JobTitle = proj.JobTitle,
             Candidate = new JobApplicationCandidateViewModel
             {
                 Id = proj.Candidate.Id,

@@ -69,6 +69,7 @@ public sealed class ChangeJobApplicationStatusHandlerTests
             .ReturnsAsync(() => new JobApplicationProjection(
                 ApplicationId,
                 JobId,
+                job.Title,
                 new JobApplicationCandidate(1, "Candidato", "candidato@test.local", false),
                 application.Status,
                 application.AppliedAt,

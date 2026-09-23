@@ -80,7 +80,7 @@ export function MyApplicationsPage() {
   const columns = useMemo<DataTableColumn<JobApplicationResponse>[]>(
     () => [
       { key: 'id', header: 'Candidatura', render: (application) => <strong>#{application.id}</strong> },
-      { key: 'jobId', header: 'Vaga', render: (application) => application.jobId ?? '-' },
+      { key: 'jobId', header: 'Vaga', render: (application) => application.jobTitle },
       {
         key: 'status',
         header: 'Status',

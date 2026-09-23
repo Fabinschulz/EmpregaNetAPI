@@ -13,6 +13,7 @@ function completeApplicationResponse(): Record<string, unknown> {
   return {
     id: 12,
     jobId: 3,
+    jobTitle: 'Desenvolvedor Frontend',
     candidate: { id: 5, name: 'ana.souza', email: 'ana.souza@empreganet.com.br', isDeleted: false },
     status: 'Processing',
     appliedAt: '10/01/2026 09:00:00',
