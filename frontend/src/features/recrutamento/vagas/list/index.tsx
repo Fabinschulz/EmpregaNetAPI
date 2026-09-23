@@ -19,7 +19,7 @@ import { type JobsListQueryParams } from '@/shared/schema';
 import { formatDate } from '@/shared/utils';
 import Link from 'next/link';
 import { useCallback, useMemo, useState } from 'react';
-import { describePositions, jobStatusLabel, jobStatusTone } from '../domain';
+import { canManageJob, describeJobStatusBadge, describePositions } from '../domain';
 import { jobsRoutes } from '../jobs-routes';
 import { useDeleteJobMutation, useJobsListQuery, type JobResponse } from '../service';
 import { JobsFilterFields } from './jobs-filter-fields';
@@ -71,7 +71,10 @@ export function RecruitmentJobsPage() {
       {
         key: 'status',
         header: 'Status',
-        render: (job) => <StatusBadge label={jobStatusLabel(job.status)} tone={jobStatusTone(job.status)} />
+        render: (job) => {
+          const { label, tone } = describeJobStatusBadge(job);
+          return <StatusBadge label={label} tone={tone} />;
+        }
       },
       {
         key: 'positions',
@@ -83,6 +86,8 @@ export function RecruitmentJobsPage() {
         key: 'actions',
         type: 'actions',
         getActions: (job) => {
+          if (!canManageJob(job)) return [];
+
           const actions: RowAction[] = [
             { key: 'edit', label: 'Editar', icon: actionIcons.edit, href: jobsRoutes.detail(job.id) }
           ];

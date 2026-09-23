@@ -40,12 +40,20 @@ namespace EmpregaNet.Application.Jobs.Commands
             try
             {
                 var job = await _repository.GetByIdAsync(request.Id, cancellationToken);
-                if (job is null || job.IsDeleted)
+                if (job is null)
                 {
                     throw new ValidationAppException(
                         nameof(request.Id),
                         $"Vaga com ID '{request.Id}' não encontrada.",
                         DomainErrorEnum.RESOURCE_ID_NOT_FOUND);
+                }
+
+                if (job.IsDeleted)
+                {
+                    throw new ValidationAppException(
+                        nameof(request.Id),
+                        $"Vaga com ID '{request.Id}' já foi excluída.",
+                        DomainErrorEnum.INVALID_ACTION_FOR_STATUS);
                 }
 
                 await _jobEmployerAccess.EnsureCanManageCompanyAsync(job.CompanyId, cancellationToken);

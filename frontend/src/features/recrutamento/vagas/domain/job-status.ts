@@ -32,6 +32,25 @@ export function jobStatusTone(status: JobStatus): 'positive' | 'negative' | 'neu
   return 'negative';
 }
 
+export const DELETED_JOB_STATUS_LABEL = 'Excluída';
+
+type JobStatusSummary = { status: JobStatus; isDeleted?: boolean | null };
+
+export function describeJobStatusBadge(
+  job: JobStatusSummary,
+  audience: JobStatusAudience = 'recruiter'
+): { label: string; tone: 'positive' | 'negative' | 'neutral' } {
+  if (job.isDeleted) {
+    return { label: DELETED_JOB_STATUS_LABEL, tone: 'neutral' };
+  }
+  return { label: jobStatusLabel(job.status, audience), tone: jobStatusTone(job.status) };
+}
+
+/** Uma vaga excluída (soft delete) não pode mais ser editada nem excluída de novo. */
+export function canManageJob(job: { isDeleted?: boolean | null }): boolean {
+  return !job.isDeleted;
+}
+
 /** "3 de 5 vagas preenchidas" - a frase que responde às três quantidades de uma vez. */
 export function describePositions(positions: number, filledPositions: number): string {
   return `${filledPositions} de ${positions} ${positions === 1 ? 'vaga preenchida' : 'vagas preenchidas'}`;

@@ -37,6 +37,7 @@ import {
 import { FormProvider } from '@/shared/context';
 import { usePersistedTablePagination } from '@/shared/hooks';
 import { formatDate } from '@/shared/utils';
+import { ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useCallback, useMemo, useState } from 'react';
@@ -48,6 +49,7 @@ import {
 import { describePositions, jobStatusLabel, jobStatusTone } from '../domain';
 import { jobsRoutes } from '../jobs-routes';
 import { useJobQuery, useOpenApplicationsCountQuery } from '../service';
+import styles from './candidates-by-job.module.scss';
 import {
   CandidatesFilterFields,
   candidatesFilterSchema,
@@ -118,8 +120,9 @@ export function CandidatesByJobPage() {
         key: 'candidate',
         header: 'Candidato',
         render: (application) => (
-          <Link href={`/recrutamento/candidatos/${application.candidate.id}`}>
+          <Link href={`/recrutamento/candidatos/${application.candidate.id}`} className={styles.candidateLink}>
             {candidateDisplayName(application.candidate)}
+            <ChevronRight className={styles.candidateLinkIcon} aria-hidden />
           </Link>
         )
       },

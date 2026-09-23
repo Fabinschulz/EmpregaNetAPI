@@ -111,6 +111,24 @@ public sealed class DeleteJobHandlerTests
     }
 
     /// <summary>
+    /// Regressão: GetByIdAsync não filtra IsDeleted, então uma vaga já excluída chega ao handler como
+    /// um registro "encontrado" com IsDeleted = true. Reportar RESOURCE_ID_NOT_FOUND nesse caso confunde
+    /// com "nunca existiu" - o código correto é o mesmo usado por UpdateJobHandler para o mesmo estado.
+    /// </summary>
+    [Fact]
+    public async Task Handle_VagaJaExcluida_DeveLancarValidationAppExceptionComCodigoDeStatusInvalido()
+    {
+        GivenRecruiter();
+        GivenJob(CreateJob(isDeleted: true));
+
+        var act = async () => await CreateSut().Handle(new DeleteCommand<JobViewModel>(JobId), CancellationToken.None);
+
+        var assertion = await act.Should().ThrowAsync<ValidationAppException>();
+        assertion.Which.Code.Should().Be(DomainErrorEnum.INVALID_ACTION_FOR_STATUS);
+        _jobs.Verify(x => x.DeleteAsync(It.IsAny<long>(), It.IsAny<CancellationToken>()), Times.Never);
+    }
+
+    /// <summary>
     /// Regressão directa do bug: uma <see cref="ValidationAppException"/> de negócio (aqui, acesso
     /// negado à empresa da vaga) tem de chegar ao <c>GlobalExceptionHandler</c> com o seu tipo e
     /// <see cref="ValidationAppException.Code"/> intactos - nunca embrulhada num

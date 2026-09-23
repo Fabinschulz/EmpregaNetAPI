@@ -35,6 +35,7 @@ import { FormProvider } from '@/shared/context';
 import { useListRefresh, usePersistedTablePagination } from '@/shared/hooks';
 import { type ListOrderByValue } from '@/shared/schema';
 import { formatDate } from '@/shared/utils';
+import { ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 import { useCallback, useMemo, useState } from 'react';
 import { RecruitmentApplicationsFilterFields } from './recruitment-applications-filter-fields';
@@ -42,6 +43,7 @@ import {
   defaultRecruitmentApplicationsFilter,
   recruitmentApplicationsFilterFormSchema
 } from './recruitment-applications-filter-schema';
+import styles from './recruitment-applications.module.scss';
 
 const DESTRUCTIVE_TRANSITIONS: ReadonlySet<ApplicationStatus> = new Set(['Rejected', 'Canceled']);
 type PendingTransition = { application: JobApplicationResponse; target: ApplicationStatus };
@@ -96,8 +98,9 @@ export function RecruitmentApplicationsPage() {
         key: 'candidate',
         header: 'Candidato',
         render: (application) => (
-          <Link href={`/recrutamento/candidatos/${application.candidate.id}`}>
+          <Link href={`/recrutamento/candidatos/${application.candidate.id}`} className={styles.candidateLink}>
             {candidateDisplayName(application.candidate)}
+            <ChevronRight className={styles.candidateLinkIcon} aria-hidden />
           </Link>
         )
       },

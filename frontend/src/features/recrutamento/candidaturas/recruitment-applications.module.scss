@@ -1,0 +1,12 @@
+.candidateLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.candidateLinkIcon {
+  width: 14px;
+  height: 14px;
+  color: var(--muted);
+  flex: 0 0 auto;
+}

@@ -67,5 +67,6 @@ export function canAccessPath(pathname: string, roles: readonly string[] | null 
   if (isPublicPath(pathname)) return true;
   if (pathname.startsWith('/recrutamento')) return isRecruitmentStaff(roles);
   if (pathname.startsWith('/admin')) return isAdmin(roles);
+  if (pathname.startsWith('/candidaturas')) return isCandidate(roles);
   return true;
 }

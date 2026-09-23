@@ -23,7 +23,7 @@ import {
   describeCloseJobConfirmation,
   type OpenApplicationsCount
 } from '../close-job-copy';
-import { describePositions, jobStatusLabel, jobStatusTone } from '../domain';
+import { describeJobStatusBadge, describePositions } from '../domain';
 import { defaultFormJob, JobFormFields, jobFormSchema, jobFormValuesFromResponse, type JobFormValues } from '../form';
 import { jobsRoutes } from '../jobs-routes';
 import { useCloseJobMutation, useJobQuery, useOpenApplicationsCountQuery, useUpdateJobMutation } from '../service';
@@ -62,7 +62,9 @@ export function RecruitmentEditJobPage() {
 
   const jobStatus = job?.status ?? 'Active';
   const isJobActive = jobStatus === 'Active';
-  const closedNotice = isJobActive ? null : closedJobNoticeCopy[jobStatus];
+  const isJobDeleted = job?.isDeleted ?? false;
+  const closedNotice = !isJobActive && !isJobDeleted ? closedJobNoticeCopy[jobStatus] : null;
+  const statusBadge = job ? describeJobStatusBadge(job) : null;
 
   return (
     <ApiQueryBoundary
@@ -89,7 +91,8 @@ export function RecruitmentEditJobPage() {
             title={HEADING.title}
             description={
               <>
-                {HEADING.description} <StatusBadge label={jobStatusLabel(jobStatus)} tone={jobStatusTone(jobStatus)} />{' '}
+                {HEADING.description}{' '}
+                {statusBadge ? <StatusBadge label={statusBadge.label} tone={statusBadge.tone} /> : null}{' '}
                 {job ? (
                   <StatusBadge label={describePositions(job.positions, job.filledPositions)} tone="neutral" />
                 ) : null}
@@ -97,6 +100,7 @@ export function RecruitmentEditJobPage() {
             }
             backHref={jobsRoutes.list}
             submitLabel="Salvar"
+            submitDisabled={isJobDeleted}
           >
             <Button variant="outline" asChild>
               <Link href={jobsRoutes.candidates(jobId)}>
@@ -104,7 +108,7 @@ export function RecruitmentEditJobPage() {
                 Ver candidatos
               </Link>
             </Button>
-            {isJobActive ? (
+            {isJobActive && !isJobDeleted ? (
               <Button
                 type="button"
                 startIcon={actionIcons.archive}
@@ -122,7 +126,13 @@ export function RecruitmentEditJobPage() {
               </Alert>
             </FormNotice>
           ) : null}
-          {closedNotice ? (
+          {isJobDeleted ? (
+            <FormNotice>
+              <Alert variant="destructive" title="Vaga excluída">
+                Esta vaga foi excluída e não pode mais ser editada. As alterações abaixo não podem ser salvas.
+              </Alert>
+            </FormNotice>
+          ) : closedNotice ? (
             <FormNotice>
               <Alert title={closedNotice.title}>{closedNotice.body}</Alert>
             </FormNotice>

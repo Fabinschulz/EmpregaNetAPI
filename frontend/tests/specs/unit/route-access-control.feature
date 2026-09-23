@@ -43,6 +43,19 @@ Funcionalidade: Controle de acesso a rotas por papel (RBAC)
       | Candidate | negado    |
       |           | negado    |
 
+  Esquema do Cenário: a área /candidaturas é restrita a candidatos
+    Dado que o usuário tem os papéis "<papeis>"
+    Quando eu verifico o acesso à rota "/candidaturas"
+    Então o acesso deve ser "<resultado>"
+
+    Exemplos:
+      | papeis    | resultado |
+      | Candidate | permitido |
+      | Admin     | negado    |
+      | Recruiter | negado    |
+      | Manager   | negado    |
+      |           | negado    |
+
   Esquema do Cenário: a checagem de papel não diferencia maiúsculas de minúsculas
     Dado que o usuário tem os papéis "<papeis>"
     Quando eu verifico o acesso à rota "/admin/usuarios"

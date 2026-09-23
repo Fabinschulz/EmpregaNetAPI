@@ -1,6 +1,6 @@
 'use client';
 
-import { isAdmin, isRecruitmentStaff } from '@/shared/utils/lib';
+import { isAdmin, isCandidate, isRecruitmentStaff } from '@/shared/utils/lib';
 import { entityIcons } from '@/shared/components';
 import type { LucideIcon } from 'lucide-react';
 import { useMemo } from 'react';
@@ -31,7 +31,12 @@ export function useAppShellNavigation(roles: string[], isAuthenticated: boolean)
     const principal: ShellNavItem[] = [
       { href: '/dashboard', label: 'Painel', icon: entityIcons.dashboard, visible: isAuthenticated },
       { href: '/vagas', label: 'Vagas', icon: entityIcons.job, visible: true },
-      { href: '/candidaturas', label: 'Minhas candidaturas', icon: entityIcons.application, visible: isAuthenticated },
+      {
+        href: '/candidaturas',
+        label: 'Minhas candidaturas',
+        icon: entityIcons.application,
+        visible: isAuthenticated && isCandidate(roles)
+      },
       {
         href: '/conta/perfil',
         label: 'Conta',
