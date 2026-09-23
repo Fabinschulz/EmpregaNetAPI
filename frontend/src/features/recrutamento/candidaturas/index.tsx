@@ -2,6 +2,10 @@
 
 import { ApplicationStatusBadge } from '@/features/candidaturas/application-status-badge';
 import {
+  applicationTransitionDialogTitle,
+  describeApplicationTransitionConfirmation
+} from '@/features/candidaturas/application-transition-copy';
+import {
   applicationStatusTransitions,
   applicationTransitionIcons,
   applicationTransitionLabels,
@@ -10,6 +14,7 @@ import {
   type ApplicationStatus
 } from '@/features/candidaturas/domain';
 import {
+  candidateDisplayName,
   useAllJobApplicationsQuery,
   useChangeApplicationStatusMutation,
   useDeleteApplicationMutation,
@@ -30,6 +35,7 @@ import { FormProvider } from '@/shared/context';
 import { useListRefresh, usePersistedTablePagination } from '@/shared/hooks';
 import { type ListOrderByValue } from '@/shared/schema';
 import { formatDate } from '@/shared/utils';
+import Link from 'next/link';
 import { useCallback, useMemo, useState } from 'react';
 import { RecruitmentApplicationsFilterFields } from './recruitment-applications-filter-fields';
 import {
@@ -37,10 +43,8 @@ import {
   recruitmentApplicationsFilterFormSchema
 } from './recruitment-applications-filter-schema';
 
-/** Transições destrutivas exigem confirmação antes de disparar a mutação. */
 const DESTRUCTIVE_TRANSITIONS: ReadonlySet<ApplicationStatus> = new Set(['Rejected', 'Canceled']);
-
-type PendingTransition = { id: number; status: ApplicationStatus };
+type PendingTransition = { application: JobApplicationResponse; target: ApplicationStatus };
 
 export function RecruitmentApplicationsPage() {
   const pagination = usePersistedTablePagination({ storageKey: 'recrutamento-candidaturas' });
@@ -79,12 +83,25 @@ export function RecruitmentApplicationsPage() {
 
   const handleConfirmTransition = useCallback(() => {
     if (!pendingTransition) return;
-    changeApplicationStatus(pendingTransition, { onSettled: () => setPendingTransition(null) });
+    changeApplicationStatus(
+      { id: pendingTransition.application.id, status: pendingTransition.target },
+      { onSettled: () => setPendingTransition(null) }
+    );
   }, [pendingTransition, changeApplicationStatus]);
 
   const columns = useMemo<DataTableColumn<JobApplicationResponse>[]>(
     () => [
       { key: 'id', header: 'Candidatura', render: (application) => <strong>#{application.id}</strong> },
+      {
+        key: 'candidate',
+        header: 'Candidato',
+        render: (application) => (
+          <Link href={`/recrutamento/candidatos/${application.candidate.id}`}>
+            {candidateDisplayName(application.candidate)}
+          </Link>
+        )
+      },
+      { key: 'candidateEmail', header: 'E-mail', render: (application) => application.candidate.email || '-' },
       { key: 'jobId', header: 'Vaga', render: (application) => application.jobTitle },
       {
         key: 'status',
@@ -105,9 +122,7 @@ export function RecruitmentApplicationsPage() {
               key: target,
               label: applicationTransitionLabels[target],
               icon: applicationTransitionIcons[target],
-              onSelect: isDestructive
-                ? () => setPendingTransition({ id: application.id, status: target })
-                : () => changeApplicationStatus({ id: application.id, status: target }),
+              onSelect: () => setPendingTransition({ application, target }),
               variant: isDestructive ? 'destructive' : 'default',
               disabled: isChangingStatus || isDeleting
             };
@@ -129,10 +144,12 @@ export function RecruitmentApplicationsPage() {
         }
       }
     ],
-    [changeApplicationStatus, isChangingStatus, isDeleting, getDeleteAction]
+    [isChangingStatus, isDeleting, getDeleteAction]
   );
 
-  const pendingLabel = pendingTransition ? applicationTransitionLabels[pendingTransition.status] : '';
+  const pendingLabel = pendingTransition ? applicationTransitionLabels[pendingTransition.target] : '';
+  const pendingCandidateName = pendingTransition ? candidateDisplayName(pendingTransition.application.candidate) : '';
+  const pendingCurrentStatus = pendingTransition ? parseApplicationStatus(pendingTransition.application.status) : null;
 
   return (
     <ApiQueryBoundary
@@ -175,14 +192,16 @@ export function RecruitmentApplicationsPage() {
           onOpenChange={(open) => {
             if (!open) setPendingTransition(null);
           }}
-          title={`${pendingLabel} candidatura?`}
+          title={
+            pendingTransition ? applicationTransitionDialogTitle(pendingTransition.target, pendingCandidateName) : ''
+          }
           description={
             pendingTransition
-              ? `Esta ação move a candidatura #${pendingTransition.id} para um status final e não pode ser desfeita.`
+              ? describeApplicationTransitionConfirmation(pendingCurrentStatus, pendingTransition.target)
               : undefined
           }
           confirmLabel={pendingLabel}
-          tone="destructive"
+          tone={pendingTransition && DESTRUCTIVE_TRANSITIONS.has(pendingTransition.target) ? 'destructive' : 'default'}
           loading={isChangingStatus}
           onConfirm={handleConfirmTransition}
         />

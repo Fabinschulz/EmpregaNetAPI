@@ -2,6 +2,10 @@
 
 import { ApplicationStatusBadge } from '@/features/candidaturas/application-status-badge';
 import {
+  applicationTransitionDialogTitle,
+  describeApplicationTransitionConfirmation
+} from '@/features/candidaturas/application-transition-copy';
+import {
   applicationStatusTransitions,
   applicationTransitionIcons,
   applicationTransitionLabels,
@@ -51,7 +55,6 @@ import {
   type CandidatesFilterParams
 } from './candidates-filter-fields';
 
-/** Transições que exigem confirmação por serem terminais/negativas. */
 const DESTRUCTIVE_TRANSITIONS: ReadonlySet<ApplicationStatus> = new Set<ApplicationStatus>(['Rejected', 'Canceled']);
 
 type PendingTransition = { application: JobApplicationResponse; target: ApplicationStatus };
@@ -75,7 +78,7 @@ export function CandidatesByJobPage() {
   const { mutate: deleteApplication, isPending: isDeleting } = useDeleteApplicationMutation();
 
   const isLastPositionAvailable = job?.status === 'Active' && job.availablePositions === 1;
-  const isPendingLastPositionApproval = pending?.target === 'Approved';
+  const isPendingLastPositionApproval = pending?.target === 'Approved' && isLastPositionAvailable;
 
   const {
     data: openApplicationsCount,
@@ -145,9 +148,7 @@ export function CandidatesByJobPage() {
               icon: applicationTransitionIcons[target],
               variant: destructive ? 'destructive' : 'default',
               disabled: isChangingStatus || isDeleting || isDoomedApproval,
-              onSelect: destructive
-                ? () => setPending({ application, target })
-                : () => changeStatus({ id: application.id, status: target })
+              onSelect: () => setPending({ application, target })
             };
           });
 
@@ -158,10 +159,13 @@ export function CandidatesByJobPage() {
         }
       }
     ],
-    [changeStatus, isChangingStatus, isDeleting, isLastPositionAvailable, job, getDeleteAction]
+    [isChangingStatus, isDeleting, isLastPositionAvailable, job, getDeleteAction]
   );
 
   const pendingLabel = pending ? applicationTransitionLabels[pending.target] : '';
+  const pendingCandidateName = pending ? candidateDisplayName(pending.application.candidate) : '';
+  const pendingCurrentStatus = pending ? parseApplicationStatus(pending.application.status) : null;
+  const isPendingDestructive = pending ? DESTRUCTIVE_TRANSITIONS.has(pending.target) : false;
 
   const handleConfirmTransition = () => {
     if (!pending) return;
@@ -233,17 +237,23 @@ export function CandidatesByJobPage() {
           onOpenChange={(open) => {
             if (!open) setPending(null);
           }}
-          title={isPendingLastPositionApproval ? approveLastPositionDialogCopy.title : `${pendingLabel} candidatura`}
+          title={
+            isPendingLastPositionApproval
+              ? approveLastPositionDialogCopy.title
+              : pending
+                ? applicationTransitionDialogTitle(pending.target, pendingCandidateName)
+                : ''
+          }
           description={
             isPendingLastPositionApproval
               ? describeApproveLastPositionConfirmation(otherOpenApplications)
               : pending
-                ? `Confirmar "${pendingLabel}" para a candidatura #${pending.application.id}?`
+                ? describeApplicationTransitionConfirmation(pendingCurrentStatus, pending.target)
                 : undefined
           }
           confirmLabel={isPendingLastPositionApproval ? approveLastPositionDialogCopy.confirmLabel : pendingLabel}
           cancelLabel={isPendingLastPositionApproval ? approveLastPositionDialogCopy.cancelLabel : 'Voltar'}
-          tone="destructive"
+          tone={isPendingLastPositionApproval || isPendingDestructive ? 'destructive' : 'default'}
           loading={isChangingStatus || (isPendingLastPositionApproval && isCountingOpenApplications)}
           onConfirm={handleConfirmTransition}
         />
