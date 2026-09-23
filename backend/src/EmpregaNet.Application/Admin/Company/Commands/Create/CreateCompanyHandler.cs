@@ -1,6 +1,8 @@
 using Microsoft.Extensions.Logging;
 using EmpregaNet.Domain.Enums;
 using EmpregaNet.Domain.Entities;
+using EmpregaNet.Application.Auth;
+using EmpregaNet.Application.Abstraction;
 using EmpregaNet.Application.Common.Exceptions;
 using EmpregaNet.Application.Common.Base;
 using EmpregaNet.Application.Admin.Company.Factories;
@@ -23,18 +25,23 @@ public sealed record CreateCompanyCommand(
 public sealed class CreateCompanyCommandHandler : IRequestHandler<CreateCommand<CreateCompanyCommand>, long>
 {
     private readonly ICompanyRepository _companyRepository;
+    private readonly IHttpCurrentUser _httpCurrentUser;
     private readonly ILogger<CreateCompanyCommandHandler> _logger;
 
     public CreateCompanyCommandHandler(
         ICompanyRepository companyRepository,
+        IHttpCurrentUser httpCurrentUser,
         ILogger<CreateCompanyCommandHandler> logger)
     {
         _companyRepository = companyRepository;
+        _httpCurrentUser = httpCurrentUser;
         _logger = logger;
     }
 
     public async Task<long> Handle(CreateCommand<CreateCompanyCommand> request, CancellationToken cancellationToken)
     {
+        AdministradorAccess.EnsureAdministrator(_httpCurrentUser);
+
         _logger.LogInformation("Iniciando o processo de criação da empresa: {CompanyName}", request.entity.CompanyName);
 
         var cnpjCleaned = BrazilianDocument.NormalizeCnpj(request.entity.Cnpj);

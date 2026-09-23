@@ -11,6 +11,14 @@ public interface IJobApplicationRepository : IBaseRepository<JobApplication>
     /// </summary>
     Task<bool> ExistsActiveAsync(long jobId, long userId, CancellationToken cancellationToken);
 
+    /// <summary>
+    /// Existe qualquer candidatura para esta vaga, independentemente do status? Usado para bloquear a
+    /// exclusão da vaga: sem FK entre <c>Job</c> e <c>JobApplication</c>, apagar uma vaga com
+    /// candidaturas (mesmo concluídas) deixaria histórico de candidatos apontando para um registro
+    /// sumido.
+    /// </summary>
+    Task<bool> ExistsByJobIdAsync(long jobId, CancellationToken cancellationToken);
+
     Task<IReadOnlyList<long>> GetAppliedJobIdsAsync(
         long userId,
         IReadOnlyCollection<long> jobIds,
@@ -39,11 +47,17 @@ public interface IJobApplicationRepository : IBaseRepository<JobApplication>
         long userId,
         CancellationToken cancellationToken);
 
+    /// <summary>
+    /// Todas as candidaturas (recrutamento). <paramref name="companyId"/> restringe às vagas dessa
+    /// empresa - Admin passa <c>null</c> e vê a plataforma inteira; Recruiter/Manager sempre passam
+    /// a própria empresa (ver <c>IJobEmployerAccess.ResolveCompanyScopeAsync</c>).
+    /// </summary>
     Task<ListDataPagination<JobApplicationProjection>> GetAllWithCandidateAsync(
         CancellationToken cancellationToken,
         int page,
         int size,
-        string? orderBy = null);
+        string? orderBy = null,
+        long? companyId = null);
 
     Task<ListDataPagination<JobApplicationProjection>> GetByJobIdAsync(
         long jobId,

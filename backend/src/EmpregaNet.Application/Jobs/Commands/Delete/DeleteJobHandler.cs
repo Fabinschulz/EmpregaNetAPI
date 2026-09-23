@@ -12,17 +12,20 @@ namespace EmpregaNet.Application.Jobs.Commands
     public sealed class DeleteJobHandler : IRequestHandler<DeleteCommand<JobViewModel>, bool>
     {
         private readonly IJobRepository _repository;
+        private readonly IJobApplicationRepository _jobApplicationRepository;
         private readonly ILogger<DeleteJobHandler> _logger;
         private readonly IHttpCurrentUser _httpCurrentUser;
         private readonly IJobEmployerAccess _jobEmployerAccess;
 
         public DeleteJobHandler(
             IJobRepository repository,
+            IJobApplicationRepository jobApplicationRepository,
             ILogger<DeleteJobHandler> logger,
             IHttpCurrentUser httpCurrentUser,
             IJobEmployerAccess jobEmployerAccess)
         {
             _repository = repository ?? throw new ArgumentNullException(nameof(repository));
+            _jobApplicationRepository = jobApplicationRepository ?? throw new ArgumentNullException(nameof(jobApplicationRepository));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _httpCurrentUser = httpCurrentUser;
             _jobEmployerAccess = jobEmployerAccess;
@@ -47,6 +50,13 @@ namespace EmpregaNet.Application.Jobs.Commands
 
                 await _jobEmployerAccess.EnsureCanManageCompanyAsync(job.CompanyId, cancellationToken);
 
+                if (await _jobApplicationRepository.ExistsByJobIdAsync(request.Id, cancellationToken))
+                {
+                    throw ValidationAppException.ForBusinessRule(
+                        "Não é possível excluir uma vaga com candidaturas vinculadas. Cancele ou remova as candidaturas antes de excluir a vaga.",
+                        DomainErrorEnum.INVALID_ACTION_FOR_RECORD);
+                }
+
                 await _repository.DeleteAsync(request.Id, cancellationToken);
                 _logger.LogInformation("Vaga de emprego removida com sucesso. ID: {Id}", request.Id);
                 return true;
@@ -55,11 +65,6 @@ namespace EmpregaNet.Application.Jobs.Commands
             {
                 _logger.LogWarning(ex, "Vaga de emprego não encontrada para remoção: {Message}. Request: {@Request}", ex.Message, request);
                 throw new KeyNotFoundException("A vaga de emprego que você está tentando remover não existe ou já foi removida.");
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Erro inesperado ao remover vaga de emprego (ID: {Id}). Request: {@Request}", request.Id, request);
-                throw new Exception("Ocorreu um erro inesperado ao remover a vaga de emprego. Por favor, tente novamente mais tarde.");
             }
         }
     }

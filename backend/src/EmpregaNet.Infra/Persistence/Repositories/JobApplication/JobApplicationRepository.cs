@@ -34,6 +34,13 @@ public class JobApplicationRepository : BaseRepository<JobApplication>, IJobAppl
             .AnyAsync(a => a.JobId == jobId && a.UserId == userId, cancellationToken);
     }
 
+    public async Task<bool> ExistsByJobIdAsync(long jobId, CancellationToken cancellationToken)
+    {
+        return await _context.JobApplications
+            .AsNoTracking()
+            .AnyAsync(a => a.JobId == jobId && !a.IsDeleted, cancellationToken);
+    }
+
     /// <summary>
     /// Vagas, entre as consultadas, em que o utilizador tem candidatura activa, é o que faz o feed
     /// mostrar "Já candidatado" em vez do botão de candidatura.
@@ -129,11 +136,21 @@ public class JobApplicationRepository : BaseRepository<JobApplication>, IJobAppl
         CancellationToken cancellationToken,
         int page,
         int size,
-        string? orderBy = null)
+        string? orderBy = null,
+        long? companyId = null)
     {
         var query = _context.JobApplications
             .AsNoTracking()
             .Where(a => !a.IsDeleted);
+
+        if (companyId.HasValue)
+        {
+            query =
+                from application in query
+                join job in _context.Jobs.AsNoTracking() on application.JobId equals job.Id
+                where job.CompanyId == companyId.Value
+                select application;
+        }
 
         return await ProjectWithCandidate(ApplyOrderBy(query, orderBy))
             .ToPaginatedListAsync(page, size, cancellationToken);

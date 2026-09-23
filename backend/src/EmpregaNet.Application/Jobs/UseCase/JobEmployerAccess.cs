@@ -20,6 +20,43 @@ public sealed class JobEmployerAccess : IJobEmployerAccess
 
     public async Task EnsureCanManageCompanyAsync(long companyId, CancellationToken cancellationToken = default)
     {
+        var (isAdmin, ownCompanyId) = await ResolveCurrentStaffScopeAsync();
+        if (isAdmin)
+            return;
+
+        if (ownCompanyId is null)
+        {
+            throw ValidationAppException.ForBusinessRule(
+                "Seu usuário ainda não está vinculado a uma empresa. Solicite ao administrador.",
+                DomainErrorEnum.MISSING_RESOURCE_PERMISSION);
+        }
+
+        if (ownCompanyId.Value != companyId)
+        {
+            throw ValidationAppException.ForBusinessRule(
+                "Você só pode gerenciar vagas da empresa à qual está vinculado.",
+                DomainErrorEnum.MISSING_RESOURCE_PERMISSION);
+        }
+    }
+
+    public async Task<long?> ResolveCompanyScopeAsync(CancellationToken cancellationToken = default)
+    {
+        var (isAdmin, ownCompanyId) = await ResolveCurrentStaffScopeAsync();
+        if (isAdmin)
+            return null;
+
+        if (ownCompanyId is null)
+        {
+            throw ValidationAppException.ForBusinessRule(
+                "Seu usuário ainda não está vinculado a uma empresa. Solicite ao administrador.",
+                DomainErrorEnum.MISSING_RESOURCE_PERMISSION);
+        }
+
+        return ownCompanyId;
+    }
+
+    private async Task<(bool IsAdmin, long? CompanyId)> ResolveCurrentStaffScopeAsync()
+    {
         var appUser = await _userManager.FindByIdAsync(_currentUser.UserId.ToString());
         if (appUser is null || appUser.IsDeleted)
         {
@@ -30,20 +67,8 @@ public sealed class JobEmployerAccess : IJobEmployerAccess
 
         var roles = await _userManager.GetRolesAsync(appUser);
         if (roles.Contains(RecruitmentRoleNames.Admin))
-            return;
+            return (true, null);
 
-        if (appUser.EmployerCompanyId is null)
-        {
-            throw ValidationAppException.ForBusinessRule(
-                "Seu usuário ainda não está vinculado a uma empresa. Solicite ao administrador.",
-                DomainErrorEnum.MISSING_RESOURCE_PERMISSION);
-        }
-
-        if (appUser.EmployerCompanyId.Value != companyId)
-        {
-            throw ValidationAppException.ForBusinessRule(
-                "Você só pode gerenciar vagas da empresa à qual está vinculado.",
-                DomainErrorEnum.MISSING_RESOURCE_PERMISSION);
-        }
+        return (false, appUser.EmployerCompanyId);
     }
 }

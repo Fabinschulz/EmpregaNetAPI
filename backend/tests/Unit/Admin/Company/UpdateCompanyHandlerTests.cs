@@ -1,5 +1,8 @@
+using EmpregaNet.Application.Abstraction;
 using EmpregaNet.Application.Admin.Company.Commands;
 using EmpregaNet.Application.Admin.Company.ViewModel;
+using EmpregaNet.Application.Auth;
+using EmpregaNet.Application.Auth.ViewModel;
 using EmpregaNet.Application.Common.Base;
 using EmpregaNet.Application.Common.Exceptions;
 using EmpregaNet.Domain.Entities;
@@ -14,12 +17,35 @@ namespace EmpregaNet.Tests.Unit.Application.Admin.CompanyHandlers;
 public sealed class UpdateCompanyHandlerTests
 {
     private readonly Mock<ICompanyRepository> _repo = new();
+    private readonly Mock<IHttpCurrentUser> _currentUser = new();
+
+    public UpdateCompanyHandlerTests() => GivenAuthenticatedUser(RecruitmentRoleNames.Admin);
+
+    private void GivenAuthenticatedUser(params string[] roles)
+    {
+        _currentUser.Setup(x => x.GetContextUser()).Returns(new UserLoggedViewModel
+        {
+            AccessToken = "token",
+            ExpiresIn = 3600,
+            UserToken = new UserToken
+            {
+                Id = 1,
+                Username = "admin",
+                Email = "admin@test.local",
+                Roles = [.. roles],
+                Claims = []
+            }
+        });
+    }
+
+    private UpdateCompanyHandler CreateSut() =>
+        new(_repo.Object, _currentUser.Object, NullLogger<UpdateCompanyHandler>.Instance);
 
     [Fact]
     public async Task Handle_EmpresaInexistente_DeveLancarValidationAppException()
     {
         _repo.Setup(x => x.GetByIdAsync(5L)).ReturnsAsync((Company?)null);
-        var sut = new UpdateCompanyHandler(_repo.Object, NullLogger<UpdateCompanyHandler>.Instance);
+        var sut = CreateSut();
         var cmd = new UpdateCommand<UpdateCompanyCommand, CompanyViewModel>(5, CompanyTestData.ValidUpdateCommand());
 
         var act = async () => await sut.Handle(cmd, CancellationToken.None);
@@ -27,6 +53,23 @@ public sealed class UpdateCompanyHandlerTests
         await act.Should().ThrowAsync<ValidationAppException>()
             .Where(e => e.Code == DomainErrorEnum.RESOURCE_ID_NOT_FOUND);
         _repo.Verify(x => x.UpdateAsync(It.IsAny<Company>(), It.IsAny<CancellationToken>()), Times.Never);
+    }
+
+    // Defesa em profundidade: reforço na Application além do [Authorize(Policy = Administrador)] da API.
+    [Theory]
+    [InlineData(RecruitmentRoleNames.Recruiter)]
+    [InlineData(RecruitmentRoleNames.Manager)]
+    public async Task Handle_UsuarioNaoAdministrador_DeveRecusarAntesDeConsultarRepositorio(string role)
+    {
+        GivenAuthenticatedUser(role);
+        var cmd = new UpdateCommand<UpdateCompanyCommand, CompanyViewModel>(5, CompanyTestData.ValidUpdateCommand());
+        var sut = CreateSut();
+
+        var act = async () => await sut.Handle(cmd, CancellationToken.None);
+
+        var assertion = await act.Should().ThrowAsync<ValidationAppException>();
+        assertion.Which.Code.Should().Be(DomainErrorEnum.MISSING_RESOURCE_PERMISSION);
+        _repo.Verify(x => x.GetByIdAsync(It.IsAny<long>()), Times.Never);
     }
 
     [Fact]
@@ -44,7 +87,7 @@ public sealed class UpdateCompanyHandlerTests
         };
         EntityIdHelper.SetCompanyId(company, 5L);
         _repo.Setup(x => x.GetByIdAsync(5L)).ReturnsAsync(company);
-        var sut = new UpdateCompanyHandler(_repo.Object, NullLogger<UpdateCompanyHandler>.Instance);
+        var sut = CreateSut();
         var cmd = new UpdateCommand<UpdateCompanyCommand, CompanyViewModel>(5, CompanyTestData.ValidUpdateCommand());
 
         var act = async () => await sut.Handle(cmd, CancellationToken.None);
@@ -67,7 +110,7 @@ public sealed class UpdateCompanyHandlerTests
         };
         EntityIdHelper.SetCompanyId(company, 12L);
         _repo.Setup(x => x.GetByIdAsync(12L)).ReturnsAsync(company);
-        var sut = new UpdateCompanyHandler(_repo.Object, NullLogger<UpdateCompanyHandler>.Instance);
+        var sut = CreateSut();
         var update = CompanyTestData.ValidUpdateCommand();
         var cmd = new UpdateCommand<UpdateCompanyCommand, CompanyViewModel>(12, update);
 

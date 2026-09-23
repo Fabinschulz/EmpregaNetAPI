@@ -6,4 +6,9 @@ namespace EmpregaNet.Application.Abstraction;
 public interface IJobEmployerAccess
 {
     Task EnsureCanManageCompanyAsync(long companyId, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Resolve o escopo da empresa do usuário atual (Admin vê a plataforma inteira, Recruiter/Manager só a própria empresa).
+    /// </summary>
+    Task<long?> ResolveCompanyScopeAsync(CancellationToken cancellationToken = default);
 }

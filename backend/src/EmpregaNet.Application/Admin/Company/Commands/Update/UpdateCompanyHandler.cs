@@ -2,6 +2,8 @@ using Microsoft.Extensions.Logging;
 using EmpregaNet.Domain.Enums;
 using System.ComponentModel.DataAnnotations;
 using EmpregaNet.Domain.Entities;
+using EmpregaNet.Application.Auth;
+using EmpregaNet.Application.Abstraction;
 using EmpregaNet.Application.Common.Exceptions;
 using EmpregaNet.Application.Admin.Company.ViewModel;
 using EmpregaNet.Application.Common.Base;
@@ -23,17 +25,22 @@ public sealed record UpdateCompanyCommand(
 public sealed class UpdateCompanyHandler : IRequestHandler<UpdateCommand<UpdateCompanyCommand, CompanyViewModel>, CompanyViewModel>
 {
     private readonly ICompanyRepository _companyRepository;
+    private readonly IHttpCurrentUser _httpCurrentUser;
     private readonly ILogger<UpdateCompanyHandler> _logger;
 
     public UpdateCompanyHandler(ICompanyRepository companyRepository,
+        IHttpCurrentUser httpCurrentUser,
         ILogger<UpdateCompanyHandler> logger)
     {
         _companyRepository = companyRepository;
+        _httpCurrentUser = httpCurrentUser;
         _logger = logger;
     }
 
     public async Task<CompanyViewModel> Handle(UpdateCommand<UpdateCompanyCommand, CompanyViewModel> request, CancellationToken cancellationToken)
     {
+        AdministradorAccess.EnsureAdministrator(_httpCurrentUser);
+
         _logger.LogInformation("Iniciando o processo de atualização da empresa: {CompanyId}", request.Id);
 
         try

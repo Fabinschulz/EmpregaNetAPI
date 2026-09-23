@@ -42,6 +42,10 @@ export function isRecruitmentStaff(userRoles: readonly string[] | null | undefin
   return satisfiesPolicy(userRoles, AUTH_POLICIES.recrutamento);
 }
 
+export function isCandidate(userRoles: readonly string[] | null | undefined): boolean {
+  return hasRole(userRoles, 'Candidate');
+}
+
 export const PERMISSION_POLICIES = {
   /** `DELETE /api/companies/{id}` */
   'company.delete': AUTH_POLICIES.administrador,

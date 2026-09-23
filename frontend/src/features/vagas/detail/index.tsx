@@ -32,7 +32,7 @@ import {
   workModelVocabulary,
   workShiftVocabulary
 } from '@/shared/schema';
-import { formatSalaryRange } from '@/shared/utils';
+import { formatSalaryRange, isCandidate } from '@/shared/utils';
 import type { LucideIcon } from 'lucide-react';
 import {
   Accessibility,
@@ -63,14 +63,15 @@ type MetaItem = {
 };
 
 export function JobDetailPage({ job }: JobDetailPageProps) {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, roles } = useAuth();
   const { apiError, mutateAsync, isPending: isApplying } = useApplyToJobMutation(job.id);
   const { data: interactions } = useJobFeedInteractionsQuery([job.id]);
   const hasApplied = interactions?.appliedJobIds.includes(job.id) ?? false;
   const publishedLabel = useRelativeTime(job.publishedAt ?? job.createdAt);
+  const canApply = !isAuthenticated || isCandidate(roles);
 
   function onApply() {
-    if (!isAuthenticated || hasApplied) return;
+    if (!isAuthenticated || hasApplied || !isCandidate(roles)) return;
     mutateAsync().catch(() => {});
   }
 
@@ -194,26 +195,28 @@ export function JobDetailPage({ job }: JobDetailPageProps) {
         </CardContent>
 
         <CardFooter className={styles.footer}>
-          {hasApplied ? (
-            <AppliedBadge />
-          ) : (
-            <Button
-              variant="primary"
-              onClick={onApply}
-              disabled={!isAuthenticated || isApplying}
-              aria-busy={isApplying}
-            >
-              {isApplying ? (
-                <Spinner size="sm" label={null} />
-              ) : isAuthenticated ? (
-                <actionIcons.apply aria-hidden />
-              ) : (
-                <actionIcons.signIn aria-hidden />
-              )}
-              {applyLabel}
-            </Button>
-          )}
-          {!isAuthenticated ? (
+          {canApply ? (
+            hasApplied ? (
+              <AppliedBadge />
+            ) : (
+              <Button
+                variant="primary"
+                onClick={onApply}
+                disabled={!isAuthenticated || isApplying}
+                aria-busy={isApplying}
+              >
+                {isApplying ? (
+                  <Spinner size="sm" label={null} />
+                ) : isAuthenticated ? (
+                  <actionIcons.apply aria-hidden />
+                ) : (
+                  <actionIcons.signIn aria-hidden />
+                )}
+                {applyLabel}
+              </Button>
+            )
+          ) : null}
+          {canApply && !isAuthenticated ? (
             <p className={styles.footerHint}>É necessário entrar na conta para enviar sua candidatura.</p>
           ) : null}
           {apiError ? (

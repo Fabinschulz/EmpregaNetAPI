@@ -5,6 +5,7 @@ import { AppliedBadge } from '@/features/vagas/applied-badge';
 import { actionIcons, Button, IconButton, Spinner } from '@/shared/components';
 import { useAuth } from '@/shared/context';
 import { useCopyToClipboard } from '@/shared/hooks';
+import { isCandidate } from '@/shared/utils';
 import Link from 'next/link';
 import { publicJobsRoutes, publicJobUrl } from '../../public-jobs-routes';
 import styles from './job-card.module.scss';
@@ -18,7 +19,7 @@ type JobCardActionsProps = {
 };
 
 export function JobCardActions({ jobId, jobTitle, hasApplied, isActive = true }: JobCardActionsProps) {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, roles } = useAuth();
   const { mutate, isPending } = useApplyToJobMutation(jobId);
 
   const copyLink = useCopyToClipboard({
@@ -45,7 +46,14 @@ export function JobCardActions({ jobId, jobTitle, hasApplied, isActive = true }:
 
       {hasApplied ? (
         <AppliedBadge />
-      ) : !isActive ? null : isAuthenticated ? (
+      ) : !isActive ? null : !isAuthenticated ? (
+        <Button variant="primary" asChild>
+          <Link href="/login" aria-label={`Entrar para se candidatar à vaga ${jobTitle}`}>
+            <actionIcons.signIn aria-hidden />
+            Entrar para se candidatar
+          </Link>
+        </Button>
+      ) : isCandidate(roles) ? (
         <Button
           variant="primary"
           onClick={() => mutate()}
@@ -56,14 +64,7 @@ export function JobCardActions({ jobId, jobTitle, hasApplied, isActive = true }:
           {isPending ? <Spinner size="sm" label={null} /> : <actionIcons.apply aria-hidden />}
           Candidatar-se
         </Button>
-      ) : (
-        <Button variant="primary" asChild>
-          <Link href="/login" aria-label={`Entrar para se candidatar à vaga ${jobTitle}`}>
-            <actionIcons.signIn aria-hidden />
-            Entrar para se candidatar
-          </Link>
-        </Button>
-      )}
+      ) : null}
     </div>
   );
 }
