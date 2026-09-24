@@ -1,3 +1,4 @@
+using EmpregaNet.Application.Common.Exceptions;
 using EmpregaNet.Application.JobApplications.Queries;
 using EmpregaNet.Domain.Entities;
 using EmpregaNet.Domain.Enums;
@@ -111,5 +112,51 @@ public sealed class GetMyJobApplicationsHandlerIntegrationTests
             .Handle(new GetMyJobApplicationsQuery(1, 100, null, null), CancellationToken.None);
 
         result.Data.Should().Contain(a => a.JobId == 7331 && a.Status == ApplicationStatusEnum.CanceledByCandidate);
+    }
+
+    // O validator não valida mais Status (fonte única passou a ser o ApplicationStatusParser, alinhado
+    // aos outros dois endpoints de candidaturas): qualquer caixa do nome declarado tem de ser aceita.
+    [Theory]
+    [InlineData("pending", ApplicationStatusEnum.Pending)]
+    [InlineData("PROCESSING", ApplicationStatusEnum.Processing)]
+    [InlineData(" Processing ", ApplicationStatusEnum.Processing)]
+    public async Task Handle_StatusValidoEmQualquerCaixa_DeveFiltrarPeloStatus(string status, ApplicationStatusEnum expected)
+    {
+        using var scope = _fixture.Services.CreateScope();
+        var context = scope.ServiceProvider.GetRequiredService<PostgreSqlContext>();
+
+        await SeedAsync(context, CandidateId, jobId: 7341, expected);
+        await SeedAsync(context, CandidateId, jobId: 7342, ApplicationStatusEnum.Rejected);
+
+        var result = await CreateSut(context, CandidateId)
+            .Handle(new GetMyJobApplicationsQuery(1, 100, status, null), CancellationToken.None);
+
+        result.Data.Should().OnlyContain(a => a.Status == expected);
+        result.Data.Should().Contain(a => a.JobId == 7341);
+    }
+
+    // Regressão: "99" e "1" passam no Enum.TryParse (aceita número); "Pending,Processing" faria OU bit a
+    // bit; "Recebida" é o rótulo pt-BR, não o nome do enum. O validator não recusa mais nada disto — a
+    // recusa tem de vir do ApplicationStatusParser, no handler, com o mesmo INVALID_QUERY_FILTER dos
+    // outros dois endpoints de candidaturas.
+    [Theory]
+    [InlineData("99")]
+    [InlineData("0")]
+    [InlineData("1")]
+    [InlineData("Pending,Processing")]
+    [InlineData("NaoSelecionado")]
+    [InlineData("naoselecionado")]
+    [InlineData("Recebida")]
+    [InlineData("Inexistente")]
+    public async Task Handle_StatusInvalido_DeveLancarInvalidQueryFilter(string status)
+    {
+        using var scope = _fixture.Services.CreateScope();
+        var context = scope.ServiceProvider.GetRequiredService<PostgreSqlContext>();
+
+        var act = async () => await CreateSut(context, CandidateId)
+            .Handle(new GetMyJobApplicationsQuery(1, 100, status, null), CancellationToken.None);
+
+        (await act.Should().ThrowAsync<ValidationAppException>())
+            .Which.Code.Should().Be(DomainErrorEnum.INVALID_QUERY_FILTER);
     }
 }

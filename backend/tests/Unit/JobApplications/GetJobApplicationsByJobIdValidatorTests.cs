@@ -67,6 +67,25 @@ public sealed class GetJobApplicationsByJobIdValidatorTests
         result.IsValid.Should().BeTrue(because: string.Join("; ", result.Errors.Select(e => e.ErrorMessage)));
     }
 
+    /// <summary>
+    /// <c>GET /api/jobapplications/mine</c> tinha regra própria de <c>Status</c> com <c>Enum.TryParse</c>:
+    /// aceitava número e lista com vírgula em silêncio. Alinhado aos dois validators irmãos, a fonte
+    /// única passa a ser o <c>ApplicationStatusParser</c> no handler.
+    /// </summary>
+    [Theory]
+    [InlineData("Foo")]
+    [InlineData("1")]
+    [InlineData("Pending,Processing")]
+    [InlineData("NaoSelecionado")]
+    public void GetMyJobApplicationsQueryValidator_StatusInvalido_NaoDeveSerRecusadoPeloValidator(string status)
+    {
+        var validator = new GetMyJobApplicationsQueryValidator();
+
+        var result = validator.Validate(new GetMyJobApplicationsQuery(Page: 1, Size: 20, Status: status, OrderBy: null));
+
+        result.IsValid.Should().BeTrue(because: string.Join("; ", result.Errors.Select(e => e.ErrorMessage)));
+    }
+
     /// <summary>Busca com o mesmo teto de 120 caracteres do feed de vagas.</summary>
     [Theory]
     [InlineData(null, true)]

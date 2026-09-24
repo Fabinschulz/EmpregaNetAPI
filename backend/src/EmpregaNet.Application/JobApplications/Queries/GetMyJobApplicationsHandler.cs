@@ -1,8 +1,6 @@
 using EmpregaNet.Application.Common.Base;
-using EmpregaNet.Application.Common.Exceptions;
 using EmpregaNet.Application.JobApplications.ViewModel;
 using EmpregaNet.Domain.Common;
-using EmpregaNet.Domain.Enums;
 using EmpregaNet.Domain.Interfaces;
 using Microsoft.Extensions.Logging;
 
@@ -37,7 +35,7 @@ public sealed class GetMyJobApplicationsHandler :
 
         try
         {
-            var status = ParseStatus(request.Status);
+            var status = ApplicationStatusParser.ParseOrNull(request.Status);
             var result = await _jobApplicationRepository.GetByUserIdAsync(
                 userId,
                 cancellationToken,
@@ -54,24 +52,5 @@ public sealed class GetMyJobApplicationsHandler :
             _logger.LogError(ex, "Erro inesperado ao buscar minhas vagas aplicadas. Query: {@Query}", request);
             throw;
         }
-    }
-
-    private static ApplicationStatusEnum? ParseStatus(string? status)
-    {
-        if (string.IsNullOrWhiteSpace(status))
-        {
-            return null;
-        }
-
-        if (!Enum.TryParse<ApplicationStatusEnum>(status, true, out var parsed) ||
-            parsed == ApplicationStatusEnum.NaoSelecionado)
-        {
-            throw new ValidationAppException(
-                nameof(status),
-                "Status de candidatura inválido para filtro.",
-                DomainErrorEnum.INVALID_QUERY_FILTER);
-        }
-
-        return parsed;
     }
 }

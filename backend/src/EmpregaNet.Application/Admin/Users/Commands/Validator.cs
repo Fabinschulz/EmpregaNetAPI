@@ -1,5 +1,6 @@
 using EmpregaNet.Application.Common.Base;
 using EmpregaNet.Application.Users.ViewModel;
+using EmpregaNet.Application.Utils.Helpers;
 using EmpregaNet.Domain.Enums;
 using FluentValidation;
 
@@ -20,7 +21,7 @@ public sealed class UpdateAdminUserCommandValidator : AbstractValidator<UpdateCo
         RuleFor(x => x.entity!.UserType)
             .NotEmpty()
             .WithMessage("O tipo de usuário é obrigatório.")
-            .Must(t => Enum.TryParse<UserTypeEnum>(t, ignoreCase: true, out var v) && v != UserTypeEnum.NaoSelecionado)
+            .Must(t => EnumNameParser.TryParseName<UserTypeEnum>(t, out var v) && v != UserTypeEnum.NaoSelecionado)
             .WithMessage("Tipo de usuário inválido. Utilize um valor do enum (ex.: Candidate, Recruiter, Admin).");
     }
 }

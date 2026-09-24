@@ -4,6 +4,7 @@ using EmpregaNet.Application.Common.Exceptions;
 using EmpregaNet.Application.Abstraction;
 using EmpregaNet.Application.Users.Identity;
 using EmpregaNet.Application.Users.ViewModel;
+using EmpregaNet.Application.Utils.Helpers;
 using EmpregaNet.Domain.Entities;
 using EmpregaNet.Domain.Enums;
 using Microsoft.AspNetCore.Identity;
@@ -65,7 +66,8 @@ public sealed class UpdateAdminUserHandler : IRequestHandler<UpdateCommand<Updat
 
         var entity = request.entity;
 
-        if (!Enum.TryParse<UserTypeEnum>(entity.UserType, ignoreCase: true, out var parsed))
+        if (!EnumNameParser.TryParseName<UserTypeEnum>(entity.UserType, out var parsed) ||
+            parsed == UserTypeEnum.NaoSelecionado)
         {
             throw new ValidationAppException(
                 nameof(entity.UserType),
