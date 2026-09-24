@@ -9,7 +9,12 @@ using Microsoft.Extensions.Logging;
 
 namespace EmpregaNet.Application.JobApplications.Queries;
 
-public sealed record GetJobApplicationsByJobIdQuery(long JobId, int Page, int Size, string? Status, string? OrderBy)
+/// <summary>
+/// Candidaturas de uma vaga. <paramref name="Search"/> filtra por nome ou e-mail do candidato
+/// (case-insensitive) antes da paginação.
+/// </summary>
+public sealed record GetJobApplicationsByJobIdQuery(
+    long JobId, int Page, int Size, string? Status, string? OrderBy, string? Search = null)
     : IRequest<ListDataPagination<JobApplicationViewModel>>, IPaginatedQuery;
 
 public sealed class GetJobApplicationsByJobIdHandler :
@@ -48,35 +53,17 @@ public sealed class GetJobApplicationsByJobIdHandler :
         await _jobEmployerAccess.EnsureCanManageCompanyAsync(job.CompanyId, cancellationToken);
 
         _logger.LogInformation("Listando candidaturas da vaga {JobId}", request.JobId);
-        var status = ParseStatus(request.Status);
+        var status = ApplicationStatusParser.ParseOrNull(request.Status);
         var result = await _jobApplicationRepository.GetByJobIdAsync(
             request.JobId,
             cancellationToken,
             request.Page,
             request.Size,
             status,
-            request.OrderBy);
+            request.OrderBy,
+            request.Search);
 
         var data = result.Data.Select(a => a.ToViewModel()).ToList();
         return new ListDataPagination<JobApplicationViewModel>(data, result.TotalItems, request.Page, request.Size);
-    }
-
-    private static ApplicationStatusEnum? ParseStatus(string? status)
-    {
-        if (string.IsNullOrWhiteSpace(status))
-        {
-            return null;
-        }
-
-        if (!Enum.TryParse<ApplicationStatusEnum>(status, true, out var parsed) ||
-            parsed == ApplicationStatusEnum.NaoSelecionado)
-        {
-            throw new ValidationAppException(
-                nameof(status),
-                "Status de candidatura inválido para filtro.",
-                DomainErrorEnum.INVALID_QUERY_FILTER);
-        }
-
-        return parsed;
     }
 }

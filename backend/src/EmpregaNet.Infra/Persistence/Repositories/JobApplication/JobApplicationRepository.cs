@@ -68,8 +68,9 @@ public class JobApplicationRepository : BaseRepository<JobApplication>, IJobAppl
 
     public async Task<JobApplicationProjection?> GetProjectionByIdAsync(long id, CancellationToken cancellationToken)
     {
-        return await ProjectWithCandidate(_context.JobApplications.AsNoTracking().Where(a => a.Id == id))
-            .FirstOrDefaultAsync(cancellationToken);
+        var joined = JoinCandidateAndJob(_context.JobApplications.AsNoTracking().Where(a => a.Id == id));
+
+        return await ProjectWithCandidate(joined).FirstOrDefaultAsync(cancellationToken);
     }
 
     public async Task<JobApplicationNotificationProjection?> GetNotificationProjectionAsync(
@@ -137,7 +138,9 @@ public class JobApplicationRepository : BaseRepository<JobApplication>, IJobAppl
         int page,
         int size,
         string? orderBy = null,
-        long? companyId = null)
+        long? companyId = null,
+        ApplicationStatusEnum? status = null,
+        string? search = null)
     {
         var query = _context.JobApplications
             .AsNoTracking()
@@ -152,8 +155,12 @@ public class JobApplicationRepository : BaseRepository<JobApplication>, IJobAppl
                 select application;
         }
 
-        return await ProjectWithCandidate(ApplyOrderBy(query, orderBy))
-            .ToPaginatedListAsync(page, size, cancellationToken);
+        if (status.HasValue)
+        {
+            query = query.Where(a => a.Status == status.Value);
+        }
+
+        return await ListWithCandidateAsync(query, search, orderBy, page, size, cancellationToken);
     }
 
     public async Task<ListDataPagination<JobApplicationProjection>> GetByJobIdAsync(
@@ -162,7 +169,8 @@ public class JobApplicationRepository : BaseRepository<JobApplication>, IJobAppl
         int page,
         int size,
         ApplicationStatusEnum? status = null,
-        string? orderBy = null)
+        string? orderBy = null,
+        string? search = null)
     {
         var query = _context.JobApplications
             .AsNoTracking()
@@ -173,8 +181,7 @@ public class JobApplicationRepository : BaseRepository<JobApplication>, IJobAppl
             query = query.Where(a => a.Status == status.Value);
         }
 
-        return await ProjectWithCandidate(ApplyOrderBy(query, orderBy))
-            .ToPaginatedListAsync(page, size, cancellationToken);
+        return await ListWithCandidateAsync(query, search, orderBy, page, size, cancellationToken);
     }
 
     public async Task<ListDataPagination<JobApplicationProjection>> GetByUserIdAsync(
@@ -194,12 +201,31 @@ public class JobApplicationRepository : BaseRepository<JobApplication>, IJobAppl
             query = query.Where(a => a.Status == status.Value);
         }
 
-        return await ProjectWithCandidate(ApplyOrderBy(query, orderBy))
+        return await ListWithCandidateAsync(query, search: null, orderBy, page, size, cancellationToken);
+    }
+
+    /// <summary>
+    /// Cadeia única das listagens: junta vaga e candidato, filtra pela busca, ordena, projeta e
+    /// pagina, nessa ordem. A busca entra <b>antes</b> da paginação; filtrar depois paginaria sobre o
+    /// conjunto errado e o <c>TotalItems</c> não refletiria o filtro.
+    /// </summary>
+    private Task<ListDataPagination<JobApplicationProjection>> ListWithCandidateAsync(
+        IQueryable<JobApplication> applications,
+        string? search,
+        string? orderBy,
+        int page,
+        int size,
+        CancellationToken cancellationToken)
+    {
+        var joined = ApplySearch(JoinCandidateAndJob(applications), search);
+
+        return ProjectWithCandidate(ApplyOrderBy(joined, orderBy))
             .ToPaginatedListAsync(page, size, cancellationToken);
     }
 
     /// <summary>
-    /// Resolve o candidato junto da candidatura, em uma consulta só.
+    /// Junta a vaga e o candidato à candidatura, em uma consulta só, expondo as três linhas para que
+    /// filtros sobre vaga/candidato possam ser compostos antes da projeção.
     /// </summary>
     /// <remarks>
     /// É um LEFT JOIN (<c>DefaultIfEmpty</c>) e não um INNER: o usuário é excluído logicamente, mas
@@ -210,43 +236,97 @@ public class JobApplicationRepository : BaseRepository<JobApplication>, IJobAppl
     /// O candidato excluído continua sendo devolvido, com <c>IsDeleted</c> marcado: o histórico do
     /// processo seletivo precisa dele, e cabe à tela decidir como sinalizar.
     /// </remarks>
-    private IQueryable<JobApplicationProjection> ProjectWithCandidate(IQueryable<JobApplication> applications)
+    private IQueryable<ApplicationWithJobAndCandidate> JoinCandidateAndJob(IQueryable<JobApplication> applications)
     {
         return from application in applications
                join job in _context.Jobs.AsNoTracking() on application.JobId equals job.Id into jobs
                from job in jobs.DefaultIfEmpty()
                join user in _context.Users.AsNoTracking() on application.UserId equals user.Id into candidates
                from candidate in candidates.DefaultIfEmpty()
-               select new JobApplicationProjection(
-                   application.Id,
-                   application.JobId,
-                   job != null ? job.Title : string.Empty,
-                   new JobApplicationCandidate(
-                       application.UserId,
-                       candidate != null ? (candidate.UserName ?? string.Empty) : string.Empty,
-                       candidate != null ? (candidate.Email ?? string.Empty) : string.Empty,
-                       candidate != null && candidate.IsDeleted),
-                   application.Status,
-                   application.AppliedAt,
-                   application.CreatedAt,
-                   application.UpdatedAt,
-                   application.DeletedAt,
-                   application.IsDeleted);
+               select new ApplicationWithJobAndCandidate
+               {
+                   Application = application,
+                   Job = job,
+                   Candidate = candidate
+               };
     }
 
-    private static IQueryable<JobApplication> ApplyOrderBy(IQueryable<JobApplication> query, string? orderBy)
+    /// <summary>
+    /// Busca textual por título da vaga, nome de usuário ou e-mail do candidato (case-insensitive).
+    /// Termo vazio não filtra.
+    /// </summary>
+    private static IQueryable<ApplicationWithJobAndCandidate> ApplySearch(
+        IQueryable<ApplicationWithJobAndCandidate> query,
+        string? search)
+    {
+        if (string.IsNullOrWhiteSpace(search))
+        {
+            return query;
+        }
+
+        var term = search.Trim().ToLower();
+
+        return query.Where(x =>
+            (x.Job != null && x.Job.Title.ToLower().Contains(term)) ||
+            (x.Candidate != null && x.Candidate.UserName != null && x.Candidate.UserName.ToLower().Contains(term)) ||
+            (x.Candidate != null && x.Candidate.Email != null && x.Candidate.Email.ToLower().Contains(term)));
+    }
+
+    private static IQueryable<JobApplicationProjection> ProjectWithCandidate(
+        IQueryable<ApplicationWithJobAndCandidate> joined)
+    {
+        return joined.Select(x => new JobApplicationProjection(
+            x.Application.Id,
+            x.Application.JobId,
+            x.Job != null ? x.Job.Title : string.Empty,
+            new JobApplicationCandidate(
+                x.Application.UserId,
+                x.Candidate != null ? (x.Candidate.UserName ?? string.Empty) : string.Empty,
+                x.Candidate != null ? (x.Candidate.Email ?? string.Empty) : string.Empty,
+                x.Candidate != null && x.Candidate.IsDeleted),
+            x.Application.Status,
+            x.Application.AppliedAt,
+            x.Application.CreatedAt,
+            x.Application.UpdatedAt,
+            x.Application.DeletedAt,
+            x.Application.IsDeleted));
+    }
+
+    /// <summary>
+    /// Ordena sobre as linhas já juntadas (antes da projeção): os campos de ordenação são todos da
+    /// candidatura, e ordenar sobre o record projetado por construtor não é traduzível.
+    /// </summary>
+    private static IQueryable<ApplicationWithJobAndCandidate> ApplyOrderBy(
+        IQueryable<ApplicationWithJobAndCandidate> query,
+        string? orderBy)
     {
         return orderBy switch
         {
-            "createdAt_ASC" => query.OrderBy(x => x.CreatedAt),
-            "createdAt_DESC" => query.OrderByDescending(x => x.CreatedAt),
-            "updatedAt_ASC" => query.OrderBy(x => x.UpdatedAt),
-            "updatedAt_DESC" => query.OrderByDescending(x => x.UpdatedAt),
-            "id_ASC" => query.OrderBy(x => x.Id),
-            "id_DESC" => query.OrderByDescending(x => x.Id),
-            "appliedAt_ASC" => query.OrderBy(x => x.AppliedAt),
-            "appliedAt_DESC" => query.OrderByDescending(x => x.AppliedAt),
-            _ => query.OrderByDescending(x => x.AppliedAt)
+            "createdAt_ASC" => query.OrderBy(x => x.Application.CreatedAt),
+            "createdAt_DESC" => query.OrderByDescending(x => x.Application.CreatedAt),
+            "updatedAt_ASC" => query.OrderBy(x => x.Application.UpdatedAt),
+            "updatedAt_DESC" => query.OrderByDescending(x => x.Application.UpdatedAt),
+            "id_ASC" => query.OrderBy(x => x.Application.Id),
+            "id_DESC" => query.OrderByDescending(x => x.Application.Id),
+            "appliedAt_ASC" => query.OrderBy(x => x.Application.AppliedAt),
+            "appliedAt_DESC" => query.OrderByDescending(x => x.Application.AppliedAt),
+            _ => query.OrderByDescending(x => x.Application.AppliedAt)
         };
+    }
+
+    /// <summary>
+    /// Candidatura + vaga + candidato carregados pelo LEFT JOIN das listagens.
+    /// </summary>
+    /// <remarks>
+    /// Classe de leitura e não <c>ValueTuple</c>: árvore de expressão não aceita literal de tupla, e
+    /// a composição posterior (<c>Where</c>/<c>OrderBy</c>) sobre membros de uma classe com
+    /// inicializador é a forma que o provider já traduz aqui (mesmo padrão de <c>JobWithCompany</c>
+    /// em <c>JobRepository</c>).
+    /// </remarks>
+    private sealed class ApplicationWithJobAndCandidate
+    {
+        public required JobApplication Application { get; init; }
+        public Job? Job { get; init; }
+        public User? Candidate { get; init; }
     }
 }

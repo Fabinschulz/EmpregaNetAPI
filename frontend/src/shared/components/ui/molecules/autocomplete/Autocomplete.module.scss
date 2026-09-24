@@ -28,6 +28,17 @@
   min-width: 240px;
 }
 
+.limitHint {
+  margin: 0;
+  padding-inline: 12px;
+  font-size: 0.75rem;
+  color: var(--muted);
+
+  &:not(:empty) {
+    padding-block: 6px;
+  }
+}
+
 .status {
   display: flex;
   align-items: center;

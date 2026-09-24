@@ -26,6 +26,9 @@ Regras de *version bump*: [`../sdd/SDD-USAGE-GUIDE.md`](../sdd/SDD-USAGE-GUIDE.m
 | [`emp-feed-vagas/`](emp-feed-vagas/prd.md) | Feed público de vagas: agregado `Job` enriquecido, busca full-text, filtros combináveis na URL, scroll infinito | `prd` · `design` · `spec` · `tasks` |
 | [`emp-dashboard-analytics/`](emp-dashboard-analytics/design.md) | Dashboard de métricas: cinco endpoints agregados, escopo por empresa, séries temporais, funil, distribuições e insights derivados | `design` |
 | [`emp-acompanhamento-candidatura/`](emp-acompanhamento-candidatura/prd.md) | Notificação do andamento da candidatura ao candidato por e-mail, cancelamento pelo próprio candidato e encerramento de vaga como estado terminal | `prd` · `design` · `spec` · `tasks` |
+| [`emp-filtros-vagas-localizacao/`](emp-filtros-vagas-localizacao/prd.md) | Feed público de vagas: reativar filtro de Estado (UF) e adicionar filtro de Cidade, já suportados pelo estado/URL mas sem controle na interface | `prd` · `design` · `spec` · `tasks` |
+| [`emp-filtros-candidaturas-recrutamento/`](emp-filtros-candidaturas-recrutamento/prd.md) | Recrutamento: filtro de status e busca em `/recrutamento/candidaturas`, busca em candidatos por vaga, ordenação em gestão de vagas, e persistência de filtros na URL nas três telas | `prd` · `design` · `spec` · `tasks` |
+| [`emp-filtro-tipo-usuario-admin/`](emp-filtro-tipo-usuario-admin/prd.md) | Backoffice de usuários: filtro por tipo de usuário (candidato/recrutador/admin/gestor), com extensão de contrato HTTP em `GET /api/admin` | `prd` · `design` · `spec` · `tasks` |
 
 Prioridades de alto nível ficam no issue tracker. Um índice textual opcional pode viver em
 `../sdd/FEATURES-BACKLOG.md`, sem substituir as issues.

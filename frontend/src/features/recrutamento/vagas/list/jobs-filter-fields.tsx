@@ -1,18 +1,19 @@
 'use client';
 
 import {
-  AutocompleteField,
   actionIcons,
+  AutocompleteField,
   Button,
   FilterBar,
   FilterField,
   SelectField,
-  type AutocompleteOption
+  type AutocompleteOption,
+  type SelectOption
 } from '@/shared/components';
 import { useFormContext } from '@/shared/context';
 import { useFilterFormSync } from '@/shared/hooks';
-import { defaultJobsFilter, jobsFilterToParams, type JobsFilterFormValues } from './jobs-filter-schema';
-import type { JobsListQueryParams } from '@/shared/schema';
+import { DATE_ORDER_BY_OPTIONS, LIST_SEARCH_MAX_LENGTH } from '@/shared/schema';
+import { defaultJobsFilter, type JobsFilterFormValues } from './jobs-filter-schema';
 
 const STATUS_OPTIONS = [
   { label: 'Todas', value: 'all' },
@@ -20,10 +21,10 @@ const STATUS_OPTIONS = [
   { label: 'Encerradas', value: 'closed' }
 ];
 
-type JobsFilterParams = Pick<JobsListQueryParams, 'search' | 'isActive'>;
+const ORDER_BY_OPTIONS: SelectOption[] = [...DATE_ORDER_BY_OPTIONS];
 
 type JobsFilterFieldsProps = {
-  onChange: (params: JobsFilterParams) => void;
+  onChange: (values: JobsFilterFormValues) => void;
   searchOptions: AutocompleteOption[];
   searchLoading?: boolean;
 };
@@ -33,8 +34,9 @@ export function JobsFilterFields({ onChange, searchOptions, searchLoading }: Job
 
   const search = watch('search');
   const status = watch('status');
+  const orderBy = watch('orderBy');
 
-  useFilterFormSync(jobsFilterToParams({ search, status }), onChange);
+  useFilterFormSync({ search, status, orderBy }, onChange);
 
   return (
     <FilterBar
@@ -56,9 +58,11 @@ export function JobsFilterFields({ onChange, searchOptions, searchLoading }: Job
           placeholder="Título ou descrição da vaga"
           options={searchOptions}
           loading={searchLoading}
+          maxLength={LIST_SEARCH_MAX_LENGTH}
         />
       </FilterField>
       <SelectField name="status" label="Situação" options={STATUS_OPTIONS} />
+      <SelectField name="orderBy" label="Ordenar por" options={ORDER_BY_OPTIONS} />
     </FilterBar>
   );
 }

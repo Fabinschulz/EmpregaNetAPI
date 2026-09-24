@@ -76,3 +76,30 @@ Funcionalidade: Vocabulário do domínio de vagas
     Então as faixas devem ser contínuas
     E a primeira faixa não deve ter piso
     E a última faixa não deve ter teto
+
+  # ---------------------------------------------------------------------------------------------
+  # emp-filtros-vagas-localizacao — contrato de `cities` na resposta do vocabulário
+  # ---------------------------------------------------------------------------------------------
+
+  # Deploy fora de ordem: o frontend novo pode encontrar a API antiga, ainda sem `cities`. O
+  # vocabulário inteiro (requisitos e benefícios) não pode cair por causa do campo novo.
+  @emp-filtros-vagas-localizacao @contrato
+  Cenário: Contrato - resposta do vocabulário sem o campo cities é aceita com lista vazia
+    Dado uma resposta do vocabulário de vagas sem o campo "cities"
+    Quando eu valido a resposta do vocabulário de vagas
+    Então a resposta do vocabulário deve ser aceita
+    E o vocabulário validado deve ter 0 grupos de cidade
+    E o vocabulário validado deve manter os requisitos e benefícios da resposta
+
+  @emp-filtros-vagas-localizacao @contrato
+  Cenário: Contrato - resposta do vocabulário com cities agrupadas por código de UF é aceita
+    Dado uma resposta do vocabulário de vagas com as cidades:
+      | uf | cidades                      |
+      | CE | Fortaleza, Juazeiro do Norte |
+      | SP | Campinas                     |
+    Quando eu valido a resposta do vocabulário de vagas
+    Então a resposta do vocabulário deve ser aceita
+    E o vocabulário validado deve ter 2 grupos de cidade
+    E o grupo de cidades da UF "CE" deve listar "Fortaleza, Juazeiro do Norte"
+    E o grupo de cidades da UF "SP" deve listar "Campinas"
+    E o vocabulário validado deve manter os requisitos e benefícios da resposta

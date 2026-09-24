@@ -58,9 +58,17 @@ const vocabularyGroupResponseSchema = z.object({
   items: z.array(z.string())
 });
 
+const vocabularyCityGroupResponseSchema = z.object({
+  state: z.string(),
+  items: z.array(z.string())
+});
+
+export type VocabularyCityGroupResponse = z.infer<typeof vocabularyCityGroupResponseSchema>;
+
 export const jobVocabularyResponseSchema = z.object({
   requirements: z.array(vocabularyGroupResponseSchema),
   benefits: z.array(vocabularyGroupResponseSchema),
+  cities: z.array(vocabularyCityGroupResponseSchema).default([]),
   maxItemsPerJob: z.number().int().positive()
 });
 
@@ -69,5 +77,6 @@ export type JobVocabularyResponse = z.infer<typeof jobVocabularyResponseSchema>;
 export const emptyJobVocabulary: JobVocabularyResponse = {
   requirements: [],
   benefits: [],
+  cities: [],
   maxItemsPerJob: 20
 };

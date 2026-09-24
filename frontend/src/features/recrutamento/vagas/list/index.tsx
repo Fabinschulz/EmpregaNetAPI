@@ -14,8 +14,12 @@ import {
   type RowAction
 } from '@/shared/components';
 import { FormProvider } from '@/shared/context';
-import { useListRefresh, usePersistedTablePagination } from '@/shared/hooks';
-import { type JobsListQueryParams } from '@/shared/schema';
+import {
+  hasActiveUrlSyncedParams,
+  useListRefresh,
+  usePersistedTablePagination,
+  useUrlSyncedParams
+} from '@/shared/hooks';
 import { formatDate } from '@/shared/utils';
 import Link from 'next/link';
 import { useCallback, useMemo, useState } from 'react';
@@ -23,30 +27,47 @@ import { canManageJob, describeJobStatusBadge, describePositions } from '../doma
 import { jobsRoutes } from '../jobs-routes';
 import { useDeleteJobMutation, useJobsListQuery, type JobResponse } from '../service';
 import { JobsFilterFields } from './jobs-filter-fields';
-import { defaultJobsFilter, jobsFilterFormSchema } from './jobs-filter-schema';
-
-type JobsFilterParams = Pick<JobsListQueryParams, 'search' | 'isActive'>;
+import {
+  defaultJobsFilter,
+  jobsFilterFormSchema,
+  jobsFilterToParams,
+  type JobsFilterFormValues
+} from './jobs-filter-schema';
 
 export function RecruitmentJobsPage() {
   const pagination = usePersistedTablePagination({ storageKey: 'recrutamento-vagas' });
   const { setPage } = pagination;
-  const [filters, setFilters] = useState<JobsFilterParams>({});
+  const {
+    values: filter,
+    resetKey: filterResetKey,
+    onChange: writeFilterToUrl,
+    reset: resetFilter
+  } = useUrlSyncedParams(defaultJobsFilter, jobsFilterFormSchema);
+  const [seenFilterResetKey, setSeenFilterResetKey] = useState(filterResetKey);
+  if (filterResetKey !== seenFilterResetKey) {
+    setSeenFilterResetKey(filterResetKey);
+    setPage(1);
+  }
 
   const { data, isPending, isFetching, isError, error, refetch } = useJobsListQuery({
     page: pagination.page,
     size: pagination.pageSize,
-    ...filters
+    ...jobsFilterToParams(filter)
   });
 
   const handleRefresh = useListRefresh({ refetch, resource: 'vagas' });
 
-  const handleFiltersChange = useCallback(
-    (next: JobsFilterParams) => {
-      setFilters(next);
+  const handleFilterChange = useCallback(
+    (next: JobsFilterFormValues) => {
+      writeFilterToUrl(next);
       setPage(1);
     },
-    [setPage]
+    [setPage, writeFilterToUrl]
   );
+
+  const handleClearFilter = useCallback(() => resetFilter(defaultJobsFilter), [resetFilter]);
+
+  const hasActiveFilter = hasActiveUrlSyncedParams(filter, defaultJobsFilter);
 
   const searchOptions = useMemo(
     () => (data?.data ?? []).map((job) => ({ label: job.title, value: String(job.id) })),
@@ -135,16 +156,37 @@ export function RecruitmentJobsPage() {
           onRefresh={handleRefresh}
           isRefreshing={isFetching}
           emptyTitle="Nenhuma vaga"
-          emptyMessage="Nenhuma vaga encontrada para os filtros informados."
+          emptyMessage={
+            hasActiveFilter ? (
+              <>
+                Nenhuma vaga corresponde aos filtros aplicados.{' '}
+                <Button
+                  type="button"
+                  variant="link"
+                  size="sm"
+                  startIcon={actionIcons.clearFilters}
+                  onClick={handleClearFilter}
+                >
+                  Limpar filtros
+                </Button>
+              </>
+            ) : (
+              'Nenhuma vaga cadastrada.'
+            )
+          }
           filters={
-            <FilterSection title="Buscar vagas" description="Filtre por título/descrição ou pela situação da vaga.">
+            <FilterSection
+              title="Buscar vagas"
+              description="Filtre por título/descrição ou pela situação da vaga e escolha a ordem de exibição."
+            >
               <FormProvider
+                key={filterResetKey}
                 validationSchema={jobsFilterFormSchema}
-                defaultValues={defaultJobsFilter}
+                defaultValues={filter}
                 onSubmit={() => undefined}
               >
                 <JobsFilterFields
-                  onChange={handleFiltersChange}
+                  onChange={handleFilterChange}
                   searchOptions={searchOptions}
                   searchLoading={isFetching}
                 />

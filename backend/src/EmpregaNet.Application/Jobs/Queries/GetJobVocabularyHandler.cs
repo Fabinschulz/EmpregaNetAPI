@@ -1,6 +1,7 @@
 using EmpregaNet.Application.Jobs.ViewModel;
 using EmpregaNet.Application.Utils.Helpers;
 using EmpregaNet.Domain.Enums;
+using EmpregaNet.Domain.Interfaces;
 
 namespace EmpregaNet.Application.Jobs.Queries;
 
@@ -12,13 +13,42 @@ public sealed record GetJobVocabularyQuery : IRequest<JobVocabularyViewModel>;
 public sealed class GetJobVocabularyHandler : IRequestHandler<GetJobVocabularyQuery, JobVocabularyViewModel>
 {
     /// <summary>
-    /// Monta a resposta uma única vez: o vocabulário é estático e reconstruí-lo por requisição
-    /// seria reflexão repetida sem nenhum ganho.
+    /// Parte derivada de enums e constantes, montada uma única vez: é estática e reconstruí-la por
+    /// requisição seria reflexão repetida sem nenhum ganho.
     /// </summary>
-    private static readonly JobVocabularyViewModel Vocabulary = Build();
+    private static readonly JobVocabularyViewModel StaticVocabulary = Build();
 
-    public Task<JobVocabularyViewModel> Handle(GetJobVocabularyQuery request, CancellationToken cancellationToken)
-        => Task.FromResult(Vocabulary);
+    private readonly IJobRepository _jobRepository;
+
+    public GetJobVocabularyHandler(IJobRepository jobRepository)
+    {
+        _jobRepository = jobRepository;
+    }
+
+    /// <summary>
+    /// <c>Cities</c> vem das vagas e é consultado por requisição, o que, na prática, só acontece
+    /// quando o cache HTTP do endpoint (<c>PublicCatalog</c>, invalidado pela tag de <c>Job</c>) expira.
+    /// </summary>
+    public async Task<JobVocabularyViewModel> Handle(GetJobVocabularyQuery request, CancellationToken cancellationToken)
+    {
+        var groups = await _jobRepository.GetActiveCitiesByStateAsync(cancellationToken);
+
+        return new JobVocabularyViewModel
+        {
+            JobTypes = StaticVocabulary.JobTypes,
+            WorkModels = StaticVocabulary.WorkModels,
+            WorkShifts = StaticVocabulary.WorkShifts,
+            ExperienceLevels = StaticVocabulary.ExperienceLevels,
+            Areas = StaticVocabulary.Areas,
+            States = StaticVocabulary.States,
+            Requirements = StaticVocabulary.Requirements,
+            Benefits = StaticVocabulary.Benefits,
+            Cities = groups
+                .Select(g => new VocabularyCityGroupViewModel(g.State.ToString(), g.Items))
+                .ToList(),
+            MaxItemsPerJob = StaticVocabulary.MaxItemsPerJob
+        };
+    }
 
     private static JobVocabularyViewModel Build() => new()
     {
@@ -30,6 +60,7 @@ public sealed class GetJobVocabularyHandler : IRequestHandler<GetJobVocabularyQu
         States = OptionsOf<UF>(),
         Requirements = GroupsOf(JobVocabulary.RequirementGroups),
         Benefits = GroupsOf(JobVocabulary.BenefitGroups),
+        Cities = [],
         MaxItemsPerJob = JobVocabulary.MaxItemsPerJob
     };
 

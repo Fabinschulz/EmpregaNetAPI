@@ -51,21 +51,30 @@ public interface IJobApplicationRepository : IBaseRepository<JobApplication>
     /// Todas as candidaturas (recrutamento). <paramref name="companyId"/> restringe às vagas dessa
     /// empresa - Admin passa <c>null</c> e vê a plataforma inteira; Recruiter/Manager sempre passam
     /// a própria empresa (ver <c>IJobEmployerAccess.ResolveCompanyScopeAsync</c>).
+    /// <paramref name="status"/> e <paramref name="search"/> (nome/e-mail do candidato ou título da vaga,
+    /// case-insensitive) são aplicados antes da paginação: <c>TotalItems</c> reflete o filtro.
     /// </summary>
     Task<ListDataPagination<JobApplicationProjection>> GetAllWithCandidateAsync(
         CancellationToken cancellationToken,
         int page,
         int size,
         string? orderBy = null,
-        long? companyId = null);
+        long? companyId = null,
+        ApplicationStatusEnum? status = null,
+        string? search = null);
 
+    /// <summary>
+    /// Candidaturas de uma vaga. <paramref name="search"/> segue a mesma regra de
+    /// <see cref="GetAllWithCandidateAsync"/> e também é aplicado antes da paginação.
+    /// </summary>
     Task<ListDataPagination<JobApplicationProjection>> GetByJobIdAsync(
         long jobId,
         CancellationToken cancellationToken,
         int page,
         int size,
         ApplicationStatusEnum? status = null,
-        string? orderBy = null);
+        string? orderBy = null,
+        string? search = null);
 
     Task<ListDataPagination<JobApplicationProjection>> GetByUserIdAsync(
         long userId,

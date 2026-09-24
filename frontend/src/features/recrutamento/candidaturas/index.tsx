@@ -23,6 +23,7 @@ import {
 import {
   actionIcons,
   ApiQueryBoundary,
+  Button,
   ConfirmDialog,
   FilterSection,
   PageHeader,
@@ -35,8 +36,12 @@ import {
   type RowAction
 } from '@/shared/components';
 import { FormProvider } from '@/shared/context';
-import { useListRefresh, usePersistedTablePagination } from '@/shared/hooks';
-import { type ListOrderByValue } from '@/shared/schema';
+import {
+  hasActiveUrlSyncedParams,
+  useListRefresh,
+  usePersistedTablePagination,
+  useUrlSyncedParams
+} from '@/shared/hooks';
 import { formatDate } from '@/shared/utils';
 import { MousePointerClick } from 'lucide-react';
 import Link from 'next/link';
@@ -44,7 +49,9 @@ import { useCallback, useMemo, useState } from 'react';
 import { RecruitmentApplicationsFilterFields } from './recruitment-applications-filter-fields';
 import {
   defaultRecruitmentApplicationsFilter,
-  recruitmentApplicationsFilterFormSchema
+  recruitmentApplicationsFilterFormSchema,
+  recruitmentApplicationsFilterToParams,
+  type RecruitmentApplicationsFilterFormValues
 } from './recruitment-applications-filter-schema';
 import styles from './recruitment-applications.module.scss';
 
@@ -54,13 +61,23 @@ type PendingTransition = { application: JobApplicationResponse; target: Applicat
 export function RecruitmentApplicationsPage() {
   const pagination = usePersistedTablePagination({ storageKey: 'recrutamento-candidaturas' });
   const { setPage } = pagination;
-  const [orderBy, setOrderBy] = useState<ListOrderByValue | undefined>(defaultRecruitmentApplicationsFilter.orderBy);
+  const {
+    values: filter,
+    resetKey: filterResetKey,
+    onChange: writeFilterToUrl,
+    reset: resetFilter
+  } = useUrlSyncedParams(defaultRecruitmentApplicationsFilter, recruitmentApplicationsFilterFormSchema);
+  const [seenFilterResetKey, setSeenFilterResetKey] = useState(filterResetKey);
+  if (filterResetKey !== seenFilterResetKey) {
+    setSeenFilterResetKey(filterResetKey);
+    setPage(1);
+  }
   const [pendingTransition, setPendingTransition] = useState<PendingTransition | null>(null);
 
   const { data, isPending, isFetching, isError, error, refetch } = useAllJobApplicationsQuery({
     page: pagination.page,
     size: pagination.pageSize,
-    orderBy
+    ...recruitmentApplicationsFilterToParams(filter)
   });
 
   const handleRefresh = useListRefresh({ refetch, resource: 'candidaturas' });
@@ -78,13 +95,27 @@ export function RecruitmentApplicationsPage() {
       `A candidatura #${application.id} será removida permanentemente. Esta ação não pode ser desfeita.`
   });
 
-  const handleOrderByChange = useCallback(
-    (next: ListOrderByValue) => {
-      setOrderBy(next);
+  const handleFilterChange = useCallback(
+    (next: RecruitmentApplicationsFilterFormValues) => {
+      writeFilterToUrl(next);
       setPage(1);
     },
-    [setPage]
+    [setPage, writeFilterToUrl]
   );
+
+  const handleClearFilter = useCallback(() => resetFilter(defaultRecruitmentApplicationsFilter), [resetFilter]);
+
+  const hasActiveFilter = hasActiveUrlSyncedParams(filter, defaultRecruitmentApplicationsFilter);
+
+  const searchOptions = useMemo(() => {
+    const labels = new Set<string>();
+    for (const application of data?.data ?? []) {
+      labels.add(candidateDisplayName(application.candidate));
+      if (application.candidate.email) labels.add(application.candidate.email);
+      if (application.jobTitle) labels.add(application.jobTitle);
+    }
+    return [...labels].map((label) => ({ label, value: label }));
+  }, [data]);
 
   const handleConfirmTransition = useCallback(() => {
     if (!pendingTransition) return;
@@ -184,15 +215,40 @@ export function RecruitmentApplicationsPage() {
           onRefresh={handleRefresh}
           isRefreshing={isFetching}
           emptyTitle="Nenhuma candidatura"
-          emptyMessage="Nenhuma candidatura encontrada."
+          emptyMessage={
+            hasActiveFilter ? (
+              <>
+                Nenhuma candidatura corresponde aos filtros aplicados.{' '}
+                <Button
+                  type="button"
+                  variant="link"
+                  size="sm"
+                  startIcon={actionIcons.clearFilters}
+                  onClick={handleClearFilter}
+                >
+                  Limpar filtros
+                </Button>
+              </>
+            ) : (
+              'Nenhuma candidatura encontrada.'
+            )
+          }
           filters={
-            <FilterSection title="Ordenar candidaturas" description="Escolha a ordem de exibição das candidaturas.">
+            <FilterSection
+              title="Filtrar candidaturas"
+              description="Filtre por status, busque por candidato, e-mail ou vaga e escolha a ordem de exibição."
+            >
               <FormProvider
+                key={filterResetKey}
                 validationSchema={recruitmentApplicationsFilterFormSchema}
-                defaultValues={defaultRecruitmentApplicationsFilter}
+                defaultValues={filter}
                 onSubmit={() => undefined}
               >
-                <RecruitmentApplicationsFilterFields onChange={handleOrderByChange} />
+                <RecruitmentApplicationsFilterFields
+                  onChange={handleFilterChange}
+                  searchOptions={searchOptions}
+                  searchLoading={isFetching}
+                />
               </FormProvider>
             </FilterSection>
           }

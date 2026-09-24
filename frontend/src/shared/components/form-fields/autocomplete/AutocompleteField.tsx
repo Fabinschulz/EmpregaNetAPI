@@ -9,6 +9,7 @@ export type AutocompleteFieldProps = FormFieldBaseProps & {
   placeholder?: string;
   loading?: boolean;
   debounceMs?: number;
+  maxLength?: number;
 };
 
 export const AutocompleteField: React.FC<AutocompleteFieldProps> = ({
@@ -20,6 +21,7 @@ export const AutocompleteField: React.FC<AutocompleteFieldProps> = ({
   options,
   loading,
   debounceMs,
+  maxLength,
   error: errorProp,
   disabled,
   className
@@ -48,6 +50,7 @@ export const AutocompleteField: React.FC<AutocompleteFieldProps> = ({
         placeholder={placeholder}
         loading={loading}
         debounceMs={debounceMs}
+        maxLength={maxLength}
         disabled={control.disabled}
         onBlur={control.onBlur}
         ref={ref}

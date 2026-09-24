@@ -1,5 +1,4 @@
 using EmpregaNet.Application.Abstraction;
-using EmpregaNet.Application.Common.Base;
 using EmpregaNet.Application.JobApplications.ViewModel;
 using EmpregaNet.Domain.Common;
 using EmpregaNet.Domain.Interfaces;
@@ -7,7 +6,7 @@ using Microsoft.Extensions.Logging;
 
 namespace EmpregaNet.Application.JobApplications.Queries;
 
-public sealed class GetAllJobApplicationsHandler : IRequestHandler<GetAllQuery<JobApplicationViewModel>, ListDataPagination<JobApplicationViewModel>>
+public sealed class GetAllJobApplicationsHandler : IRequestHandler<GetAllJobApplicationsQuery, ListDataPagination<JobApplicationViewModel>>
 {
     private readonly IJobApplicationRepository _repository;
     private readonly IJobEmployerAccess _jobEmployerAccess;
@@ -23,11 +22,12 @@ public sealed class GetAllJobApplicationsHandler : IRequestHandler<GetAllQuery<J
         _logger = logger;
     }
 
-    public async Task<ListDataPagination<JobApplicationViewModel>> Handle(GetAllQuery<JobApplicationViewModel> request, CancellationToken cancellationToken)
+    public async Task<ListDataPagination<JobApplicationViewModel>> Handle(GetAllJobApplicationsQuery request, CancellationToken cancellationToken)
     {
         _logger.LogInformation("Listando candidaturas (page: {Page}, size: {Size})", request.Page, request.Size);
 
         var companyScope = await _jobEmployerAccess.ResolveCompanyScopeAsync(cancellationToken);
+        var status = ApplicationStatusParser.ParseOrNull(request.Status);
 
         try
         {
@@ -36,7 +36,9 @@ public sealed class GetAllJobApplicationsHandler : IRequestHandler<GetAllQuery<J
                 request.Page,
                 request.Size,
                 request.OrderBy,
-                companyScope);
+                companyScope,
+                status,
+                request.Search);
             var data = result.Data.Select(a => a.ToViewModel()).ToList();
             return new ListDataPagination<JobApplicationViewModel>(data, result.TotalItems, request.Page, request.Size);
         }

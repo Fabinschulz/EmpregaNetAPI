@@ -108,13 +108,39 @@ public class JobRepository : BaseRepository<Job>, IJobRepository
         return new ListDataPagination<JobFeedProjection>(data, totalItems, filter.Page, filter.Size);
     }
 
+    public async Task<IReadOnlyList<VocabularyCityGroup>> GetActiveCitiesByStateAsync(CancellationToken cancellationToken)
+    {
+        var rows = await VisibleCatalogJobs()
+            .Where(x => x.Job.Location.State != UF.NaoSelecionado
+                        && x.Job.Location.City.Trim() != string.Empty)
+            .Select(x => new { x.Job.Location.State, City = x.Job.Location.City.Trim() })
+            .Distinct()
+            .ToListAsync(cancellationToken);
+
+        return rows
+            .GroupBy(r => r.State)
+            .OrderBy(g => g.Key.ToString(), StringComparer.Ordinal)
+            .Select(g => new VocabularyCityGroup(
+                g.Key,
+                g.Select(r => r.City)
+                    .Distinct(StringComparer.Ordinal)
+                    .OrderBy(city => city, StringComparer.InvariantCulture)
+                    .ToList()))
+            .ToList();
+    }
+
+    /// <summary>
+    /// Vagas visíveis no catálogo público: ativas, não excluídas e de empresa não excluída.
+    /// </summary>
+    private IQueryable<JobWithCompany> VisibleCatalogJobs()
+        => from job in _context.Jobs.AsNoTracking()
+           join company in _context.Companies.AsNoTracking() on job.CompanyId equals company.Id
+           where !job.IsDeleted && job.IsActive && !company.IsDeleted
+           select new JobWithCompany { Job = job, Company = company };
+
     private IQueryable<JobWithCompany> BuildFeedQuery(JobFeedFilter filter)
     {
-        var query =
-            from job in _context.Jobs.AsNoTracking()
-            join company in _context.Companies.AsNoTracking() on job.CompanyId equals company.Id
-            where !job.IsDeleted && job.IsActive && !company.IsDeleted
-            select new JobWithCompany { Job = job, Company = company };
+        var query = VisibleCatalogJobs();
 
         if (filter.HasSearch)
         {

@@ -1,8 +1,11 @@
 using EmpregaNet.Application.Jobs;
 using EmpregaNet.Application.Jobs.Queries;
 using EmpregaNet.Application.Jobs.ViewModel;
+using EmpregaNet.Domain.Common;
 using EmpregaNet.Domain.Enums;
+using EmpregaNet.Domain.Interfaces;
 using FluentAssertions;
+using Moq;
 
 namespace EmpregaNet.Tests.Unit.Application.Jobs;
 
@@ -127,9 +130,22 @@ public sealed class JobVocabularyTests
         vocabulary.Benefits.SelectMany(g => g.Items).Should().Contain("Fretado");
     }
 
+    /// <summary>
+    /// Estes testes cobrem só a parte estática do vocabulário; as cidades (vindas do repositório)
+    /// ficam fora do escopo aqui, por isso o repositório devolve uma lista vazia.
+    /// </summary>
     private sealed class JobVocabularyHandlerFixture
     {
-        private readonly GetJobVocabularyHandler _handler = new();
+        private readonly GetJobVocabularyHandler _handler = new(EmptyCitiesRepository());
+
+        private static IJobRepository EmptyCitiesRepository()
+        {
+            var repository = new Mock<IJobRepository>();
+            repository
+                .Setup(x => x.GetActiveCitiesByStateAsync(It.IsAny<CancellationToken>()))
+                .ReturnsAsync(Array.Empty<VocabularyCityGroup>());
+            return repository.Object;
+        }
 
         public Task<JobVocabularyViewModel> LoadAsync()
             => _handler.Handle(new GetJobVocabularyQuery(), CancellationToken.None);
