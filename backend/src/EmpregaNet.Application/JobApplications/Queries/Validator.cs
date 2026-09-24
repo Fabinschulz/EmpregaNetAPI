@@ -1,5 +1,4 @@
 using EmpregaNet.Application.Common.Base;
-using EmpregaNet.Domain.Enums;
 using FluentValidation;
 
 namespace EmpregaNet.Application.JobApplications.Queries;
@@ -25,15 +24,14 @@ public sealed class GetAllJobApplicationsValidator : BasePaginatedQueryValidator
     }
 }
 
+/// <remarks>
+/// Sem regra de <c>Status</c>, pelo mesmo motivo de <see cref="GetAllJobApplicationsValidator"/>: o
+/// <see cref="ApplicationStatusParser"/> é a fonte única.
+/// </remarks>
 public sealed class GetMyJobApplicationsQueryValidator : BasePaginatedQueryValidator<GetMyJobApplicationsQuery>
 {
     public GetMyJobApplicationsQueryValidator() : base()
     {
-        RuleFor(x => x.Status)
-            .Must(value => string.IsNullOrWhiteSpace(value) ||
-                           (Enum.TryParse<ApplicationStatusEnum>(value, true, out var parsed) &&
-                            parsed != ApplicationStatusEnum.NaoSelecionado))
-            .WithMessage("Status de candidatura inválido.");
     }
 }
 
