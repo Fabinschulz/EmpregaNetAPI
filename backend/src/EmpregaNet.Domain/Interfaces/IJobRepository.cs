@@ -37,4 +37,12 @@ public interface IJobRepository : IBaseRepository<Job>
     Task<ListDataPagination<JobFeedProjection>> GetFeedAsync(
         JobFeedFilter filter,
         CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Cidades das vagas visíveis no feed (ativas, não excluídas, de empresa não excluída), agrupadas
+    /// por UF (ordenadas pelo código da UF).
+    /// Cidade vazia não entra; grafias que só diferem por espaços nas pontas colapsam numa entrada.
+    /// UF sem nenhuma vaga não gera grupo.
+    /// </summary>
+    Task<IReadOnlyList<VocabularyCityGroup>> GetActiveCitiesByStateAsync(CancellationToken cancellationToken);
 }

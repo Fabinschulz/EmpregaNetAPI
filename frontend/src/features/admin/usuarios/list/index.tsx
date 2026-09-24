@@ -3,6 +3,7 @@
 import {
   actionIcons,
   ApiQueryBoundary,
+  Button,
   ConfirmDialog,
   FilterSection,
   PageHeader,
@@ -13,8 +14,13 @@ import {
   type RowAction
 } from '@/shared/components';
 import { FormProvider } from '@/shared/context';
-import { useListRefresh, usePersistedTablePagination } from '@/shared/hooks';
-import { type AdminUsersListQueryParams, type UserResponse } from '@/shared/schema';
+import {
+  hasActiveUrlSyncedParams,
+  useListRefresh,
+  usePersistedTablePagination,
+  useUrlSyncedParams
+} from '@/shared/hooks';
+import { type UserResponse } from '@/shared/schema';
 import { formatDate, maskCpf, userTypeLabel } from '@/shared/utils';
 import { useCallback, useMemo, useState } from 'react';
 import { adminUsersRoutes } from '../admin-users-routes';
@@ -23,33 +29,45 @@ import { AdminUsersFilterFields } from './admin-users-filter-fields';
 import {
   adminUsersFilterFormSchema,
   adminUsersFilterToParams,
-  defaultAdminUsersFilter
+  defaultAdminUsersFilter,
+  type AdminUsersFilterFormValues
 } from './admin-users-filter-schema';
-
-type AdminUsersFilterParams = Pick<AdminUsersListQueryParams, 'search' | 'isDeleted' | 'orderBy'>;
 
 export function AdminUsersPage() {
   const pagination = usePersistedTablePagination({ storageKey: 'admin-usuarios' });
   const { setPage } = pagination;
-  const [filters, setFilters] = useState<AdminUsersFilterParams>(() =>
-    adminUsersFilterToParams(defaultAdminUsersFilter)
-  );
+  const {
+    values: filter,
+    resetKey: filterResetKey,
+    onChange: writeFilterToUrl,
+    reset: resetFilter
+  } = useUrlSyncedParams(defaultAdminUsersFilter, adminUsersFilterFormSchema);
+
+  const [seenFilterResetKey, setSeenFilterResetKey] = useState(filterResetKey);
+  if (filterResetKey !== seenFilterResetKey) {
+    setSeenFilterResetKey(filterResetKey);
+    setPage(1);
+  }
 
   const { data, isPending, isFetching, isError, error, refetch } = useAdminUsersListQuery({
     page: pagination.page,
     size: pagination.pageSize,
-    ...filters
+    ...adminUsersFilterToParams(filter)
   });
 
   const handleRefresh = useListRefresh({ refetch, resource: 'usuários' });
 
-  const handleFiltersChange = useCallback(
-    (next: AdminUsersFilterParams) => {
-      setFilters(next);
+  const handleFilterChange = useCallback(
+    (next: AdminUsersFilterFormValues) => {
+      writeFilterToUrl(next);
       setPage(1);
     },
-    [setPage]
+    [setPage, writeFilterToUrl]
   );
+
+  const handleClearFilter = useCallback(() => resetFilter(defaultAdminUsersFilter), [resetFilter]);
+
+  const hasActiveFilter = hasActiveUrlSyncedParams(filter, defaultAdminUsersFilter);
 
   const searchOptions = useMemo(
     () => (data?.data ?? []).map((user) => ({ label: user.username, value: String(user.id) })),
@@ -122,16 +140,37 @@ export function AdminUsersPage() {
           onRefresh={handleRefresh}
           isRefreshing={isFetching}
           emptyTitle="Nenhum usuário"
-          emptyMessage="Nenhum usuário encontrado para os filtros informados."
+          emptyMessage={
+            hasActiveFilter ? (
+              <>
+                Nenhum usuário corresponde aos filtros aplicados.{' '}
+                <Button
+                  type="button"
+                  variant="link"
+                  size="sm"
+                  startIcon={actionIcons.clearFilters}
+                  onClick={handleClearFilter}
+                >
+                  Limpar filtros
+                </Button>
+              </>
+            ) : (
+              'Nenhum usuário cadastrado.'
+            )
+          }
           filters={
-            <FilterSection title="Buscar usuários" description="Filtre por nome/e-mail/CPF, situação e ordenação.">
+            <FilterSection
+              title="Buscar usuários"
+              description="Filtre por nome/e-mail/CPF, situação, tipo de usuário e ordenação."
+            >
               <FormProvider
+                key={filterResetKey}
                 validationSchema={adminUsersFilterFormSchema}
-                defaultValues={defaultAdminUsersFilter}
+                defaultValues={filter}
                 onSubmit={() => undefined}
               >
                 <AdminUsersFilterFields
-                  onChange={handleFiltersChange}
+                  onChange={handleFilterChange}
                   searchOptions={searchOptions}
                   searchLoading={isFetching}
                 />

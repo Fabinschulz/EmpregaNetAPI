@@ -25,7 +25,6 @@ import {
   ApiQueryBoundary,
   Button,
   ConfirmDialog,
-  FilterBar,
   FilterSection,
   PageHeader,
   StatusBadge,
@@ -38,7 +37,7 @@ import {
   type RowAction
 } from '@/shared/components';
 import { FormProvider } from '@/shared/context';
-import { usePersistedTablePagination } from '@/shared/hooks';
+import { hasActiveUrlSyncedParams, usePersistedTablePagination, useUrlSyncedParams } from '@/shared/hooks';
 import { formatDate } from '@/shared/utils';
 import { MousePointerClick } from 'lucide-react';
 import Link from 'next/link';
@@ -53,12 +52,13 @@ import { describePositions, jobStatusLabel, jobStatusTone } from '../domain';
 import { jobsRoutes } from '../jobs-routes';
 import { useJobQuery, useOpenApplicationsCountQuery } from '../service';
 import styles from './candidates-by-job.module.scss';
+import { CandidatesFilterFields } from './candidates-filter-fields';
 import {
-  CandidatesFilterFields,
   candidatesFilterSchema,
+  candidatesFilterToParams,
   defaultCandidatesFilter,
-  type CandidatesFilterParams
-} from './candidates-filter-fields';
+  type CandidatesFilterFormValues
+} from './candidates-filter-schema';
 
 const DESTRUCTIVE_TRANSITIONS: ReadonlySet<ApplicationStatus> = new Set<ApplicationStatus>(['Rejected', 'Canceled']);
 
@@ -69,14 +69,24 @@ export function CandidatesByJobPage() {
   const jobId = useMemo(() => Number(params.id), [params.id]);
   const pagination = usePersistedTablePagination({ storageKey: `recrutamento-vaga-${jobId}-candidatos` });
   const { setPage } = pagination;
-  const [filters, setFilters] = useState<CandidatesFilterParams>({});
+  const {
+    values: filter,
+    resetKey: filterResetKey,
+    onChange: writeFilterToUrl,
+    reset: resetFilter
+  } = useUrlSyncedParams(defaultCandidatesFilter, candidatesFilterSchema);
+  const [seenFilterResetKey, setSeenFilterResetKey] = useState(filterResetKey);
+  if (filterResetKey !== seenFilterResetKey) {
+    setSeenFilterResetKey(filterResetKey);
+    setPage(1);
+  }
   const [pending, setPending] = useState<PendingTransition | null>(null);
 
   const { data: job } = useJobQuery(jobId);
-  const { data, isPending, isError, error, refetch } = useApplicationsByJobQuery(jobId, {
+  const { data, isPending, isFetching, isError, error, refetch } = useApplicationsByJobQuery(jobId, {
     page: pagination.page,
     size: pagination.pageSize,
-    ...filters
+    ...candidatesFilterToParams(filter)
   });
 
   const { mutate: changeStatus, isPending: isChangingStatus } = useChangeApplicationStatusMutation();
@@ -109,12 +119,25 @@ export function CandidatesByJobPage() {
   });
 
   const handleFilterChange = useCallback(
-    (next: CandidatesFilterParams) => {
-      setFilters(next);
+    (next: CandidatesFilterFormValues) => {
+      writeFilterToUrl(next);
       setPage(1);
     },
-    [setPage]
+    [setPage, writeFilterToUrl]
   );
+
+  const handleClearFilter = useCallback(() => resetFilter(defaultCandidatesFilter), [resetFilter]);
+
+  const hasActiveFilter = hasActiveUrlSyncedParams(filter, defaultCandidatesFilter);
+
+  const searchOptions = useMemo(() => {
+    const labels = new Set<string>();
+    for (const application of data?.data ?? []) {
+      labels.add(candidateDisplayName(application.candidate));
+      if (application.candidate.email) labels.add(application.candidate.email);
+    }
+    return [...labels].map((label) => ({ label, value: label }));
+  }, [data]);
 
   const columns = useMemo<DataTableColumn<JobApplicationResponse>[]>(
     () => [
@@ -224,20 +247,40 @@ export function CandidatesByJobPage() {
           totalItems={data?.totalItems}
           isPending={isPending}
           emptyTitle="Nenhuma candidatura"
-          emptyMessage="Nenhuma candidatura encontrada para os filtros informados."
+          emptyMessage={
+            hasActiveFilter ? (
+              <>
+                Nenhuma candidatura desta vaga corresponde aos filtros aplicados.{' '}
+                <Button
+                  type="button"
+                  variant="link"
+                  size="sm"
+                  startIcon={actionIcons.clearFilters}
+                  onClick={handleClearFilter}
+                >
+                  Limpar filtros
+                </Button>
+              </>
+            ) : (
+              'Nenhuma candidatura recebida para esta vaga.'
+            )
+          }
           filters={
             <FilterSection
               title="Filtrar candidaturas"
-              description="Filtre por status e ordene pela data de recebimento."
+              description="Filtre por status, busque pelo candidato e ordene pela data de recebimento."
             >
               <FormProvider
+                key={filterResetKey}
                 validationSchema={candidatesFilterSchema}
-                defaultValues={defaultCandidatesFilter}
+                defaultValues={filter}
                 onSubmit={() => undefined}
               >
-                <FilterBar>
-                  <CandidatesFilterFields onChange={handleFilterChange} />
-                </FilterBar>
+                <CandidatesFilterFields
+                  onChange={handleFilterChange}
+                  searchOptions={searchOptions}
+                  searchLoading={isFetching}
+                />
               </FormProvider>
             </FilterSection>
           }

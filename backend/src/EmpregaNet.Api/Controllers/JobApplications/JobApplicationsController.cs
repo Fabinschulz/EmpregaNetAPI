@@ -41,17 +41,44 @@ public class JobApplicationsController : MainController<ApplyToJobCommand, Chang
         return Created($"api/jobapplications/{id}", id);
     }
 
-    /// <summary>Lista todas as candidaturas (paginação; apenas recrutamento).</summary>
-    [HttpGet]
-    [OutputCache(PolicyName = OutputCachePolicies.EntityRead)]
-    [Authorize(Policy = Constants.AuthPolicies.Recrutamento)]
+    /// <summary>
+    /// Assinatura genérica da base, suprimida do routing: candidaturas expõem a action com o filtro
+    /// de status abaixo, sobre um query dedicado (o genérico não tem handler para candidaturas).
+    /// </summary>
+    [NonAction]
     public override Task<IActionResult> GetAll(
         [FromQuery] int page = 1,
         [FromQuery] int size = 100,
         [FromQuery] string? orderBy = null,
         [FromQuery] bool? isDeleted = null,
         [FromQuery] string? search = null)
-        => base.GetAll(page, size, orderBy, isDeleted, search);
+        => GetAll(page, size, orderBy, isDeleted, search, null);
+
+    /// <summary>
+    /// Lista todas as candidaturas (paginação; apenas recrutamento), no escopo de empresa de quem
+    /// consulta. status filtra pelo nome do status da candidatura (ex.: <c>Processing</c>); search filtra
+    /// por nome ou e-mail do candidato e título da vaga. Status inválido devolve 400.
+    /// </summary>
+    [HttpGet]
+    [OutputCache(PolicyName = OutputCachePolicies.EntityRead)]
+    [Authorize(Policy = Constants.AuthPolicies.Recrutamento)]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ListDataPagination<JobApplicationViewModel>))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(DomainError))]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(DomainError))]
+    [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(DomainError))]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(DomainError))]
+    public async Task<IActionResult> GetAll(
+        [FromQuery] int page = 1,
+        [FromQuery] int size = 100,
+        [FromQuery] string? orderBy = null,
+        [FromQuery] bool? isDeleted = null,
+        [FromQuery] string? search = null,
+        [FromQuery] string? status = null)
+    {
+        var result = await _mediator.Send(
+            new GetAllJobApplicationsQuery(page, size, orderBy, isDeleted, search, status));
+        return Ok(result);
+    }
 
     /// <summary>Lista as candidaturas do utilizador autenticado.</summary>
     [HttpGet("mine")]
@@ -69,7 +96,10 @@ public class JobApplicationsController : MainController<ApplyToJobCommand, Chang
         return Ok(result);
     }
 
-    /// <summary>Lista candidaturas associadas a uma vaga (apenas recrutamento).</summary>
+    /// <summary>
+    /// Lista candidaturas associadas a uma vaga (apenas recrutamento). search filtra por nome ou
+    /// e-mail do candidato, combinável com status.
+    /// </summary>
     [HttpGet("job/{jobId:long}")]
     [OutputCache(PolicyName = OutputCachePolicies.AuthenticatedRead, Tags = [ApplicationCacheTags.JobApplicationsByJob])]
     [Authorize(Policy = Constants.AuthPolicies.Recrutamento)]
@@ -82,9 +112,11 @@ public class JobApplicationsController : MainController<ApplyToJobCommand, Chang
         [FromQuery] int page = 1,
         [FromQuery] int size = 100,
         [FromQuery] string? status = null,
-        [FromQuery] string? orderBy = null)
+        [FromQuery] string? orderBy = null,
+        [FromQuery] string? search = null)
     {
-        var result = await _mediator.Send(new GetJobApplicationsByJobIdQuery(jobId, page, size, status, orderBy));
+        var result = await _mediator.Send(
+            new GetJobApplicationsByJobIdQuery(jobId, page, size, status, orderBy, search));
         return Ok(result);
     }
 

@@ -172,3 +172,115 @@ Funcionalidade: Filtros do feed de vagas na URL
     E eu alterno o valor "Producao" no filtro "areas"
     E eu alterno o valor "Fretado" no filtro "benefits"
     Então devem estar ativos 3 filtros
+
+  # ---------------------------------------------------------------------------------------------
+  # emp-filtros-vagas-localizacao — Estado e Cidade
+  # ---------------------------------------------------------------------------------------------
+
+  @emp-filtros-vagas-localizacao @CA-07
+  Esquema do Cenário: CA-07 Estado e Cidade repetidos sobrevivem à ida e volta pela URL
+    Dado que a URL do feed é "<url>"
+    Quando eu interpreto os filtros do feed
+    E eu serializo os filtros de volta para a URL
+    Então a URL serializada deve ser "<esperado>"
+
+    Exemplos:
+      | url                                         | esperado                                    |
+      | ?uf=CE&city=Fortaleza                       | city=Fortaleza&uf=CE                        |
+      | ?uf=CE&uf=SP&city=Fortaleza&city=Campinas   | city=Fortaleza&city=Campinas&uf=CE&uf=SP    |
+
+  # Recarregar = interpretar de novo a URL que o próprio feed escreveu. Cidade com espaço no nome é
+  # o caso comum no interior ("Juazeiro do Norte") e passa pela codificação da query.
+  @emp-filtros-vagas-localizacao @CA-07
+  Cenário: CA-07 recarregar a página mantém Estados e Cidades escolhidos
+    Dado que a URL do feed é "?uf=CE&uf=SP&city=Juazeiro do Norte&city=Campinas"
+    Quando eu interpreto os filtros do feed
+    E eu serializo os filtros de volta para a URL
+    E eu interpreto de novo os filtros a partir da URL serializada
+    Então a lista "states" deve conter 2 itens
+    E a lista "states" deve conter "CE"
+    E a lista "states" deve conter "SP"
+    E a lista "cities" deve conter 2 itens
+    E a lista "cities" deve conter "Juazeiro do Norte"
+    E a lista "cities" deve conter "Campinas"
+    E devem estar ativos 4 filtros
+
+  # A URL usa `uf`, a API usa `state`: é nesta tradução que um filtro se perderia em silêncio.
+  @emp-filtros-vagas-localizacao @CA-07
+  Cenário: CA-07 Estado e Cidade da URL viram os parâmetros state e city da API
+    Dado que a URL do feed é "?uf=CE&uf=SP&city=Fortaleza"
+    Quando eu interpreto os filtros do feed
+    E eu converto os filtros em parâmetros da API
+    Então o parâmetro "state" da API deve ser "CE,SP"
+    E o parâmetro "city" da API deve ser "Fortaleza"
+
+  @emp-filtros-vagas-localizacao @CA-04
+  Cenário: CA-04 com um Estado selecionado só aparecem as cidades dele
+    Dado que o vocabulário do feed traz as cidades:
+      | uf | cidades                        |
+      | CE | Fortaleza, Juazeiro do Norte   |
+      | MG | Belo Horizonte                 |
+      | SP | Campinas, São Paulo            |
+    Quando eu calculo os grupos de cidade para os Estados "CE"
+    Então devem aparecer 1 grupos de cidade
+    E o grupo de cidade "Ceará" deve listar "Fortaleza, Juazeiro do Norte"
+
+  @emp-filtros-vagas-localizacao @CA-04
+  Cenário: CA-04 com dois Estados selecionados aparecem as cidades dos dois
+    Dado que o vocabulário do feed traz as cidades:
+      | uf | cidades                        |
+      | CE | Fortaleza, Juazeiro do Norte   |
+      | MG | Belo Horizonte                 |
+      | SP | Campinas, São Paulo            |
+    Quando eu calculo os grupos de cidade para os Estados "SP, CE"
+    Então devem aparecer 2 grupos de cidade
+    E o grupo de cidade "Ceará" deve listar "Fortaleza, Juazeiro do Norte"
+    E o grupo de cidade "São Paulo" deve listar "Campinas, São Paulo"
+    E não deve aparecer o grupo de cidade "Minas Gerais"
+
+  @emp-filtros-vagas-localizacao @CA-04
+  Cenário: CA-04 Estado sem vagas não mostra cidade nenhuma
+    Dado que o vocabulário do feed traz as cidades:
+      | uf | cidades                        |
+      | CE | Fortaleza, Juazeiro do Norte   |
+      | SP | Campinas, São Paulo            |
+    Quando eu calculo os grupos de cidade para os Estados "BA"
+    Então devem aparecer 0 grupos de cidade
+
+  @emp-filtros-vagas-localizacao @CA-04
+  Cenário: CA-04 Estado sem vagas junto de outro com vagas mostra só as cidades do que tem
+    Dado que o vocabulário do feed traz as cidades:
+      | uf | cidades                        |
+      | CE | Fortaleza, Juazeiro do Norte   |
+      | SP | Campinas, São Paulo            |
+    Quando eu calculo os grupos de cidade para os Estados "BA, CE"
+    Então devem aparecer 1 grupos de cidade
+    E o grupo de cidade "Ceará" deve listar "Fortaleza, Juazeiro do Norte"
+
+  @emp-filtros-vagas-localizacao @CA-05
+  Cenário: CA-05 sem Estado selecionado aparecem todas as cidades, agrupadas pelo nome do Estado
+    Dado que o vocabulário do feed traz as cidades:
+      | uf | cidades                        |
+      | CE | Fortaleza, Juazeiro do Norte   |
+      | MG | Belo Horizonte                 |
+      | SP | Campinas, São Paulo            |
+    Quando eu calculo os grupos de cidade para os Estados ""
+    Então devem aparecer 3 grupos de cidade
+    E o grupo de cidade "Ceará" deve listar "Fortaleza, Juazeiro do Norte"
+    E o grupo de cidade "Minas Gerais" deve listar "Belo Horizonte"
+    E o grupo de cidade "São Paulo" deve listar "Campinas, São Paulo"
+
+  @emp-filtros-vagas-localizacao @CA-05
+  Cenário: CA-05 vocabulário sem cidades não produz grupo nenhum
+    Dado que o vocabulário do feed não traz cidades
+    Quando eu calculo os grupos de cidade para os Estados ""
+    Então devem aparecer 0 grupos de cidade
+
+  # Contrato: o grupo de cidades é rotulado por `ufFullLabel`. Um código sem rótulo apareceria na
+  # gaveta como título vazio. Cobre as 27 UFs do seletor de Estado de uma vez.
+  @emp-filtros-vagas-localizacao @contrato
+  Cenário: Contrato - toda UF do seletor de Estado tem rótulo por extenso nos grupos de cidade
+    Dado que o vocabulário do feed traz uma cidade em cada UF do seletor de Estado
+    Quando eu calculo os grupos de cidade para os Estados ""
+    Então devem aparecer 27 grupos de cidade
+    E cada grupo de cidade deve ter o nome por extenso da sua UF

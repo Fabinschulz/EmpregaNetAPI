@@ -30,20 +30,31 @@ public class AdminController : MainController<AdminUsersCreateNotSupportedComman
     {
     }
 
+    /// <summary>Assinatura genérica da base, suprimida do routing: a listagem expõe a action com o filtro userType abaixo.</summary>
+    [NonAction]
+    public override Task<IActionResult> GetAll(
+        [FromQuery] int page = 1,
+        [FromQuery] int size = 100,
+        [FromQuery] string? orderBy = null,
+        [FromQuery] bool? isDeleted = null,
+        [FromQuery] string? search = null)
+        => GetAll(page, size, orderBy, isDeleted, search, null);
+
     /// <summary>
     /// Lista usuários. isDeleted omitido = todos; false = ativos; true = somente excluídos.
     /// search filtra por nome de usuário ou e-mail.
     /// </summary>
     [HttpGet]
     [OutputCache(PolicyName = OutputCachePolicies.AuthenticatedRead, Tags = [ApplicationCacheTags.AdminUsers])]
-    public override async Task<IActionResult> GetAll(
+    public async Task<IActionResult> GetAll(
         [FromQuery] int page = 1,
         [FromQuery] int size = 100,
         [FromQuery] string? orderBy = null,
         [FromQuery] bool? isDeleted = null,
-        [FromQuery] string? search = null)
+        [FromQuery] string? search = null,
+        [FromQuery] string? userType = null)
     {
-        var result = await _mediator.Send(new GetAllUsersQuery(page, size, orderBy, isDeleted, search));
+        var result = await _mediator.Send(new GetAllUsersQuery(page, size, orderBy, isDeleted, search, userType));
         return Ok(result);
     }
 

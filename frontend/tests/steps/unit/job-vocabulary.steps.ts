@@ -6,7 +6,11 @@ import {
   workModelVocabulary,
   workShiftVocabulary
 } from '@/shared/schema/job-vocabulary';
-import { Then, When } from '@cucumber/cucumber';
+import {
+  jobVocabularyResponseSchema,
+  type JobVocabularyResponse
+} from '@/features/vagas/service/jobs-feed-response-schema';
+import { DataTable, Given, Then, When } from '@cucumber/cucumber';
 import { expect } from 'chai';
 import type { BusinessRulesWorld } from '../../support/world';
 
@@ -99,4 +103,80 @@ Then('a primeira faixa não deve ter piso', function () {
 
 Then('a última faixa não deve ter teto', function () {
   expect(SALARY_RANGE_OPTIONS[SALARY_RANGE_OPTIONS.length - 1].max).to.equal(undefined);
+});
+
+/** Resposta mínima válida de `GET /api/jobs/vocabulary`, sem o campo `cities`. */
+function vocabularyResponseWithoutCities(): Record<string, unknown> {
+  return {
+    requirements: [{ label: 'Operação', items: ['Empilhadeira', 'WMS'] }],
+    benefits: [{ label: 'Transporte', items: ['Fretado'] }],
+    maxItemsPerJob: 20
+  };
+}
+
+type VocabularyResponseWorldData = {
+  rawVocabulary?: Record<string, unknown>;
+  parsedVocabulary?: ReturnType<typeof jobVocabularyResponseSchema.safeParse>;
+};
+
+function vocabularyResponseData(world: BusinessRulesWorld): VocabularyResponseWorldData {
+  return world.data as VocabularyResponseWorldData;
+}
+
+function acceptedVocabulary(world: BusinessRulesWorld): JobVocabularyResponse {
+  const { parsedVocabulary } = vocabularyResponseData(world);
+  expect(parsedVocabulary, 'a resposta do vocabulário ainda não foi validada').to.not.equal(undefined);
+  expect(parsedVocabulary!.success, JSON.stringify(parsedVocabulary!.error?.issues)).to.equal(true);
+  return parsedVocabulary!.data!;
+}
+
+function parseCityList(raw: string): string[] {
+  return raw
+    .split(',')
+    .map((item) => item.trim())
+    .filter((item) => item.length > 0);
+}
+
+Given('uma resposta do vocabulário de vagas sem o campo {string}', function (this: BusinessRulesWorld, campo: string) {
+  const raw = vocabularyResponseWithoutCities();
+  delete raw[campo];
+  vocabularyResponseData(this).rawVocabulary = raw;
+});
+
+Given('uma resposta do vocabulário de vagas com as cidades:', function (this: BusinessRulesWorld, table: DataTable) {
+  vocabularyResponseData(this).rawVocabulary = {
+    ...vocabularyResponseWithoutCities(),
+    cities: table.hashes().map((row) => ({ state: row.uf, items: parseCityList(row.cidades) }))
+  };
+});
+
+When('eu valido a resposta do vocabulário de vagas', function (this: BusinessRulesWorld) {
+  const data = vocabularyResponseData(this);
+  data.parsedVocabulary = jobVocabularyResponseSchema.safeParse(data.rawVocabulary);
+});
+
+Then('a resposta do vocabulário deve ser aceita', function (this: BusinessRulesWorld) {
+  acceptedVocabulary(this);
+});
+
+Then('o vocabulário validado deve ter {int} grupos de cidade', function (this: BusinessRulesWorld, total: number) {
+  expect(acceptedVocabulary(this).cities).to.have.lengthOf(total);
+});
+
+Then(
+  'o grupo de cidades da UF {string} deve listar {string}',
+  function (this: BusinessRulesWorld, uf: string, cidades: string) {
+    const group = acceptedVocabulary(this).cities.find((item) => item.state === uf);
+    expect(group, `nenhum grupo de cidades para a UF "${uf}"`).to.not.equal(undefined);
+    expect(group!.items).to.deep.equal(parseCityList(cidades));
+  }
+);
+
+Then('o vocabulário validado deve manter os requisitos e benefícios da resposta', function (this: BusinessRulesWorld) {
+  const vocabulary = acceptedVocabulary(this);
+  const expected = vocabularyResponseWithoutCities();
+
+  expect(vocabulary.requirements).to.deep.equal(expected.requirements);
+  expect(vocabulary.benefits).to.deep.equal(expected.benefits);
+  expect(vocabulary.maxItemsPerJob).to.equal(expected.maxItemsPerJob);
 });

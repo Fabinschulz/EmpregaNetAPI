@@ -1,23 +1,26 @@
 'use client';
 
-import { CheckboxGroup, GroupedCheckboxes, RadioGroup } from '@/shared/components';
 import type { JobVocabularyResponse } from '@/features/vagas/service';
-import type { JobsFeedFilters } from '../jobs-feed-filters';
+import { CheckboxGroup, GroupedCheckboxes, RadioGroup } from '@/shared/components';
 import {
-  PUBLISHED_WITHIN_OPTIONS,
-  SALARY_RANGE_OPTIONS,
   experienceLevelVocabulary,
   findSalaryRange,
   jobAreaVocabulary,
   jobTypeVocabulary,
+  PUBLISHED_WITHIN_OPTIONS,
   publishedWithinLabel,
+  SALARY_RANGE_OPTIONS,
+  UF_SELECT_OPTIONS,
+  ufFullLabel,
   workModelVocabulary,
   workShiftVocabulary,
   type PublishedWithinValue
 } from '@/shared/schema';
 import { Accessibility } from 'lucide-react';
+import { cityGroupsForStates } from '../city-groups';
 import { FilterSection } from '../filter-section';
 import styles from '../filters.module.scss';
+import type { JobsFeedFilters } from '../jobs-feed-filters';
 import type { JobsFeedFiltersController } from '../use-jobs-feed-filters';
 
 type FeedFiltersFormProps = {
@@ -42,6 +45,8 @@ export function FeedFiltersForm({ controller, vocabulary }: FeedFiltersFormProps
     <K extends ArrayFilterKey>(key: K) =>
     (value: JobsFeedFilters[K][number]) =>
       toggleFilterValue(key, value);
+
+  const cityGroups = cityGroupsForStates(vocabulary.cities, filters.states);
 
   return (
     <div className={styles.form}>
@@ -139,7 +144,7 @@ export function FeedFiltersForm({ controller, vocabulary }: FeedFiltersFormProps
         />
       </FilterSection>
 
-      {/* <FilterSection
+      <FilterSection
         title="Estado"
         activeCount={filters.states.length}
         summary={listSummary(filters.states, ufFullLabel)}
@@ -153,7 +158,31 @@ export function FeedFiltersForm({ controller, vocabulary }: FeedFiltersFormProps
           selected={filters.states}
           onToggle={toggle('states')}
         />
-      </FilterSection> */}
+      </FilterSection>
+
+      <FilterSection
+        title="Cidade"
+        activeCount={filters.cities.length}
+        summary={listSummary(filters.cities, (city) => city)}
+      >
+        {cityGroups.length > 0 ? (
+          <GroupedCheckboxes
+            legend="Cidade"
+            legendHidden
+            columns
+            searchAfter={SEARCH_AFTER}
+            groups={cityGroups}
+            selected={filters.cities}
+            onToggle={toggle('cities')}
+          />
+        ) : (
+          <p className={styles.sectionEmpty}>
+            {filters.states.length > 0
+              ? 'Nenhuma cidade com vagas abertas nos estados selecionados.'
+              : 'Nenhuma cidade com vagas abertas no momento.'}
+          </p>
+        )}
+      </FilterSection>
 
       <FilterSection
         title="Turno"

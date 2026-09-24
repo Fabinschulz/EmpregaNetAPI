@@ -24,6 +24,7 @@ export type AutocompleteInputProps = {
   /** Consulta das sugestões em curso - mostra o indicador em vez de "nenhum resultado". */
   loading?: boolean;
   debounceMs?: number;
+  maxLength?: number;
   disabled?: boolean;
   className?: string;
   onBlur?: () => void;
@@ -39,6 +40,7 @@ export function AutocompleteInput({
   searchPlaceholder = 'Digite para buscar...',
   loading = false,
   debounceMs = 350,
+  maxLength,
   disabled,
   className,
   onBlur,
@@ -48,6 +50,11 @@ export function AutocompleteInput({
   const [open, setOpen] = React.useState(false);
 
   const { draft, setDraft, commitNow } = useDebouncedDraft({ value, onCommit: onChange, delayMs: debounceMs });
+
+  const clamp = (text: string) => (maxLength === undefined ? text : text.slice(0, maxLength));
+
+  const limitHintId = React.useId();
+  const isAtLimit = maxLength !== undefined && draft.length >= maxLength;
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -69,7 +76,18 @@ export function AutocompleteInput({
 
       <PopoverContent align="start" className={styles.popoverContent}>
         <Command shouldFilter={false}>
-          <CommandInput placeholder={searchPlaceholder} value={draft} onValueChange={setDraft} />
+          <CommandInput
+            placeholder={searchPlaceholder}
+            value={draft}
+            maxLength={maxLength}
+            aria-describedby={maxLength === undefined ? undefined : limitHintId}
+            onValueChange={(next) => setDraft(clamp(next))}
+          />
+          {maxLength === undefined ? null : (
+            <p id={limitHintId} className={styles.limitHint} aria-live="polite">
+              {isAtLimit ? `Limite de ${maxLength} caracteres.` : null}
+            </p>
+          )}
           <CommandList>
             {loading ? (
               <div className={styles.status} role="status">
@@ -84,7 +102,7 @@ export function AutocompleteInput({
                   key={option.value}
                   value={option.value}
                   onSelect={() => {
-                    commitNow(option.label);
+                    commitNow(clamp(option.label));
                     setOpen(false);
                   }}
                 >

@@ -39,19 +39,28 @@ export type SearchFilterParams = {
   search?: string;
 };
 
+export const LIST_SEARCH_MAX_LENGTH = 120;
+export const LIST_SEARCH_MAX_LENGTH_MESSAGE = `A busca não pode exceder ${LIST_SEARCH_MAX_LENGTH} caracteres.`;
+
 export type JobsListQueryParams = ListQueryParams & Pick<SoftDeleteFilterParams, 'isActive'> & SearchFilterParams;
 
 export type CompaniesListQueryParams = ListQueryParams & SoftDeleteFilterParams & SearchFilterParams;
 
 export type AdminUsersListQueryParams = ListQueryParams &
   Pick<SoftDeleteFilterParams, 'isDeleted'> &
-  SearchFilterParams;
+  SearchFilterParams & {
+    /** Nome do enum (`Candidate`, `Recruiter`, `Manager`, `Admin`) nunca o rótulo pt-BR. */
+    userType?: string;
+  };
 
 export type CandidatesListQueryParams = ListQueryParams & SearchFilterParams;
 
-export type JobApplicationsListQueryParams = ListQueryParams & StatusFilterParams;
+export type JobApplicationsListQueryParams = ListQueryParams & StatusFilterParams & SearchFilterParams;
 
-export type JobApplicationsAdminListQueryParams = ListQueryParams & SoftDeleteFilterParams;
+export type JobApplicationsAdminListQueryParams = ListQueryParams &
+  SoftDeleteFilterParams &
+  StatusFilterParams &
+  SearchFilterParams;
 
 /**
  * Tamanho usado pelas telas ainda NÃO migradas para tabela paginada ("traga tudo").
