@@ -8,6 +8,12 @@
       "port": 3000
     },
     {
+      "name": "frontend-prod",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["--dir", "frontend", "start"],
+      "port": 3000
+    },
+    {
       "name": "api",
       "runtimeExecutable": "dotnet",
       "runtimeArgs": ["run", "--project", "backend/src/EmpregaNet.Api", "--launch-profile", "http"],

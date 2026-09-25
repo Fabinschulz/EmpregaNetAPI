@@ -70,6 +70,7 @@ public sealed class ChangeJobApplicationStatusHandlerTests
                 ApplicationId,
                 JobId,
                 job.Title,
+                true,
                 new JobApplicationCandidate(1, "Candidato", "candidato@test.local", false),
                 application.Status,
                 application.AppliedAt,

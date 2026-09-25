@@ -15,6 +15,7 @@ export const jobApplicationResponseSchema = z.object({
   id: z.number().int(),
   jobId: z.number().int(),
   jobTitle: z.string(),
+  isJobAvailable: z.boolean().optional(),
   candidate: jobApplicationCandidateResponseSchema,
   status: z.string(),
   appliedAt: z.string(),

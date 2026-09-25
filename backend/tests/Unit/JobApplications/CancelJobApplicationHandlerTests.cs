@@ -83,6 +83,7 @@ public sealed class CancelJobApplicationHandlerTests
                 ApplicationId,
                 application.JobId,
                 "Vaga de teste",
+                true,
                 new JobApplicationCandidate(application.UserId, "Candidato", "candidato@test.local", false),
                 application.Status,
                 application.AppliedAt,

@@ -11,6 +11,8 @@ public sealed class JobApplicationViewModel : BaseViewModel
     public long Id { get; set; }
     public long JobId { get; set; }
     public string JobTitle { get; set; } = string.Empty;
+    /// <summary>A vaga ainda abre no detalhe público; falso quando foi encerrada ou excluída.</summary>
+    public bool IsJobAvailable { get; set; }
     public required JobApplicationCandidateViewModel Candidate { get; set; }
     public ApplicationStatusEnum Status { get; set; }
     public string AppliedAt { get; set; } = string.Empty;
@@ -35,6 +37,7 @@ public static class JobApplicationMapper
             Id = proj.Id,
             JobId = proj.JobId,
             JobTitle = proj.JobTitle,
+            IsJobAvailable = proj.IsJobAvailable,
             Candidate = new JobApplicationCandidateViewModel
             {
                 Id = proj.Candidate.Id,

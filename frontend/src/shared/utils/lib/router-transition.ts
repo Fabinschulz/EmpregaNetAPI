@@ -8,3 +8,7 @@ import { startTransition } from 'react';
 export function startRouterTransition(navigate: () => void): void {
   startTransition(navigate);
 }
+
+export function navigateAfterSignIn(path: string): void {
+  window.location.replace(path);
+}

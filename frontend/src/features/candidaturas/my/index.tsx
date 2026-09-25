@@ -36,6 +36,10 @@ import styles from './my-applications.module.scss';
 
 type MyApplicationsFilterParams = Pick<JobApplicationsListQueryParams, 'status' | 'orderBy'>;
 
+function isJobAvailable(application: JobApplicationResponse): boolean {
+  return application.isJobAvailable !== false;
+}
+
 export function MyApplicationsPage() {
   const pagination = usePersistedTablePagination({ storageKey: 'minhas-candidaturas' });
   const { setPage } = pagination;
@@ -80,7 +84,19 @@ export function MyApplicationsPage() {
   const columns = useMemo<DataTableColumn<JobApplicationResponse>[]>(
     () => [
       { key: 'id', header: 'Candidatura', render: (application) => <strong>#{application.id}</strong> },
-      { key: 'jobId', header: 'Vaga', render: (application) => application.jobTitle },
+      {
+        key: 'jobId',
+        header: 'Vaga',
+        render: (application) =>
+          isJobAvailable(application) ? (
+            application.jobTitle
+          ) : (
+            <span className={styles.inlineBadges}>
+              {application.jobTitle}
+              <Badge variant="secondary">Vaga encerrada</Badge>
+            </span>
+          )
+      },
       {
         key: 'status',
         header: 'Status',
@@ -92,7 +108,7 @@ export function MyApplicationsPage() {
           );
 
           return (
-            <span className={styles.statusCell}>
+            <span className={styles.inlineBadges}>
               <ApplicationStatusBadge status={application.status} audience="candidate" />
               {isUpdated ? (
                 <Badge variant="default" aria-label="Status atualizado desde a última visita">
@@ -110,7 +126,8 @@ export function MyApplicationsPage() {
         getActions: (application) => {
           const actions: RowAction[] = [];
 
-          if (application.jobId) {
+          // Vaga encerrada ou excluída dá 404 no detalhe público: sem link para não levar o candidato a um beco.
+          if (application.jobId && isJobAvailable(application)) {
             actions.push({
               key: 'view-job',
               label: 'Ver vaga',

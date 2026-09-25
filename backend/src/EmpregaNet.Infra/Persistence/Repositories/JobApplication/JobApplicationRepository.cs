@@ -279,6 +279,7 @@ public class JobApplicationRepository : BaseRepository<JobApplication>, IJobAppl
             x.Application.Id,
             x.Application.JobId,
             x.Job != null ? x.Job.Title : string.Empty,
+            x.Job != null && !x.Job.IsDeleted && x.Job.IsActive,
             new JobApplicationCandidate(
                 x.Application.UserId,
                 x.Candidate != null ? (x.Candidate.UserName ?? string.Empty) : string.Empty,

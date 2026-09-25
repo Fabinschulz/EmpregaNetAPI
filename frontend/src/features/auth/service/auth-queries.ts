@@ -1,7 +1,13 @@
 'use client';
 
 import { useAuth } from '@/shared/context';
-import { reportMutationApiError, resolvePostLoginPath, startRouterTransition, toastSuccess } from '@/shared/utils';
+import {
+  navigateAfterSignIn,
+  reportMutationApiError,
+  resolvePostLoginPath,
+  startRouterTransition,
+  toastSuccess
+} from '@/shared/utils';
 import { useMutation } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { useCallback, useState } from 'react';
@@ -53,8 +59,7 @@ function useAuthSessionMutation(actionLabel: string, resource: string) {
       setLoggedUser(res);
       toastSuccess('Sessão iniciada com sucesso', 'Bem-vindo à EmpregaUAI.');
 
-      const params = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
-      startRouterTransition(() => router.replace(resolvePostLoginPath(params)));
+      navigateAfterSignIn(resolvePostLoginPath(new URLSearchParams(window.location.search)));
     },
     onAuthError: (err: unknown) => {
       setSuccessMessage(null);
