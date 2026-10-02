@@ -7,7 +7,7 @@ description: Executa uma regressão End-to-End exploratória do frontend do Empr
 
 Fonte **única** da metodologia E2E e da sua orquestração. Testa a aplicação **como um utilizador real**,
 através da interface visual — não pela leitura de código. Complementa, não substitui, os cenários BDD
-existentes ([`frontend-skill`](../frontend-skill/SKILL.md) §10).
+existentes (secção "Testes" da [`frontend-skill`](../frontend-skill/SKILL.md)).
 
 **Execução:** esta skill corre na thread principal e delega ao subagent
 [`e2e-qa-engineer`](../../agents/e2e-qa-engineer.md), que detém as ferramentas de Browser.

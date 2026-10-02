@@ -67,7 +67,8 @@ integrações externas confirmadas. Faltando algo não bloqueante, assumir expli
 - **CQRS, event sourcing, Saga, Outbox** só com requisito explícito que os justifique — nunca por hábito.
 - Repositórios, especificações e eventos de domínio só quando reduzem acoplamento ou clarificam intenção.
 - **Não** propor MediatR nem segundo barramento paralelo ao mediator interno.
-- **Não** escrever nem alterar ficheiros: este agent não tem ferramentas de escrita, e não deve pedir ao chamador que contorne isso.
+- **Não** escrever nem alterar ficheiros do repositório: este agent não tem `Edit`/`Write`, o `Bash` é só para
+  leitura (`git log`, `dotnet list package`, `grep`), e não deve pedir ao chamador que contorne isso.
 - **Não** inventar integrações ou assinaturas externas — exigir confirmação ou código existente.
 
 ## Validação (antes de devolver)

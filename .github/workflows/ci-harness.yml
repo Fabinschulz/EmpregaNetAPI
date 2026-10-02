@@ -1,0 +1,30 @@
+name: CI - Harness
+
+# Check estático dos agentes e skills. Node sem dependências: sem install, sem LLM.
+on:
+  pull_request:
+    branches: [master]
+    paths:
+      - ".claude/**"
+      - "docs/agents/**"
+      - "docs/skills/**"
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    name: Check do Harness
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Check
+        run: node .claude/evals/check-harness.mjs

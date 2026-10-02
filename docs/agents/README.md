@@ -40,7 +40,7 @@ Frontmatter — apenas campos que o Claude Code consome:
 ---
 name: <kebab-case, igual ao nome do ficheiro>
 description: <o que faz · quando usar · quando NÃO usar e para quem encaminhar>
-tools: <allowlist explícita — a ausência de Edit/Write é o que garante "read-only">
+tools: <allowlist explícita — sem Edit/Write para quem julga; se ficar Bash, o limite de escrita vai nas regras invioláveis>
 model: inherit | sonnet | opus
 ---
 ```
@@ -76,3 +76,5 @@ Anti-padrões ao escrever um agent:
 - **Idioma:** respostas e artefactos em português (Brasil); identificadores de código em inglês.
 - **Modelo:** `inherit` por omissão, para respeitar a escolha do utilizador. Fixar um modelo só com motivo (o `e2e-qa-engineer` usa `sonnet` por ser execução longa e mecânica).
 - **Ao adicionar um agent:** criar em `.claude/agents/`, seguir o padrão acima, e acrescentar linha na tabela deste índice, na de [`../skills/README.md`](../skills/README.md) se houver skill associada, na tabela de roteamento do `meta-agent` e no [`CLAUDE.md`](../../.claude/CLAUDE.md).
+- **Antes de commitar mudança no Harness:** `node .claude/evals/check-harness.mjs` — cobra este padrão, o
+  registo nos quatro índices e as ligações; a CI corre o mesmo. Ver [ADR 0016](../sdd/adrs/0016-evals-do-harness.md).
