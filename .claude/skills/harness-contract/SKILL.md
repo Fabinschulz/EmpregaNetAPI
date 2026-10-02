@@ -126,6 +126,9 @@ blocked_by: null        # ou a causa nomeada, quando a etapa não pôde concluir
 
 Regras do bloco:
 
+- É **YAML literal**, num bloco ```` ```yaml ````, com as chaves e os níveis exactamente como acima —
+  `confidence: HIGH`, nunca `**confidence:** alta`. O orquestrador lê o nível por máquina; tradução ou
+  negrito fazem o gate cair no caso "sem confiança declarada".
 - `evidence` aponta para **fonte verificável** — caminho com símbolo ou linha, comando com resultado, rota navegada.
   Frase de opinião não é evidência e não entra aqui.
 - `assumptions` vazio significa *nenhuma suposição foi feita*, não *não verifiquei*. Na dúvida, escrever a suposição.
@@ -206,7 +209,8 @@ Disciplina de manutenção:
 | Colar o conteúdo de um ficheiro no prompt de delegação | O agente tem `Read`; duplica o custo e desactualiza-se |
 | Reencaminhar o relatório bruto de um agente para o seguinte | É o mecanismo pelo qual o contexto cresce sem limite |
 | `confidence: HIGH` com validação que não correu | Confunde intenção com prova — o caso que mais alucinação produz |
-| Reexecutar a mesma delegação sem mudar nada após falha | Retry sem causa é ruído; ver §8 do `meta-agent` |
+| Reexecutar a mesma delegação sem mudar nada após falha | Retry sem causa é ruído; ver "Gate de confiança e replaneamento" no `meta-agent` |
+| Pôr credencial (senha, token) no prompt de delegação | O prompt fica gravado em claro no transcript da sessão; o login é feito pelo utilizador |
 | Resolver conflito entre fontes fundindo as duas versões | Produz um terceiro estado que não existe em lado nenhum |
 | Criar um agente novo para um papel que um existente já cobre | Cada agente é superfície de manutenção; ver `docs/agents/README.md` |
 
@@ -223,4 +227,5 @@ Português (Brasil); identificadores, rótulos do bloco estruturado (`confidence
 
 | Versão | Mudança |
 | ------ | ------- |
+| 1.1.0 | Bloco de saída fixado como YAML literal com níveis em inglês (a auditoria de 38 execuções reais encontrou 5 com `alta`/`alto` ou negrito, que o gate não lê); anti-padrão de credencial no prompt de delegação; referência ao `meta-agent` passa a usar o título da secção — o "§8" apontava para "Idioma". Ver [ADR 0016](../../../docs/sdd/adrs/0016-evals-do-harness.md) |
 | 1.0.0 | Contrato inicial: hierarquia de fonte de verdade em dois eixos, classificação de afirmações, escala de confiança, bloco de saída estruturado, Working Context, orçamento por etapa e decaimento. Generaliza padrões que já existiam dispersos em `debug-specialist` (confiança declarada), `dotnet-architect` (assunções explícitas) e `code-reviewer`/`performance-optimizer` (rótulo *suspeita*) |
