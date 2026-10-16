@@ -11,6 +11,7 @@ using EmpregaNet.Infra.Persistence.Repositories;
 using EmpregaNet.Tests.Support;
 using FluentAssertions;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
@@ -340,7 +341,55 @@ public sealed class GetAllJobApplicationsHandlerIntegrationTests
         single.Candidate.Name.Should().Be(deleted.UserName);
     }
 
+    [Theory]
+    [InlineData(JobState.Active, true, true)]
+    [InlineData(JobState.Closed, false, true)]
+    [InlineData(JobState.Deleted, false, false)]
+    public async Task Handle_EstadoDaVaga_DeveSepararDisponivelDeVisualizavel(
+        JobState state, bool expectedAvailable, bool expectedViewable)
+    {
+        var title = Token("Estado");
+        var companyId = await CreateCompanyAsync();
+        var recruiterId = await CreateRecruiterAsync(companyId);
+        var job = await CreateJobAsync(companyId, title);
+        var candidate = await CreateCandidateAsync();
+        await ApplyAsync(job.Id, candidate.Id, ApplicationStatusEnum.Pending);
+        await ChangeJobStateAsync(job.Id, state);
+
+        var result = await HandleAsync(recruiterId, Query(search: title));
+
+        var single = result.Data.Should().ContainSingle().Subject;
+        single.IsJobAvailable.Should().Be(expectedAvailable);
+        single.IsJobViewable.Should().Be(expectedViewable);
+    }
+
     // ---------- Infraestrutura do teste ----------
+
+    public enum JobState { Active, Closed, Deleted }
+
+    private async Task ChangeJobStateAsync(long jobId, JobState state)
+    {
+        if (state == JobState.Active)
+        {
+            return;
+        }
+
+        using var scope = _fixture.Services.CreateScope();
+        var context = scope.ServiceProvider.GetRequiredService<PostgreSqlContext>();
+        var job = await context.Set<Job>().SingleAsync(x => x.Id == jobId);
+
+        if (state == JobState.Closed)
+        {
+            job.Close();
+        }
+        else
+        {
+            job.IsDeleted = true;
+            job.DeletedAt = DateTimeOffset.UtcNow;
+        }
+
+        await context.SaveChangesAsync();
+    }
 
     private static GetAllJobApplicationsQuery Query(
         string? status = null, string? search = null, int page = 1, int size = 100) =>
