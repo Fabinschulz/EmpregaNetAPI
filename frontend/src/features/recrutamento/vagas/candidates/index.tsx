@@ -223,7 +223,10 @@ export function CandidatesByJobPage() {
               Acompanhe, avance e gerencie as candidaturas desta vaga.{' '}
               {job ? (
                 <>
-                  <StatusBadge label={jobStatusLabel(job.status)} tone={jobStatusTone(job.status)} />{' '}
+                  <StatusBadge
+                    label={jobStatusLabel(job.status, 'recruiter', job.positions)}
+                    tone={jobStatusTone(job.status)}
+                  />{' '}
                   <StatusBadge label={describePositions(job.positions, job.filledPositions)} tone="neutral" />
                 </>
               ) : null}

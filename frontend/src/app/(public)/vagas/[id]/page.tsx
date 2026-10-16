@@ -41,7 +41,6 @@ export async function generateMetadata({ params }: JobDetailRouteProps): Promise
     : `Vaga de ${job.title} em ${regionOf(job)}. Candidate-se pela ${SITE_NAME}.`;
 
   if (!job.isActive) {
-    // Vaga encerrada continua acessível por link, mas não deve disputar espaço nos buscadores.
     const closedTitle = `Vaga encerrada: ${job.title} • ${SITE_NAME}`;
     return {
       title: closedTitle,

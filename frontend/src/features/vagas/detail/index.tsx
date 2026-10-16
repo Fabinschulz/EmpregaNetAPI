@@ -93,7 +93,7 @@ export function JobDetailPage({ job }: JobDetailPageProps) {
   meta.push({
     key: 'salary',
     icon: Banknote,
-    label: formatSalaryRange(job.salaryMin, job.salaryMax, job.salaryDisclosed ?? true),
+    label: formatSalaryRange(job.salaryMin, job.salaryMax, job.salaryDisclosed ?? true, job.isActive ? ' - ' : ' a '),
     strong: job.salaryDisclosed ?? true,
     srLabel: 'Faixa salarial'
   });
@@ -149,7 +149,7 @@ export function JobDetailPage({ job }: JobDetailPageProps) {
     });
   }
 
-  if (job.publishedAt ?? job.createdAt) {
+  if (job.isActive && (job.publishedAt ?? job.createdAt)) {
     meta.push({ key: 'published', icon: CalendarDays, label: `Publicada ${publishedLabel}`, srLabel: 'Publicação' });
   }
 
@@ -163,7 +163,10 @@ export function JobDetailPage({ job }: JobDetailPageProps) {
         <CardHeader>
           <div className={styles.headerRow}>
             <CardTitle>{job.title}</CardTitle>
-            <StatusBadge label={jobStatusLabel(job.status, 'candidate')} tone={jobStatusTone(job.status)} />
+            <StatusBadge
+              label={jobStatusLabel(job.status, 'candidate', job.positions)}
+              tone={jobStatusTone(job.status)}
+            />
           </div>
 
           {job.summary?.trim() ? <p className={styles.summary}>{job.summary}</p> : null}
