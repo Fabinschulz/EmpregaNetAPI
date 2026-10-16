@@ -1,0 +1,120 @@
+.notice {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  margin-top: 16px;
+  padding: clamp(1.25rem, 4vw, 1.75rem);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: radial-gradient(120% 140% at 0% 0%, var(--brand-soft), transparent 60%), var(--surface-raised);
+  box-shadow: var(--shadow-card);
+  animation: noticeIn 320ms ease-out both;
+}
+
+.icon {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: var(--radius-pill);
+  color: var(--text);
+  background: linear-gradient(145deg, var(--success-soft), var(--brand-soft));
+  box-shadow: inset 0 0 0 1px var(--border);
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.title {
+  margin: 0;
+  font-size: 1.25rem;
+  line-height: 1.3;
+  color: var(--text);
+}
+
+.headline {
+  margin: 0;
+  font-size: 1rem;
+  color: var(--text);
+}
+
+.reason,
+.period {
+  margin: 0;
+  font-size: 0.9375rem;
+  color: var(--muted);
+}
+
+.timeline {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin: 10px 0 2px;
+  padding: 0;
+  list-style: none;
+}
+
+.timeline li {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.timelineLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+.timelineValue {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.timeline .timelineLine {
+  width: 2.5rem;
+  height: 2px;
+  border-radius: var(--radius-pill);
+  background: var(--border-strong);
+}
+
+.cta {
+  align-self: flex-start;
+  margin-top: 12px;
+}
+
+@keyframes noticeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .notice {
+    animation: none;
+  }
+}
+
+@media (max-width: 520px) {
+  .notice {
+    flex-direction: column;
+  }
+
+  .timeline .timelineLine {
+    display: none;
+  }
+}
