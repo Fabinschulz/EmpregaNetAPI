@@ -97,7 +97,11 @@ public class JobsController : MainController<CreateJobCommand, UpdateJobCommand,
         return Ok(result);
     }
 
-    /// <summary>Retorna os detalhes de uma vaga específica por ID, incluindo título, descrição, empresa, localização, requisitos, etc.</summary>
+    /// <summary>
+    /// Retorna os detalhes de uma vaga específica por ID, incluindo título, descrição, empresa, localização, requisitos, etc.
+    /// Vagas encerradas (<c>isActive = false</c>) também são devolvidas, com <c>status</c> e <c>closedAt</c>, para que
+    /// a página pública informe o encerramento. Vagas excluídas devolvem 404 a quem não é de recrutamento.
+    /// </summary>
     [AllowAnonymous]
     [HttpGet("{id:long}")]
     [OutputCache(PolicyName = OutputCachePolicies.PublicCatalog)]

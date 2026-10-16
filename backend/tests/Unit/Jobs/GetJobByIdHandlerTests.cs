@@ -1,3 +1,4 @@
+using EmpregaNet.Application.Auth;
 using EmpregaNet.Application.Common.Base;
 using EmpregaNet.Application.Common.Exceptions;
 using EmpregaNet.Application.Jobs.Queries;
@@ -65,13 +66,39 @@ public sealed class GetJobByIdHandlerTests
     }
 
     [Fact]
-    public async Task Handle_VagaEncerradaSemPerfilDeRecrutamento_DeveLancarNotFound()
+    public async Task Handle_VagaEncerradaSemPerfilDeRecrutamento_DeveDevolverComIsActiveFalseEClosedAt()
     {
         SetupRepository(CreateJob(isActive: false));
+
+        var result = await CreateSut().Handle(new GetByIdQuery<JobViewModel>(1), CancellationToken.None);
+
+        result.IsActive.Should().BeFalse();
+        result.ClosedAt.Should().NotBeNull();
+        result.Title.Should().Be("Operador(a) de Empilhadeira");
+    }
+
+    [Fact]
+    public async Task Handle_VagaEncerradaEExcluidaSemPerfilDeRecrutamento_DeveLancarNotFound()
+    {
+        SetupRepository(CreateJob(isActive: false, isDeleted: true));
 
         var act = async () => await CreateSut().Handle(new GetByIdQuery<JobViewModel>(1), CancellationToken.None);
 
         await act.Should().ThrowAsync<NotFoundException>();
+    }
+
+    [Fact]
+    public async Task Handle_StaffDeveVerVagaExcluida()
+    {
+        SetupRepository(CreateJob(isActive: false, isDeleted: true));
+        _httpContextAccessor.HttpContext!.User = new System.Security.Claims.ClaimsPrincipal(
+            new System.Security.Claims.ClaimsIdentity(
+                [new System.Security.Claims.Claim(System.Security.Claims.ClaimTypes.Role, RecruitmentRoleNames.Admin)],
+                "test"));
+
+        var result = await CreateSut().Handle(new GetByIdQuery<JobViewModel>(1), CancellationToken.None);
+
+        result.IsActive.Should().BeFalse();
     }
 
     [Fact]
