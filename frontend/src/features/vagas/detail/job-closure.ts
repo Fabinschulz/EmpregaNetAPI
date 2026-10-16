@@ -1,4 +1,4 @@
-import type { JobStatus } from '@/features/recrutamento/vagas/domain';
+import { jobStatusLabel, type JobStatus } from '@/features/recrutamento/vagas/domain';
 import { formatDate } from '@/shared/utils';
 
 const API_DATE = /^(\d{2})\/(\d{2})\/(\d{4})/;
@@ -27,7 +27,6 @@ function toCalendarDay(value?: string | null): number | null {
   return Date.UTC(parsed.getFullYear(), parsed.getMonth(), parsed.getDate());
 }
 
-/** Motivo exibido ao visitante; exaustivo sobre `JobStatus` (o compilador barra um status novo). */
 export function closureReason(status: JobStatus): string {
   switch (status) {
     case 'ClosedByFulfillment':
@@ -42,13 +41,11 @@ export function closureReason(status: JobStatus): string {
   }
 }
 
-/** "16 de outubro de 2026", ou `null` sem data válida. */
 export function formatLongDate(value?: string | null): string | null {
   const day = toCalendarDay(value);
   return day === null ? null : longDateFormatter.format(new Date(day));
 }
 
-/** "Ficou aberta por N dias"; `null` quando falta uma das datas ou a ordem é incoerente. */
 export function describeOpenPeriod(publishedAt?: string | null, closedAt?: string | null): string | null {
   const start = toCalendarDay(publishedAt);
   const end = toCalendarDay(closedAt);
@@ -59,9 +56,24 @@ export function describeOpenPeriod(publishedAt?: string | null, closedAt?: strin
   return `Ficou aberta por ${days} ${days === 1 ? 'dia' : 'dias'}`;
 }
 
-type ClosureJob = { status: JobStatus; publishedAt?: string | null; closedAt?: string | null };
+export function closureStatusLabel(status: JobStatus, positions?: number | null): string {
+  return status === 'ClosedByFulfillment' ? jobStatusLabel(status, 'candidate', positions) : 'Encerrada';
+}
+
+export function closureTitle(status: JobStatus): string {
+  return status === 'ClosedByFulfillment' ? 'Boas notícias: esta vaga foi preenchida' : 'Processo seletivo encerrado';
+}
+
+type ClosureJob = {
+  status: JobStatus;
+  positions?: number | null;
+  publishedAt?: string | null;
+  closedAt?: string | null;
+};
 
 export type JobClosureSummary = {
+  statusLabel: string;
+  title: string;
   headline: string;
   reason: string;
   publishedOn: string | null;
@@ -74,6 +86,8 @@ export function summarizeJobClosure(job: ClosureJob): JobClosureSummary {
   const publishedLong = formatLongDate(job.publishedAt);
 
   return {
+    statusLabel: closureStatusLabel(job.status, job.positions),
+    title: closureTitle(job.status),
     headline: closedLong ? `Esta vaga foi encerrada em ${closedLong}.` : 'Esta vaga foi encerrada.',
     reason: closureReason(job.status),
     publishedOn: publishedLong ? formatDate(job.publishedAt) : null,

@@ -18,7 +18,8 @@ export function formatCurrencyCompact(num: number): string {
 export function formatSalaryRange(
   min: number | null | undefined,
   max: number | null | undefined,
-  disclosed: boolean
+  disclosed: boolean,
+  rangeSeparator = ' - '
 ): string {
   if (!disclosed) return 'A combinar';
 
@@ -26,7 +27,9 @@ export function formatSalaryRange(
   const hasMax = typeof max === 'number';
 
   if (hasMin && hasMax) {
-    return min === max ? formatCurrencyCompact(min) : `${formatCurrencyCompact(min)} - ${formatCurrencyCompact(max)}`;
+    return min === max
+      ? formatCurrencyCompact(min)
+      : `${formatCurrencyCompact(min)}${rangeSeparator}${formatCurrencyCompact(max)}`;
   }
 
   if (hasMin) return `A partir de ${formatCurrencyCompact(min)}`;

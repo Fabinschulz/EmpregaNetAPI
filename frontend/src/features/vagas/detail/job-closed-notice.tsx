@@ -1,54 +1,68 @@
 import type { JobResponse } from '@/features/recrutamento/vagas/service';
 import { Button } from '@/shared/components';
-import { CalendarCheck, CheckCircle2, Flag } from 'lucide-react';
+import { ArrowRight, CalendarCheck, CalendarPlus, CheckCircle2, Flag, Hourglass } from 'lucide-react';
 import Link from 'next/link';
 import styles from './job-closed-notice.module.scss';
 import { summarizeJobClosure } from './job-closure';
 
 type JobClosedNoticeProps = {
-  job: Pick<JobResponse, 'status' | 'publishedAt' | 'closedAt'>;
+  job: Pick<JobResponse, 'status' | 'positions' | 'publishedAt' | 'closedAt'>;
 };
 
-/**
- * Aviso de vaga encerrada: substitui o CTA de candidatura. Explica que o processo terminou
- * (e não que a página quebrou) e leva o visitante às vagas abertas.
- */
 export function JobClosedNotice({ job }: JobClosedNoticeProps) {
-  const { headline, reason, publishedOn, closedOn, openPeriod } = summarizeJobClosure(job);
-  const Icon = job.status === 'ClosedByFulfillment' ? CheckCircle2 : Flag;
+  const { statusLabel, title, headline, reason, publishedOn, closedOn, openPeriod } = summarizeJobClosure(job);
+  const fulfilled = job.status === 'ClosedByFulfillment';
+  const Icon = fulfilled ? CheckCircle2 : Flag;
 
   return (
-    <aside className={styles.notice} role="status" aria-labelledby="job-closed-title">
+    <aside
+      className={styles.notice}
+      data-tone={fulfilled ? 'success' : 'neutral'}
+      role="status"
+      aria-labelledby="job-closed-title"
+    >
       <span className={styles.icon} aria-hidden>
-        <Icon size={28} />
+        <Icon size={32} />
       </span>
 
       <div className={styles.content}>
+        <span className={styles.pill}>{statusLabel}</span>
         <h2 id="job-closed-title" className={styles.title}>
-          Processo seletivo encerrado
+          {title}
         </h2>
         <p className={styles.headline}>{headline}</p>
         <p className={styles.reason}>{reason}</p>
 
         {publishedOn && closedOn ? (
-          <ol className={styles.timeline} aria-label="Período da vaga">
-            <li>
-              <span className={styles.timelineLabel}>Publicada em</span>
-              <span className={styles.timelineValue}>{publishedOn}</span>
-            </li>
-            <li aria-hidden className={styles.timelineLine} />
-            <li>
-              <span className={styles.timelineLabel}>
-                <CalendarCheck size={14} aria-hidden /> Encerrada em
+          <ol className={styles.stepper} aria-label="Período da vaga">
+            <li className={styles.step}>
+              <span className={styles.dot} aria-hidden>
+                <CalendarPlus size={14} />
               </span>
-              <span className={styles.timelineValue}>{closedOn}</span>
+              <span className={styles.stepLabel}>Publicada em</span>
+              <span className={styles.stepValue}>{publishedOn}</span>
+            </li>
+            <li className={`${styles.step} ${styles.stepEnd}`}>
+              <span className={`${styles.dot} ${styles.dotEnd}`} aria-hidden>
+                <CalendarCheck size={14} />
+              </span>
+              <span className={styles.stepLabel}>Encerrada em</span>
+              <span className={styles.stepValue}>{closedOn}</span>
             </li>
           </ol>
         ) : null}
-        {openPeriod ? <p className={styles.period}>{openPeriod}.</p> : null}
+        {openPeriod ? (
+          <p className={styles.chip}>
+            <Hourglass size={14} aria-hidden />
+            {openPeriod}
+          </p>
+        ) : null}
 
         <Button asChild variant="primary" className={styles.cta}>
-          <Link href="/vagas">Ver vagas abertas</Link>
+          <Link href="/vagas">
+            Ver vagas abertas
+            <ArrowRight size={18} aria-hidden className={styles.arrow} />
+          </Link>
         </Button>
       </div>
     </aside>

@@ -18,7 +18,17 @@ const candidateStatusLabelOverrides: Partial<Record<JobStatus, string>> = {
   ClosedManually: 'Encerrada'
 };
 
-export function jobStatusLabel(status: JobStatus, audience: JobStatusAudience = 'recruiter'): string {
+/**
+ * Rótulo do status. `positions` só importa para `ClosedByFulfillment`: com uma única posição o
+ * rótulo é singular ("Vaga preenchida"); com várias, `null` ou `undefined` fica no plural.
+ */
+export function jobStatusLabel(
+  status: JobStatus,
+  audience: JobStatusAudience = 'recruiter',
+  positions?: number | null
+): string {
+  if (status === 'ClosedByFulfillment' && positions === 1) return 'Vaga preenchida';
+
   if (audience === 'candidate') {
     return candidateStatusLabelOverrides[status] ?? jobStatusLabels[status];
   }
@@ -34,7 +44,7 @@ export function jobStatusTone(status: JobStatus): 'positive' | 'negative' | 'neu
 
 export const DELETED_JOB_STATUS_LABEL = 'Excluída';
 
-type JobStatusSummary = { status: JobStatus; isDeleted?: boolean | null };
+type JobStatusSummary = { status: JobStatus; isDeleted?: boolean | null; positions?: number | null };
 
 export function describeJobStatusBadge(
   job: JobStatusSummary,
@@ -43,7 +53,7 @@ export function describeJobStatusBadge(
   if (job.isDeleted) {
     return { label: DELETED_JOB_STATUS_LABEL, tone: 'neutral' };
   }
-  return { label: jobStatusLabel(job.status, audience), tone: jobStatusTone(job.status) };
+  return { label: jobStatusLabel(job.status, audience, job.positions), tone: jobStatusTone(job.status) };
 }
 
 /** Uma vaga excluída (soft delete) não pode mais ser editada nem excluída de novo. */
