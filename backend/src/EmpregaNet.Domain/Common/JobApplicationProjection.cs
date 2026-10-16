@@ -7,6 +7,7 @@ public sealed record JobApplicationProjection(
     long JobId,
     string JobTitle,
     bool IsJobAvailable,
+    bool IsJobViewable,
     JobApplicationCandidate Candidate,
     ApplicationStatusEnum Status,
     DateTimeOffset AppliedAt,

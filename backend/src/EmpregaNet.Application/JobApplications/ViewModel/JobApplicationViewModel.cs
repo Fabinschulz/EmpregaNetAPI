@@ -13,6 +13,8 @@ public sealed class JobApplicationViewModel : BaseViewModel
     public string JobTitle { get; set; } = string.Empty;
     /// <summary>A vaga ainda abre no detalhe público; falso quando foi encerrada ou excluída.</summary>
     public bool IsJobAvailable { get; set; }
+    /// <summary>Falso só quando a vaga foi excluída; vaga encerrada ainda abre no detalhe público.</summary>
+    public bool IsJobViewable { get; set; }
     public required JobApplicationCandidateViewModel Candidate { get; set; }
     public ApplicationStatusEnum Status { get; set; }
     public string AppliedAt { get; set; } = string.Empty;
@@ -38,6 +40,7 @@ public static class JobApplicationMapper
             JobId = proj.JobId,
             JobTitle = proj.JobTitle,
             IsJobAvailable = proj.IsJobAvailable,
+            IsJobViewable = proj.IsJobViewable,
             Candidate = new JobApplicationCandidateViewModel
             {
                 Id = proj.Candidate.Id,
