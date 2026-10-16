@@ -46,6 +46,7 @@ import {
   MapPin,
   Users
 } from 'lucide-react';
+import { JobClosedNotice } from './job-closed-notice';
 import styles from './job-detail.module.scss';
 
 type JobDetailPageProps = {
@@ -157,7 +158,8 @@ export function JobDetailPage({ job }: JobDetailPageProps) {
 
   return (
     <section>
-      <Card className={styles.card}>
+      {job.isActive ? null : <JobClosedNotice job={job} />}
+      <Card className={job.isActive ? styles.card : `${styles.card} ${styles.closed}`}>
         <CardHeader>
           <div className={styles.headerRow}>
             <CardTitle>{job.title}</CardTitle>
@@ -194,37 +196,39 @@ export function JobDetailPage({ job }: JobDetailPageProps) {
           ) : null}
         </CardContent>
 
-        <CardFooter className={styles.footer}>
-          {canApply ? (
-            hasApplied ? (
-              <AppliedBadge />
-            ) : (
-              <Button
-                variant="primary"
-                onClick={onApply}
-                disabled={!isAuthenticated || isApplying}
-                aria-busy={isApplying}
-              >
-                {isApplying ? (
-                  <Spinner size="sm" label={null} />
-                ) : isAuthenticated ? (
-                  <actionIcons.apply aria-hidden />
-                ) : (
-                  <actionIcons.signIn aria-hidden />
-                )}
-                {applyLabel}
-              </Button>
-            )
-          ) : null}
-          {canApply && !isAuthenticated ? (
-            <p className={styles.footerHint}>É necessário entrar na conta para enviar sua candidatura.</p>
-          ) : null}
-          {apiError ? (
-            <Alert variant="destructive" title="Erro">
-              {apiError}
-            </Alert>
-          ) : null}
-        </CardFooter>
+        {job.isActive ? (
+          <CardFooter className={styles.footer}>
+            {canApply ? (
+              hasApplied ? (
+                <AppliedBadge />
+              ) : (
+                <Button
+                  variant="primary"
+                  onClick={onApply}
+                  disabled={!isAuthenticated || isApplying}
+                  aria-busy={isApplying}
+                >
+                  {isApplying ? (
+                    <Spinner size="sm" label={null} />
+                  ) : isAuthenticated ? (
+                    <actionIcons.apply aria-hidden />
+                  ) : (
+                    <actionIcons.signIn aria-hidden />
+                  )}
+                  {applyLabel}
+                </Button>
+              )
+            ) : null}
+            {canApply && !isAuthenticated ? (
+              <p className={styles.footerHint}>É necessário entrar na conta para enviar sua candidatura.</p>
+            ) : null}
+            {apiError ? (
+              <Alert variant="destructive" title="Erro">
+                {apiError}
+              </Alert>
+            ) : null}
+          </CardFooter>
+        ) : null}
       </Card>
     </section>
   );

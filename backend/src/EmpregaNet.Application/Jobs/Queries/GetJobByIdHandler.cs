@@ -39,7 +39,9 @@ public sealed class GetJobByIdHandler : IRequestHandler<GetByIdQuery<JobViewMode
 
 
             var staff = RecruitmentRoleNames.IsRecruitmentStaff(_httpContextAccessor.HttpContext?.User);
-            if (!staff && (entity.IsDeleted || !entity.IsActive))
+            // Vaga encerrada (inativa) continua visível: a página pública mostra o aviso de encerramento.
+            // Só a excluída é escondida de quem não é staff.
+            if (!staff && entity.IsDeleted)
             {
                 throw new NotFoundException($"Vaga de emprego com ID '{request.Id}' não encontrada.");
             }

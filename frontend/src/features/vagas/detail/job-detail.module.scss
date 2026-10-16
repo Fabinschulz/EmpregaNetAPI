@@ -2,6 +2,11 @@
   margin-top: 16px;
 }
 
+/* Vaga encerrada: a descrição segue legível, mas recua para o aviso ficar em primeiro plano. */
+.closed .body {
+  opacity: 0.78;
+}
+
 .headerRow {
   display: flex;
   align-items: flex-start;
