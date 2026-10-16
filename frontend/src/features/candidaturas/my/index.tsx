@@ -18,7 +18,7 @@ import { formatDate } from '@/shared/utils';
 import { Ban } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ApplicationStatusBadge } from '../application-status-badge';
-import { canCandidateCancelApplication } from '../domain';
+import { canCandidateCancelApplication, isJobAvailable, isJobViewable } from '../domain';
 import { useCancelMyApplicationMutation, useMyJobApplicationsQuery, type JobApplicationResponse } from '../service';
 import { cancelApplicationDialogCopy } from './cancel-application-dialog-copy';
 import {
@@ -35,10 +35,6 @@ import {
 import styles from './my-applications.module.scss';
 
 type MyApplicationsFilterParams = Pick<JobApplicationsListQueryParams, 'status' | 'orderBy'>;
-
-function isJobAvailable(application: JobApplicationResponse): boolean {
-  return application.isJobAvailable !== false;
-}
 
 export function MyApplicationsPage() {
   const pagination = usePersistedTablePagination({ storageKey: 'minhas-candidaturas' });
@@ -126,8 +122,7 @@ export function MyApplicationsPage() {
         getActions: (application) => {
           const actions: RowAction[] = [];
 
-          // Vaga encerrada ou excluída dá 404 no detalhe público: sem link para não levar o candidato a um beco.
-          if (application.jobId && isJobAvailable(application)) {
+          if (application.jobId && isJobViewable(application)) {
             actions.push({
               key: 'view-job',
               label: 'Ver vaga',
