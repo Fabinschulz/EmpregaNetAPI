@@ -54,7 +54,7 @@ public sealed class JobApplicationIndexTests
     /// passar a excluir o status errado.
     /// </summary>
     [Fact]
-    public void FiltroDoIndice_DeveExcluirExactamenteOStatusCanceladoPeloCandidato()
+    public void FiltroDoIndice_DeveExcluirStatusCanceladoPeloCandidatoESoftDelete()
     {
         using var context = CreateContext();
 
@@ -64,7 +64,9 @@ public sealed class JobApplicationIndexTests
             .Single(i => i.GetDatabaseName() == "IX_JobApplications_JobId_UserId")
             .GetFilter();
 
-        var expected = $"\"Status\" <> {(int)ApplicationStatusEnum.CanceledByCandidate}";
+        // IsDeleted tem de constar: IsActiveApplication trata soft-deleted como não activa, e um índice
+        // que ainda a conte faz o INSERT da recandidatura rebentar com 23505 (500 em produção).
+        var expected = $"\"Status\" <> {(int)ApplicationStatusEnum.CanceledByCandidate} AND \"IsDeleted\" = false";
 
         filter.Should().Be(expected);
     }

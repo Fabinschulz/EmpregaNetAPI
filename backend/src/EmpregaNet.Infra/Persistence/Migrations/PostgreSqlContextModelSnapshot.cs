@@ -278,7 +278,7 @@ namespace EmpregaNet.Infra.Persistence.Migrations
                     b.HasIndex("JobId", "UserId")
                         .IsUnique()
                         .HasDatabaseName("IX_JobApplications_JobId_UserId")
-                        .HasFilter("\"Status\" <> 9");
+                        .HasFilter("\"Status\" <> 9 AND \"IsDeleted\" = false");
 
                     b.ToTable("JobApplications", (string)null);
                 });
