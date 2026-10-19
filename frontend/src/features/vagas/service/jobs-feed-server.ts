@@ -1,5 +1,6 @@
 import 'server-only';
 
+import { serverApiHeaders } from '@/shared/api/server-api-headers';
 import { getPublicEnv } from '@/shared/utils';
 import { cacheLife } from 'next/cache';
 import type { JobsFeedQueryParams } from './jobs-feed-params';
@@ -58,7 +59,7 @@ export async function getJobsFeedCached(params: JobsFeedQueryParams): Promise<Jo
 
   const query = buildQueryString(params);
   const res = await fetch(`${serverApiBaseUrl()}/api/jobs/feed?${query}`, {
-    headers: { Accept: 'application/json' }
+    headers: serverApiHeaders()
   });
 
   if (!res.ok) {
@@ -81,7 +82,7 @@ export async function getJobVocabularyCached(): Promise<JobVocabularyResponse> {
   cacheLife('days');
 
   const res = await fetch(`${serverApiBaseUrl()}/api/jobs/vocabulary`, {
-    headers: { Accept: 'application/json' }
+    headers: serverApiHeaders()
   });
 
   if (!res.ok) {
