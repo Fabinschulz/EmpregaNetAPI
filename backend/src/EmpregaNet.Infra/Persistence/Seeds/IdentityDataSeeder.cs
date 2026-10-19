@@ -2,7 +2,6 @@ using System.Security.Claims;
 using EmpregaNet.Application.Auth;
 using EmpregaNet.Domain.Entities;
 using EmpregaNet.Domain.Enums;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -26,9 +25,13 @@ public static class IdentityDataSeeder
         "Manager"
     ];
 
-    public static async Task SeedAsync(WebApplication app, CancellationToken cancellationToken = default)
+    /// <remarks>
+    /// Não é seguro executar em paralelo: verifica antes de criar. Chame só sob o bloqueio de inicialização
+    /// (<see cref="Startup.StartupCoordinator"/>).
+    /// </remarks>
+    public static async Task SeedAsync(IServiceProvider rootServices, CancellationToken cancellationToken = default)
     {
-        using var scope = app.Services.CreateScope();
+        using var scope = rootServices.CreateScope();
         var services = scope.ServiceProvider;
         var logger = services.GetRequiredService<ILoggerFactory>().CreateLogger(nameof(IdentityDataSeeder));
 

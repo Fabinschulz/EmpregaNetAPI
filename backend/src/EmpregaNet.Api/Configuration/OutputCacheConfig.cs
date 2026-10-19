@@ -1,6 +1,7 @@
 using EmpregaNet.Api.Configuration.OutputCache;
 using EmpregaNet.Application.Abstraction;
 using EmpregaNet.Infra.Cache;
+using EmpregaNet.Infra.Persistence.Database;
 
 namespace EmpregaNet.Api.Configuration;
 
@@ -54,5 +55,42 @@ public static class OutputCacheConfig
         services.AddSingleton<IOutputCacheManager, OutputCacheManager>();
 
         return services;
+    }
+
+    /// <summary>Maior validade do cache do catálogo público que ainda é aceitável entre réplicas sem Redis.</summary>
+    public const int MaxSafeExpirationMinutesWithoutSharedStore = 5;
+
+    /// <summary>
+    /// Mensagem de aviso, ou <c>null</c> quando não há o que avisar. Sem Redis, cada réplica tem o próprio cache de
+    /// saída e a invalidação por tag (feita depois de uma escrita) só alcança a réplica que atendeu a escrita: as
+    /// outras servem o catálogo público antigo até a validade acabar. Só a validade limita esse atraso.
+    /// </summary>
+    public static string? StalePublicCatalogWarning(
+        OutputCacheOptions cache, DatabaseOptions database, bool redisActive, bool isDevelopment)
+    {
+        if (isDevelopment || redisActive || database.ExpectedMaxReplicas <= 1
+            || cache.DefaultExpirationMinutes <= MaxSafeExpirationMinutesWithoutSharedStore)
+        {
+            return null;
+        }
+
+        return $"OutputCache:DefaultExpirationMinutes = {cache.DefaultExpirationMinutes} com {database.ExpectedMaxReplicas} " +
+               "réplicas previstas e sem Redis: a invalidação do cache é local a cada réplica, então o catálogo público " +
+               $"pode ficar até {cache.DefaultExpirationMinutes} minuto(s) desatualizado nas outras réplicas. " +
+               $"Use no máximo {MaxSafeExpirationMinutesWithoutSharedStore} minutos ou ative o Redis.";
+    }
+
+    public static void WarnIfPublicCacheCanBeStale(WebApplication app)
+    {
+        var cache = app.Configuration.GetSection(OutputCacheOptions.SectionName).Get<OutputCacheOptions>() ?? new OutputCacheOptions();
+        var database = app.Configuration.GetSection(DatabaseOptions.SectionName).Get<DatabaseOptions>() ?? new DatabaseOptions();
+
+        var warning = StalePublicCatalogWarning(
+            cache, database, RedisOptions.Resolve(app.Configuration).IsActive, app.Environment.IsDevelopment());
+
+        if (warning is not null)
+        {
+            app.Logger.LogWarning("{Warning}", warning);
+        }
     }
 }

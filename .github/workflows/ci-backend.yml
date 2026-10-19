@@ -40,6 +40,21 @@ jobs:
     permissions:
       contents: read
 
+    # PostgreSQL descartavel para os testes que precisam de um banco de verdade (migracoes, bloqueio de inicializacao,
+    # concorrencia entre replicas). Sem ele esses testes aparecem como ignorados.
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
     outputs:
       version: ${{ steps.version.outputs.version }}
 
@@ -74,6 +89,8 @@ jobs:
             -p:InformationalVersion=${{ steps.version.outputs.version }}+${{ github.sha }}
 
       - name: Testes
+        env:
+          EMPREGANET_TEST_PG: Host=localhost;Port=5432;Username=postgres;Password=postgres;Database=postgres
         run: |
           dotnet test "${{ inputs.tests_project }}" \
             --configuration Release \

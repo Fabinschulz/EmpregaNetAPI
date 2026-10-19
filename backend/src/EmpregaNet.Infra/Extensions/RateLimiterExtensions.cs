@@ -60,7 +60,9 @@ public sealed class RateLimit
     public int QueueLimit { get; set; } = 0;
 
     /// <summary>
-    /// Endereços de rede que passam sem limite algum.
+    /// Endereços de rede que passam sem limite algum. <b>Só para IPs estáveis</b>: o valor é comparado com o IP
+    /// restaurado por <c>ForwardedHeaders</c> e aceita apenas endereços exatos, sem CIDR. Não use com tarefas
+    /// Fargate (o IP muda a cada início); para o SSR use <see cref="InternalCaller"/>.
     ///
     /// <para>Necessário para origens confiáveis que concentram o tráfego de muita gente num
     /// único endereço. O caso concreto aqui é o servidor do site (Next.js): quando ele monta
@@ -69,6 +71,12 @@ public sealed class RateLimit
     /// esgotaria sozinho.</para>
     /// </summary>
     public string[] BypassIps { get; set; } = [];
+
+    /// <summary>
+    /// Identificação do servidor Next.js (SSR) por segredo, no lugar de uma lista de IPs. Veja
+    /// <see cref="InternalCallerAuthenticator"/>.
+    /// </summary>
+    public InternalCallerOptions InternalCaller { get; set; } = new();
 
     /// <summary>
     /// Rotas que nunca são limitadas (comparação por início do caminho).
@@ -97,6 +105,23 @@ public sealed class RateLimit
 
     /// <summary>De quanto em quanto tempo a limpeza dos baldes parados é executada.</summary>
     public int EvictionSweepIntervalSeconds { get; set; } = 60;
+}
+
+/// <summary>Segredo e balde do chamador interno (SSR). Desativado enquanto <see cref="Secret"/> estiver vazio.</summary>
+public sealed class InternalCallerOptions
+{
+    public string HeaderName { get; set; } = "X-Internal-Caller";
+
+    /// <summary>Segredo compartilhado com o Next.js (mínimo de 32 caracteres). Vem de secret, nunca do repositório.</summary>
+    public string? Secret { get; set; }
+
+    /// <summary>Tamanho do balde do chamador interno; zero usa 10 vezes o balde individual.</summary>
+    public int BurstCapacity { get; set; }
+
+    /// <summary>Fichas repostas por período; zero usa 10 vezes o ritmo individual.</summary>
+    public int SustainedPerPeriod { get; set; }
+
+    public bool IsEnabled => !string.IsNullOrWhiteSpace(Secret);
 }
 
 public static class RateLimiterExtensions
@@ -226,6 +251,11 @@ internal sealed class BoundedEvictingRateLimiter : PartitionedRateLimiter<HttpCo
     /// </summary>
     private readonly RateLimiter _overflowLimiter;
 
+    private readonly InternalCallerAuthenticator _internalCaller;
+
+    /// <summary>Balde único do SSR autenticado: mais largo que o individual, mas com teto.</summary>
+    private readonly RateLimiter? _internalLimiter;
+
     private readonly Timer _evictionTimer;
 
     /// <summary>`volatile` porque é escrito na thread que descarta e lido na thread do timer.</summary>
@@ -245,6 +275,24 @@ internal sealed class BoundedEvictingRateLimiter : PartitionedRateLimiter<HttpCo
             QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
             QueueLimit = 0
         });
+
+        _internalCaller = new InternalCallerAuthenticator(options.InternalCaller);
+        if (_internalCaller.IsEnabled)
+        {
+            _internalLimiter = new TokenBucketRateLimiter(new TokenBucketRateLimiterOptions
+            {
+                TokenLimit = options.InternalCaller.BurstCapacity > 0
+                    ? options.InternalCaller.BurstCapacity
+                    : options.BurstCapacity * 10,
+                TokensPerPeriod = options.InternalCaller.SustainedPerPeriod > 0
+                    ? options.InternalCaller.SustainedPerPeriod
+                    : options.SustainedPerPeriod * 10,
+                ReplenishmentPeriod = TimeSpan.FromSeconds(options.ReplenishmentPeriodInSeconds),
+                AutoReplenishment = true,
+                QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+                QueueLimit = 0
+            });
+        }
 
         var sweepInterval = TimeSpan.FromSeconds(Math.Max(1, options.EvictionSweepIntervalSeconds));
         _evictionTimer = new Timer(_ => EvictIdlePartitions(), null, sweepInterval, sweepInterval);
@@ -296,6 +344,11 @@ internal sealed class BoundedEvictingRateLimiter : PartitionedRateLimiter<HttpCo
             return _noopLimiter.GetStatistics();
         }
 
+        if (_internalLimiter is not null && _internalCaller.IsAuthenticated(resource.Request))
+        {
+            return _internalLimiter.GetStatistics();
+        }
+
         return _limiters.TryGetValue(GetPartitionKey(resource), out var limiter)
             ? limiter.GetStatistics()
             : null;
@@ -317,6 +370,11 @@ internal sealed class BoundedEvictingRateLimiter : PartitionedRateLimiter<HttpCo
         if (!_options.Enabled || IsExempt(httpContext))
         {
             return (null, _noopLimiter);
+        }
+
+        if (_internalLimiter is not null && _internalCaller.IsAuthenticated(httpContext.Request))
+        {
+            return (null, _internalLimiter);
         }
 
         var key = GetPartitionKey(httpContext);
@@ -447,6 +505,7 @@ internal sealed class BoundedEvictingRateLimiter : PartitionedRateLimiter<HttpCo
             _evictionTimer.Dispose();
             _noopLimiter.Dispose();
             _overflowLimiter.Dispose();
+            _internalLimiter?.Dispose();
 
             foreach (var limiter in _limiters.Values)
             {

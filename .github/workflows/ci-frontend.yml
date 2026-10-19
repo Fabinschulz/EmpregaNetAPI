@@ -70,3 +70,21 @@ jobs:
         run: pnpm build
         env:
           NEXT_PUBLIC_API_BASE_URL: ${{ inputs.api_base_url }}
+
+  container:
+    name: Imagem de contêiner
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    defaults:
+      run:
+        working-directory: ${{ inputs.working_directory }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Constrói sem push: confere usuário não-root, ausência de URLs de desenvolvimento no bundle e /healthz.
+      - name: Construir e validar a imagem
+        run: bash scripts/verify-container.sh

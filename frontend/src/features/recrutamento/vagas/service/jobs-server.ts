@@ -3,6 +3,7 @@
 // `service/index.ts`, que é consumido por Client Components.
 import 'server-only';
 
+import { serverApiHeaders } from '@/shared/api/server-api-headers';
 import { getPublicEnv } from '@/shared/utils';
 import { cacheLife, cacheTag } from 'next/cache';
 import { jobResponseSchema, type JobResponse } from './jobs-response-schema';
@@ -50,7 +51,7 @@ export async function getJobCached(id: number): Promise<JobResponse | null> {
   if (!Number.isFinite(id) || id <= 0) return null;
 
   const res = await fetch(`${serverApiBaseUrl()}/api/jobs/${id}`, {
-    headers: { Accept: 'application/json' }
+    headers: serverApiHeaders()
   });
 
   if (res.status === 404) return null;

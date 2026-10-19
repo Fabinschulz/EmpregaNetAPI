@@ -14,6 +14,7 @@ public static class DependencyInjection
     {
         app.UseMiddleware<CorrelationIdMiddleware>();
         app.UseResponseCompression();
+        OutputCacheConfig.WarnIfPublicCacheCanBeStale(app);
 
         // Configura o uso de headers de proxy reverso (X-Forwarded-For, X-Forwarded-Proto) caso esteja atrás de um proxy reverso.
         app.UseForwardedHeadersIfConfigured();

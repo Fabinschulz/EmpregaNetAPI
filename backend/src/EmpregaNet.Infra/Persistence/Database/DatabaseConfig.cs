@@ -10,8 +10,7 @@ public static class DatabaseConfig
 {
     public static WebApplicationBuilder SetupDatabaseConnection(this WebApplicationBuilder builder)
     {
-        var connectionString = builder.Configuration.GetConnectionString("PostgreSQLConnection")
-                                            ?? throw new Exception("PostgreSQLConnection não encontrada no arquivo de configuração.");
+        var connectionString = PostgreSqlConnectionString.Resolve(builder.Configuration);
 
         var isDevelopment = builder.Environment.IsDevelopment();
 
@@ -49,21 +48,5 @@ public static class DatabaseConfig
         }
 
         return builder;
-    }
-
-    /// <summary>
-    /// Aplica migrações pendentes no banco de dados.
-    /// </summary>
-    public static WebApplication ApplyPendingMigrations(this WebApplication webApp)
-    {
-        using var scope = webApp.Services.CreateScope();
-        var context = scope.ServiceProvider.GetRequiredService<PostgreSqlContext>();
-
-        if (context.Database.GetPendingMigrations().Any())
-        {
-            context.Database.Migrate();
-        }
-
-        return webApp;
     }
 }
