@@ -15,7 +15,6 @@ namespace EmpregaNet.Infra.Persistence.Database
         public DbSet<JobApplication> JobApplications => Set<JobApplication>();
         public DbSet<UserRefreshToken> UserRefreshTokens => Set<UserRefreshToken>();
 
-        /// <summary>Key ring do ASP.NET Core Data Protection, compartilhado por todas as réplicas.</summary>
         public DbSet<DataProtectionKey> DataProtectionKeys => Set<DataProtectionKey>();
     }
 }

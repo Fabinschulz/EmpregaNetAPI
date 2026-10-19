@@ -12,10 +12,7 @@ using Npgsql;
 
 namespace EmpregaNet.Tests.Integration.Startup;
 
-/// <summary>
-/// Inicialização contra um PostgreSQL real: migrações de verdade (inclusive <c>CREATE EXTENSION</c>), seed,
-/// key ring e a corrida entre réplicas. Requer <c>EMPREGANET_TEST_PG</c> (veja <see cref="PostgresFactAttribute"/>).
-/// </summary>
+/// <summary>Inicialização contra um PostgreSQL real. Requer <c>EMPREGANET_TEST_PG</c> (veja <see cref="PostgresFactAttribute"/>).</summary>
 public sealed class StartupPostgresTests
 {
     private static readonly Dictionary<string, string?> FastStartup = new()

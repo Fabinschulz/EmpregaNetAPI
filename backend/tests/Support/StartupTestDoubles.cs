@@ -3,7 +3,6 @@ using Microsoft.Extensions.Logging;
 
 namespace EmpregaNet.Tests.Support;
 
-/// <summary>Relógio manual: o tempo só anda quando o teste manda, e a espera "dorme" instantaneamente.</summary>
 internal sealed class ManualTimeProvider : TimeProvider
 {
     private long _ticks;
@@ -15,7 +14,6 @@ internal sealed class ManualTimeProvider : TimeProvider
     public void Advance(TimeSpan span) => _ticks += span.Ticks;
 }
 
-/// <summary>Logger que guarda as mensagens para o teste inspecionar.</summary>
 internal sealed class ListLogger<T> : ILogger<T>
 {
     public List<(LogLevel Level, string Message)> Entries { get; } = [];
@@ -28,7 +26,6 @@ internal sealed class ListLogger<T> : ILogger<T>
         Entries.Add((logLevel, formatter(state, exception)));
 }
 
-/// <summary>Sonda do banco que devolve, em ordem, os resultados programados (sucesso ou exceção).</summary>
 internal sealed class ScriptedProbe(params Exception?[] results) : IDatabaseProbe
 {
     private readonly Queue<Exception?> _results = new(results);

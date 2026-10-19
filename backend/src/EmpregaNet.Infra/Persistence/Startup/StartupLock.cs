@@ -3,23 +3,18 @@ using Npgsql;
 
 namespace EmpregaNet.Infra.Persistence.Startup;
 
-/// <summary>Exclusão mútua entre réplicas durante a inicialização.</summary>
 public interface IStartupLock
 {
-    /// <exception cref="TimeoutException">Outra réplica manteve o bloqueio além do limite.</exception>
     Task<IAsyncDisposable> AcquireAsync(TimeSpan timeout, CancellationToken cancellationToken);
 }
 
 /// <summary>
-/// Bloqueio consultivo do PostgreSQL (<c>pg_try_advisory_lock</c>) mantido por uma conexão dedicada.
+/// <c>pg_try_advisory_lock</c> numa conexão dedicada e sem pool: o bloqueio é da sessão, então réplica que morre
+/// no meio da inicialização o perde sozinha.
 /// </summary>
-/// <remarks>
-/// O bloqueio é da <b>sessão</b>: se a réplica morre no meio da inicialização, a conexão cai e o PostgreSQL o libera
-/// sozinho; nunca fica preso. A conexão não usa pool, para que fechá-la encerre a sessão de fato.
-/// </remarks>
 public sealed class PostgresAdvisoryLock(string connectionString, ILogger<PostgresAdvisoryLock> logger) : IStartupLock
 {
-    /// <summary>Chave fixa do bloqueio ("EMPR" + "STRT" em ASCII); todas as réplicas usam a mesma.</summary>
+    // "EMPR" + "STRT" em ASCII.
     public const long LockKey = 0x454D5052_53545254L;
 
     private static readonly TimeSpan PollInterval = TimeSpan.FromSeconds(1);

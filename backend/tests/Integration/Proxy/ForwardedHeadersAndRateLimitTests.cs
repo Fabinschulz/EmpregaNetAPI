@@ -5,10 +5,6 @@ using FluentAssertions;
 
 namespace EmpregaNet.Tests.Integration.Proxy;
 
-/// <summary>
-/// Comportamento atrás de um proxy ou ALB: o IP real é restaurado só quando o par é confiável, o que o cliente
-/// forja não vale, e o rate limit por IP continua contando por cliente.
-/// </summary>
 public sealed class ForwardedHeadersAndRateLimitTests
 {
     private const string AlbPeer = "10.0.1.5";
@@ -52,7 +48,6 @@ public sealed class ForwardedHeadersAndRateLimitTests
         return (json.RootElement.GetProperty("ip").GetString(), json.RootElement.GetProperty("scheme").GetString());
     }
 
-    // ---- IP real e esquema ----
 
     [Fact]
     public async Task Proxy_confiavel_por_rede_repassa_o_ip_real_e_o_esquema()
@@ -109,7 +104,6 @@ public sealed class ForwardedHeadersAndRateLimitTests
         scheme.Should().Be("http");
     }
 
-    // ---- rate limit atrás do proxy ----
 
     [Fact]
     public async Task Clientes_distintos_atras_do_mesmo_proxy_tem_baldes_separados()
@@ -157,7 +151,6 @@ public sealed class ForwardedHeadersAndRateLimitTests
         }
     }
 
-    // ---- chamador interno (SSR) ----
 
     [Fact]
     public async Task Ssr_com_segredo_nao_depende_do_ip_e_nao_consome_o_balde_dos_visitantes()

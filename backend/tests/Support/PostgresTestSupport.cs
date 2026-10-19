@@ -21,7 +21,6 @@ public sealed class PostgresFactAttribute : FactAttribute
     }
 }
 
-/// <summary>Banco temporário, criado no servidor de teste e apagado ao final.</summary>
 internal sealed class PostgresTestDatabase : IAsyncDisposable
 {
     private readonly string _adminConnectionString;
@@ -53,7 +52,6 @@ internal sealed class PostgresTestDatabase : IAsyncDisposable
         return new PostgresTestDatabase(admin, name, builder.ConnectionString);
     }
 
-    /// <summary>Connection string do mesmo servidor, para um banco que não existe.</summary>
     public string ConnectionStringForMissingDatabase()
     {
         var builder = new NpgsqlConnectionStringBuilder(_adminConnectionString) { Database = $"nao_existe_{Guid.NewGuid():N}" };

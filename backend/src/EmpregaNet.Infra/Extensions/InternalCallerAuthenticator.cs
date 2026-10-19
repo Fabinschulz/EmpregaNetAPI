@@ -5,17 +5,11 @@ using Microsoft.AspNetCore.Http;
 namespace EmpregaNet.Infra.Extensions;
 
 /// <summary>
-/// Reconhece o servidor Next.js (SSR) pelo que ele <b>sabe</b>, e não pelo endereço de onde ele vem.
+/// Reconhece o SSR do Next.js por um segredo no cabeçalho, já que o IP das tarefas Fargate muda a cada início.
+/// Segredo errado ou ausente não dá privilégio nem penalidade: a requisição segue como a de qualquer cliente.
 /// </summary>
-/// <remarks>
-/// Os IPs das tarefas Fargate mudam a cada início e o tráfego do SSR passa pelo ALB, então uma lista de IPs
-/// (<see cref="RateLimit.BypassIps"/>) não serve. O SSR envia um segredo compartilhado no cabeçalho; quem o
-/// apresenta usa um balde próprio, mais largo, porém <b>limitado</b>. Segredo errado ou ausente não dá
-/// privilégio nenhum nem penalidade: a requisição segue como a de qualquer cliente.
-/// </remarks>
 internal sealed class InternalCallerAuthenticator
 {
-    /// <summary>Menor tamanho aceito para o segredo; abaixo disso ele seria adivinhável.</summary>
     public const int MinimumSecretLength = 32;
 
     private readonly string _headerName;
@@ -59,7 +53,7 @@ internal sealed class InternalCallerAuthenticator
             return false;
         }
 
-        // Compara o hash, em tempo constante, para não vazar o segredo pelo tempo de resposta.
+        // Hash + tempo constante: não vaza o segredo pelo tempo de resposta.
         var hash = SHA256.HashData(Encoding.UTF8.GetBytes(presented.Trim()));
         return CryptographicOperations.FixedTimeEquals(hash, _secretHash);
     }

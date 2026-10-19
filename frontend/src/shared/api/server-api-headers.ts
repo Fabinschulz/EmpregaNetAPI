@@ -1,13 +1,8 @@
 import 'server-only';
 
 /**
- * Cabeçalhos de toda chamada do servidor Next.js (SSR) à API.
- *
- * O SSR chama a API a partir de tarefas cujo IP muda a cada início, e todo o tráfego do site passa por poucas
- * tarefas. Por isso a API não o reconhece por IP: ele se identifica com um segredo compartilhado
- * (`INTERNAL_API_SECRET`) e recebe um balde de requisições próprio, mais largo, porém limitado.
- *
- * Sem o segredo configurado nada é enviado, e a API trata o SSR como um cliente comum.
+ * Cabeçalhos das chamadas do SSR à API. O IP das tarefas muda a cada início, então ele se identifica por
+ * `INTERNAL_API_SECRET`; sem o segredo nada é enviado e a API o trata como um cliente comum.
  */
 export function serverApiHeaders(): Record<string, string> {
   const headers: Record<string, string> = { Accept: 'application/json' };

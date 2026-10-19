@@ -57,13 +57,11 @@ public static class OutputCacheConfig
         return services;
     }
 
-    /// <summary>Maior validade do cache do catálogo público que ainda é aceitável entre réplicas sem Redis.</summary>
     public const int MaxSafeExpirationMinutesWithoutSharedStore = 5;
 
     /// <summary>
-    /// Mensagem de aviso, ou <c>null</c> quando não há o que avisar. Sem Redis, cada réplica tem o próprio cache de
-    /// saída e a invalidação por tag (feita depois de uma escrita) só alcança a réplica que atendeu a escrita: as
-    /// outras servem o catálogo público antigo até a validade acabar. Só a validade limita esse atraso.
+    /// Sem Redis, a invalidação por tag só alcança a réplica que atendeu a escrita; as outras servem o catálogo
+    /// público antigo até a validade acabar. Devolve o aviso, ou <c>null</c> quando não há o que avisar.
     /// </summary>
     public static string? StalePublicCatalogWarning(
         OutputCacheOptions cache, DatabaseOptions database, bool redisActive, bool isDevelopment)

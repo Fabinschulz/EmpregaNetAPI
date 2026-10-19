@@ -8,10 +8,6 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace EmpregaNet.Tests.Integration.Security;
 
-/// <summary>
-/// Prova, ponta a ponta, que o key ring do Data Protection é compartilhado entre réplicas e sobrevive a
-/// reinícios: um token de Identity emitido por uma réplica tem de ser aceito por outra.
-/// </summary>
 public sealed class DataProtectionMultiReplicaTests
 {
     private const string Password = "Abcd@123";

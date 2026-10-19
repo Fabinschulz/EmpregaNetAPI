@@ -22,12 +22,9 @@ public sealed class NpgsqlDatabaseCapacityReader(string connectionString) : IDat
 }
 
 /// <summary>
-/// Compara o pool configurado com o <c>max_connections</c> real do banco e avisa se as réplicas previstas não cabem.
+/// Avisa se o pool das réplicas previstas não cabe no <c>max_connections</c> real. É aviso, não trava: falha de
+/// leitura não impede a inicialização.
 /// </summary>
-/// <remarks>
-/// É um aviso, não uma trava: o valor correto depende do RDS efetivo, que só o banco sabe. Falha de leitura não
-/// impede a inicialização.
-/// </remarks>
 public sealed class ConnectionCapacityStep(
     IDatabaseCapacityReader reader,
     IOptions<DatabaseOptions> options,
