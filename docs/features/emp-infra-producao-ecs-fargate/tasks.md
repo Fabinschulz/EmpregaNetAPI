@@ -77,6 +77,27 @@ estresse R$ 880, teto planejado R$ 1.000, contenção em R$ 800, meta R$ 650–7
 | 4.7 | Verificação estática do Terraform (ex.: checkov ou tflint) proibindo `0.0.0.0/0` de entrada fora do ALB | Falha na CI se violada |
 | 4.8 | `plan` agendado com papel somente leitura para detectar alteração manual | Alerta quando houver diferença |
 
+### Base estrutural do Terraform (referência: IntegradorAnymarket)
+
+O Terraform desta fase segue a estrutura já validada no projeto IntegradorAnymarket. É **referência de
+convenções**, não código a copiar: nada foi escrito nem aplicado, e os recursos (ALB, RDS, Scheduler) são outros.
+
+| Convenção do Integrador | Aplicação aqui |
+| ----------------------- | -------------- |
+| Workspace = ambiente, com guarda que aborta quando o workspace não é o esperado | `homolog` e `prod` como workspaces; o `plan` falha no workspace `default` |
+| Backend S3 com `use_lockfile` (sem DynamoDB) e bucket de estado criado por um módulo `bootstrap` separado | Mesmo desenho; resolve a tarefa 4.1 |
+| Módulos pequenos com `resource.tf`, `variables.tf` e `outputs.tf` | `network`, `rds`, `alb`, `ecs-service`, `iam`, `scheduler` (tarefas 4.2 a 4.5) |
+| Provider com versão fixada e `allowed_account_ids` | Impede aplicar na conta errada; a conta dedicada do cliente entra na lista |
+| `lifecycle { ignore_changes = [task_definition] }` no serviço ECS | O deploy da CI troca a task definition sem o `plan` brigar com ele |
+| Deployment circuit breaker com rollback | Reversão automática de deploy que não fica saudável (não cobre migração `rename`/`drop`) |
+| Tarefas em subnet pública com IP público, sem NAT Gateway | Já decidido no ADR 0018; o isolamento vem dos security groups |
+| Regras de security group como recursos próprios | Facilita a verificação estática da tarefa 4.7 |
+| Segredos referenciados por `valueFrom` do Secrets Manager/SSM na task definition | Tarefa 4.6; o valor nunca passa pelo Terraform nem pelo repositório |
+| CI com `terraform fmt -check` e `validate` | Sem credencial AWS; o `plan` roda só com o papel somente leitura (tarefa 4.8) |
+
+Pré-requisito vindo da Fase 3 que o Terraform precisa honrar: ver o ADR 0019 (variáveis `Startup__RunMigrations`,
+`ForwardedHeaders__KnownNetworks`, `INTERNAL_API_SECRET`, `DataProtection__CertificatePfxBase64`).
+
 ## Fase 5 — Task definitions, serviços ECS e deploy
 
 | # | Tarefa | Critério de pronto |
@@ -128,6 +149,12 @@ estresse R$ 880, teto planejado R$ 1.000, contenção em R$ 800, meta R$ 650–7
 - Custo máximo projetado aprovado.
 
 ## Deviation notes
+
+- 2.1.0 (2026-10-19): a Fase 3 foi preparada na branch `feat/ecs-fase1-preparacao-multi-replica` (ADR 0019):
+  3.1 feita (Data Protection no PostgreSQL, cifrado por certificado); 3.5 feita (Dockerfile, `/healthz`, verificação na
+  CI); 3.8 feita por outro caminho que o `BypassIps` (segredo `X-Internal-Caller`, ver ADR 0019); 3.3, 3.4, 3.6 e 3.7
+  seguem pendentes de validação num RDS e no ALB reais; 3.2 não foi tocada. O rate limit e o teto de e-mails continuam
+  por réplica (multiplicam por N): risco residual registrado no ADR 0019.
 
 - 2.0.0 (2026-10-19): substitui o plano 1.0.0 (EC2 + RDS, ADR 0017). A pasta passou de `emp-infra-producao-ecs-ready`
   para `emp-infra-producao-ecs-fargate`.
