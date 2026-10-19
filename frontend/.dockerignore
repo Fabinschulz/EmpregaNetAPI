@@ -1,0 +1,17 @@
+# Fora do contexto: dependências e saída de build vêm das etapas do Dockerfile, e .env* nunca entra na imagem
+# (carregaria URLs de desenvolvimento e valores locais para dentro do bundle).
+node_modules
+.next
+.env
+.env.*
+!.env.example
+*.tsbuildinfo
+next-env.d.ts
+coverage
+tests
+docs
+.git
+.gitignore
+.dockerignore
+Dockerfile
+*.log
