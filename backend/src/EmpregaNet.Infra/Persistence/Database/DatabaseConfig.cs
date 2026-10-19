@@ -10,8 +10,7 @@ public static class DatabaseConfig
 {
     public static WebApplicationBuilder SetupDatabaseConnection(this WebApplicationBuilder builder)
     {
-        var connectionString = builder.Configuration.GetConnectionString("PostgreSQLConnection")
-                                            ?? throw new Exception("PostgreSQLConnection não encontrada no arquivo de configuração.");
+        var connectionString = PostgreSqlConnectionString.Resolve(builder.Configuration);
 
         var isDevelopment = builder.Environment.IsDevelopment();
 
