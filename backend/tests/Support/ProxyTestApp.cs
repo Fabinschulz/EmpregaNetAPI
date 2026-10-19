@@ -34,6 +34,9 @@ internal sealed class ProxyTestApp : IAsyncDisposable
         var builder = WebApplication.CreateBuilder(new WebApplicationOptions { EnvironmentName = "Staging" });
         builder.WebHost.UseTestServer();
         builder.Logging.SetMinimumLevel(LogLevel.Warning);
+        // Só a configuração do teste: o appsettings.json local do desenvolvedor (ignorado pelo git, mas copiado para a
+        // saída dos testes) não pode vazar para dentro do teste.
+        builder.Configuration.Sources.Clear();
         builder.Configuration.AddInMemoryCollection(settings);
 
         if (withRateLimiter)
