@@ -49,20 +49,4 @@ public static class DatabaseConfig
 
         return builder;
     }
-
-    /// <summary>
-    /// Aplica migrações pendentes no banco de dados.
-    /// </summary>
-    public static WebApplication ApplyPendingMigrations(this WebApplication webApp)
-    {
-        using var scope = webApp.Services.CreateScope();
-        var context = scope.ServiceProvider.GetRequiredService<PostgreSqlContext>();
-
-        if (context.Database.GetPendingMigrations().Any())
-        {
-            context.Database.Migrate();
-        }
-
-        return webApp;
-    }
 }

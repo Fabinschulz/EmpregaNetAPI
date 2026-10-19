@@ -3,6 +3,7 @@ using System.Security.Cryptography.X509Certificates;
 using EmpregaNet.Domain.Entities;
 using EmpregaNet.Infra.Extensions;
 using EmpregaNet.Infra.Persistence.Database;
+using EmpregaNet.Infra.Persistence.Startup;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -42,10 +43,17 @@ internal sealed class ReplicaHost : IDisposable
         ReplicaDatabase database,
         IDictionary<string, string?>? settings = null,
         string environment = "Development",
-        bool sharedDataProtection = true)
+        bool sharedDataProtection = true,
+        bool withStartup = false)
     {
+        var effectiveSettings = new Dictionary<string, string?>(settings ?? new Dictionary<string, string?>());
+        if (database is ReplicaDatabase.Postgres pg && !effectiveSettings.ContainsKey("ConnectionStrings:PostgreSQLConnection"))
+        {
+            effectiveSettings["ConnectionStrings:PostgreSQLConnection"] = pg.ConnectionString;
+        }
+
         var configuration = new ConfigurationBuilder()
-            .AddInMemoryCollection(settings ?? new Dictionary<string, string?>())
+            .AddInMemoryCollection(effectiveSettings)
             .Build();
 
         var hostEnvironment = new Mock<IHostEnvironment>();
@@ -91,8 +99,16 @@ internal sealed class ReplicaHost : IDisposable
             services.AddDataProtection().UseEphemeralDataProtectionProvider();
         }
 
+        if (withStartup)
+        {
+            services.AddStartupTasks(configuration);
+        }
+
         return new ReplicaHost(services.BuildServiceProvider());
     }
+
+    /// <summary>Coordenador de inicialização desta réplica (requer <c>withStartup: true</c>).</summary>
+    public StartupCoordinator Coordinator => Services.GetRequiredService<StartupCoordinator>();
 
     public void Dispose() => Services.Dispose();
 

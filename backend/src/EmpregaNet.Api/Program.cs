@@ -2,8 +2,7 @@ using EmpregaNet.Api.Middleware;
 using EmpregaNet.AI;
 using EmpregaNet.Infra;
 using EmpregaNet.Infra.Extensions;
-using EmpregaNet.Infra.Persistence.Database;
-using EmpregaNet.Infra.Persistence.Seeds;
+using EmpregaNet.Infra.Persistence.Startup;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,12 +18,16 @@ builder.RegisterCoreDependencies();
 
 var app = builder.Build();
 
-// if (app.Environment.IsDevelopment() || app.Environment.IsStaging())
-// {
-app.ApplyPendingMigrations();
-// }
+// Espera o banco, aplica (ou exige) as migrações, faz o seed e garante o key ring do Data Protection, tudo sob um
+// bloqueio entre réplicas. O host só começa a escutar depois disto, então nenhuma réplica recebe tráfego antes de
+// estar apta. Com --migrate-only roda só isto e encerra (job de migração, separado do boot das réplicas).
+var migrateOnly = args.Contains(StartupExtensions.MigrateOnlyArgument);
+await app.RunStartupTasksAsync(migrateOnly);
 
-await IdentityDataSeeder.SeedAsync(app);
+if (migrateOnly)
+{
+    return;
+}
 
 #region Configure Pipeline
 

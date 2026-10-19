@@ -8,6 +8,7 @@ using EmpregaNet.Infra.Cache;
 using EmpregaNet.Infra.Events;
 using EmpregaNet.Infra.Extensions;
 using EmpregaNet.Infra.Persistence.Database;
+using EmpregaNet.Infra.Persistence.Startup;
 using EmpregaNet.Infra.Persistence.Repositories;
 using EmpregaNet.Infra.Persistence.Repositories.Dashboard;
 using EmpregaNet.Infra.Email;
@@ -139,6 +140,7 @@ public static class DependencyInjection
     {
         builder.UseRedisCache();
         builder.Services.AddEmpregaNetDataProtection(builder.Configuration, builder.Environment);
+        builder.Services.AddStartupTasks(builder.Configuration);
         builder.Services.AddHttpContextAccessor();
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddProblemDetails();
