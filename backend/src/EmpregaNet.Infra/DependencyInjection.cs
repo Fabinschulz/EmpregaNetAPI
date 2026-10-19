@@ -138,6 +138,7 @@ public static class DependencyInjection
     private static void SetupInfrastructureServices(this WebApplicationBuilder builder)
     {
         builder.UseRedisCache();
+        builder.Services.AddEmpregaNetDataProtection(builder.Configuration, builder.Environment);
         builder.Services.AddHttpContextAccessor();
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddProblemDetails();
