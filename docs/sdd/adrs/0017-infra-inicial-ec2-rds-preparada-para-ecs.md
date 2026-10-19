@@ -2,7 +2,8 @@
 
 ## Status
 
-Aceite. Decisões pendentes no fim do documento.
+Superado pelo [ADR 0018](0018-infra-ecs-fargate-com-auto-scaling.md) em 2026-10-19. A EC2 única não cumpre o
+requisito obrigatório de aumento automático de capacidade; o texto abaixo fica como registro da análise.
 
 ## Contexto
 

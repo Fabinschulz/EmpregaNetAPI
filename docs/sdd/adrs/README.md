@@ -22,7 +22,8 @@ Registos curtos de decisões **estruturais e duradouras** (stack, limites entre 
 | [0014](0014-envio-de-email-via-ses.md) | E-mail transacional pela API do Amazon SES com credencial da IAM role, em vez de relay SMTP com utilizador e palavra-passe | Aceite |
 | [0015](0015-vaga-com-posicoes-e-encerramento-por-preenchimento.md) | Vaga com total de posições; encerramento automático ao preencher, com motivo e data gravados ao lado de `IsActive` (estende o [0006](0006-agregado-job-enriquecido.md)) | Aceite |
 | [0016](0016-evals-do-harness.md) | Evals do Harness determinísticos e offline (check estático na CI + auditoria de transcripts); execução ao vivo, juiz LLM e evals da IA do produto adiados com gatilho | Aceite |
-| [0017](0017-infra-inicial-ec2-rds-preparada-para-ecs.md) | Infraestrutura inicial em EC2 + RDS preparada para ECS (Data Protection no banco, mesma origem, agenda 07h–00h); Fargate adiado com gatilho de retorno | Aceite |
+| [0017](0017-infra-inicial-ec2-rds-preparada-para-ecs.md) | Infraestrutura inicial em EC2 + RDS preparada para ECS (Data Protection no banco, mesma origem, agenda 07h–00h); Fargate adiado com gatilho de retorno | Superado pelo [0018](0018-infra-ecs-fargate-com-auto-scaling.md) |
+| [0018](0018-infra-ecs-fargate-com-auto-scaling.md) | Infraestrutura em ECS Fargate com Auto Scaling, ALB e RDS; tarefas zeradas entre 00h e 07h; teto de R$ 1.000/mês por limite de capacidade, não por orçamento | Aceite |
 
 ## Como criar
 
