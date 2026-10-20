@@ -29,6 +29,7 @@ jobs:
     outputs:
       backend: ${{ steps.detect.outputs.backend }}
       frontend: ${{ steps.detect.outputs.frontend }}
+      infra: ${{ steps.detect.outputs.infra }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -66,6 +67,14 @@ jobs:
     with:
       working_directory: frontend
       api_base_url: ${{ vars.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5225' }}
+
+  ci-infra:
+    name: CI - Infra
+    needs: changes
+    if: needs.changes.outputs.infra == 'true'
+    uses: ./.github/workflows/ci-infra.yml
+    permissions:
+      contents: read
 
   # Só o backend vira imagem: mudança apenas no frontend não publica nem faz deploy da API.
   # Imagem e deploy estão desligados porque a infraestrutura AWS foi removida: religar tirando o `false &&`.

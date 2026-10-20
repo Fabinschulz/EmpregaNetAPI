@@ -1,0 +1,6 @@
+# Backend S3 do state. Copie para infra/backend.hcl (no gitignore) e use:
+#   terraform -chdir=infra init -backend-config=backend.hcl
+# O bucket é o que o módulo bootstrap criou: empreganet-terraform-state-<conta>-<região>.
+bucket = "empreganet-terraform-state-123456789012-sa-east-1"
+region = "sa-east-1"
+# profile = "empreganet"

@@ -1,0 +1,41 @@
+# Modelo dos valores que o Terraform precisa e que não ficam no repositório.
+# Copie para infra/terraform.tfvars (no gitignore) e troque cada valor pelo real. Os valores abaixo são de mentira.
+
+# ------------------------- Conta ----------------------------------
+aws_account_id = "123456789012"
+
+# ------------------------- Domínio --------------------------------
+# Um hostname só para frontend e API (mesma origem). O certificado ACM é emitido na mesma região do ALB.
+domain_name     = "homolog.exemplo.gov.br"
+certificate_arn = "arn:aws:acm:sa-east-1:123456789012:certificate/00000000-0000-0000-0000-000000000000"
+
+# Zona do Route 53 desta conta; deixe comentado se o DNS é gerenciado em outro lugar.
+# route53_zone_id = "Z0123456789ABCDEFGHIJ"
+
+# ------------------------- Imagem ---------------------------------
+# SHA completo do commit das primeiras imagens (api e web) publicadas no ECR. Só vale para o primeiro apply.
+image_tag = "0000000000000000000000000000000000000000"
+
+# ------------------------- Alertas --------------------------------
+alarm_email = "alertas@exemplo.com"
+
+# ------------------------- Opcionais ------------------------------
+# Estes já têm valor padrão; descomente só para trocar.
+
+# Production exige o certificado do Data Protection no segredo da aplicação.
+# aspnetcore_environment = "Production"
+
+# Remetente verificado no SES (e-mail ou domínio); sem ele o envio de e-mail fica desligado.
+# ses_identity = "no-reply@exemplo.gov.br"
+
+# service_capacity = {
+#   api = { cpu = 512, memory = 1024, min = 1, max = 2 }
+#   web = { cpu = 512, memory = 1024, min = 1, max = 2 }
+# }
+
+# budget_limit_usd = 198
+# schedule_enabled = true
+# db_deletion_protection = true
+
+# Informe o ARN se o provedor OIDC do GitHub já existir na conta (só existe um por conta).
+# github_oidc_provider_arn = "arn:aws:iam::123456789012:oidc-provider/token.actions.githubusercontent.com"

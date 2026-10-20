@@ -1,0 +1,46 @@
+name: CI - Infra
+
+# Verificações estáticas do Terraform: não precisam de credenciais da AWS nem de estado remoto.
+on:
+  workflow_call:
+    inputs:
+      terraform_version:
+        required: false
+        type: string
+        default: "1.16.5"
+
+permissions: {}
+
+jobs:
+  validate:
+    name: Validar Terraform
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ inputs.terraform_version }}
+          terraform_wrapper: false
+
+      - name: Formato
+        run: terraform fmt -check -recursive infra
+
+      - name: Nenhuma entrada aberta fora do ALB
+        run: bash infra/scripts/check-open-ingress.sh infra
+
+      - name: Validar cada pasta com .tf
+        run: |
+          set -euo pipefail
+          find infra -name '*.tf' -not -path '*/.terraform/*' -exec dirname {} \; | sort -u | while read -r dir; do
+            echo "::group::${dir}"
+            terraform -chdir="$dir" init -backend=false -input=false
+            terraform -chdir="$dir" validate
+            echo "::endgroup::"
+          done
