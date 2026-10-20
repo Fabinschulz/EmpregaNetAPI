@@ -7,33 +7,21 @@ using Microsoft.Extensions.Hosting;
 
 namespace EmpregaNet.Infra.Extensions;
 
-/// <summary>
-/// Configuração da seção <c>DataProtection</c>.
-/// </summary>
-/// <remarks>
-/// O certificado protege as <b>chaves</b> do key ring em repouso; ele não assina nem cifra os tokens. Os
-/// valores vêm de segredo (ECS <c>secrets</c>, Parameter Store ou Secrets Manager), nunca do repositório.
-/// </remarks>
+/// <summary>Seção <c>DataProtection</c>. O certificado cifra as chaves do key ring em repouso; não assina os tokens.</summary>
 public sealed class DataProtectionSettings
 {
     public const string SectionName = "DataProtection";
     public const string DefaultApplicationName = "EmpregaNet";
 
-    /// <summary>
-    /// Isola o key ring desta aplicação. Sem um nome fixo o ASP.NET Core usa o caminho do conteúdo,
-    /// que muda entre imagens e quebraria a validação de tokens emitidos por outra réplica.
-    /// </summary>
+    /// <summary>Sem nome fixo o framework usa o caminho do conteúdo, que muda entre imagens e invalida tokens de outra réplica.</summary>
     public string ApplicationName { get; set; } = DefaultApplicationName;
 
-    /// <summary>PFX (PKCS#12) com chave privada, em Base64. Cifra as chaves antes de gravá-las no banco.</summary>
+    /// <summary>PFX (PKCS#12) com chave privada, em Base64.</summary>
     public string? CertificatePfxBase64 { get; set; }
 
     public string? CertificatePassword { get; set; }
 
-    /// <summary>
-    /// Certificado anterior, usado só para <b>ler</b> chaves gravadas antes de uma rotação do certificado.
-    /// Remova-o depois que o key ring tiver sido regravado com o certificado novo.
-    /// </summary>
+    /// <summary>Só para ler chaves gravadas antes de uma rotação do certificado.</summary>
     public string? PreviousCertificatePfxBase64 { get; set; }
 
     public string? PreviousCertificatePassword { get; set; }
@@ -42,18 +30,9 @@ public sealed class DataProtectionSettings
 public static class DataProtectionExtensions
 {
     /// <summary>
-    /// Persiste o key ring do Data Protection no PostgreSQL, compartilhado por todas as réplicas.
+    /// Guarda o key ring no PostgreSQL, compartilhado entre réplicas: os tokens de e-mail e de senha do Identity
+    /// dependem dele. Em Production o certificado é obrigatório; nos demais ambientes a falta dele só avisa.
     /// </summary>
-    /// <remarks>
-    /// Tokens de confirmação de e-mail e de redefinição de senha do Identity são protegidos por este key
-    /// ring. Com o padrão do framework cada contêiner gera as próprias chaves em disco efêmero: o link
-    /// emitido por uma réplica seria inválido em outra e depois de qualquer reinício.
-    /// <para>Em <b>Production</b> o certificado é obrigatório, para que o banco nunca guarde as chaves em
-    /// texto claro. Nos demais ambientes (inclusive Staging, que o pipeline atual usa) a ausência dele só
-    /// gera um aviso, para não interromper os ambientes existentes.</para>
-    /// <para>Nenhuma chave é gerada ou apagada a cada partida: o framework só cria uma chave nova quando
-    /// não há nenhuma ativa. A primeira chave é criada pelo coordenador de inicialização, sob bloqueio.</para>
-    /// </remarks>
     public static IServiceCollection AddEmpregaNetDataProtection(
         this IServiceCollection services,
         IConfiguration configuration,

@@ -9,7 +9,6 @@ namespace EmpregaNet.Infra.Persistence.Startup;
 
 public static class StartupExtensions
 {
-    /// <summary>Argumento de linha de comando que roda só a inicialização e encerra (job de migração).</summary>
     public const string MigrateOnlyArgument = "--migrate-only";
 
     public static IServiceCollection AddStartupTasks(this IServiceCollection services, IConfiguration configuration)
@@ -37,10 +36,7 @@ public static class StartupExtensions
         return services;
     }
 
-    /// <summary>
-    /// Executa a inicialização antes de a aplicação começar a escutar. Com <paramref name="migrateOnly"/> as
-    /// migrações são aplicadas mesmo que <c>Startup:RunMigrations</c> seja false.
-    /// </summary>
+    /// <summary>Com <paramref name="migrateOnly"/> as migrações são aplicadas mesmo com <c>Startup:RunMigrations</c> = false.</summary>
     public static async Task RunStartupTasksAsync(
         this WebApplication app,
         bool migrateOnly = false,

@@ -5,9 +5,8 @@ using Npgsql;
 namespace EmpregaNet.Infra.Persistence.Database;
 
 /// <summary>
-/// Única fonte da connection string do PostgreSQL: lê <c>ConnectionStrings:PostgreSQLConnection</c> e aplica os
-/// parâmetros de <see cref="DatabaseOptions"/> que a string não definiu. Usada pelo DbContext, pelo teste de
-/// disponibilidade e pelo bloqueio de inicialização, para que todos abram conexões com as mesmas regras.
+/// Única fonte da connection string: aplica os parâmetros de <see cref="DatabaseOptions"/> que a string não definiu,
+/// para DbContext, teste de disponibilidade e bloqueio de inicialização abrirem conexões com as mesmas regras.
 /// </summary>
 public static class PostgreSqlConnectionString
 {
@@ -31,7 +30,6 @@ public static class PostgreSqlConnectionString
         var written = new DbConnectionStringBuilder { ConnectionString = rawConnectionString };
         var builder = new NpgsqlConnectionStringBuilder(rawConnectionString);
 
-        // Valor escrito na connection string prevalece: quem opera pode ajustar sem mexer na configuração do app.
         if (!HasAny(written, "Maximum Pool Size", "Max Pool Size", "MaxPoolSize"))
         {
             builder.MaxPoolSize = options.MaxPoolSize;

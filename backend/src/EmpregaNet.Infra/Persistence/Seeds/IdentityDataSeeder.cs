@@ -25,10 +25,7 @@ public static class IdentityDataSeeder
         "Manager"
     ];
 
-    /// <remarks>
-    /// Não é seguro executar em paralelo: verifica antes de criar. Chame só sob o bloqueio de inicialização
-    /// (<see cref="Startup.StartupCoordinator"/>).
-    /// </remarks>
+    /// <remarks>Não é seguro em paralelo; chame só sob o bloqueio de <see cref="Startup.StartupCoordinator"/>.</remarks>
     public static async Task SeedAsync(IServiceProvider rootServices, CancellationToken cancellationToken = default)
     {
         using var scope = rootServices.CreateScope();

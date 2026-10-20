@@ -14,14 +14,9 @@ using Microsoft.Extensions.Logging;
 namespace EmpregaNet.Tests.Integration.Cache;
 
 /// <summary>
-/// Cada "réplica" é uma aplicação com o cache de saída real da API (<see cref="OutputCacheConfig"/>) e o próprio
-/// store em memória, como duas tarefas Fargate. O contador mostra quantas vezes o handler rodou: número igual na
-/// segunda leitura significa que veio do cache.
+/// Cada "réplica" tem o cache de saída real da API e o próprio store em memória. Caracteriza o limite aceito sem
+/// Redis: o catálogo público só se renova por validade. Requisição autenticada nunca entra nesse cache.
 /// </summary>
-/// <remarks>
-/// Caracteriza o limite aceito da Fase 1: sem Redis, o catálogo público só se renova por validade. Requisições
-/// autenticadas nunca entram no cache de saída da API, então listas e perfil do usuário não sofrem esse atraso.
-/// </remarks>
 public sealed class OutputCacheMultiReplicaTests
 {
     private sealed class Replica : IAsyncDisposable
@@ -55,7 +50,7 @@ public sealed class OutputCacheMultiReplicaTests
                 .WithMetadata(new OutputCacheAttribute { PolicyName = OutputCachePolicies.PublicCatalog, Tags = ["catalog"] });
             app.MapPost("/write", async (IOutputCacheStore store, CancellationToken ct) =>
             {
-                // O que o OutputCacheManager faz depois de uma escrita: invalida por tag, no store LOCAL.
+                // Como o OutputCacheManager depois de uma escrita: invalida por tag, no store local.
                 await store.EvictByTagAsync("catalog", ct);
                 return Results.NoContent();
             });

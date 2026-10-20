@@ -18,9 +18,7 @@ builder.RegisterCoreDependencies();
 
 var app = builder.Build();
 
-// Espera o banco, aplica (ou exige) as migrações, faz o seed e garante o key ring do Data Protection, tudo sob um
-// bloqueio entre réplicas. O host só começa a escutar depois disto, então nenhuma réplica recebe tráfego antes de
-// estar apta. Com --migrate-only roda só isto e encerra (job de migração, separado do boot das réplicas).
+// Migrações, seed e key ring sob bloqueio entre réplicas; com --migrate-only roda só isto e encerra.
 var migrateOnly = args.Contains(StartupExtensions.MigrateOnlyArgument);
 await app.RunStartupTasksAsync(migrateOnly);
 

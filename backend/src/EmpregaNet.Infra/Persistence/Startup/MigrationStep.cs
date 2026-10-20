@@ -6,7 +6,6 @@ using Microsoft.Extensions.Options;
 
 namespace EmpregaNet.Infra.Persistence.Startup;
 
-/// <summary>Uma etapa da inicialização, executada sob o bloqueio entre réplicas.</summary>
 public interface IStartupStep
 {
     string Name { get; }
@@ -21,7 +20,7 @@ public interface IMigrationRunner
     Task MigrateAsync(CancellationToken cancellationToken);
 }
 
-/// <summary>Executa as migrações do EF Core. Provedores não relacionais (testes em memória) não têm migrações.</summary>
+/// <summary>Provedores não relacionais (testes em memória) não têm migrações.</summary>
 public sealed class EfMigrationRunner(IServiceScopeFactory scopeFactory) : IMigrationRunner
 {
     public async Task<IReadOnlyList<string>> GetPendingAsync(CancellationToken cancellationToken)
@@ -46,12 +45,9 @@ public sealed class EfMigrationRunner(IServiceScopeFactory scopeFactory) : IMigr
 }
 
 /// <summary>
-/// Aplica as migrações pendentes, ou recusa a inicialização quando a política é não aplicá-las.
+/// Aplica as migrações pendentes. Com <see cref="StartupOptions.RunMigrations"/> = false, recusa a inicialização:
+/// código novo sobre schema velho é pior que não subir.
 /// </summary>
-/// <remarks>
-/// Com <see cref="StartupOptions.RunMigrations"/> = false, uma réplica que encontra o schema atrasado não atende
-/// tráfego: servir código novo sobre schema velho é pior que não subir. O erro não é mascarado.
-/// </remarks>
 public sealed class MigrationStep(
     IMigrationRunner runner,
     IOptions<StartupOptions> options,

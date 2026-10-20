@@ -76,7 +76,6 @@ public sealed class PostgreSqlConnectionStringTests
     }
 
     [Theory]
-    // (max_connections, réplicas, pool, reservadas) -> cabe?
     [InlineData(100, 2, 20, 10, true)]   // 2×20 + 10 = 50
     [InlineData(100, 2, 100, 10, false)] // o padrão do Npgsql: 2×100 + 10 = 210
     [InlineData(50, 2, 20, 10, true)]    // 2×20 + 10 = 50, no limite

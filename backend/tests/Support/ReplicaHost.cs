@@ -15,7 +15,6 @@ using Moq;
 
 namespace EmpregaNet.Tests.Support;
 
-/// <summary>Banco compartilhado entre as réplicas simuladas de um teste.</summary>
 internal abstract record ReplicaDatabase
 {
     public sealed record InMemory(string Name) : ReplicaDatabase;
@@ -25,10 +24,7 @@ internal abstract record ReplicaDatabase
     public static ReplicaDatabase NewInMemory() => new InMemory($"replicas_{Guid.NewGuid():N}");
 }
 
-/// <summary>
-/// Uma "réplica" da API: um contêiner de serviços próprio (nada em memória é compartilhado com as outras),
-/// apontando para o mesmo banco. Serve para provar comportamento entre instâncias sem subir o host HTTP.
-/// </summary>
+/// <summary>Uma "réplica" da API: contêiner de serviços próprio, apontando para o mesmo banco das outras.</summary>
 internal sealed class ReplicaHost : IDisposable
 {
     public ServiceProvider Services { get; }
@@ -107,14 +103,12 @@ internal sealed class ReplicaHost : IDisposable
         return new ReplicaHost(services.BuildServiceProvider());
     }
 
-    /// <summary>Coordenador de inicialização desta réplica (requer <c>withStartup: true</c>).</summary>
     public StartupCoordinator Coordinator => Services.GetRequiredService<StartupCoordinator>();
 
     public void Dispose() => Services.Dispose();
 
     public IServiceScope Scope() => Services.CreateScope();
 
-    /// <summary>PFX autoassinado, em Base64, para os testes de proteção em repouso.</summary>
     public static string CreateCertificatePfxBase64(string password, string subject = "CN=empreganet-dp-test")
     {
         using var rsa = RSA.Create(2048);

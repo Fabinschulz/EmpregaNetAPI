@@ -5,7 +5,6 @@ using Npgsql;
 
 namespace EmpregaNet.Infra.Persistence.Startup;
 
-/// <summary>Abre uma conexão e executa uma consulta trivial; lança se o banco não responde.</summary>
 public interface IDatabaseProbe
 {
     Task ProbeAsync(CancellationToken cancellationToken);
@@ -22,7 +21,6 @@ public sealed class NpgsqlDatabaseProbe(string connectionString) : IDatabaseProb
     }
 }
 
-/// <summary>O banco não ficou disponível: por erro permanente ou depois de esgotado o tempo de espera.</summary>
 public sealed class DatabaseUnavailableException(string message, Exception inner) : Exception(message, inner);
 
 public interface IDatabaseReadinessWaiter
@@ -31,13 +29,9 @@ public interface IDatabaseReadinessWaiter
 }
 
 /// <summary>
-/// Espera o PostgreSQL ficar disponível, com intervalo crescente e limite de tempo.
+/// Espera o PostgreSQL com intervalo crescente e limite de tempo (o RDS religa pouco antes das tarefas).
+/// Erro permanente (senha errada, banco inexistente) falha na hora; esgotado o tempo, lança sem mascarar o erro.
 /// </summary>
-/// <remarks>
-/// Cobre o caso real da operação programada: o RDS é religado pouco antes das tarefas e pode levar minutos. Falha
-/// de rede e banco "iniciando" são esperadas; <b>erro permanente</b> (senha errada, banco inexistente) falha na hora,
-/// sem consumir o tempo de espera. Esgotado o tempo, lança: o erro não é mascarado e o orquestrador decide.
-/// </remarks>
 public sealed class DatabaseReadinessWaiter : IDatabaseReadinessWaiter
 {
     private readonly IDatabaseProbe _probe;
@@ -111,7 +105,6 @@ public sealed class DatabaseReadinessWaiter : IDatabaseReadinessWaiter
         }
     }
 
-    /// <summary>Falha que pode passar sozinha (rede, banco iniciando, conexões esgotadas); o resto é permanente.</summary>
     public static bool IsTransient(Exception exception) => exception switch
     {
         NpgsqlException npgsql => npgsql.IsTransient,
