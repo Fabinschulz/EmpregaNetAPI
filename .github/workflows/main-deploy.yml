@@ -68,10 +68,11 @@ jobs:
       api_base_url: ${{ vars.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5225' }}
 
   # Só o backend vira imagem: mudança apenas no frontend não publica nem faz deploy da API.
+  # Imagem e deploy estão desligados porque a infraestrutura AWS foi removida: religar tirando o `false &&`.
   image:
     name: CD - Imagem
     needs: [changes, ci-backend]
-    if: github.event_name != 'pull_request' && needs.changes.outputs.backend == 'true'
+    if: false && github.event_name != 'pull_request' && needs.changes.outputs.backend == 'true'
     uses: ./.github/workflows/cd-image.yml
     permissions:
       contents: read
@@ -88,7 +89,7 @@ jobs:
   deploy:
     name: CD - Deploy EC2
     needs: image
-    if: github.event_name != 'pull_request'
+    if: false && github.event_name != 'pull_request'
     uses: ./.github/workflows/cd-ec2.yml
     permissions:
       contents: read
