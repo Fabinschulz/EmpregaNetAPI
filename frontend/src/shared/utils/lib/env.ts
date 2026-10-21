@@ -1,8 +1,11 @@
 import { z } from 'zod';
 
+// Variável vazia vale como ausente: o build do contêiner embute "" quando o ARG não é informado.
+const emptyAsUndefined = (value: unknown) => (value === '' ? undefined : value);
+
 const envSchema = z.object({
   NEXT_PUBLIC_API_BASE_URL: z.string().url().or(z.literal('')).default(''),
-  NEXT_PUBLIC_GOOGLE_CLIENT_ID: z.string().min(1).optional()
+  NEXT_PUBLIC_GOOGLE_CLIENT_ID: z.preprocess(emptyAsUndefined, z.string().min(1).optional())
 });
 
 export type PublicEnv = z.infer<typeof envSchema>;
