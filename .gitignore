@@ -25,3 +25,14 @@ tsconfig.tsbuildinfo
 
 .claude/worktrees/
 docs/qa/
+
+# Terraform: estado local, plugins e valores por máquina (o .terraform.lock.hcl continua versionado)
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+*.tfplan
+backend.hcl
+crash.log
+
+__pycache__/

@@ -150,6 +150,11 @@ Pré-requisito vindo da Fase 3 que o Terraform precisa honrar: ver o ADR 0019 (v
 
 ## Deviation notes
 
+- 2.2.0 (2026-10-20): o Terraform foi escrito em `infra/` na branch `feat/infra-terraform-ecs` (ADR 0020), com a estrutura do
+  IntegradorAnymarket: rede, RDS, ALB, ECR, segredo, IAM, ECS (inclui a tarefa de migração), Auto Scaling, agenda, alarmes e
+  orçamento. Cobre as tarefas 4.1 (bucket de estado), 4.2 a 4.7 e partes de 5 e 6 (task definitions, serviços, target
+  tracking e agendas), **só com `fmt` e `validate`; nenhum `plan` nem `apply`**, porque não há conta, domínio nem certificado.
+  Ficam de fora: 4.8 (`plan` agendado), a Lambda das 06:45, a ação do Budgets e os workflows de CD para ECS.
 - 2.1.0 (2026-10-19): a Fase 3 foi preparada na branch `feat/ecs-fase1-preparacao-multi-replica` (ADR 0019):
   3.1 feita (Data Protection no PostgreSQL, cifrado por certificado); 3.5 feita (Dockerfile, `/healthz`, verificação na
   CI); 3.8 feita por outro caminho que o `BypassIps` (segredo `X-Internal-Caller`, ver ADR 0019); 3.3, 3.4, 3.6 e 3.7

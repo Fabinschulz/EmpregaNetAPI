@@ -25,6 +25,7 @@ Registos curtos de decisões **estruturais e duradouras** (stack, limites entre 
 | [0017](0017-infra-inicial-ec2-rds-preparada-para-ecs.md) | Infraestrutura inicial em EC2 + RDS preparada para ECS (Data Protection no banco, mesma origem, agenda 07h–00h); Fargate adiado com gatilho de retorno | Superado pelo [0018](0018-infra-ecs-fargate-com-auto-scaling.md) |
 | [0018](0018-infra-ecs-fargate-com-auto-scaling.md) | Infraestrutura em ECS Fargate com Auto Scaling, ALB e RDS; tarefas zeradas entre 00h e 07h; teto de R$ 1.000/mês por limite de capacidade, não por orçamento | Aceite |
 | [0019](0019-preparacao-multi-replica-para-ecs.md) | Preparação para várias réplicas: Data Protection no banco cifrado por certificado, proxy confiável por CIDR estrito, inicialização com bloqueio e `--migrate-only`, pool por réplica, Next em contêiner (concretiza a Fase 3 do [0018](0018-infra-ecs-fargate-com-auto-scaling.md)) | Aceite |
+| [0020](0020-layout-do-terraform.md) | Layout do Terraform herdado do IntegradorAnymarket (workspace por ambiente, módulos, estado no S3, migração em tarefa avulsa); escrito e validado, não aplicado | Aceite |
 
 ## Como criar
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Uso: detect-changes.sh <event_name> <base_sha> <head_sha>
-# Imprime backend=true|false e frontend=true|false, uma linha cada, para anexar ao $GITHUB_OUTPUT.
+# Imprime backend=true|false, frontend=true|false e infra=true|false, uma linha cada, para anexar ao $GITHUB_OUTPUT.
 # Workflows reutilizáveis não aceitam filtro de paths, por isso a decisão fica neste script.
 set -euo pipefail
 
@@ -8,14 +8,16 @@ event="${1:-}"
 base="${2:-}"
 head="${3:-}"
 
-backend_pattern='^(backend/|\.github/workflows/(main-deploy|ci-backend|cd-image|cd-ec2)\.yml$|\.github/(actions|scripts)/)'
-frontend_pattern='^(frontend/|\.github/workflows/(main-deploy|ci-frontend)\.yml$)'
+backend_pattern='^(backend/|\.github/workflows/(main-deploy|ci-backend|cd-image|cd-ecs)\.yml$|\.github/(actions|scripts)/)'
+frontend_pattern='^(frontend/|\.github/workflows/(main-deploy|ci-frontend|cd-image)\.yml$)'
+infra_pattern='^(infra/|\.github/workflows/(main-deploy|ci-infra|cd-ecs)\.yml$|\.github/scripts/(ecs_deploy\.py|tests/))'
 
 # Sem uma base conhecida não há como provar que nada mudou; pular o CD em silêncio seria pior que rodá-lo à toa.
 everything_changed() {
   echo "$1 Todas as áreas tratadas como alteradas." >&2
   echo "backend=true"
   echo "frontend=true"
+  echo "infra=true"
   exit 0
 }
 
@@ -34,6 +36,8 @@ changed="$(git diff --name-only "${base}...${head}")"
 
 if grep -Eq "$backend_pattern" <<<"$changed"; then backend=true; else backend=false; fi
 if grep -Eq "$frontend_pattern" <<<"$changed"; then frontend=true; else frontend=false; fi
+if grep -Eq "$infra_pattern" <<<"$changed"; then infra=true; else infra=false; fi
 
 echo "backend=${backend}"
 echo "frontend=${frontend}"
+echo "infra=${infra}"

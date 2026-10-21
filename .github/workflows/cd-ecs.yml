@@ -1,0 +1,64 @@
+name: CD - Deploy ECS
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        description: "Ambiente (workspace do Terraform), por exemplo homolog."
+        required: true
+        type: string
+      api_tag:
+        description: SHA da imagem da API; vazio mantém a revisão atual.
+        required: false
+        type: string
+        default: ""
+      web_tag:
+        description: SHA da imagem do frontend; vazio mantém a revisão atual.
+        required: false
+        type: string
+        default: ""
+      allow_off_window:
+        description: Permite implantar com os serviços zerados (fora da janela 07h-00h).
+        required: false
+        type: boolean
+        default: false
+
+permissions: {}
+
+jobs:
+  deploy:
+    name: Deploy no ECS
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    permissions:
+      contents: read
+      id-token: write
+    # Um deploy por ambiente por vez; um segundo espera em vez de cancelar o primeiro no meio da migração.
+    concurrency:
+      group: deploy-ecs-${{ inputs.environment }}
+      cancel-in-progress: false
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            .github/actions
+            .github/scripts
+
+      - name: Autenticar na AWS
+        uses: ./.github/actions/aws-auth
+        with:
+          aws-region: ${{ vars.AWS_REGION || 'sa-east-1' }}
+          role-arn: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
+
+      - name: Migrar e implantar
+        env:
+          ENVIRONMENT: ${{ inputs.environment }}
+          API_TAG: ${{ inputs.api_tag }}
+          WEB_TAG: ${{ inputs.web_tag }}
+          ALLOW_OFF_WINDOW: ${{ inputs.allow_off_window }}
+        run: |
+          args=(--environment "$ENVIRONMENT" --api-tag "$API_TAG" --web-tag "$WEB_TAG")
+          if [ "$ALLOW_OFF_WINDOW" = "true" ]; then args+=(--allow-off-window); fi
+          python3 .github/scripts/ecs_deploy.py "${args[@]}"
