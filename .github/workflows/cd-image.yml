@@ -1,53 +1,53 @@
-name: CD - Imagem para ECR
+name: CD - Imagens para ECR
 
+# Publica as imagens arm64 da API e do frontend com o SHA completo do commit como tag. Os repositórios têm tag imutável
+# (Terraform), então não existe `latest`: re-executar o mesmo commit reaproveita a imagem que já está no ECR.
+# Sem `environment:` na chave dos jobs: o papel OIDC só confia no token da branch master (ref), e um job com
+# environment gera outro `sub` e seria negado (ADR 0020).
 on:
   workflow_call:
     inputs:
       environment:
-        description: GitHub Environment de onde vêm vars/secrets.
+        description: "Ambiente (workspace do Terraform), por exemplo homolog."
         required: true
         type: string
+      api_changed:
+        description: Publica a imagem da API.
+        required: true
+        type: boolean
+      web_changed:
+        description: Publica a imagem do frontend.
+        required: true
+        type: boolean
       publish_artifact_name:
-        required: true
-        type: string
-      version:
-        required: true
-        type: string
-      ecr_repository:
+        description: Artefato com o publish da API (obrigatório quando api_changed).
         required: false
         type: string
-        default: empreganet-api
+        default: ""
     outputs:
-      image_uri:
-        value: ${{ jobs.push.outputs.image_uri }}
-      image_tag:
-        value: ${{ jobs.push.outputs.image_tag }}
-      ecr_registry:
-        value: ${{ jobs.push.outputs.ecr_registry }}
-    secrets:
-      AWS_ACCESS_KEY_ID:
-        required: false
-      AWS_SECRET_ACCESS_KEY:
-        required: false
+      api_tag:
+        description: Tag da imagem da API, ou vazio se não foi publicada.
+        value: ${{ jobs.api.outputs.tag }}
+      web_tag:
+        description: Tag da imagem do frontend, ou vazio se não foi publicada.
+        value: ${{ jobs.web.outputs.tag }}
 
 permissions: {}
 
 jobs:
-  push:
-    name: Deploy ECR
-    # Runners arm64 são gratuitos em repositórios públicos.
+  api:
+    name: Imagem da API
+    if: inputs.api_changed
+    # Runners arm64 são gratuitos em repositórios públicos e dispensam emulação (o SDK do .NET aborta sob QEMU).
     runs-on: ubuntu-24.04-arm
     timeout-minutes: 20
-    environment: ${{ inputs.environment }}
-
     permissions:
       contents: read
-      id-token: write # necessário para o caminho OIDC do aws-auth
-
+      id-token: write
     outputs:
-      image_uri: ${{ steps.meta.outputs.image_uri }}
-      image_tag: ${{ steps.meta.outputs.image_tag }}
-      ecr_registry: ${{ steps.login-ecr.outputs.registry }}
+      tag: ${{ steps.meta.outputs.tag }}
+    env:
+      REPOSITORY: empreganet-${{ inputs.environment }}-api
 
     steps:
       - name: Checkout
@@ -62,33 +62,32 @@ jobs:
       - name: Autenticar na AWS
         uses: ./.github/actions/aws-auth
         with:
-          aws-region: ${{ vars.AWS_REGION }}
-          role-arn: ${{ vars.AWS_ROLE_ARN }}
-          access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ vars.AWS_REGION || 'sa-east-1' }}
+          role-arn: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
 
       - name: Login no ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
-      - name: Montar tags
+      - name: Verificar se a tag já existe
         id: meta
         env:
-          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          REPOSITORY: ${{ inputs.ecr_repository }}
+          TAG: ${{ github.sha }}
         run: |
-          TAG="sha-${GITHUB_SHA::12}"
-          {
-            echo "image_tag=$TAG"
-            echo "image_uri=$REGISTRY/$REPOSITORY:$TAG"
-            echo "image_uri_latest=$REGISTRY/$REPOSITORY:latest"
-            echo "image_uri_version=$REGISTRY/$REPOSITORY:v${{ inputs.version }}"
-          } >> "$GITHUB_OUTPUT"
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          if aws ecr describe-images --repository-name "$REPOSITORY" --image-ids imageTag="$TAG" > /dev/null 2>&1; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+            echo "A imagem $REPOSITORY:$TAG já existe; nada a publicar."
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Setup Buildx
+        if: steps.meta.outputs.exists == 'false'
         uses: docker/setup-buildx-action@v3
 
       - name: Build e push
+        if: steps.meta.outputs.exists == 'false'
         uses: docker/build-push-action@v6
         with:
           context: image-context
@@ -97,41 +96,100 @@ jobs:
           platforms: linux/arm64
           push: true
           provenance: false
-          tags: |
-            ${{ steps.meta.outputs.image_uri }}
-            ${{ steps.meta.outputs.image_uri_version }}
-            ${{ steps.meta.outputs.image_uri_latest }}
+          tags: ${{ steps.login-ecr.outputs.registry }}/${{ env.REPOSITORY }}:${{ steps.meta.outputs.tag }}
           labels: |
             org.opencontainers.image.revision=${{ github.sha }}
-            org.opencontainers.image.version=${{ inputs.version }}
             org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
-            org.opencontainers.image.created=${{ github.event.repository.updated_at }}
           cache-from: type=gha,scope=empreganet-api
           cache-to: type=gha,scope=empreganet-api,mode=max
 
-
-      - name: Verificar integridade no registro
+      - name: Conferir no registro
         env:
-          REPOSITORY: ${{ inputs.ecr_repository }}
-          TAG: ${{ steps.meta.outputs.image_tag }}
+          TAG: ${{ steps.meta.outputs.tag }}
         run: |
-          DIGEST="$(aws ecr describe-images \
-            --repository-name "$REPOSITORY" \
-            --image-ids imageTag="$TAG" \
-            --query 'imageDetails[0].imageDigest' \
-            --output text)"
-
+          DIGEST="$(aws ecr describe-images --repository-name "$REPOSITORY" --image-ids imageTag="$TAG" \
+            --query 'imageDetails[0].imageDigest' --output text)"
           if [ -z "$DIGEST" ] || [ "$DIGEST" = "None" ]; then
-            echo "::error title=Imagem ausente no ECR::Tag $TAG não encontrada após o push."
+            echo "::error title=Imagem ausente no ECR::Tag $TAG não encontrada em $REPOSITORY."
             exit 1
           fi
+          echo "| Imagem | Tag | Digest |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| --- | --- | --- |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| $REPOSITORY | \`${TAG::12}\` | \`$DIGEST\` |" >> "$GITHUB_STEP_SUMMARY"
 
-          {
-            echo "### Imagem publicada"
-            echo ""
-            echo "| Campo | Valor |"
-            echo "| --- | --- |"
-            echo "| Tag imutável | \`$TAG\` |"
-            echo "| Digest | \`$DIGEST\` |"
-            echo "| Versão | \`${{ inputs.version }}\` |"
-          } >> "$GITHUB_STEP_SUMMARY"
+  web:
+    name: Imagem do frontend
+    if: inputs.web_changed
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 25
+    permissions:
+      contents: read
+      id-token: write
+    outputs:
+      tag: ${{ steps.meta.outputs.tag }}
+    env:
+      REPOSITORY: empreganet-${{ inputs.environment }}-web
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Autenticar na AWS
+        uses: ./.github/actions/aws-auth
+        with:
+          aws-region: ${{ vars.AWS_REGION || 'sa-east-1' }}
+          role-arn: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
+
+      - name: Login no ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Verificar se a tag já existe
+        id: meta
+        env:
+          TAG: ${{ github.sha }}
+        run: |
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          if aws ecr describe-images --repository-name "$REPOSITORY" --image-ids imageTag="$TAG" > /dev/null 2>&1; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+            echo "A imagem $REPOSITORY:$TAG já existe; nada a publicar."
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Setup Buildx
+        if: steps.meta.outputs.exists == 'false'
+        uses: docker/setup-buildx-action@v3
+
+      # NEXT_PUBLIC_* é embutido no bundle: a API vai pelo mesmo domínio (/api, roteado pelo ALB), então fica vazio.
+      - name: Build e push
+        if: steps.meta.outputs.exists == 'false'
+        uses: docker/build-push-action@v6
+        with:
+          context: frontend
+          platforms: linux/arm64
+          push: true
+          provenance: false
+          build-args: |
+            NEXT_PUBLIC_API_BASE_URL=
+            NEXT_PUBLIC_GOOGLE_CLIENT_ID=${{ vars.NEXT_PUBLIC_GOOGLE_CLIENT_ID }}
+          tags: ${{ steps.login-ecr.outputs.registry }}/${{ env.REPOSITORY }}:${{ steps.meta.outputs.tag }}
+          labels: |
+            org.opencontainers.image.revision=${{ github.sha }}
+            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+          cache-from: type=gha,scope=empreganet-web
+          cache-to: type=gha,scope=empreganet-web,mode=max
+
+      - name: Conferir no registro
+        env:
+          TAG: ${{ steps.meta.outputs.tag }}
+        run: |
+          DIGEST="$(aws ecr describe-images --repository-name "$REPOSITORY" --image-ids imageTag="$TAG" \
+            --query 'imageDetails[0].imageDigest' --output text)"
+          if [ -z "$DIGEST" ] || [ "$DIGEST" = "None" ]; then
+            echo "::error title=Imagem ausente no ECR::Tag $TAG não encontrada em $REPOSITORY."
+            exit 1
+          fi
+          echo "| Imagem | Tag | Digest |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| --- | --- | --- |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| $REPOSITORY | \`${TAG::12}\` | \`$DIGEST\` |" >> "$GITHUB_STEP_SUMMARY"

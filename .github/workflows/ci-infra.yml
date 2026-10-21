@@ -32,6 +32,9 @@ jobs:
       - name: Formato
         run: terraform fmt -check -recursive infra
 
+      - name: Testes do script de deploy
+        run: python3 -m unittest discover -s .github/scripts/tests
+
       - name: Nenhuma entrada aberta fora do ALB
         run: bash infra/scripts/check-open-ingress.sh infra
 

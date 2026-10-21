@@ -8,10 +8,14 @@ on:
   workflow_dispatch:
     inputs:
       environment:
-        description: Ambiente alvo.
+        description: Ambiente alvo (workspace do Terraform).
         type: choice
-        options: [Develop, Homolog, Production]
-        default: Develop
+        options: [homolog]
+        default: homolog
+      allow_off_window:
+        description: Implantar mesmo com os serviços zerados (fora da janela 07h-00h).
+        type: boolean
+        default: false
 
 permissions: {}
 
@@ -76,46 +80,37 @@ jobs:
     permissions:
       contents: read
 
-  # Só o backend vira imagem: mudança apenas no frontend não publica nem faz deploy da API.
-  # Imagem e deploy estão desligados porque a infraestrutura AWS foi removida: religar tirando o `false &&`.
+  # Imagens e deploy só rodam fora de pull request e depois que a infraestrutura existe: a variável de repositório
+  # AWS_DEPLOY_ROLE_ARN (saída github_actions_role_arn do Terraform) liga os dois; sem ela o CI segue normal.
+  # Cada serviço só é publicado e implantado quando a sua área mudou e o seu CI passou.
   image:
-    name: CD - Imagem
-    needs: [changes, ci-backend]
-    if: false && github.event_name != 'pull_request' && needs.changes.outputs.backend == 'true'
+    name: CD - Imagens
+    needs: [changes, ci-backend, ci-frontend]
+    if: >-
+      ${{ !cancelled() && github.event_name != 'pull_request' && vars.AWS_DEPLOY_ROLE_ARN != ''
+      && (needs.ci-backend.result == 'success' || needs.ci-backend.result == 'skipped')
+      && (needs.ci-frontend.result == 'success' || needs.ci-frontend.result == 'skipped')
+      && (needs.ci-backend.result == 'success' || needs.ci-frontend.result == 'success') }}
     uses: ./.github/workflows/cd-image.yml
     permissions:
       contents: read
       id-token: write
     with:
-      environment: ${{ inputs.environment || 'Develop' }}
+      environment: ${{ inputs.environment || 'homolog' }}
+      api_changed: ${{ needs.ci-backend.result == 'success' }}
+      web_changed: ${{ needs.ci-frontend.result == 'success' }}
       publish_artifact_name: ${{ needs.ci-backend.outputs.publish_artifact_name }}
-      version: ${{ needs.ci-backend.outputs.version }}
-      ecr_repository: empreganet-api
-    secrets:
-      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
   deploy:
-    name: CD - Deploy EC2
+    name: CD - Deploy ECS
     needs: image
-    if: false && github.event_name != 'pull_request'
-    uses: ./.github/workflows/cd-ec2.yml
+    if: ${{ !cancelled() && needs.image.result == 'success' && (needs.image.outputs.api_tag != '' || needs.image.outputs.web_tag != '') }}
+    uses: ./.github/workflows/cd-ecs.yml
     permissions:
       contents: read
-      id-token: write # OIDC para a AWS
+      id-token: write
     with:
-      environment: ${{ inputs.environment || 'Develop' }}
-      aspnetcore_environment: ${{ inputs.environment == 'Production' && 'Production' || 'Staging' }}
-      image_uri: ${{ needs.image.outputs.image_uri }}
-      image_tag: ${{ needs.image.outputs.image_tag }}
-      ecr_registry: ${{ needs.image.outputs.ecr_registry }}
-    secrets:
-      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      DB_USERNAME: ${{ secrets.DB_USERNAME }}
-      DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-      JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
-      SEED_ADMIN_PASSWORD: ${{ secrets.SEED_ADMIN_PASSWORD }}
-      SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
-      REDIS_HOST: ${{ secrets.REDIS_HOST }}
-      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      environment: ${{ inputs.environment || 'homolog' }}
+      api_tag: ${{ needs.image.outputs.api_tag }}
+      web_tag: ${{ needs.image.outputs.web_tag }}
+      allow_off_window: ${{ inputs.allow_off_window || false }}

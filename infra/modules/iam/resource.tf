@@ -21,8 +21,14 @@ locals {
     "arn:aws:ecs:${local.region}:${local.account_id}:service/${local.name_prefix}/${local.name_prefix}-${name}"
   ]
   migrate_task_definition_arn = "arn:aws:ecs:${local.region}:${local.account_id}:task-definition/${local.name_prefix}-migrate:*"
-  cluster_task_arn            = "arn:aws:ecs:${local.region}:${local.account_id}:task/${local.name_prefix}/*"
-  cluster_arn                 = "arn:aws:ecs:${local.region}:${local.account_id}:cluster/${local.name_prefix}"
+  task_definition_arns = [
+    for name in concat(tolist(local.services), ["migrate"]) :
+    "arn:aws:ecs:${local.region}:${local.account_id}:task-definition/${local.name_prefix}-${name}:*"
+  ]
+  database_arn           = "arn:aws:rds:${local.region}:${local.account_id}:db:${local.name_prefix}"
+  migrate_log_stream_arn = "arn:aws:logs:${local.region}:${local.account_id}:log-group:/ecs/${local.name_prefix}/migrate:log-stream:*"
+  cluster_task_arn       = "arn:aws:ecs:${local.region}:${local.account_id}:task/${local.name_prefix}/*"
+  cluster_arn            = "arn:aws:ecs:${local.region}:${local.account_id}:cluster/${local.name_prefix}"
 
   # Só o ECS assume estas roles, e só em nome desta conta (proteção contra confused deputy).
   ecs_tasks_trust = jsonencode({
@@ -196,11 +202,39 @@ resource "aws_iam_role_policy" "github_actions" {
         Resource = values(var.repository_arns)
       },
       {
+        # O deploy resolve a URI do repositório para montar a imagem da nova revisão.
+        Sid      = "EcrDescribeRepositories"
+        Effect   = "Allow"
+        Action   = ["ecr:DescribeRepositories"]
+        Resource = values(var.repository_arns)
+      },
+      {
         # A AWS não permite restringir estas duas ações por recurso.
         Sid      = "EcsTaskDefinition"
         Effect   = "Allow"
         Action   = ["ecs:RegisterTaskDefinition", "ecs:DescribeTaskDefinition"]
         Resource = "*"
+      },
+      {
+        # A nova revisão herda as tags da anterior (alocação de custo); registrar com tags exige TagResource.
+        Sid      = "EcsTagTaskDefinition"
+        Effect   = "Allow"
+        Action   = ["ecs:TagResource"]
+        Resource = local.task_definition_arns
+      },
+      {
+        # O deploy confere que o RDS está disponível antes de migrar (ele fica parado de 00:15 a 06:25).
+        Sid      = "RdsStatus"
+        Effect   = "Allow"
+        Action   = ["rds:DescribeDBInstances"]
+        Resource = local.database_arn
+      },
+      {
+        # Mostra no job as últimas linhas do log da migração.
+        Sid      = "MigrationLogs"
+        Effect   = "Allow"
+        Action   = ["logs:GetLogEvents"]
+        Resource = local.migrate_log_stream_arn
       },
       {
         Sid      = "EcsServices"

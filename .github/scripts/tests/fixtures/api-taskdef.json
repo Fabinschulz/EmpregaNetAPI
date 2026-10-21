@@ -1,0 +1,230 @@
+{
+  "taskDefinition": {
+    "taskDefinitionArn": "arn:aws:ecs:sa-east-1:994954129201:task-definition/empreganet-homolog-api:2",
+    "containerDefinitions": [
+      {
+        "name": "api",
+        "image": "994954129201.dkr.ecr.sa-east-1.amazonaws.com/empreganet-homolog-api:e2422e773c4fa7044baeaa3a976f3a9ef45c888f",
+        "cpu": 0,
+        "portMappings": [
+          {
+            "containerPort": 8080,
+            "hostPort": 8080,
+            "protocol": "tcp"
+          }
+        ],
+        "essential": true,
+        "environment": [
+          {
+            "name": "ASPNETCORE_ENVIRONMENT",
+            "value": "Staging"
+          },
+          {
+            "name": "RateLimiting__BurstCapacity",
+            "value": "600"
+          },
+          {
+            "name": "RateLimiting__ReplenishmentPeriodInSeconds",
+            "value": "10"
+          },
+          {
+            "name": "JwtSettings__ExpirationHours",
+            "value": "8"
+          },
+          {
+            "name": "ForwardedHeaders__KnownNetworks__0",
+            "value": "10.20.0.0/24"
+          },
+          {
+            "name": "Ses__FromName",
+            "value": "EmpregaNet"
+          },
+          {
+            "name": "ForwardedHeaders__KnownNetworks__1",
+            "value": "10.20.1.0/24"
+          },
+          {
+            "name": "Startup__RunSeed",
+            "value": "false"
+          },
+          {
+            "name": "Database__ExpectedMaxReplicas",
+            "value": "3"
+          },
+          {
+            "name": "AppUrls__EmailConfirmationPath",
+            "value": "/confirm-email"
+          },
+          {
+            "name": "OutputCache__DefaultExpirationMinutes",
+            "value": "2"
+          },
+          {
+            "name": "RateLimiting__SustainedPerPeriod",
+            "value": "300"
+          },
+          {
+            "name": "Ses__FromEmail",
+            "value": ""
+          },
+          {
+            "name": "Startup__RunMigrations",
+            "value": "false"
+          },
+          {
+            "name": "JwtSettings__Issuer",
+            "value": "EmpregaNet.Api"
+          },
+          {
+            "name": "AppUrls__CorsAllowedOrigins__0",
+            "value": "https://feiraoextrema-hml.marilize.com.br"
+          },
+          {
+            "name": "Ses__Enabled",
+            "value": "false"
+          },
+          {
+            "name": "Redis__Enabled",
+            "value": "false"
+          },
+          {
+            "name": "JwtSettings__Audience",
+            "value": "EmpregaNet.App"
+          },
+          {
+            "name": "AppUrls__PublicAppBaseUrl",
+            "value": "https://feiraoextrema-hml.marilize.com.br"
+          },
+          {
+            "name": "EmailThrottle__MaxPerDay",
+            "value": "30"
+          },
+          {
+            "name": "RateLimiting__Enabled",
+            "value": "true"
+          },
+          {
+            "name": "JwtSettings__RefreshTokenExpirationDays",
+            "value": "14"
+          },
+          {
+            "name": "AppUrls__PasswordResetPath",
+            "value": "/reset-password"
+          },
+          {
+            "name": "Ses__Region",
+            "value": "sa-east-1"
+          }
+        ],
+        "mountPoints": [],
+        "volumesFrom": [],
+        "secrets": [
+          {
+            "name": "ConnectionStrings__PostgreSQLConnection",
+            "valueFrom": "arn:aws:secretsmanager:sa-east-1:994954129201:secret:empreganet/homolog/app-EKCGxe:ConnectionStrings__PostgreSQLConnection::"
+          },
+          {
+            "name": "JwtSettings__SecretKey",
+            "valueFrom": "arn:aws:secretsmanager:sa-east-1:994954129201:secret:empreganet/homolog/app-EKCGxe:JwtSettings__SecretKey::"
+          },
+          {
+            "name": "DataProtection__CertificatePfxBase64",
+            "valueFrom": "arn:aws:secretsmanager:sa-east-1:994954129201:secret:empreganet/homolog/app-EKCGxe:DataProtection__CertificatePfxBase64::"
+          },
+          {
+            "name": "DataProtection__CertificatePassword",
+            "valueFrom": "arn:aws:secretsmanager:sa-east-1:994954129201:secret:empreganet/homolog/app-EKCGxe:DataProtection__CertificatePassword::"
+          },
+          {
+            "name": "RateLimiting__InternalCaller__Secret",
+            "valueFrom": "arn:aws:secretsmanager:sa-east-1:994954129201:secret:empreganet/homolog/app-EKCGxe:INTERNAL_API_SECRET::"
+          }
+        ],
+        "stopTimeout": 30,
+        "logConfiguration": {
+          "logDriver": "awslogs",
+          "options": {
+            "awslogs-group": "/ecs/empreganet-homolog/api",
+            "awslogs-region": "sa-east-1",
+            "awslogs-stream-prefix": "api"
+          }
+        },
+        "systemControls": []
+      }
+    ],
+    "family": "empreganet-homolog-api",
+    "taskRoleArn": "arn:aws:iam::994954129201:role/empreganet-homolog-api-task",
+    "executionRoleArn": "arn:aws:iam::994954129201:role/empreganet-homolog-ecs-execution",
+    "networkMode": "awsvpc",
+    "revision": 2,
+    "volumes": [],
+    "status": "ACTIVE",
+    "requiresAttributes": [
+      {
+        "name": "com.amazonaws.ecs.capability.logging-driver.awslogs"
+      },
+      {
+        "name": "ecs.capability.execution-role-awslogs"
+      },
+      {
+        "name": "com.amazonaws.ecs.capability.ecr-auth"
+      },
+      {
+        "name": "com.amazonaws.ecs.capability.docker-remote-api.1.19"
+      },
+      {
+        "name": "ecs.capability.secrets.asm.environment-variables"
+      },
+      {
+        "name": "com.amazonaws.ecs.capability.task-iam-role"
+      },
+      {
+        "name": "ecs.capability.container-ordering"
+      },
+      {
+        "name": "ecs.capability.execution-role-ecr-pull"
+      },
+      {
+        "name": "com.amazonaws.ecs.capability.docker-remote-api.1.18"
+      },
+      {
+        "name": "ecs.capability.task-eni"
+      }
+    ],
+    "placementConstraints": [],
+    "compatibilities": [
+      "EC2",
+      "MANAGED_INSTANCES",
+      "FARGATE"
+    ],
+    "runtimePlatform": {
+      "cpuArchitecture": "ARM64",
+      "operatingSystemFamily": "LINUX"
+    },
+    "requiresCompatibilities": [
+      "FARGATE"
+    ],
+    "cpu": "512",
+    "memory": "1024",
+    "registeredAt": "2026-10-21T15:54:16.144000-03:00",
+    "registeredBy": "arn:aws:iam::994954129201:user/mariliz_iam"
+  },
+  "tags": [
+    {
+      "key": "Project",
+      "value": "empreganet"
+    },
+    {
+      "key": "Environment",
+      "value": "homolog"
+    },
+    {
+      "key": "Repository",
+      "value": "EmpregaNetAPI"
+    },
+    {
+      "key": "ManagedBy",
+      "value": "terraform"
+    }
+  ]
+}

@@ -8,9 +8,9 @@ event="${1:-}"
 base="${2:-}"
 head="${3:-}"
 
-backend_pattern='^(backend/|\.github/workflows/(main-deploy|ci-backend|cd-image|cd-ec2)\.yml$|\.github/(actions|scripts)/)'
-frontend_pattern='^(frontend/|\.github/workflows/(main-deploy|ci-frontend)\.yml$)'
-infra_pattern='^(infra/|\.github/workflows/(main-deploy|ci-infra)\.yml$)'
+backend_pattern='^(backend/|\.github/workflows/(main-deploy|ci-backend|cd-image|cd-ecs)\.yml$|\.github/(actions|scripts)/)'
+frontend_pattern='^(frontend/|\.github/workflows/(main-deploy|ci-frontend|cd-image)\.yml$)'
+infra_pattern='^(infra/|\.github/workflows/(main-deploy|ci-infra|cd-ecs)\.yml$|\.github/scripts/(ecs_deploy\.py|tests/))'
 
 # Sem uma base conhecida não há como provar que nada mudou; pular o CD em silêncio seria pior que rodá-lo à toa.
 everything_changed() {

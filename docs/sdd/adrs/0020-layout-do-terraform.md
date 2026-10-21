@@ -61,8 +61,8 @@ operar infraestrutura nos dois projetos.
 ## Pendências e fora de escopo
 
 - Conta AWS dedicada, região (LGPD), domínio, certificado ACM e identidade do SES (decisões pendentes do ADR 0018).
-- Workflows de CD para ECS (`cd-image` e `cd-ecs`): substituir o `cd-ec2`, rodar a tarefa de migração e atualizar os
-  serviços. O `main-deploy.yml` mantém imagem e deploy desligados.
+- ~~Workflows de CD para ECS~~ feitos: `cd-image` e `cd-ecs` (script `ecs_deploy.py`, com testes) substituem o
+  `cd-ec2`, que foi removido. Ligam quando a variável `AWS_DEPLOY_ROLE_ARN` existe no repositório.
 - Lambda de conferência do RDS (06:45), ação do Budgets que nega aumento de capacidade (90 %) e `plan` agendado com
   papel somente leitura (tarefa 4.8).
 - Sentry, WAF, Redis, NAT e Multi-AZ, com os gatilhos do ADR 0018.

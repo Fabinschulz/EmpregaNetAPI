@@ -34,3 +34,5 @@ docs/qa/
 *.tfplan
 backend.hcl
 crash.log
+
+__pycache__/

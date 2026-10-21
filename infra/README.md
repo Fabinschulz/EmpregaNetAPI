@@ -116,7 +116,7 @@ terraform -chdir=infra plan -detailed-exitcode
 
 Aponte o hostname para a saída `alb_dns_name` (ou informe `route53_zone_id`) e confira `https://<domínio>/healthz` (o frontend). O `/health/live` da API só responde dentro do target group; por fora, `/api/*` é o que chega nela.
 
-**7. Daqui em diante, a CI publica e implanta.** Os serviços ignoram `task_definition` e `desired_count` (`ignore_changes`): a CI é dona da revisão e o Auto Scaling é dono da contagem. O `image_tag` só vale para o primeiro apply. Deploy fora da janela 07h-00h não valida nada (tarefas zeradas).
+**7. Daqui em diante, a CI publica e implanta** (seção "Deploy pela CI"). Os serviços ignoram `task_definition` e `desired_count` (`ignore_changes`): a CI é dona da revisão e o Auto Scaling é dono da contagem. O `image_tag` só vale para o primeiro apply.
 
 - No workspace `default` o plan falha de propósito: *"Selecione o workspace do ambiente antes do plan/apply"*.
 - O ambiente tem no máximo 17 caracteres (limite de 32 do nome dos target groups).
@@ -125,6 +125,22 @@ Aponte o hostname para a saída `alb_dns_name` (ou informe `route53_zone_id`) e 
 - `Trust Server Certificate=true` cifra a conexão sem validar o certificado do RDS; em VPC o risco é baixo, e `VerifyFull` exigiria o bundle da RDS na imagem.
 - O papel OIDC da CI só aceita a `master` (`ref:refs/heads/master`). Um job com `environment:` na chave do job gera outro `sub` (`...:environment:<Nome>`) e seria negado: o workflow de CD para ECS não deve usá-lo, ou a trust policy precisa aceitar esse formato.
 - Para o primeiro `destroy` e o seguinte do mesmo ambiente, o snapshot final tem nome fixo (`empreganet-<env>-final`); apague o anterior antes.
+
+## Deploy pela CI
+
+O `main-deploy.yml` roda a cada push na `master` e no disparo manual. Dois jobs ficam depois dos CIs, só fora de pull request e **só quando a variável de repositório `AWS_DEPLOY_ROLE_ARN` existe** (sem ela o CI segue normal e nada é publicado):
+
+| Job | O que faz |
+| --- | --- |
+| `CD - Imagens` (`cd-image.yml`) | Constrói em runner arm64 e publica `api` (a partir do publish do CI) e `web` no ECR, com o SHA completo do commit como tag. Só o serviço cuja área mudou e cujo CI passou. Tag imutável: re-executar o mesmo commit reaproveita a imagem |
+| `CD - Deploy ECS` (`cd-ecs.yml`) | Roda `.github/scripts/ecs_deploy.py`: registra a revisão nova de cada serviço, **migra o banco antes** (tarefa `--migrate-only`, só quando a API mudou), atualiza os serviços e espera o rollout. Migração com código diferente de 0 aborta sem tocar nos serviços; um rollout que não fica saudável é revertido pelo circuit breaker |
+
+Para ligar: `gh variable set AWS_DEPLOY_ROLE_ARN --body "$(terraform -chdir=infra output -raw github_actions_role_arn)"`. Variáveis opcionais: `AWS_REGION` (padrão `sa-east-1`) e `NEXT_PUBLIC_GOOGLE_CLIENT_ID` (de build do frontend).
+
+- O deploy **recusa** serviços com 0 tarefas e o RDS que não esteja `available` (de 00:15 a 06:25 ele está parado). Rode dentro da janela 07h-00h; o disparo manual tem `allow_off_window` para os casos deliberados.
+- Os jobs não usam `environment:`, pelo motivo do `sub` do OIDC descrito acima.
+- Os testes do script rodam sem AWS: `python -m unittest discover -s .github/scripts/tests` (a CI de infra também os roda).
+- Só existe o ambiente `homolog`. Um `prod` pede o seu próprio papel (outra variável) e outra conta ou outro workspace.
 
 ## Janela de operação e custo
 
@@ -144,4 +160,4 @@ Rode o `validate` do mesmo jeito em cada pasta com `.tf` (cada módulo e `infra/
 
 ## O que não está aqui
 
-Deliberadamente fora, com gatilho de retorno no ADR 0018: a Lambda de conferência do RDS às 06:45; a ação do Budgets que nega aumento de capacidade em 90 %; o `plan` agendado com papel somente leitura (tarefa 4.8); os workflows de CD para ECS (`cd-image` e `cd-ec2` continuam desligados no `main-deploy.yml`); Sentry; login com Google (`GoogleAuth__ClientIds`; o client id do frontend é de build, na CI de imagem); WAF; Redis; NAT; Multi-AZ. Dependem de decisões ou recursos que ainda não existem: conta, domínio, certificado, identidade do SES.
+Deliberadamente fora, com gatilho de retorno no ADR 0018: a Lambda de conferência do RDS às 06:45; a ação do Budgets que nega aumento de capacidade em 90 %; o `plan` agendado com papel somente leitura (tarefa 4.8); Sentry; login com Google (`GoogleAuth__ClientIds`; o client id do frontend é de build, na CI de imagem); WAF; Redis; NAT; Multi-AZ. Dependem de decisões ou recursos que ainda não existem: conta, domínio, certificado, identidade do SES.
