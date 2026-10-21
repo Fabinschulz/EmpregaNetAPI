@@ -127,15 +127,19 @@ resource "aws_iam_openid_connect_provider" "github" {
 locals {
   github_oidc_provider_arn = coalesce(var.github_oidc_provider_arn, one(aws_iam_openid_connect_provider.github[*].arn))
 
-  # Subject imutável do OIDC do GitHub: o token traz os IDs numéricos do dono e do repositório, então um repositório
-  # apagado e recriado com o mesmo nome não assume esta role.
-  github_oidc_subject = format(
-    "repo:%s@%d/%s@%d:ref:refs/heads/master",
-    split("/", var.github_repository)[0],
-    var.github_repository_ids.owner_id,
-    split("/", var.github_repository)[1],
-    var.github_repository_ids.repository_id,
-  )
+  # O GitHub emite o sub em um de dois formatos, conforme a configuração do repositório: o clássico, por nome, e o
+  # imutável, com os IDs numéricos (um repositório apagado e recriado com o mesmo nome não assume a role). Este
+  # repositório emite o clássico; o imutável fica aceito para o dia em que o GitHub passar a emiti-lo.
+  github_oidc_subjects = [
+    "repo:${var.github_repository}:ref:refs/heads/master",
+    format(
+      "repo:%s@%d/%s@%d:ref:refs/heads/master",
+      split("/", var.github_repository)[0],
+      var.github_repository_ids.owner_id,
+      split("/", var.github_repository)[1],
+      var.github_repository_ids.repository_id,
+    ),
+  ]
 }
 
 # Assumida pelo workflow de deploy sem chave de acesso. Só a branch master deste repositório entra.
@@ -152,7 +156,7 @@ resource "aws_iam_role" "github_actions" {
         Condition = {
           StringEquals = {
             "token.actions.githubusercontent.com:aud" = "sts.amazonaws.com"
-            "token.actions.githubusercontent.com:sub" = local.github_oidc_subject
+            "token.actions.githubusercontent.com:sub" = local.github_oidc_subjects
           }
         }
       }
