@@ -86,9 +86,15 @@ aws secretsmanager put-secret-value --secret-id empreganet/homolog/app --secret-
 
 ```bash
 terraform -chdir=infra output ecr_repository_urls
-docker buildx build --platform linux/arm64 --provenance=false --target local -t <url api>:<sha> backend && docker push <url api>:<sha>
+# API: publica no host para arm64 (o SDK do .NET aborta sob emulação QEMU: dotnet restore sai com 134) e só
+# empacota a imagem em arm64; use um clone limpo do commit, não a árvore de trabalho
+dotnet publish backend/src/EmpregaNet.Api/EmpregaNet.Api.csproj -c Release -r linux-musl-arm64 --no-self-contained -p:UseAppHost=false -o backend/publish
+docker buildx build --platform linux/arm64 --provenance=false --target prebuilt -t <url api>:<sha> backend && docker push <url api>:<sha>
+# Web: o build roda emulado sem problema
 docker buildx build --platform linux/arm64 --provenance=false -t <url web>:<sha> frontend && docker push <url web>:<sha>
 ```
+
+No Windows, o `docker login` pode falhar com *The stub received bad data* (o token do ECR é maior que o limite do credential helper). Contorno: use um `DOCKER_CONFIG` temporário com `{"auths": {"<registro>": {"auth": "<base64 de AWS:token>"}}}` e apague-o depois.
 
 **5. Migrar o banco.** Cria só o necessário para rodar a tarefa de migração e a executa:
 

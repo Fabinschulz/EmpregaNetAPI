@@ -68,7 +68,7 @@ resource "aws_appautoscaling_policy" "memory" {
 resource "aws_appautoscaling_scheduled_action" "open" {
   for_each = { for name, target in aws_appautoscaling_target.this : name => target if var.schedule_enabled }
 
-  name               = "${each.value.resource_id}-open"
+  name               = "${var.service_names[each.key]}-open"
   service_namespace  = each.value.service_namespace
   scalable_dimension = each.value.scalable_dimension
   resource_id        = each.value.resource_id
@@ -84,7 +84,7 @@ resource "aws_appautoscaling_scheduled_action" "open" {
 resource "aws_appautoscaling_scheduled_action" "close" {
   for_each = { for name, target in aws_appautoscaling_target.this : name => target if var.schedule_enabled }
 
-  name               = "${each.value.resource_id}-close"
+  name               = "${var.service_names[each.key]}-close"
   service_namespace  = each.value.service_namespace
   scalable_dimension = each.value.scalable_dimension
   resource_id        = each.value.resource_id
