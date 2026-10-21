@@ -2,10 +2,8 @@ locals {
   name_prefix = "empreganet-${var.environment}"
 }
 
-# ------------------------- ECS running tasks -------------------------
-# Um serviço que cai (processo em loop de falha, segredo ausente, imagem que não puxa) fica sem task rodando.
-# Se o serviço some, a métrica some junto: por isso dado ausente conta como violação. De madrugada o zero é esperado;
-# o módulo scheduler desliga as ações destes alarmes às 00:00 e as religa às 07:10.
+# Dado ausente conta como violação: se o serviço some, a métrica some junto. De madrugada o zero é esperado; o módulo
+# scheduler desliga as ações destes alarmes às 00:00 e as religa às 07:10.
 resource "aws_cloudwatch_metric_alarm" "ecs_running_tasks" {
   for_each = var.ecs_service_names
 
@@ -28,7 +26,6 @@ resource "aws_cloudwatch_metric_alarm" "ecs_running_tasks" {
   tags = var.tags
 }
 
-# ------------------------- Load balancer ------------------------------
 resource "aws_cloudwatch_metric_alarm" "alb_target_5xx" {
   alarm_name        = "${local.name_prefix}-alb-target-5xx"
   alarm_description = "As aplicações responderam 5xx dez vezes ou mais em 5 minutos: veja os logs da API e do frontend."
@@ -49,7 +46,6 @@ resource "aws_cloudwatch_metric_alarm" "alb_target_5xx" {
   tags = var.tags
 }
 
-# ------------------------- RDS ----------------------------------------
 # Com o RDS parado de madrugada as métricas somem; dado ausente não conta como violação.
 resource "aws_cloudwatch_metric_alarm" "rds_cpu" {
   alarm_name        = "${local.name_prefix}-rds-cpu"

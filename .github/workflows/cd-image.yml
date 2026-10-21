@@ -1,9 +1,7 @@
 name: CD - Imagens para ECR
 
-# Publica as imagens arm64 da API e do frontend com o SHA completo do commit como tag. Os repositórios têm tag imutável
-# (Terraform), então não existe `latest`: re-executar o mesmo commit reaproveita a imagem que já está no ECR.
-# Sem `environment:` na chave dos jobs: o papel OIDC só confia no token da branch master (ref), e um job com
-# environment gera outro `sub` e seria negado (ADR 0020).
+# Tag imutável no ECR: não há `latest`, e re-executar o mesmo commit reaproveita a imagem que já existe.
+# Sem `environment:` nos jobs: o papel OIDC só confia na master, e environment gera outro `sub` (ADR 0020).
 on:
   workflow_call:
     inputs:

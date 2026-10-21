@@ -2,7 +2,6 @@ data "aws_caller_identity" "current" {}
 data "aws_region" "current" {}
 
 locals {
-  # As chaves são endereços de recurso: renomear uma destrói a role. Para renomear, use um bloco moved.
   services = toset(["api", "web"])
 
   name_prefix = "empreganet-${var.environment}"
@@ -46,8 +45,6 @@ locals {
   })
 }
 
-# ------------------------- Task execution role -----------------------
-# Usada pelo ECS (não pela aplicação) para puxar a imagem, gravar logs e ler o segredo antes de a task iniciar.
 resource "aws_iam_role" "execution" {
   name               = "${local.name_prefix}-ecs-execution"
   assume_role_policy = local.ecs_tasks_trust
@@ -90,7 +87,6 @@ resource "aws_iam_role_policy" "execution" {
   })
 }
 
-# ------------------------- Task roles --------------------------------
 # A role que a aplicação assume. A API só envia e-mail (SES); o frontend não chama nenhum serviço da AWS.
 resource "aws_iam_role" "task" {
   for_each = local.services
@@ -119,7 +115,6 @@ resource "aws_iam_role_policy" "api_ses" {
   })
 }
 
-# ------------------------- GitHub OIDC -------------------------------
 # O provedor é único por conta: se outro projeto já o criou, informe o ARN em github_oidc_provider_arn.
 resource "aws_iam_openid_connect_provider" "github" {
   count = var.github_oidc_provider_arn == null ? 1 : 0
@@ -143,7 +138,6 @@ locals {
   )
 }
 
-# ------------------------- CI role -----------------------------------
 # Assumida pelo workflow de deploy sem chave de acesso. Só a branch master deste repositório entra.
 resource "aws_iam_role" "github_actions" {
   name = "${local.name_prefix}-github-actions"
@@ -202,7 +196,6 @@ resource "aws_iam_role_policy" "github_actions" {
         Resource = values(var.repository_arns)
       },
       {
-        # O deploy resolve a URI do repositório para montar a imagem da nova revisão.
         Sid      = "EcrDescribeRepositories"
         Effect   = "Allow"
         Action   = ["ecr:DescribeRepositories"]
@@ -230,7 +223,6 @@ resource "aws_iam_role_policy" "github_actions" {
         Resource = local.database_arn
       },
       {
-        # Mostra no job as últimas linhas do log da migração.
         Sid      = "MigrationLogs"
         Effect   = "Allow"
         Action   = ["logs:GetLogEvents"]
@@ -243,7 +235,6 @@ resource "aws_iam_role_policy" "github_actions" {
         Resource = local.ecs_service_arns
       },
       {
-        # A tarefa de migração roda antes de cada deploy; o CI só a dispara e acompanha.
         Sid      = "EcsMigrationRun"
         Effect   = "Allow"
         Action   = ["ecs:RunTask"]

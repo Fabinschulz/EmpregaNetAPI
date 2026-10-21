@@ -2,7 +2,6 @@ locals {
   bucket_state = "empreganet-terraform-state-${var.aws_account_id}-${var.aws_region}"
 }
 
-# ------------------------- State Bucket -----------------------------
 resource "aws_s3_bucket" "tf_state" {
   bucket = local.bucket_state
 
@@ -19,7 +18,6 @@ resource "aws_s3_bucket" "tf_state" {
   }
 }
 
-# Mantém versões anteriores do state para recuperar de uma escrita errada.
 resource "aws_s3_bucket_versioning" "tf_state" {
   bucket = aws_s3_bucket.tf_state.id
 

@@ -1,7 +1,5 @@
 name: CD - Deploy ECS
 
-# Registra as revisões das task definitions, roda a migração (quando a API muda) e atualiza os serviços.
-# A lógica está em .github/scripts/ecs_deploy.py, com testes em .github/scripts/tests/.
 on:
   workflow_call:
     inputs:

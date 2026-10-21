@@ -1,5 +1,4 @@
 locals {
-  # As chaves são endereços de recurso: renomear uma destrói o repositório. Para renomear, use um bloco moved.
   services = toset(["api", "web"])
 
   name_prefix = "empreganet-${var.environment}"

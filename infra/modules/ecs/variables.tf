@@ -8,7 +8,6 @@ variable "environment" {
   }
 }
 
-# ------------------------- Network ------------------------------------
 variable "vpc_id" {
   description = "VPC onde ficam os security groups das tasks"
   type        = string
@@ -39,7 +38,6 @@ variable "database_security_group" {
   type        = string
 }
 
-# ------------------------- Images -------------------------------------
 variable "repository_urls" {
   description = "URL dos repositórios ECR por serviço (api, web)"
   type        = map(string)
@@ -50,7 +48,6 @@ variable "image_tag" {
   type        = string
 }
 
-# ------------------------- Roles and secret ---------------------------
 variable "execution_role_arn" {
   description = "Task execution role (puxa a imagem, grava logs e lê o segredo)"
   type        = string
@@ -66,7 +63,6 @@ variable "secret_arn" {
   type        = string
 }
 
-# ------------------------- Application -------------------------------
 variable "capacity" {
   description = "Tamanho de cada tarefa e limites do Auto Scaling, por serviço (api, web)"
   type = map(object({

@@ -80,9 +80,8 @@ jobs:
     permissions:
       contents: read
 
-  # Imagens e deploy só rodam fora de pull request e depois que a infraestrutura existe: a variável de repositório
-  # AWS_DEPLOY_ROLE_ARN (saída github_actions_role_arn do Terraform) liga os dois; sem ela o CI segue normal.
-  # Cada serviço só é publicado e implantado quando a sua área mudou e o seu CI passou.
+  # Só fora de pull request e com a variável AWS_DEPLOY_ROLE_ARN (saída do Terraform); cada serviço, só quando a
+  # sua área mudou e o seu CI passou.
   image:
     name: CD - Imagens
     needs: [changes, ci-backend, ci-frontend]

@@ -1,4 +1,3 @@
-# ------------------------- AWS -----------------------------------------
 variable "aws_region" {
   description = "Região da AWS onde os recursos são criados"
   type        = string
@@ -21,7 +20,6 @@ variable "aws_account_id" {
   }
 }
 
-# ------------------------- Rede -----------------------------------------
 variable "vpc_cidr" {
   description = "CIDR da VPC dedicada (/16); as subnets são derivadas dele em /24"
   type        = string
@@ -33,7 +31,6 @@ variable "vpc_cidr" {
   }
 }
 
-# ------------------------- Domínio e certificado -------------------------
 variable "domain_name" {
   description = "Hostname público único do frontend e da API (mesma origem: o cookie de autenticação é host-only)"
   type        = string
@@ -60,7 +57,6 @@ variable "route53_zone_id" {
   default     = null
 }
 
-# ------------------------- Imagens ---------------------------------------
 variable "image_tag" {
   description = "SHA do commit (40 caracteres hexadecimais) das imagens das task definitions iniciais; só vale para o primeiro apply, porque depois a CI é dona da revisão"
   type        = string
@@ -71,7 +67,6 @@ variable "image_tag" {
   }
 }
 
-# ------------------------- Aplicação -------------------------------------
 variable "aspnetcore_environment" {
   description = "Valor de ASPNETCORE_ENVIRONMENT. Production exige o certificado do Data Protection (ADR 0019); Staging só avisa"
   type        = string
@@ -119,7 +114,6 @@ variable "ses_from_email" {
   default     = null
 }
 
-# ------------------------- Banco ------------------------------------------
 variable "db_master_password" {
   description = "Senha do usuário mestre do RDS (a mesma que vai na connection string do segredo da aplicação). Efêmera e write-only: não entra no state nem no plan; só é preciso informá-la na criação e quando db_master_password_version aumenta. Use TF_VAR_db_master_password"
   type        = string
@@ -152,7 +146,6 @@ variable "db_deletion_protection" {
   default     = true
 }
 
-# ------------------------- Agenda e custo ---------------------------------
 variable "schedule_enabled" {
   description = "Liga a agenda de operação (07h-00h): sem ela as tarefas e o RDS ficam 24 horas"
   type        = bool
@@ -170,7 +163,6 @@ variable "budget_limit_usd" {
   default     = 198
 }
 
-# ------------------------- GitHub ------------------------------------------
 variable "github_repository" {
   description = "Repositório do GitHub (dono/nome) cujo workflow na branch master publica as imagens e faz o deploy"
   type        = string

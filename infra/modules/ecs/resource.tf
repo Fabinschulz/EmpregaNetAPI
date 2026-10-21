@@ -1,7 +1,6 @@
 data "aws_region" "current" {}
 
 locals {
-  # As chaves são endereços de recurso: renomear uma destrói o recurso. Para renomear, use um bloco moved.
   services = toset(["api", "web"])
 
   name_prefix = "empreganet-${var.environment}"
@@ -11,7 +10,6 @@ locals {
   public_url = "https://${var.domain_name}"
 }
 
-# ------------------------- Cluster -----------------------------------
 resource "aws_ecs_cluster" "this" {
   name = local.name_prefix
 
@@ -24,7 +22,6 @@ resource "aws_ecs_cluster" "this" {
   tags = var.tags
 }
 
-# ------------------------- Log groups --------------------------------
 # O módulo iam deriva o ARN destes grupos do nome, então o nome não pode mudar sem mudar lá.
 resource "aws_cloudwatch_log_group" "this" {
   for_each = toset(concat(tolist(local.services), ["migrate"]))
@@ -34,8 +31,7 @@ resource "aws_cloudwatch_log_group" "this" {
   tags              = var.tags
 }
 
-# ------------------------- Task security groups ----------------------
-# Um grupo por serviço; a tarefa de migração usa o da API. As regras são recursos próprios (sem blocos inline).
+# A tarefa de migração usa o grupo da API.
 resource "aws_security_group" "task" {
   for_each = local.services
 
@@ -69,8 +65,7 @@ resource "aws_vpc_security_group_egress_rule" "alb_to_task" {
   to_port                      = local.container_ports[each.key]
 }
 
-# Saída 443 para a internet: ECR, Secrets Manager, CloudWatch Logs, SES, Google, Sentry e, no frontend, a API pelo
-# hostname público. Sem NAT, é o que a tarefa precisa para funcionar.
+# Saída 443 (sem NAT): ECR, Secrets Manager, Logs, SES, Google e, no frontend, a API pelo hostname público.
 resource "aws_vpc_security_group_egress_rule" "https" {
   for_each = local.services
 
@@ -82,7 +77,6 @@ resource "aws_vpc_security_group_egress_rule" "https" {
   to_port           = 443
 }
 
-# Só a API (e a migração) fala com o banco.
 resource "aws_vpc_security_group_egress_rule" "database" {
   security_group_id            = aws_security_group.task["api"].id
   description                  = "PostgreSQL 5432 para o RDS"
@@ -103,7 +97,6 @@ resource "aws_vpc_security_group_ingress_rule" "database_from_api" {
   tags                         = var.tags
 }
 
-# ------------------------- Configuração da aplicação -------------------
 locals {
   # Convenção __ do .NET: JwtSettings__SecretKey vira JwtSettings:SecretKey. Nenhum segredo aqui.
   api_environment = [
@@ -207,7 +200,6 @@ locals {
   }
 }
 
-# ------------------------- Task definitions --------------------------
 resource "aws_ecs_task_definition" "this" {
   for_each = local.containers
 
@@ -257,7 +249,6 @@ resource "aws_ecs_task_definition" "this" {
   tags = var.tags
 }
 
-# ------------------------- Services ------------------------------------
 # O nome do serviço é <cluster>-<serviço>: o módulo iam deriva o ARN dele deste padrão para o papel do CI.
 resource "aws_ecs_service" "this" {
   for_each = local.services
@@ -268,16 +259,14 @@ resource "aws_ecs_service" "this" {
   desired_count   = var.capacity[each.key].min
   launch_type     = "FARGATE"
 
-  # Sem NAT gateway, a task precisa de IP público para puxar a imagem e ler o segredo. A entrada continua fechada
-  # pelos security groups: só o load balancer chega nela.
+  # Sem NAT a task precisa de IP público para puxar a imagem; a entrada segue fechada pelos security groups.
   network_configuration {
     subnets          = var.subnet_ids
     security_groups  = [aws_security_group.task[each.key].id]
     assign_public_ip = true
   }
 
-  # Uma imagem que nunca fica saudável é revertida para a revisão anterior, e a única task saudável nunca é trocada
-  # antes de a nova estar de pé (mínimo 100%, máximo 200%).
+  # Reverte a revisão que não fica saudável e nunca troca a única task antes de a nova estar de pé.
   deployment_circuit_breaker {
     enable   = true
     rollback = true

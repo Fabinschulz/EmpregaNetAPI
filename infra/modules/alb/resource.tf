@@ -2,7 +2,6 @@ locals {
   name_prefix = "empreganet-${var.environment}"
 }
 
-# ------------------------- Security group ----------------------------
 resource "aws_security_group" "this" {
   name        = "${local.name_prefix}-alb"
   description = "Load balancer publico da EmpregaNet"
@@ -31,7 +30,6 @@ resource "aws_vpc_security_group_ingress_rule" "http_redirect" {
 
 # A saída para as tarefas (8080 e 3000) é criada no módulo ecs, que conhece os security groups delas.
 
-# ------------------------- Load balancer -----------------------------
 resource "aws_lb" "this" {
   name               = local.name_prefix
   load_balancer_type = "application"
@@ -39,13 +37,11 @@ resource "aws_lb" "this" {
   subnets            = var.public_subnet_ids
   security_groups    = [aws_security_group.this.id]
 
-  # Cabeçalhos HTTP malformados são descartados no balanceador, antes de chegarem à aplicação.
   drop_invalid_header_fields = true
 
   tags = var.tags
 }
 
-# ------------------------- Target groups -----------------------------
 # Health check na liveness: com /health/ready o ECS substituiria tarefas em laço se o banco estivesse fora.
 resource "aws_lb_target_group" "api" {
   name        = "${local.name_prefix}-api"
@@ -54,7 +50,7 @@ resource "aws_lb_target_group" "api" {
   protocol    = "HTTP"
   port        = 8080
 
-  # Uma task que sai de rotação deixa de receber requisições em 30 s, em vez dos 300 s padrão, e o rollout não demora.
+  # 30 s em vez dos 300 s padrão: o rollout não demora.
   deregistration_delay = 30
 
   health_check {
@@ -91,7 +87,6 @@ resource "aws_lb_target_group" "web" {
   tags = var.tags
 }
 
-# ------------------------- Listeners ---------------------------------
 resource "aws_lb_listener" "https" {
   load_balancer_arn = aws_lb.this.arn
   port              = 443
@@ -144,7 +139,6 @@ resource "aws_lb_listener" "http" {
   tags = var.tags
 }
 
-# ------------------------- DNS ----------------------------------------
 resource "aws_route53_record" "this" {
   count = var.route53_zone_id == null ? 0 : 1
 

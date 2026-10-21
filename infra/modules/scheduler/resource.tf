@@ -30,7 +30,6 @@ locals {
   }
 }
 
-# ------------------------- Dead-letter queue --------------------------
 # Execução que esgota as tentativas (por exemplo, o RDS não responde ao início) fica aqui em vez de se perder.
 resource "aws_sqs_queue" "dlq" {
   count = var.enabled ? 1 : 0
@@ -41,7 +40,6 @@ resource "aws_sqs_queue" "dlq" {
   tags                      = var.tags
 }
 
-# ------------------------- Role do scheduler --------------------------
 resource "aws_iam_role" "scheduler" {
   count = var.enabled ? 1 : 0
 
@@ -95,7 +93,6 @@ resource "aws_iam_role_policy" "scheduler" {
   })
 }
 
-# ------------------------- Agendas ------------------------------------
 resource "aws_scheduler_schedule" "this" {
   for_each = { for name, schedule in local.schedules : name => schedule if var.enabled }
 

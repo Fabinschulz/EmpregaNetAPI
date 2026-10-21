@@ -1,14 +1,12 @@
 #!/usr/bin/env python3
 """Deploy da EmpregaNet no ECS Fargate.
 
-Para cada serviço com imagem nova: registra uma revisão da task definition vigente com a imagem trocada. Quando a API
-muda, antes disso roda a tarefa de migração (`--migrate-only`) com a mesma imagem e aborta se ela falhar: as réplicas
-sobem com Startup__RunMigrations=false e se recusam a iniciar com schema atrasado (ADR 0019). Só então atualiza os
-serviços e espera o rollout; o circuit breaker do ECS reverte uma revisão que não fica saudável.
+Registra uma revisão da task definition vigente com a imagem nova de cada serviço. Quando a API muda, roda antes a
+tarefa de migração (`--migrate-only`) e aborta se ela falhar: as réplicas sobem com Startup__RunMigrations=false
+e se recusam a iniciar com schema atrasado (ADR 0019). Só então atualiza os serviços e espera o rollout.
 
-Não usa a ação `amazon-ecs-deploy-task-definition`: a migração precisa acontecer entre o registro e a atualização.
-Depende só da biblioteca padrão e da AWS CLI. Os nomes seguem o Terraform (infra/): cluster e serviços
-`empreganet-<ambiente>[-api|-web]`, repositórios `empreganet-<ambiente>-<serviço>`, task definition `-migrate`.
+Não usa a ação oficial de deploy porque a migração precisa acontecer entre o registro e a atualização. Os nomes
+seguem o Terraform: `empreganet-<ambiente>[-api|-web]` e a task definition `-migrate`.
 """
 
 from __future__ import annotations
@@ -41,14 +39,13 @@ SERVICES = ("api", "web")
 
 
 class DeployError(Exception):
-    """Falha que deve derrubar o job, com uma mensagem acionável."""
+    pass
 
 
 AwsRunner = Callable[..., Any]
 
 
 def run_aws(*args: str) -> Any:
-    """Executa a AWS CLI e devolve o JSON da saída (ou None quando não há saída)."""
     result = subprocess.run(["aws", *args, "--output", "json"], capture_output=True, text=True, check=False)
     if result.returncode != 0:
         raise DeployError(f"aws {' '.join(args[:2])} falhou: {result.stderr.strip() or result.stdout.strip()}")
@@ -102,7 +99,6 @@ class Deployer:
         self.poll = poll
         self.summary: list[str] = []
 
-    # ------------------------- Validação ------------------------------
     def validate_inputs(self) -> None:
         if not self.image_tags:
             raise DeployError("Nenhuma imagem para implantar: informe a tag da API, a do frontend ou as duas.")
@@ -144,7 +140,6 @@ class Deployer:
         if status != "available":
             raise DeployError(f"O RDS {self.prefix} está '{status}': a migração não consegue conectar. Aguarde 'available'.")
 
-    # ------------------------- Task definitions -----------------------
     def register(self, source: str, container: str, image: str) -> str:
         """Registra uma revisão de `source` (família ou ARN) com a imagem trocada; devolve o ARN novo."""
         described = self.aws("ecs", "describe-task-definition", "--task-definition", source, "--include", "TAGS")
@@ -157,7 +152,6 @@ class Deployer:
         self.log(f"Registrada {arn}")
         return arn
 
-    # ------------------------- Migração -------------------------------
     def run_migration(self, task_definition_arn: str, network_configuration: dict) -> None:
         response = self.aws(
             "ecs", "run-task",
@@ -208,7 +202,6 @@ class Deployer:
         for event in events.get("events", []):
             self.log(event["message"].rstrip())
 
-    # ------------------------- Rollout --------------------------------
     def update_service(self, service: str, task_definition_arn: str) -> None:
         self.aws(
             "ecs", "update-service",
@@ -244,7 +237,6 @@ class Deployer:
                 raise DeployError(f"Rollout sem conclusão em {self.timeout} s: {', '.join(sorted(pending))}.")
             self.sleep(self.poll)
 
-    # ------------------------- Orquestração ---------------------------
     def deploy(self) -> None:
         self.validate_inputs()
         services = self.describe_services()
@@ -302,7 +294,6 @@ def main(argv: list[str] | None = None) -> int:
 
     write_summary(args.environment, deployer.summary)
     return 0
-
 
 if __name__ == "__main__":
     sys.exit(main())

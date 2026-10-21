@@ -2,7 +2,6 @@ locals {
   name_prefix = "empreganet-${var.environment}"
 }
 
-# ------------------------- Security group ----------------------------
 # A entrada 5432 vem do security group das tarefas e é criada no módulo ecs, que o conhece. Sem saída: o banco não inicia conexões.
 resource "aws_security_group" "this" {
   name        = "${local.name_prefix}-db"
@@ -11,14 +10,12 @@ resource "aws_security_group" "this" {
   tags        = var.tags
 }
 
-# ------------------------- Subnets e parâmetros ----------------------
 resource "aws_db_subnet_group" "this" {
   name       = local.name_prefix
   subnet_ids = var.private_subnet_ids
   tags       = var.tags
 }
 
-# rds.force_ssl recusa conexão sem TLS.
 resource "aws_db_parameter_group" "this" {
   name_prefix = "${local.name_prefix}-"
   family      = "postgres${var.engine_major_version}"
@@ -35,7 +32,6 @@ resource "aws_db_parameter_group" "this" {
   }
 }
 
-# ------------------------- Instância ---------------------------------
 resource "aws_db_instance" "this" {
   identifier = local.name_prefix
 

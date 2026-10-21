@@ -4,7 +4,6 @@ locals {
   # Duas zonas: o ALB exige duas e o grupo de subnets do RDS também.
   azs = slice(data.aws_availability_zones.available.names, 0, 2)
 
-  # /24 por subnet dentro do /16: públicas em 0 e 1, privadas em 10 e 11.
   public_cidrs  = [for i, _ in local.azs : cidrsubnet(var.vpc_cidr, 8, i)]
   private_cidrs = [for i, _ in local.azs : cidrsubnet(var.vpc_cidr, 8, 10 + i)]
 }
@@ -15,7 +14,6 @@ data "aws_availability_zones" "available" {
 
 data "aws_region" "current" {}
 
-# ------------------------- VPC ---------------------------------------
 resource "aws_vpc" "this" {
   cidr_block           = var.vpc_cidr
   enable_dns_support   = true
@@ -29,7 +27,6 @@ resource "aws_internet_gateway" "this" {
   tags   = merge(var.tags, { Name = local.name_prefix })
 }
 
-# ------------------------- Subnets públicas --------------------------
 # ALB e tarefas. Sem NAT Gateway: as tarefas recebem IP público e a entrada é fechada pelos security groups.
 resource "aws_subnet" "public" {
   count = length(local.azs)
@@ -60,7 +57,6 @@ resource "aws_route_table_association" "public" {
   route_table_id = aws_route_table.public.id
 }
 
-# ------------------------- Subnets privadas --------------------------
 # Só o RDS. A tabela de rotas não tem rota para o internet gateway (nem NAT): o banco é inalcançável de fora.
 resource "aws_subnet" "private" {
   count = length(local.azs)
@@ -84,7 +80,6 @@ resource "aws_route_table_association" "private" {
   route_table_id = aws_route_table.private.id
 }
 
-# ------------------------- Endpoint do S3 ----------------------------
 # Gateway endpoint, sem custo: o tráfego das tarefas para o S3 (camadas das imagens do ECR) não sai pela internet.
 resource "aws_vpc_endpoint" "s3" {
   vpc_id            = aws_vpc.this.id

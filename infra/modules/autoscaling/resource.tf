@@ -2,7 +2,6 @@ locals {
   timezone = "America/Sao_Paulo"
 }
 
-# ------------------------- Scalable targets ---------------------------
 # Os limites mudam duas vezes por dia pelas ações agendadas abaixo; depois do primeiro apply o Terraform não os
 # reescreve (ignore_changes), senão cada apply religaria ou desligaria os serviços fora de hora.
 resource "aws_appautoscaling_target" "this" {
@@ -19,7 +18,6 @@ resource "aws_appautoscaling_target" "this" {
   }
 }
 
-# ------------------------- Target tracking ----------------------------
 resource "aws_appautoscaling_policy" "cpu" {
   for_each = aws_appautoscaling_target.this
 
@@ -62,9 +60,7 @@ resource "aws_appautoscaling_policy" "memory" {
   }
 }
 
-# ------------------------- Agenda -------------------------------------
-# Janela de operação 07h-00h (America/Sao_Paulo). O serviço volta antes das 07h para a tarefa já estar de pé; o RDS
-# é ligado às 06:25 pelo módulo scheduler.
+# Janela 07h-00h (America/Sao_Paulo): as tarefas voltam antes das 07h e o RDS liga às 06:25 (módulo scheduler).
 resource "aws_appautoscaling_scheduled_action" "open" {
   for_each = { for name, target in aws_appautoscaling_target.this : name => target if var.schedule_enabled }
 

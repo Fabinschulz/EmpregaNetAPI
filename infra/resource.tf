@@ -1,5 +1,3 @@
-# ------------------------- Environment guard -------------------------
-# O ambiente é o workspace selecionado; no workspace default os recursos não teriam ambiente definido.
 resource "terraform_data" "environment_guard" {
   input = terraform.workspace
 
@@ -12,7 +10,6 @@ resource "terraform_data" "environment_guard" {
 }
 
 locals {
-  # Remetente: o informado ou, se a identidade do SES é um e-mail, ela mesma.
   ses_from_email = var.ses_from_email != null ? var.ses_from_email : (try(strcontains(var.ses_identity, "@"), false) ? var.ses_identity : "")
 
   tags = {
@@ -35,7 +32,6 @@ resource "terraform_data" "production_guard" {
   }
 }
 
-# ------------------------- Network -----------------------------------
 module "network" {
   source = "./modules/network"
 
@@ -44,7 +40,6 @@ module "network" {
   tags        = local.tags
 }
 
-# ------------------------- SNS ---------------------------------------
 module "sns" {
   source = "./modules/sns"
 
@@ -53,7 +48,6 @@ module "sns" {
   tags        = local.tags
 }
 
-# ------------------------- ECR ---------------------------------------
 module "ecr" {
   source = "./modules/ecr"
 
@@ -61,7 +55,6 @@ module "ecr" {
   tags        = local.tags
 }
 
-# ------------------------- Secrets Manager ---------------------------
 module "secrets" {
   source = "./modules/secrets"
 
@@ -69,7 +62,6 @@ module "secrets" {
   tags        = local.tags
 }
 
-# ------------------------- RDS ---------------------------------------
 module "rds" {
   source = "./modules/rds"
 
@@ -86,7 +78,6 @@ module "rds" {
   tags = local.tags
 }
 
-# ------------------------- IAM ---------------------------------------
 # Vem antes do ecs: deriva os ARNs de log groups, serviços e task definitions pelo nome.
 module "iam" {
   source = "./modules/iam"
@@ -101,7 +92,6 @@ module "iam" {
   tags                     = local.tags
 }
 
-# ------------------------- ALB ---------------------------------------
 module "alb" {
   source = "./modules/alb"
 
@@ -114,7 +104,6 @@ module "alb" {
   tags              = local.tags
 }
 
-# ------------------------- ECS ---------------------------------------
 module "ecs" {
   source = "./modules/ecs"
 
@@ -138,7 +127,6 @@ module "ecs" {
   tags                    = local.tags
 }
 
-# ------------------------- Auto Scaling ------------------------------
 module "autoscaling" {
   source = "./modules/autoscaling"
 
@@ -149,7 +137,6 @@ module "autoscaling" {
   schedule_enabled = var.schedule_enabled
 }
 
-# ------------------------- CloudWatch --------------------------------
 module "cloudwatch" {
   source = "./modules/cloudwatch"
 
@@ -162,7 +149,6 @@ module "cloudwatch" {
   tags               = local.tags
 }
 
-# ------------------------- Scheduler ---------------------------------
 module "scheduler" {
   source = "./modules/scheduler"
 
@@ -175,7 +161,6 @@ module "scheduler" {
   tags                     = local.tags
 }
 
-# ------------------------- Budgets -----------------------------------
 module "budgets" {
   source = "./modules/budgets"
 
