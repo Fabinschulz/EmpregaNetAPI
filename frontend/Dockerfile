@@ -1,8 +1,5 @@
 # syntax=docker/dockerfile:1
 
-# Imagem do frontend para ECS Fargate. Não substitui o deploy atual (Vercel): é só o artefato que a Fase de
-# infraestrutura vai publicar no ECR.
-#
 # Variáveis de BUILD (embutidas no bundle do navegador, públicas por definição):
 #   NEXT_PUBLIC_API_BASE_URL         vazio = o navegador chama /api no mesmo domínio (o ALB roteia /api/* para a API)
 #   NEXT_PUBLIC_GOOGLE_CLIENT_ID     opcional
@@ -34,6 +31,7 @@ ENV NEXT_PUBLIC_API_BASE_URL=${NEXT_PUBLIC_API_BASE_URL} \
     NEXT_TELEMETRY_DISABLED=1
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
+
 # O standalone copia public/ se existir; garante a pasta para o COPY da imagem final não falhar.
 RUN mkdir -p public && pnpm build
 
